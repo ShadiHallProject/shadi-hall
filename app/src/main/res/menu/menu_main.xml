@@ -1,0 +1,21 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="org.by9steps.appkawakeel.MainActivity">
+    <item
+        android:id="@+id/action_tree"
+        android:orderInCategory="100"
+        android:title="@string/action_tree"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_list"
+        android:orderInCategory="100"
+        android:title="@string/action_list"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_map"
+        android:orderInCategory="100"
+        android:title="@string/map"
+        app:showAsAction="never" />
+
+</menu>
