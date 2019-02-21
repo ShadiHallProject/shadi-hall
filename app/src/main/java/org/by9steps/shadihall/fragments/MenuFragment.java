@@ -24,7 +24,14 @@ public class MenuFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_menu, container, false);
+        View view = inflater.inflate(R.layout.fragment_menu, container, false);
+
+        getChildFragmentManager().beginTransaction()
+                .add(R.id.mContainer, new LoginFragment())
+                .addToBackStack(null)
+                .commit();
+
+        return view;
     }
 
 }

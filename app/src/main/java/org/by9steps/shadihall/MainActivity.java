@@ -7,6 +7,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -14,8 +15,10 @@ import android.view.MenuItem;
 import android.view.ViewGroup;
 
 import org.by9steps.shadihall.fragments.HomeFragment;
+import org.by9steps.shadihall.fragments.ListFragment;
 import org.by9steps.shadihall.fragments.LoginFragment;
 import org.by9steps.shadihall.fragments.MenuFragment;
+import org.by9steps.shadihall.fragments.TreeFragment;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -52,7 +55,9 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onPageSelected(int i) {
 
+                if ( i != 0){
 
+                }
 
             }
 
@@ -66,7 +71,8 @@ public class MainActivity extends AppCompatActivity {
     private void setupViewPager(ViewPager viewPager) {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
         adapter.addFragment(new HomeFragment(), "Home");
-        adapter.addFragment(new LoginFragment(), "Menu");
+        adapter.addFragment(new MenuFragment(), "Menu");
+        adapter.addFragment(new ListFragment(), "Tab 3");
         viewPager.setAdapter(adapter);
     }
 
@@ -143,18 +149,31 @@ public class MainActivity extends AppCompatActivity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
+        Fragment fragment = ((ViewPagerAdapter)viewPager.getAdapter()).getFragment(0);
+
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_list){
-
-            Fragment fragment = ((ViewPagerAdapter)viewPager.getAdapter()).getFragment(0);
             if (fragment != null){
-                fragment.onResume();
+//                fragment.onResume();
+                (fragment).getChildFragmentManager().beginTransaction()
+                        .replace(R.id.container, new ListFragment())
+                        .commit();
             }
 
         }else if(id == R.id.action_tree){
 
-        }else if (id == R.id.action_map){
+            if (fragment != null){
+                (fragment).getChildFragmentManager().beginTransaction()
+                        .replace(R.id.container, new TreeFragment())
+                        .commit();
+            }
 
+        }else if (id == R.id.action_map){
+            if (fragment != null){
+                (fragment).getChildFragmentManager().beginTransaction()
+                        .replace(R.id.container, new ListFragment())
+                        .commit();
+            }
         }
 
         return super.onOptionsItemSelected(item);

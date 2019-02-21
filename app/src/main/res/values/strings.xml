@@ -6,4 +6,8 @@
     <string name="action_tree">Tree View</string>
     <string name="action_list">List View</string>
     <string name="map">Map</string>
+    <string name="login">Login</string>
+    <string name="enter_owner_number">Owner Mobile Number</string>
+    <string name="enter_user_number">User Mobile Number</string>
+    <string name="enter_password">Password</string>
 </resources>
