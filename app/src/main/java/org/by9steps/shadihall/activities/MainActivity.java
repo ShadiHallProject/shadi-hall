@@ -1,4 +1,4 @@
-package org.by9steps.shadihall;
+package org.by9steps.shadihall.activities;
 
 import android.content.Intent;
 import android.support.annotation.NonNull;
@@ -14,6 +14,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewGroup;
 
+import org.by9steps.shadihall.R;
 import org.by9steps.shadihall.fragments.HomeFragment;
 import org.by9steps.shadihall.fragments.ListFragment;
 import org.by9steps.shadihall.fragments.LoginFragment;

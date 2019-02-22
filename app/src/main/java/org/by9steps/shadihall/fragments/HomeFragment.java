@@ -12,7 +12,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import org.by9steps.shadihall.MainActivity;
 import org.by9steps.shadihall.R;
 
 /**
