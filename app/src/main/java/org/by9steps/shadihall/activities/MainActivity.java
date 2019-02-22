@@ -1,4 +1,4 @@
-package org.by9steps.shadihall.activities;
+package org.by9steps.shadihall;
 
 import android.content.Intent;
 import android.support.annotation.NonNull;
@@ -13,9 +13,7 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
-import org.by9steps.shadihall.R;
 import org.by9steps.shadihall.fragments.HomeFragment;
 import org.by9steps.shadihall.fragments.ListFragment;
 import org.by9steps.shadihall.fragments.LoginFragment;
@@ -31,7 +29,6 @@ public class MainActivity extends AppCompatActivity {
 
     private TabLayout tabLayout;
     private ViewPager viewPager;
-    int status = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -136,66 +133,5 @@ public class MainActivity extends AppCompatActivity {
         public CharSequence getPageTitle(int position) {
             return mFragmentTitleList.get(position);
         }
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        Fragment fragment = ((ViewPagerAdapter)viewPager.getAdapter()).getFragment(0);
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_list){
-            if (fragment != null){
-//                fragment.onResume();
-                (fragment).getChildFragmentManager().beginTransaction()
-                        .replace(R.id.container, new ListFragment())
-                        .commit();
-            }
-
-        }else if(id == R.id.action_tree){
-
-            if (fragment != null){
-                (fragment).getChildFragmentManager().beginTransaction()
-                        .replace(R.id.container, new TreeFragment())
-                        .commit();
-            }
-
-        }else if (id == R.id.action_map){
-            if (fragment != null){
-                (fragment).getChildFragmentManager().beginTransaction()
-                        .replace(R.id.container, new ListFragment())
-                        .commit();
-            }
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
-        MenuItem action_map = menu.findItem(R.id.action_map);
-        MenuItem action_list = menu.findItem(R.id.action_list);
-        MenuItem action_tree = menu.findItem(R.id.action_tree);
-        if (status == 0){
-            action_list.setVisible(false);
-            action_map.setVisible(false);
-            action_tree.setVisible(false);
-        }else {
-            action_list.setVisible(true);
-            action_map.setVisible(true);
-            action_tree.setVisible(true);
-        }
-        return super.onPrepareOptionsMenu(menu);
     }
 }
