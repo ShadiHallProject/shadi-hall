@@ -1,4 +1,4 @@
-package org.by9steps.shadihall;
+package org.by9steps.shadihall.activities;
 
 import android.content.Intent;
 import android.support.annotation.NonNull;
@@ -13,7 +13,9 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
+import org.by9steps.shadihall.R;
 import org.by9steps.shadihall.fragments.HomeFragment;
 import org.by9steps.shadihall.fragments.ListFragment;
 import org.by9steps.shadihall.fragments.LoginFragment;
@@ -29,6 +31,7 @@ public class MainActivity extends AppCompatActivity {
 
     private TabLayout tabLayout;
     private ViewPager viewPager;
+    int status = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -177,5 +180,22 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        MenuItem action_map = menu.findItem(R.id.action_map);
+        MenuItem action_list = menu.findItem(R.id.action_list);
+        MenuItem action_tree = menu.findItem(R.id.action_tree);
+        if (status == 0){
+            action_list.setVisible(false);
+            action_map.setVisible(false);
+            action_tree.setVisible(false);
+        }else {
+            action_list.setVisible(true);
+            action_map.setVisible(true);
+            action_tree.setVisible(true);
+        }
+        return super.onPrepareOptionsMenu(menu);
     }
 }

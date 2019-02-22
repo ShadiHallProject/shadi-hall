@@ -41,6 +41,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
         switch (view.getId()) {
             case R.id.login_btn:
                 FragmentManager manager = getFragmentManager();
+                assert manager != null;
                 FragmentTransaction transaction = manager.beginTransaction();
                 transaction.replace(R.id.mContainer, new MenuItemsFragment());
                 transaction.commit();
