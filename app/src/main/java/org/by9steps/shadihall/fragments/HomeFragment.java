@@ -10,7 +10,11 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.by9steps.shadihall.R;
 
@@ -41,14 +45,44 @@ public class HomeFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        Log.e("CLICK","Click");
+        Log.e("CLICK", "Click");
     }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         // Inflate the menu; this adds items to the action bar if it is present.
         inflater.inflate(R.menu.menu_main, menu);
-        super.onCreateOptionsMenu(menu,inflater);
+
+        MenuItem item = menu.findItem(R.id.action_spinner);
+        Spinner spinner = (Spinner) item.getActionView();
+
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getActivity(),
+                R.array.spinner_list_item_array, R.layout.spinner_item);
+        adapter.setDropDownViewResource(R.layout.spinner_dropdown_item);
+
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
+                Toast.makeText(getContext(), String.valueOf(position), Toast.LENGTH_SHORT).show();
+                if (position == 0) {
+                    getChildFragmentManager().beginTransaction()
+                            .replace(R.id.container, new TreeFragment())
+                            .commit();
+                } else if (position == 1) {
+                    getChildFragmentManager().beginTransaction()
+                            .replace(R.id.container, new ListFragment())
+                            .commit();
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+
+        spinner.setAdapter(adapter);
+        super.onCreateOptionsMenu(menu, inflater);
     }
 
     @Override
@@ -61,22 +95,10 @@ public class HomeFragment extends Fragment {
 //        Fragment fragment = ((MainActivity.ViewPagerAdapter)viewPager.getAdapter()).getFragment(0);
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_list){
-
-                getChildFragmentManager().beginTransaction()
-                        .replace(R.id.container, new ListFragment())
-                        .commit();
-
-        }else if(id == R.id.action_tree){
-
-                getChildFragmentManager().beginTransaction()
-                        .replace(R.id.container, new TreeFragment())
-                        .commit();
-
-        }else if (id == R.id.action_map){
-                getChildFragmentManager().beginTransaction()
-                        .replace(R.id.container, new ListFragment())
-                        .commit();
+        if (id == R.id.action_map) {
+            getChildFragmentManager().beginTransaction()
+                    .replace(R.id.container, new ListFragment())
+                    .commit();
         }
 
         return super.onOptionsItemSelected(item);

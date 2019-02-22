@@ -14,7 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import org.by9steps.shadihall.R;
-import org.by9steps.shadihall.adapter.RecyclerAdapter;
+import org.by9steps.shadihall.adapters.RecyclerViewAdapter;
 import org.by9steps.shadihall.model.Menu;
 
 import java.util.List;
@@ -47,7 +47,7 @@ public class MenuItemsFragment extends Fragment {
         mList.add(new Menu("Cash Book",R.drawable.default_avatar));
         mList.add(new Menu("ChartOfAcc",R.drawable.default_avatar));
 
-        RecyclerAdapter adapter = new RecyclerAdapter(getContext(),mList);
+        RecyclerViewAdapter adapter = new RecyclerViewAdapter(getContext(),mList);
         recyclerView.setLayoutManager(new GridLayoutManager(getContext(),2));
         recyclerView.addItemDecoration(new GridSpacingItemDecoration(2, dpToPx(10), true));
         recyclerView.setItemAnimator(new DefaultItemAnimator());
