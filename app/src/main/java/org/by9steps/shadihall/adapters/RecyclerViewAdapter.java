@@ -29,7 +29,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter {
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
         LayoutInflater inflater = LayoutInflater.from(mCtx);
-        View view = inflater.inflate(R.layout.menu_item, null);
+        View view = inflater.inflate(R.layout.fragment_menu_item, null);
         return new MenuViewHolder(view);
     }
 
