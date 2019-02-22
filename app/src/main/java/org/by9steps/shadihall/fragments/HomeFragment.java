@@ -63,7 +63,6 @@ public class HomeFragment extends Fragment {
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
-                Toast.makeText(getContext(), String.valueOf(position), Toast.LENGTH_SHORT).show();
                 if (position == 0) {
                     getChildFragmentManager().beginTransaction()
                             .replace(R.id.container, new TreeFragment())
@@ -96,9 +95,7 @@ public class HomeFragment extends Fragment {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_map) {
-            getChildFragmentManager().beginTransaction()
-                    .replace(R.id.container, new ListFragment())
-                    .commit();
+            Toast.makeText(getContext(), "coming soon", Toast.LENGTH_SHORT).show();
         }
 
         return super.onOptionsItemSelected(item);

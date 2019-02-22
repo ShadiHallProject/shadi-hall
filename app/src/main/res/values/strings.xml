@@ -11,4 +11,5 @@
     <string name="enter_user_number">User Mobile Number</string>
     <string name="enter_password">Password</string>
     <string name="actionbar_spinner">Actionbar Spinner</string>
+    <string name="menu_thumbnail">Menu thumbnail</string>
 </resources>
