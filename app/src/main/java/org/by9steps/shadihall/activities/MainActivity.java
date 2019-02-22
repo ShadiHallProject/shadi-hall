@@ -55,10 +55,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onPageSelected(int i) {
 
-                if ( i != 0){
-
-                }
-
             }
 
             @Override
