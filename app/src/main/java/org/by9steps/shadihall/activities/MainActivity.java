@@ -14,6 +14,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewGroup;
 
+import com.orm.SugarContext;
+
 import org.by9steps.shadihall.R;
 import org.by9steps.shadihall.fragments.HomeFragment;
 import org.by9steps.shadihall.fragments.ListFragment;
@@ -35,6 +37,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        SugarContext.init(this);
 
         if (getSupportActionBar()!=null)
             getSupportActionBar().setElevation(0.0f);

@@ -34,13 +34,13 @@
         tools:text="@string/app_name"
         android:maxLines="2"
         android:textColor="@android:color/black"/>
-    <!--<Button-->
-        <!--android:layout_marginRight="2dp"-->
-        <!--android:layout_weight=".05"-->
-        <!--android:layout_gravity="right"-->
-        <!--android:id="@+id/invite"-->
-        <!--android:layout_width="70dp"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:text="Invite"-->
-        <!--android:textColor="@color/colorPrimaryDark"/>-->
+    <Button
+        android:layout_marginRight="2dp"
+        android:layout_weight=".05"
+        android:layout_gravity="right"
+        android:id="@+id/detail"
+        android:layout_width="70dp"
+        android:layout_height="wrap_content"
+        android:text="Detail"
+        android:textColor="@color/colorPrimaryDark"/>
 </LinearLayout>

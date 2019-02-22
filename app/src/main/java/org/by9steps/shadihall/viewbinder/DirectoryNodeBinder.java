@@ -1,6 +1,8 @@
 package org.by9steps.shadihall.viewbinder;
 
 import android.content.Context;
+import android.content.Intent;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -10,6 +12,7 @@ import android.widget.TextView;
 import com.orm.SugarContext;
 
 import org.by9steps.shadihall.R;
+import org.by9steps.shadihall.activities.DetailCalendarActivity;
 import org.by9steps.shadihall.bean.Dir;
 
 import java.util.ArrayList;
@@ -50,6 +53,21 @@ public class DirectoryNodeBinder extends TreeViewBinder<DirectoryNodeBinder.View
 //                    .placeholder(R.drawable.default_avatar)
 //                    .into(holder.imageDir);
 
+        if (dirNode.type.equals("1")){
+            holder.detail.setVisibility(View.VISIBLE);
+            holder.detail.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    String selectedDate = dirNode.dirName;
+                    Intent intent = new Intent(mCtx, DetailCalendarActivity.class);
+                    intent.putExtra("message", selectedDate);
+                    mCtx.startActivity(intent);
+                }
+            });
+        }else {
+            holder.detail.setVisibility(View.GONE);
+        }
+
 
         if (node.isLeaf())
             holder.ivArrow.setVisibility(View.INVISIBLE);
@@ -66,13 +84,13 @@ public class DirectoryNodeBinder extends TreeViewBinder<DirectoryNodeBinder.View
         private CircleImageView imageDir;
         private ImageButton msgIcon;
         private TextView tvName;
-        public Button invite;
+        public Button detail;
 
         public ViewHolder(View rootView) {
             super(rootView);
             this.ivArrow = (ImageView) rootView.findViewById(R.id.iv_arrow);
             this.tvName = (TextView) rootView.findViewById(R.id.tv_name);
-            this.invite = rootView.findViewById(R.id.invite);
+            this.detail = rootView.findViewById(R.id.detail);
             this.imageDir = rootView.findViewById(R.id.image_dir);
             SugarContext.init(itemView.getContext());
         }

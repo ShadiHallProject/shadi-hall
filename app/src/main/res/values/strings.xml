@@ -12,4 +12,5 @@
     <string name="enter_password">Password</string>
     <string name="actionbar_spinner">Actionbar Spinner</string>
     <string name="menu_thumbnail">Menu thumbnail</string>
+    <string name="title_activity_detail_calendar">DetailCalendarActivity</string>
 </resources>
