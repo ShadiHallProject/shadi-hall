@@ -43,6 +43,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter {
         final Menu menu = mList.get(position);
 
         ((MenuViewHolder)viewHolder).name.setText(menu.getTitle());
+        ((MenuViewHolder)viewHolder).imageView.setImageResource(menu.getImage());
 
         ((MenuViewHolder)viewHolder).itemView.setOnClickListener(new View.OnClickListener() {
             @Override

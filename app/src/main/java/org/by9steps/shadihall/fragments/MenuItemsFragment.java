@@ -48,27 +48,27 @@ public class MenuItemsFragment extends Fragment {
         modelList = new ArrayList<>();
 
         mEntries = new ArrayList<>();
-        mEntries.add(new Menu("Booking",R.drawable.default_avatar));
-        mEntries.add(new Menu("Recovery",R.drawable.default_avatar));
-        mEntries.add(new Menu("Web Editing",R.drawable.default_avatar));
-        mEntries.add(new Menu("Cash Book",R.drawable.default_avatar));
-        mEntries.add(new Menu("ChartOfAcc",R.drawable.default_avatar));
+        mEntries.add(new Menu("Booking",R.drawable.booking));
+        mEntries.add(new Menu("Recovery",R.drawable.recovercash));
+        mEntries.add(new Menu("Web Editing",R.drawable.goldenwebedit));
+        mEntries.add(new Menu("Cash Book",R.drawable.goldenbook));
+        mEntries.add(new Menu("ChartOfAcc",R.drawable.chartofaccount));
 
         mReports = new ArrayList<>();
-        mReports.add(new Menu("Cash Book",R.drawable.default_avatar));
-        mReports.add(new Menu("Booking",R.drawable.default_avatar));
-        mReports.add(new Menu("Cash and Bank",R.drawable.default_avatar));
-        mReports.add(new Menu("Employee",R.drawable.default_avatar));
-        mReports.add(new Menu("Expense",R.drawable.default_avatar));
-        mReports.add(new Menu("Fixed Asset",R.drawable.default_avatar));
-        mReports.add(new Menu("Supplier",R.drawable.default_avatar));
-        mReports.add(new Menu("Client",R.drawable.default_avatar));
-        mReports.add(new Menu("Revenue",R.drawable.default_avatar));
-        mReports.add(new Menu("Capital",R.drawable.default_avatar));
-        mReports.add(new Menu("Website",R.drawable.default_avatar));
-        mReports.add(new Menu("Trail Balance",R.drawable.default_avatar));
-        mReports.add(new Menu("Profit/Loss",R.drawable.default_avatar));
-        mReports.add(new Menu("Bal Sheet",R.drawable.default_avatar));
+        mReports.add(new Menu("Cash Book",R.drawable.goldenbook));
+        mReports.add(new Menu("Booking",R.drawable.booking));
+        mReports.add(new Menu("Cash and Bank",R.drawable.cash));
+        mReports.add(new Menu("Employee",R.drawable.employee));
+        mReports.add(new Menu("Expense",R.drawable.goldenexpense));
+        mReports.add(new Menu("Fixed Asset",R.drawable.goldenfixedassets));
+        mReports.add(new Menu("Supplier",R.drawable.supplier));
+        mReports.add(new Menu("Client",R.drawable.client));
+        mReports.add(new Menu("Revenue",R.drawable.revenue));
+        mReports.add(new Menu("Capital",R.drawable.goldencapital));
+        mReports.add(new Menu("Website",R.drawable.goldenwebedit));
+        mReports.add(new Menu("Trail Balance",R.drawable.trailbalnce));
+        mReports.add(new Menu("Profit/Loss",R.drawable.profitloss));
+        mReports.add(new Menu("Bal Sheet",R.drawable.balancesheet));
 
         modelList.add(new SectionModel("Entries",mEntries));
         modelList.add(new SectionModel("Reports",mReports));

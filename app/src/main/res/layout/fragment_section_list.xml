@@ -13,13 +13,14 @@
         android:layout_height="match_parent">
 
         <ImageView
+            android:padding="10dp"
             android:src="@drawable/default_avatar"
             android:contentDescription="@string/menu_thumbnail"
             android:id="@+id/image"
             android:layout_width="match_parent"
-            android:layout_height="110dp"
+            android:layout_height="100dp"
             android:background="?attr/selectableItemBackgroundBorderless"
-            android:scaleType="fitXY" />
+            android:scaleType="fitCenter" />
 
         <TextView
             android:id="@+id/title"
