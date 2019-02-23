@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center"
+    android:orientation="horizontal">
+
+
+    <TextView
+        android:id="@+id/ed_client_id1"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="0"
+        android:background="@drawable/border"
+        android:hint="Client ID"
+        android:padding="10dp" />
+
+
+    <TextView
+        android:id="@+id/ed_net_code1"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="0"
+        android:background="@drawable/border"
+        android:hint="Net Code"
+        android:padding="10dp" />
+
+    <TextView
+        android:id="@+id/ed_sys_code1"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="0"
+        android:background="@drawable/border"
+        android:hint="Sys Code"
+        android:padding="10dp" />
+
+    <TextView
+        android:id="@+id/ed_updated_date1"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="0"
+        android:background="@drawable/border"
+        android:hint="Updated Date"
+        android:padding="10dp" />
+
+    <TextView
+        android:id="@+id/ed_group_id1"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="0"
+        android:background="@drawable/border"
+        android:hint="Gourp ID"
+        android:padding="10dp" />
+
+    <TextView
+        android:id="@+id/ed_AcName1"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="0"
+        android:background="@drawable/border"
+        android:hint="Ac Name"
+        android:padding="10dp" />
+
+    <TextView
+        android:id="@+id/ed_AcAddress1"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="0"
+        android:background="@drawable/border"
+        android:hint="Ac Address"
+        android:padding="10dp" />
+
+    <TextView
+        android:id="@+id/ed_AcMobileNo1"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="0"
+        android:background="@drawable/border"
+        android:hint="AcMobileNo"
+        android:padding="10dp" />
+
+    <TextView
+        android:id="@+id/ed_AcEmailAddress1"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="0"
+        android:background="@drawable/border"
+        android:hint="Ac Email Address"
+        android:padding="10dp" />
+
+    <TextView
+        android:id="@+id/ed_Salary1"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="0"
+        android:background="@drawable/border"
+        android:hint="Salary"
+        android:padding="10dp" />
+
+
+    <TextView
+        android:id="@+id/ed_AcContactNo1"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="0"
+        android:background="@drawable/border"
+        android:hint="Ac ContactNo"
+        android:padding="10dp" />
+
+    <TextView
+        android:id="@+id/ed_AcPassword1"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="0"
+        android:background="@drawable/border"
+        android:hint="AC Password"
+        android:inputType="textPassword"
+        android:padding="10dp" />
+
+    <TextView
+        android:id="@+id/ed_UserRights1"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="0"
+        android:background="@drawable/border"
+        android:hint="User Right"
+        android:padding="10dp" />
+
+
+    <ImageView
+        android:id="@+id/btnEdit"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="0"
+        android:background="@drawable/border"
+        android:padding="7.5dp"
+        app:srcCompat="@drawable/ic_create" />
+
+
+    <ImageView
+        android:id="@+id/btnDelete"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="0"
+        android:background="@drawable/border"
+        android:padding="7.5dp"
+        app:srcCompat="@drawable/ic_delete" />
+
+
+</LinearLayout>
+
+

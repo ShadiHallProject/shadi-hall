@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".fragments.BookCalendarFragment">
+
+    <com.squareup.timessquare.CalendarPickerView
+        android:id="@+id/calendar"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:layout_editor_absoluteX="26dp"
+        tools:layout_editor_absoluteY="191dp" />
+    <!--<TextView-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:id="@+id/view_date"-->
+        <!--android:layout_marginBottom="16dp"-->
+        <!--android:background="@color/colorPrimaryDark"-->
+        <!--android:gravity="center"-->
+        <!--android:text="Shaadi Hall"-->
+        <!--android:textAppearance="@style/TextAppearance.AppCompat.Headline"-->
+        <!--android:textColor="@android:color/white"-->
+        <!--android:textStyle="bold"-->
+        <!--tools:ignore="MissingConstraints" />-->
+
+</FrameLayout>
