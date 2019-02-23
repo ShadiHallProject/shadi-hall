@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.by9steps.shadihall.R;
 import org.by9steps.shadihall.activities.MenuClickActivity;
@@ -32,20 +33,21 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter {
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
         LayoutInflater inflater = LayoutInflater.from(mCtx);
-        View view = inflater.inflate(R.layout.fragment_menu_item, null);
+        View view = inflater.inflate(R.layout.fragment_section_list, null);
         return new MenuViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder viewHolder, int i) {
+    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder viewHolder, final int position) {
 
-        final Menu menu = mList.get(i);
+        final Menu menu = mList.get(position);
 
         ((MenuViewHolder)viewHolder).name.setText(menu.getTitle());
 
-        ((MenuViewHolder)viewHolder).layout.setOnClickListener(new View.OnClickListener() {
+        ((MenuViewHolder)viewHolder).itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Toast.makeText(mCtx, String.valueOf(position), Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(mCtx,MenuClickActivity.class);
                 intent.putExtra("message",menu.getTitle());
                 mCtx.startActivity(intent);
