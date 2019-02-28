@@ -13,4 +13,15 @@
     <string name="actionbar_spinner">Actionbar Spinner</string>
     <string name="menu_thumbnail">Menu thumbnail</string>
     <string name="title_activity_detail_calendar">DetailCalendarActivity</string>
+    <string name="create_account">Create account</string>
+    <string name="name">Name</string>
+    <string name="address">Address</string>
+    <string name="other_info">Other information</string>
+    <string name="monthly_fee">Monthly fee</string>
+    <string name="mobile_num">Mobile number</string>
+    <string name="contact_num">Contact number</string>
+    <string name="website">Website</string>
+    <string name="email">Email</string>
+    <string name="user_location">User location</string>
+    <string name="register">Register</string>
 </resources>

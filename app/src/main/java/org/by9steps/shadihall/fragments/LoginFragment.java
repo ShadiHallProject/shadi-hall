@@ -17,7 +17,7 @@ import org.by9steps.shadihall.R;
  */
 public class LoginFragment extends Fragment implements View.OnClickListener {
 
-    Button login;
+    Button login, create_account;
 
 
     public LoginFragment() {
@@ -31,8 +31,11 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
         // Inflate the layout for this fragment
         View view =  inflater.inflate(R.layout.fragment_login, container, false);
         login = view.findViewById(R.id.login_btn);
+        create_account = view.findViewById(R.id.create_account);
 
         login.setOnClickListener(this);
+        create_account.setOnClickListener(this);
+
         return view;
     }
 
@@ -45,6 +48,13 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
                 FragmentTransaction transaction = manager.beginTransaction();
                 transaction.replace(R.id.mContainer, new MenuItemsFragment());
                 transaction.commit();
+                break;
+            case R.id.create_account:
+
+                assert getFragmentManager() != null;
+                getFragmentManager().beginTransaction()
+                        .replace(R.id.mContainer,new RegisterFragment())
+                        .addToBackStack(null).commit();
                 break;
         }
     }
