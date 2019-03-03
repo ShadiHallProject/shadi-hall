@@ -26,6 +26,7 @@ import com.android.volley.toolbox.StringRequest;
 
 import org.by9steps.shadihall.AppController;
 import org.by9steps.shadihall.R;
+import org.by9steps.shadihall.activities.MainActivity;
 import org.by9steps.shadihall.activities.RegisterActivity;
 import org.by9steps.shadihall.helper.InputValidation;
 import org.json.JSONException;
@@ -170,8 +171,9 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
 
                 break;
             case R.id.create_account:
-
-                startActivity(new Intent(getContext(), RegisterActivity.class));
+                Intent intent = new Intent(getContext(), RegisterActivity.class);
+                intent.putExtra("TYPE", "Register");
+                startActivity(intent);
                 break;
         }
     }

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:padding="@dimen/twenty_dp"
+    tools:context=".activities.OtpActivity">
+
+    <android.support.design.widget.TextInputLayout
+        android:id="@+id/otp_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <android.support.design.widget.TextInputEditText
+            android:id="@+id/otpcode"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/enter_otp"
+            android:inputType="number"
+            android:maxLines="1"
+            android:maxLength="4" />
+    </android.support.design.widget.TextInputLayout>
+
+    <Button
+        android:id="@+id/otp_btn"
+        android:text="@string/confirm"
+        android:textAllCaps="false"
+        android:textColor="@android:color/white"
+        android:background="@color/colorPrimaryDark"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <Button
+        android:id="@+id/resend_otp"
+        android:textAllCaps="false"
+        android:background="@android:color/transparent"
+        android:text="@string/resend_otp"
+        android:visibility="gone"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+</LinearLayout>

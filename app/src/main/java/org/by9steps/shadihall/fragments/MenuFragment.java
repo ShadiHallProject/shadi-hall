@@ -7,6 +7,8 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -17,10 +19,32 @@ import org.by9steps.shadihall.R;
  */
 public class MenuFragment extends Fragment {
 
+    private static final String ARG_MENU = "message";
+
     //shared prefrences
     SharedPreferences sharedPreferences;
     public static final String mypreference = "mypref";
     public static final String login = "loginKey";
+
+    // TODO: Rename and change types of parameters
+    private String men;
+
+    public static MenuFragment newInstance(String message) {
+        MenuFragment fragment = new MenuFragment();
+        Bundle args = new Bundle();
+        args.putString(ARG_MENU, message);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        if (getArguments() != null) {
+            men = getArguments().getString(ARG_MENU);
+        }
+    }
 
 
     public MenuFragment() {
@@ -33,7 +57,7 @@ public class MenuFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_menu, container, false);
-
+        setHasOptionsMenu(true);
         //shared prefrences
         sharedPreferences = getActivity().getSharedPreferences(mypreference,
                 Context.MODE_PRIVATE);
@@ -55,9 +79,13 @@ public class MenuFragment extends Fragment {
                     .commit();
         }
 
-
-
         return view;
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+//         Inflate the menu; this adds items to the action bar if it is present.
+//            inflater.inflate(R.menu.setting_menu, menu);
     }
 
 }

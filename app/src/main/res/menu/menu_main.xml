@@ -8,12 +8,12 @@
         android:title="@string/actionbar_spinner"
         app:actionViewClass="android.widget.Spinner"
         android:icon="@drawable/ic_arrow_drop_down"
-        app:showAsAction="ifRoom" />
+        app:showAsAction="always" />
     <item
         android:id="@+id/action_map"
         android:orderInCategory="100"
         android:title="@string/map"
         android:icon="@drawable/ic_my_location"
-        app:showAsAction="ifRoom" />
+        app:showAsAction="always" />
 
 </menu>

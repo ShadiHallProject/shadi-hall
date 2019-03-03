@@ -17,6 +17,9 @@ public class AppController extends Application {
     private ImageLoader mImageLoader;
 
     private static AppController mInstance;
+    public static String profileType = "Edit";
+
+    public static String imageUrl = "http://69.167.137.121/plesk-site-preview/sky.com.pk/shadiHall/ClientImages";
 
     @Override
     public void onCreate() {

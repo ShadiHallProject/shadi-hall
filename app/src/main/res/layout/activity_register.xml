@@ -32,58 +32,6 @@
                 android:inputType="text"
                 android:maxLines="1" />
         </android.support.design.widget.TextInputLayout>
-        <android.support.design.widget.TextInputLayout
-            android:id="@+id/c_address_layout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <android.support.design.widget.TextInputEditText
-                android:id="@+id/c_address"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/c_address"
-                android:inputType="text"
-                android:maxLines="1" />
-        </android.support.design.widget.TextInputLayout>
-        <android.support.design.widget.TextInputLayout
-            android:id="@+id/name_of_person_layout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <android.support.design.widget.TextInputEditText
-                android:id="@+id/name_of_person"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/name_of_person"
-                android:inputType="text"
-                android:maxLines="1" />
-        </android.support.design.widget.TextInputLayout>
-        <android.support.design.widget.TextInputLayout
-            android:id="@+id/country_layout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <android.support.design.widget.TextInputEditText
-                android:id="@+id/country"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/country"
-                android:inputType="text"
-                android:maxLines="1" />
-        </android.support.design.widget.TextInputLayout>
-        <android.support.design.widget.TextInputLayout
-            android:id="@+id/password_layout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <android.support.design.widget.TextInputEditText
-                android:id="@+id/password"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/password"
-                android:inputType="textPassword"
-                android:maxLines="1" />
-        </android.support.design.widget.TextInputLayout>
         <LinearLayout
             android:weightSum="2"
             android:layout_width="match_parent"
@@ -113,58 +61,7 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent" />
         </LinearLayout>
-        <android.support.design.widget.TextInputLayout
-            android:id="@+id/login_number_layout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
 
-            <android.support.design.widget.TextInputEditText
-                android:id="@+id/login_number"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/login_number"
-                android:inputType="number"
-                android:maxLines="1" />
-        </android.support.design.widget.TextInputLayout>
-        <android.support.design.widget.TextInputLayout
-            android:id="@+id/city_layout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <android.support.design.widget.TextInputEditText
-                android:id="@+id/city"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/city"
-                android:inputType="textWebEditText"
-                android:maxLines="1" />
-        </android.support.design.widget.TextInputLayout>
-        <android.support.design.widget.TextInputLayout
-            android:id="@+id/sub_city_layout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <android.support.design.widget.TextInputEditText
-                android:id="@+id/sub_city"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/sub_city"
-                android:inputType="textEmailAddress"
-                android:maxLines="1" />
-        </android.support.design.widget.TextInputLayout>
-        <android.support.design.widget.TextInputLayout
-            android:id="@+id/persons_layout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <android.support.design.widget.TextInputEditText
-                android:id="@+id/persons"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/capacity_of_persons"
-                android:inputType="textWebEditText"
-                android:maxLines="1" />
-        </android.support.design.widget.TextInputLayout>
         <android.support.design.widget.TextInputLayout
             android:id="@+id/website_layout"
             android:layout_width="match_parent"
@@ -178,6 +75,127 @@
                 android:inputType="textWebEditText"
                 android:maxLines="1" />
         </android.support.design.widget.TextInputLayout>
+
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/persons_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <android.support.design.widget.TextInputEditText
+                android:id="@+id/persons"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/capacity_of_persons"
+                android:inputType="number"
+                android:maxLines="1" />
+        </android.support.design.widget.TextInputLayout>
+
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/c_address_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <android.support.design.widget.TextInputEditText
+                android:id="@+id/c_address"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/c_address"
+                android:inputType="text"
+                android:maxLines="1" />
+        </android.support.design.widget.TextInputLayout>
+
+        <!--<android.support.design.widget.TextInputLayout-->
+            <!--android:id="@+id/country_layout"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content">-->
+
+            <!--<android.support.design.widget.TextInputEditText-->
+                <!--android:id="@+id/country"-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:hint="@string/country"-->
+                <!--android:inputType="text"-->
+                <!--android:maxLines="1" />-->
+        <!--</android.support.design.widget.TextInputLayout>-->
+
+        <Spinner
+            android:id="@+id/sp_country"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:prompt="@string/sp_country"/>
+
+        <Spinner
+            android:layout_marginTop="10dp"
+            android:id="@+id/sp_city"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:prompt="@string/sp_country"/>
+
+        <Spinner
+            android:layout_marginTop="10dp"
+            android:id="@+id/sp_sub_city"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:prompt="@string/sp_country"/>
+
+        <!--<android.support.design.widget.TextInputLayout-->
+            <!--android:id="@+id/city_layout"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content">-->
+
+            <!--<android.support.design.widget.TextInputEditText-->
+                <!--android:id="@+id/city"-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:hint="@string/city"-->
+                <!--android:inputType="text"-->
+                <!--android:maxLines="1" />-->
+        <!--</android.support.design.widget.TextInputLayout>-->
+
+        <!--<android.support.design.widget.TextInputLayout-->
+            <!--android:id="@+id/sub_city_layout"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content">-->
+
+            <!--<android.support.design.widget.TextInputEditText-->
+                <!--android:id="@+id/sub_city"-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:hint="@string/sub_city"-->
+                <!--android:inputType="text"-->
+                <!--android:maxLines="1" />-->
+        <!--</android.support.design.widget.TextInputLayout>-->
+
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/name_of_person_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <android.support.design.widget.TextInputEditText
+                android:id="@+id/name_of_person"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/name_of_person"
+                android:inputType="text"
+                android:maxLines="1" />
+        </android.support.design.widget.TextInputLayout>
+
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/login_number_layout"
+            android:layout_width="match_parent"
+            android:layout_height="40dp">
+
+            <TextView
+                android:layout_margin="1dp"
+                android:id="@+id/login_number"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:hint="@string/login_number"
+                android:gravity="center_vertical"
+                android:textSize="18sp"
+                android:maxLines="1" />
+        </android.support.design.widget.TextInputLayout>
+
         <android.support.design.widget.TextInputLayout
             android:id="@+id/email_layout"
             android:layout_width="match_parent"
@@ -189,6 +207,20 @@
                 android:layout_height="wrap_content"
                 android:hint="@string/email"
                 android:inputType="textEmailAddress"
+                android:maxLines="1" />
+        </android.support.design.widget.TextInputLayout>
+
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/password_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <android.support.design.widget.TextInputEditText
+                android:id="@+id/password"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/password"
+                android:inputType="textPassword"
                 android:maxLines="1" />
         </android.support.design.widget.TextInputLayout>
 

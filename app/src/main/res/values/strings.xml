@@ -14,12 +14,12 @@
     <string name="menu_thumbnail">Menu thumbnail</string>
     <string name="title_activity_detail_calendar">DetailCalendarActivity</string>
     <string name="create_account">Create account</string>
-    <string name="c_name">CompanyName</string>
-    <string name="c_address">CompanyAddress</string>
+    <string name="c_name">Shadi Hall Name</string>
+    <string name="c_address">Shadi Hall Address</string>
     <string name="name_of_person">NameOfPerson</string>
     <string name="country">Country</string>
     <string name="password">Password</string>
-    <string name="c_number">CompanyNumber</string>
+    <string name="c_number">Shadi Hall Number</string>
     <string name="login_number">LoginMobileNo</string>
     <string name="contact_num">Contact number</string>
     <string name="website">Website</string>
@@ -41,4 +41,17 @@
     <string name="error_message_persons">Enter Persons</string>
     <string name="error_message_website">Enter Website</string>
     <string name="error_message_email">Enter Email</string>
+    <string name="sp_country">Select Country</string>
+    <string name="enter_phone_number">Enter Phone Number</string>
+    <string name="error_message_phone">Enter Phone Number</string>
+    <string name="enter_otp">Enter OTP</string>
+    <string name="confirm">Confirm</string>
+    <string name="resend_otp">Resend otp</string>
+    <string name="error_message_otp">Enter OTP</string>
+    <string name="action_signout">Sign Out</string>
+    <string name="action_edit_profile">Edit Profile</string>
+    <string name="action_location">Set GPS Location</string>
+    <string name="action_change_password">Change Password</string>
+    <string name="action_sms_settings">SMS Setting</string>
+    <string name="update">Update</string>
 </resources>

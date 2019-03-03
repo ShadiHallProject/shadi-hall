@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/action_signout"
+        android:orderInCategory="100"
+        android:title="@string/action_signout"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_profite"
+        android:orderInCategory="100"
+        android:title="@string/action_edit_profile"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_location"
+        android:orderInCategory="100"
+        android:title="@string/action_location"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_password"
+        android:orderInCategory="100"
+        android:title="@string/action_change_password"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_sms_settings"
+        android:orderInCategory="100"
+        android:title="@string/action_sms_settings"
+        app:showAsAction="never" />
+</menu>
