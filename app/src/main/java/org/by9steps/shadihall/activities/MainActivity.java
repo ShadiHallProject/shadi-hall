@@ -18,6 +18,12 @@ import android.view.MenuItem;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.android.volley.DefaultRetryPolicy;
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.RetryPolicy;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
 import com.orm.SugarContext;
 
 import org.by9steps.shadihall.AppController;
@@ -27,6 +33,13 @@ import org.by9steps.shadihall.fragments.ListFragment;
 import org.by9steps.shadihall.fragments.LoginFragment;
 import org.by9steps.shadihall.fragments.MenuFragment;
 import org.by9steps.shadihall.fragments.TreeFragment;
+import org.by9steps.shadihall.model.AreaName;
+import org.by9steps.shadihall.model.Bookings;
+import org.by9steps.shadihall.model.Tree;
+import org.by9steps.shadihall.model.User;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -193,6 +206,7 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString(login, "No");
         editor.apply();
+        User.delete(User.class);
 //        viewPager.setCurrentItem(1);
         startActivity(new Intent(MainActivity.this, MainActivity.class));
         finish();

@@ -16,6 +16,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.DefaultRetryPolicy;
@@ -23,12 +24,17 @@ import com.android.volley.Response;
 import com.android.volley.RetryPolicy;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
+import com.squareup.picasso.Picasso;
 
 import org.by9steps.shadihall.AppController;
 import org.by9steps.shadihall.R;
+import org.by9steps.shadihall.activities.LoginActivity;
 import org.by9steps.shadihall.activities.MainActivity;
 import org.by9steps.shadihall.activities.RegisterActivity;
 import org.by9steps.shadihall.helper.InputValidation;
+import org.by9steps.shadihall.model.AreaName;
+import org.by9steps.shadihall.model.User;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -42,19 +48,21 @@ import java.util.Map;
  */
 public class LoginFragment extends Fragment implements View.OnClickListener {
 
-    TextInputEditText owner_numb, user_number, password;
+    TextInputEditText owner_numb, password;
+    TextView user_number;
     TextInputLayout owner_layout, user_layout, password_layout;
-    Button login, create_account;
+    Button login, create_account, logOut;
 
     private ProgressDialog mProgress;
     private InputValidation inputValidation;
 
-    String oNumber, uNumber, mPassword;
+    String oNumber, uNumber, mPassword, ph;
 
     //shared prefrences
     SharedPreferences sharedPreferences;
     public static final String mypreference = "mypref";
     public static final String log_in = "loginKey";
+    public static final String phone = "phoneKey";
 
 
     public LoginFragment() {
@@ -75,15 +83,22 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
         password = view.findViewById(R.id.password);
         login = view.findViewById(R.id.login_btn);
         create_account = view.findViewById(R.id.create_account);
+        logOut = view.findViewById(R.id.log_out);
 
         inputValidation = new InputValidation(getContext());
 
         login.setOnClickListener(this);
         create_account.setOnClickListener(this);
+        logOut.setOnClickListener(this);
 
         //shared prefrences
         sharedPreferences = getActivity().getSharedPreferences(mypreference,
                 Context.MODE_PRIVATE);
+
+        if(sharedPreferences.contains(phone)){
+            ph = sharedPreferences.getString(phone,"");
+            user_number.setText(ph);
+        }
 
         return view;
     }
@@ -100,9 +115,9 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
                 if (!inputValidation.isInputEditTextFilled(owner_numb, owner_layout, getString(R.string.enter_owner_number))) {
                     return;
                 }
-                if (!inputValidation.isInputEditTextFilled(user_number, user_layout, getString(R.string.enter_user_number))) {
-                    return;
-                }
+//                if (!inputValidation.isInputEditTextFilled(user_number, user_layout, getString(R.string.enter_user_number))) {
+//                    return;
+//                }
                 if (!inputValidation.isInputEditTextFilled(password, password_layout, getString(R.string.enter_password))) {
                     return;
                 }
@@ -122,13 +137,30 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
                                 public void onResponse(String response) {
                                     Log.e("RES",response);
                                     mProgress.dismiss();
-                                    JSONObject jsonObject = null;
+                                    JSONObject jsonObj = null;
 
                                     try {
-                                        jsonObject = new JSONObject(response);
-                                        String success = jsonObject.getString("success");
-                                        String message = jsonObject.getString("message");
+                                        jsonObj= new JSONObject(response);
+                                        JSONArray jsonArray = jsonObj.getJSONArray("UserInfo");
+                                        String success = jsonObj.getString("success");
+                                        String message = jsonObj.getString("message");
                                         if (success.equals("1")){
+
+                                            User.deleteAll(User.class);
+                                            for (int i = 0; i < jsonArray.length(); i++) {
+                                                JSONObject jsonObject = jsonArray.getJSONObject(i);
+                                                String cId = jsonObject.getString("ClientID");
+                                                String cashID = jsonObject.getString("CashID");
+                                                String bookingIncomeID = jsonObject.getString("BookingIncomeID");
+                                                String bookingExpenseID = jsonObject.getString("BookingExpenseID");
+                                                String acNameID = jsonObject.getString("AcNameID");
+                                                String clientUserID = jsonObject.getString("ClientUserID");
+                                                String acName = jsonObject.getString("AcName");
+
+                                                User user = new User(cId,cashID,bookingIncomeID,bookingExpenseID,acNameID,clientUserID,acName);
+                                                user.save();
+                                            }
+
                                             SharedPreferences.Editor editor = sharedPreferences.edit();
                                             editor.putString(log_in, "Yes");
                                             editor.apply();
@@ -157,8 +189,8 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
                         protected Map<String, String> getParams() {
                             Map<String, String> params = new HashMap<String, String>();
                             Log.e("NUMBER",oNumber);
-                            params.put("logMobNum", oNumber);
-                            params.put("AcMobNum", uNumber);
+                            params.put("logMobNum", uNumber);
+                            params.put("AcMobNum", oNumber);
                             params.put("password", mPassword);
                             return params;
                         }
@@ -174,6 +206,10 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
                 Intent intent = new Intent(getContext(), RegisterActivity.class);
                 intent.putExtra("TYPE", "Register");
                 startActivity(intent);
+                break;
+            case R.id.log_out:
+                startActivity(new Intent(getContext(), LoginActivity.class));
+                getActivity().finish();
                 break;
         }
     }

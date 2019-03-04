@@ -54,4 +54,15 @@
     <string name="action_change_password">Change Password</string>
     <string name="action_sms_settings">SMS Setting</string>
     <string name="update">Update</string>
+    <string name="add_event">Add Event</string>
+    <string name="address">Address</string>
+    <string name="client_mobile_no">Client Mobile No</string>
+    <string name="cnic">CNIC Number</string>
+    <string name="total_charges">Total Charges</string>
+    <string name="event_name">Event Name</string>
+    <string name="total_persons">Total Persons</string>
+    <string name="advance_fee">Advance Fee</string>
+    <string name="description">Description</string>
+    <string name="booking_date">Booking Date</string>
+    <string name="event_date">Event Date</string>
 </resources>
