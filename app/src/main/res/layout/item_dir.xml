@@ -43,4 +43,24 @@
         android:layout_height="wrap_content"
         android:text="Detail"
         android:textColor="@color/colorPrimaryDark"/>
+    <Button
+        android:visibility="gone"
+        android:layout_marginRight="2dp"
+        android:layout_weight=".05"
+        android:layout_gravity="right"
+        android:id="@+id/add"
+        android:layout_width="70dp"
+        android:layout_height="wrap_content"
+        android:text="@string/add"
+        android:textColor="@color/colorPrimaryDark"/>
+    <Button
+        android:visibility="gone"
+        android:layout_marginRight="2dp"
+        android:layout_weight=".05"
+        android:layout_gravity="right"
+        android:id="@+id/edit"
+        android:layout_width="70dp"
+        android:layout_height="wrap_content"
+        android:text="@string/edit"
+        android:textColor="@color/colorPrimaryDark"/>
 </LinearLayout>

@@ -6,7 +6,9 @@ import android.view.MenuItem;
 
 import org.by9steps.shadihall.R;
 import org.by9steps.shadihall.fragments.BookCalendarFragment;
+import org.by9steps.shadihall.fragments.ChartOfAccFragment;
 import org.by9steps.shadihall.fragments.ListFragment;
+import org.by9steps.shadihall.fragments.RecoveryFragment;
 
 public class MenuClickActivity extends AppCompatActivity {
 
@@ -32,7 +34,7 @@ public class MenuClickActivity extends AppCompatActivity {
                     .commit();
         }else if (message.equals("Recovery")){
             getSupportFragmentManager().beginTransaction()
-                    .add(R.id.menu_container, new ListFragment())
+                    .add(R.id.menu_container, new RecoveryFragment())
                     .commit();
         }else if (message.equals("Web Editing")){
             getSupportFragmentManager().beginTransaction()
@@ -44,7 +46,7 @@ public class MenuClickActivity extends AppCompatActivity {
                     .commit();
         }else if (message.equals("ChartOfAcc")){
             getSupportFragmentManager().beginTransaction()
-                    .add(R.id.menu_container, new ListFragment())
+                    .add(R.id.menu_container, new ChartOfAccFragment())
                     .commit();
         }
     }

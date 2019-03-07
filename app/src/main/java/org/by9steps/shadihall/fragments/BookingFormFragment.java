@@ -32,6 +32,8 @@ import org.by9steps.shadihall.activities.RegisterActivity;
 import org.by9steps.shadihall.helper.InputValidation;
 import org.by9steps.shadihall.model.User;
 
+import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -46,12 +48,14 @@ import java.util.Map;
  */
 public class BookingFormFragment extends Fragment implements View.OnClickListener {
 
+    private static final String ARG_BOOKING_DATE = "event_date";
+
     InputValidation inputValidation;
 
     TextInputLayout date_layout;
     TextView date;
     TextInputLayout event_date_layout;
-    TextInputEditText event_date;
+    TextView event_date;
     TextInputLayout person_name_layout;
     TextInputEditText person_name;
     TextInputLayout address_layout;
@@ -72,10 +76,26 @@ public class BookingFormFragment extends Fragment implements View.OnClickListene
     TextInputEditText advance_fee;
     Button add_event;
 
-    Calendar myCalendar;
-    DatePickerDialog.OnDateSetListener da;
-    int mYear, mMonth, mDay;
     ProgressDialog pDialog;
+
+    private String eventDate;
+
+    public static BookingFormFragment newInstance(String message) {
+        BookingFormFragment fragment = new BookingFormFragment();
+        Bundle args = new Bundle();
+        args.putString(ARG_BOOKING_DATE, message);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        if (getArguments() != null) {
+            eventDate = getArguments().getString(ARG_BOOKING_DATE);
+        }
+    }
 
     public BookingFormFragment() {
         // Required empty public constructor
@@ -121,29 +141,12 @@ public class BookingFormFragment extends Fragment implements View.OnClickListene
         add_event = view.findViewById(R.id.add);
 
         add_event.setOnClickListener(this);
-        event_date.setOnClickListener(this);
 
         Date d = new Date();
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+        SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
         date.setText(formatter.format(d));
 
-        myCalendar = Calendar.getInstance();
-        da = new DatePickerDialog.OnDateSetListener() {
-
-            @Override
-            public void onDateSet(DatePicker view, int year, int monthOfYear,
-                                  int dayOfMonth) {
-                // TODO Auto-generated method stub
-                mYear = Calendar.YEAR;
-                mMonth = Calendar.MONTH;
-                mDay = Calendar.DAY_OF_MONTH;
-                myCalendar.set(Calendar.YEAR, year);
-                myCalendar.set(Calendar.MONTH, monthOfYear);
-                myCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
-                updateLabel();
-            }
-
-        };
+        event_date.setText(eventDate);
 
         return view;
     }
@@ -151,16 +154,22 @@ public class BookingFormFragment extends Fragment implements View.OnClickListene
     @Override
     public void onClick(View view) {
         switch (view.getId()){
-            case R.id.event_date:
-                DatePickerDialog d = new DatePickerDialog(getActivity(),
-                        R.style.AppTheme, da, mYear,mMonth,mDay);
-                d.getDatePicker().setMinDate(System.currentTimeMillis() - 1000);
-                d.show();
-                break;
             case R.id.add:
-                if (!inputValidation.isInputEditTextFilled(event_date, event_date_layout, getString(R.string.error_message_c_name))) {
-                    return;
-                }
+//                String pattern="yyyy-MM-dd";
+//                DateFormat df = new SimpleDateFormat(pattern);
+//                Date d1 = null, d2 = null;
+//                try {
+//                    d1 = df.parse(event_date.getText().toString());
+//                    d2 = df.parse(date.getText().toString());
+//                } catch (ParseException e) {
+//                    e.printStackTrace();
+//                }
+//                final String eventDate = df.format(d1);
+//                final String bookingDate = df.format(d2);
+//                Log.e("DATE",d1+"   "+d2);
+//                if (!inputValidation.isInputEditTextFilled(event_date, event_date_layout, getString(R.string.error_message_c_name))) {
+//                    return;
+//                }
                 if (!inputValidation.isInputEditTextFilled(person_name, person_name_layout, getString(R.string.error_message_c_name))) {
                     return;
                 }
@@ -248,10 +257,4 @@ public class BookingFormFragment extends Fragment implements View.OnClickListene
 
     }
 
-    private void updateLabel() {
-        String myFormat = "yyyy-MM-dd"; //In which you need put here
-        SimpleDateFormat sdf = new SimpleDateFormat(myFormat);
-
-        event_date.setText(sdf.format(myCalendar.getTime()));
-    }
 }

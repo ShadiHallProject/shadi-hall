@@ -13,6 +13,7 @@ import com.orm.SugarContext;
 
 import org.by9steps.shadihall.R;
 import org.by9steps.shadihall.activities.DetailCalendarActivity;
+import org.by9steps.shadihall.activities.RegisterActivity;
 import org.by9steps.shadihall.bean.Dir;
 
 import java.util.ArrayList;
@@ -64,8 +65,36 @@ public class DirectoryNodeBinder extends TreeViewBinder<DirectoryNodeBinder.View
                     mCtx.startActivity(intent);
                 }
             });
+        }else if (dirNode.type.equals("Add")){
+            holder.detail.setVisibility(View.GONE);
+            holder.add.setVisibility(View.VISIBLE);
+            holder.add.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    String selectedDate = dirNode.dirName;
+                    Intent intent = new Intent(mCtx, RegisterActivity.class);
+                    intent.putExtra("TYPE", "Register");
+                    mCtx.startActivity(intent);
+                }
+            });
+
+        }else if (dirNode.type.equals("Edit")){
+            holder.detail.setVisibility(View.GONE);
+            holder.edit.setVisibility(View.VISIBLE);
+            holder.edit.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    String selectedDate = dirNode.dirName;
+                    Intent intent = new Intent(mCtx, RegisterActivity.class);
+                    intent.putExtra("TYPE", "Edit");
+                    mCtx.startActivity(intent);
+                }
+            });
+
         }else {
             holder.detail.setVisibility(View.GONE);
+            holder.add.setVisibility(View.GONE);
+            holder.edit.setVisibility(View.GONE);
         }
 
 
@@ -84,13 +113,15 @@ public class DirectoryNodeBinder extends TreeViewBinder<DirectoryNodeBinder.View
         private CircleImageView imageDir;
         private ImageButton msgIcon;
         private TextView tvName;
-        public Button detail;
+        public Button detail, add, edit;
 
         public ViewHolder(View rootView) {
             super(rootView);
             this.ivArrow = (ImageView) rootView.findViewById(R.id.iv_arrow);
             this.tvName = (TextView) rootView.findViewById(R.id.tv_name);
             this.detail = rootView.findViewById(R.id.detail);
+            this.add = rootView.findViewById(R.id.add);
+            this.edit = rootView.findViewById(R.id.edit);
             this.imageDir = rootView.findViewById(R.id.image_dir);
             SugarContext.init(itemView.getContext());
         }

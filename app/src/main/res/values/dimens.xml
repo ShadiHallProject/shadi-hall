@@ -2,4 +2,10 @@
     <dimen name="fab_margin">16dp</dimen>
     <dimen name="ten_dp">10dp</dimen>
     <dimen name="twenty_dp">20dp</dimen>
+
+    <!--Text Sizes-->
+
+    <dimen name="sp_10">10sp</dimen>
+    <dimen name="textSize">15sp</dimen>
+    <dimen name="sp_18">18sp</dimen>
 </resources>
