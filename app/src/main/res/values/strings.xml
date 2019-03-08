@@ -79,4 +79,11 @@
     <string name="client_name">Client Name</string>
     <string name="error_message_amount">Enter Amount</string>
     <string name="edit">Edit</string>
+    <string name="account_type">Account Type</string>
+    <string name="account_group">Account Group</string>
+    <string name="account_name">Account Name</string>
+    <string name="debit">Debit</string>
+    <string name="credit">Credit</string>
+    <string name="debit_bal">Debit Bal</string>
+    <string name="credit_bal">Credit Bal</string>
 </resources>

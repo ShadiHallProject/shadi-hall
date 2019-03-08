@@ -48,9 +48,10 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter {
         ((MenuViewHolder)viewHolder).itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(mCtx, String.valueOf(position), Toast.LENGTH_SHORT).show();
+                Toast.makeText(mCtx, String.valueOf(position)+menu.getTitle(), Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(mCtx,MenuClickActivity.class);
                 intent.putExtra("message",menu.getTitle());
+                intent.putExtra("position",String.valueOf(position));
                 mCtx.startActivity(intent);
             }
         });

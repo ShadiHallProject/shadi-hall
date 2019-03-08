@@ -16,13 +16,15 @@ import android.widget.TextView;
 import java.util.List;
 
 import org.by9steps.shadihall.R;
+import org.by9steps.shadihall.model.Account3Name;
 import org.by9steps.shadihall.model.AreaName;
 
 public class SpinnerAdapter extends ArrayAdapter<String>{
 
     private final LayoutInflater mInflater;
     private final Context mContext;
-    private final List<AreaName> items;
+    private List<AreaName> items = null;
+    private List<Account3Name> itemsAcGroup = null;
 
     public SpinnerAdapter(@NonNull Context context, @NonNull List objects) {
         super(context, 0, objects);
@@ -30,6 +32,13 @@ public class SpinnerAdapter extends ArrayAdapter<String>{
         mContext = context;
         mInflater = LayoutInflater.from(context);
         items = objects;
+    }
+    public SpinnerAdapter(@NonNull Context context, @NonNull List objects, String s) {
+        super(context, 0, objects);
+
+        mContext = context;
+        mInflater = LayoutInflater.from(context);
+        itemsAcGroup = objects;
     }
 
     @Override
@@ -48,9 +57,15 @@ public class SpinnerAdapter extends ArrayAdapter<String>{
 
         TextView name = view.findViewById(R.id.name);
 
-        AreaName areaName = items.get(position);
+        if (items != null) {
+            AreaName areaName = items.get(position);
 
-        name.setText(areaName.getAreaName());
+            name.setText(areaName.getAreaName());
+        }else if(itemsAcGroup != null){
+            Account3Name account3Name = itemsAcGroup.get(position);
+
+            name.setText(account3Name.getAcGruopName());
+        }
 
         return view;
     }
