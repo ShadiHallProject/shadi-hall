@@ -12,6 +12,7 @@ import android.widget.TextView;
 import com.orm.SugarContext;
 
 import org.by9steps.shadihall.R;
+import org.by9steps.shadihall.activities.ChaartOfAccAddActivity;
 import org.by9steps.shadihall.activities.DetailCalendarActivity;
 import org.by9steps.shadihall.activities.RegisterActivity;
 import org.by9steps.shadihall.bean.Dir;
@@ -53,8 +54,10 @@ public class DirectoryNodeBinder extends TreeViewBinder<DirectoryNodeBinder.View
 //                    .load("http://aapkawakeel.easysoft.com.pk/ClientImages/1/"+dirNode.dirID+".jpg")
 //                    .placeholder(R.drawable.default_avatar)
 //                    .into(holder.imageDir);
+        holder.imageDir.setVisibility(View.GONE);
 
         if (dirNode.type.equals("1")){
+            holder.imageDir.setVisibility(View.VISIBLE);
             holder.detail.setVisibility(View.VISIBLE);
             holder.detail.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -67,31 +70,33 @@ public class DirectoryNodeBinder extends TreeViewBinder<DirectoryNodeBinder.View
             });
         }else if (dirNode.type.equals("Add")){
             holder.detail.setVisibility(View.GONE);
+            holder.edit.setVisibility(View.GONE);
             holder.add.setVisibility(View.VISIBLE);
             holder.add.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    String selectedDate = dirNode.dirName;
-                    Intent intent = new Intent(mCtx, RegisterActivity.class);
-                    intent.putExtra("TYPE", "Register");
+                    Intent intent = new Intent(mCtx, ChaartOfAccAddActivity.class);
                     mCtx.startActivity(intent);
                 }
             });
 
         }else if (dirNode.type.equals("Edit")){
             holder.detail.setVisibility(View.GONE);
+            holder.add.setVisibility(View.GONE);
             holder.edit.setVisibility(View.VISIBLE);
             holder.edit.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    String selectedDate = dirNode.dirName;
-                    Intent intent = new Intent(mCtx, RegisterActivity.class);
-                    intent.putExtra("TYPE", "Edit");
+                    Intent intent = new Intent(mCtx, ChaartOfAccAddActivity.class);
                     mCtx.startActivity(intent);
                 }
             });
 
+        }else if(dirNode.type.equals("CA")){
+            holder.imageDir.setVisibility(View.GONE);
+            holder.detail.setVisibility(View.GONE);
         }else {
+            holder.imageDir.setVisibility(View.VISIBLE);
             holder.detail.setVisibility(View.GONE);
             holder.add.setVisibility(View.GONE);
             holder.edit.setVisibility(View.GONE);

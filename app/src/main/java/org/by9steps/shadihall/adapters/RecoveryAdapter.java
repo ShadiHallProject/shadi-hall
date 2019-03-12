@@ -7,12 +7,15 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.by9steps.shadihall.AppController;
 import org.by9steps.shadihall.R;
+import org.by9steps.shadihall.activities.CashCollectionActivity;
 import org.by9steps.shadihall.activities.MenuClickActivity;
 import org.by9steps.shadihall.model.Menu;
 import org.by9steps.shadihall.model.Recovery;
@@ -51,6 +54,22 @@ public class RecoveryAdapter extends RecyclerView.Adapter {
         ((ItemViewHolder)viewHolder).event_date.setText(recovery.getEventDate());
         ((ItemViewHolder)viewHolder).client_name.setText(recovery.getClientName());
 
+        if (AppController.addCB.equals("Hide")) {
+            ((ItemViewHolder) viewHolder).add.setVisibility(View.GONE);
+        }else {
+            ((ItemViewHolder) viewHolder).add.setVisibility(View.VISIBLE);
+        }
+
+        ((ItemViewHolder)viewHolder).add.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(mCtx, CashCollectionActivity.class);
+                intent.putExtra("BookingID",recovery.getBookingID());
+                intent.putExtra("Spinner","Hide");
+                mCtx.startActivity(intent);
+            }
+        });
+
     }
 
     @Override
@@ -61,6 +80,7 @@ public class RecoveryAdapter extends RecyclerView.Adapter {
     class ItemViewHolder extends RecyclerView.ViewHolder {
 
         TextView recieved, expensed, total_charges, balance, profit, event_name, event_date, client_name;
+        ImageButton add;
 
 
         public ItemViewHolder(View itemView) {
@@ -74,6 +94,7 @@ public class RecoveryAdapter extends RecyclerView.Adapter {
             event_name = itemView.findViewById(R.id.event_name);
             event_date = itemView.findViewById(R.id.event_date);
             client_name = itemView.findViewById(R.id.client_name);
+            add = itemView.findViewById(R.id.add);
 
         }
     }

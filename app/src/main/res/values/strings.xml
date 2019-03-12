@@ -86,4 +86,11 @@
     <string name="credit">Credit</string>
     <string name="debit_bal">Debit Bal</string>
     <string name="credit_bal">Credit Bal</string>
+    <string name="ac_name">Ac Name</string>
+    <string name="enter_your_name">Enter Your Name</string>
+    <string name="enter_your_address">Enter Your Address</string>
+    <string name="enter_your_mobile_no">Enter Your Mobile No</string>
+    <string name="enter_your_email_address">Enter Your Email Address</string>
+    <string name="enter_your_salary">Enter Your Salary</string>
+    <string name="enter_your_password">Enter Your Password</string>
 </resources>

@@ -1,13 +1,8 @@
 package org.by9steps.shadihall.fragments;
 
 
-import android.app.DatePickerDialog;
-import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
-
-import java.util.ArrayList;
-import java.util.Calendar;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.DialogFragment;
@@ -19,7 +14,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.DatePicker;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.Toast;
@@ -33,21 +27,18 @@ import com.android.volley.toolbox.StringRequest;
 import org.by9steps.shadihall.AppController;
 import org.by9steps.shadihall.R;
 import org.by9steps.shadihall.activities.CashCollectionActivity;
-import org.by9steps.shadihall.adapters.RecoveryAdapter;
 import org.by9steps.shadihall.adapters.ReportsAdapter;
 import org.by9steps.shadihall.adapters.SpinnerAdapter;
+import org.by9steps.shadihall.model.Account2Group;
 import org.by9steps.shadihall.model.Account3Name;
 import org.by9steps.shadihall.model.CashBook;
-import org.by9steps.shadihall.model.Recovery;
 import org.by9steps.shadihall.model.User;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.Date;
-import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -55,13 +46,39 @@ import java.util.Map;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class CashBookFragment extends Fragment {
+public class ReportsFragment extends Fragment {
+
+    private static final String ARG_SPINNER_ID = "spinner_position";
 
     ProgressDialog mProgress;
     RecyclerView recyclerView;
-    List<Recovery> mList;
+    String currentDate;
+    int day,month,year;
+    static Button date_picker;
+    Spinner sp_acgroup;
+    ImageView refresh;
 
-    public CashBookFragment() {
+    // TODO: Rename and change types of parameters
+    private String spPosition;
+
+    public static ReportsFragment newInstance(String message) {
+        ReportsFragment fragment = new ReportsFragment();
+        Bundle args = new Bundle();
+        args.putString(ARG_SPINNER_ID, message);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        if (getArguments() != null) {
+            spPosition = getArguments().getString(ARG_SPINNER_ID);
+        }
+    }
+
+    public ReportsFragment() {
         // Required empty public constructor
     }
 
@@ -70,10 +87,12 @@ public class CashBookFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_cash_book, container, false);
+        View view = inflater.inflate(R.layout.fragment_reports, container, false);
 
         recyclerView = view.findViewById(R.id.recycler);
-
+        date_picker = view.findViewById(R.id.date_picker);
+        sp_acgroup = view.findViewById(R.id.sp_acgroup);
+        refresh = view.findViewById(R.id.refresh);
 
         FloatingActionButton fab = view.findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -82,23 +101,43 @@ public class CashBookFragment extends Fragment {
                 // Click action
                 Intent intent = new Intent(getContext(), CashCollectionActivity.class);
                 intent.putExtra("BookingID","0");
-                intent.putExtra("Spinner","Hide");
+                intent.putExtra("Spinner","View");
                 startActivity(intent);
             }
         });
 
-        mList = new ArrayList<>();
+        Date date = new Date();
+        SimpleDateFormat curFormater = new SimpleDateFormat("yyyy/MM/dd");
+        currentDate = curFormater.format(date);
+        Log.e("DATEEE", currentDate);
+        date_picker.setText(new SimpleDateFormat("dd/MM/yyyy").format(date));
 
-        getRecoveries();
+        List<Account2Group> list = Account2Group.listAll(Account2Group.class);
+        SpinnerAdapter spinnerAdapter = new SpinnerAdapter(getContext(),list,"");
+        sp_acgroup.setAdapter(spinnerAdapter);
+        sp_acgroup.setSelection(Integer.valueOf(spPosition));
 
+        date_picker.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                DialogFragment newFragment = new SelectDateFragment();
+                newFragment.show(getFragmentManager(), "DatePicker");
+            }
+        });
+
+        getCashBook();
+
+        refresh.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getCashBook();
+            }
+        });
 
         return view;
     }
 
-
-
-
-    public void getRecoveries(){
+    public void getCashBook(){
         mProgress = new ProgressDialog(getContext());
         mProgress.setTitle("Loading");
         mProgress.setMessage("Please wait...");
@@ -106,7 +145,7 @@ public class CashBookFragment extends Fragment {
         mProgress.show();
 
         String tag_json_obj = "json_obj_req";
-        String u = "http://69.167.137.121/plesk-site-preview/sky.com.pk/shadiHall/GetRecoveries.php";
+        String u = "http://69.167.137.121/plesk-site-preview/sky.com.pk/shadiHall/GetCashBook.php";
 
         StringRequest jsonObjectRequest = new StringRequest(com.android.volley.Request.Method.POST, u,
                 new Response.Listener<String>() {
@@ -118,37 +157,30 @@ public class CashBookFragment extends Fragment {
 
                         try {
                             jsonObj= new JSONObject(response);
-                            JSONArray jsonArray = jsonObj.getJSONArray("Recovery");
+                            JSONArray jsonArray = jsonObj.getJSONArray("CashBook");
                             String success = jsonObj.getString("success");
                             Log.e("Success",success);
                             if (success.equals("1")){
+                                CashBook.deleteAll(CashBook.class);
                                 for (int i = 0; i < jsonArray.length(); i++) {
                                     JSONObject jsonObject = jsonArray.getJSONObject(i);
                                     Log.e("Recovery",jsonObject.toString());
-                                    String ClientID = jsonObject.getString("ClientID");
-                                    String BookingID = jsonObject.getString("BookingID");
-                                    String Recieved = jsonObject.getString("Recieved");
-                                    String Expensed = jsonObject.getString("Expensed");
-                                    String ChargesTotal = jsonObject.getString("ChargesTotal");
-                                    String Balance = jsonObject.getString("Balance");
-                                    String Profit = jsonObject.getString("Profit");
-                                    String EventName = jsonObject.getString("EventName");
-                                    String ed = jsonObject.getString("EventDate");
-                                    JSONObject jbb = new JSONObject(ed);
-                                    String EventDate = jbb.getString("date");
-                                    String ClientName = jsonObject.getString("ClientName");
+                                    String AccountID = jsonObject.getString("AccountID");
+                                    String Debit = jsonObject.getString("Debit");
+                                    String Credit = jsonObject.getString("Credit");
+                                    String Bal = jsonObject.getString("Bal");
+                                    String DebitBal = jsonObject.getString("DebitBal");
+                                    String CreditBal = jsonObject.getString("CreditBal");
+                                    String AcName = jsonObject.getString("AcName");
+                                    String AcGroupID = jsonObject.getString("AcGroupID");
 
-                                    String pattern="yyyy-MM-dd";
-                                    DateFormat df = new SimpleDateFormat(pattern);
-                                    Date date = df.parse(EventDate);
-                                    String eventDate = df.format(date);
-
-                                    mList.add(new Recovery(ClientID,BookingID,Recieved,Expensed,ChargesTotal,Balance,Profit,EventName,eventDate,ClientName));
+                                    CashBook cashBook = new CashBook(AccountID,Debit,Credit,Bal,DebitBal,CreditBal,AcName,AcGroupID);
+                                    cashBook.save();
 
                                 }
 
-                                AppController.addCB = "Hide";
-                                RecoveryAdapter adapter = new RecoveryAdapter(getContext(),mList);
+                                List<CashBook> mList = CashBook.listAll(CashBook.class);
+                                ReportsAdapter adapter = new ReportsAdapter(getContext(),mList,ReportsAdapter.Cash_Book);
                                 recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
                                 recyclerView.setAdapter(adapter);
 
@@ -157,8 +189,6 @@ public class CashBookFragment extends Fragment {
                                 Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
                             }
                         } catch (JSONException e) {
-                            e.printStackTrace();
-                        } catch (ParseException e) {
                             e.printStackTrace();
                         }
                     }
@@ -176,6 +206,8 @@ public class CashBookFragment extends Fragment {
                 List<User> list = User.listAll(User.class);
                 for (User u: list) {
                     params.put("ClientID", u.getClientID());
+                    params.put("AcGroupID", ((Account2Group)sp_acgroup.getSelectedItem()).getAcGroupID());
+                    params.put("CBDate", date_picker.getText().toString());
                 }
                 return params;
             }
@@ -187,4 +219,3 @@ public class CashBookFragment extends Fragment {
     }
 
 }
-

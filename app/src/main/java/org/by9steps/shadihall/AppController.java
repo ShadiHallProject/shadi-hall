@@ -18,6 +18,7 @@ public class AppController extends Application {
 
     private static AppController mInstance;
     public static String profileType = "Edit";
+    public static String addCB = "View";
 
     public static String imageUrl = "http://69.167.137.121/plesk-site-preview/sky.com.pk/shadiHall/ClientImages";
 

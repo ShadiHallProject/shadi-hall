@@ -23,7 +23,7 @@ public class SelectDateFragment extends DialogFragment implements DatePickerDial
         populateSetDate(yy, mm+1, dd);
     }
     public void populateSetDate(int year, int month, int day) {
-        CashBookFragment.date_picker.setText(month+"/"+day+"/"+year);
+        ReportsFragment.date_picker.setText(month+"/"+day+"/"+year);
     }
 
 }

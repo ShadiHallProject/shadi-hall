@@ -61,6 +61,6 @@
         android:id="@+id/edit"
         android:layout_width="70dp"
         android:layout_height="wrap_content"
-        android:text="@string/edit"
+        android:text="Detail"
         android:textColor="@color/colorPrimaryDark"/>
 </LinearLayout>

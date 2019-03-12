@@ -67,9 +67,9 @@ public class ReportsAdapter extends RecyclerView.Adapter {
                 final CashBook cashBook = mList.get(position);
 
                 ((CashBookHolder)viewHolder).ac_name.setText(cashBook.getAcName());
-                ((CashBookHolder)viewHolder).debit.setText(cashBook.getDebit());
-                ((CashBookHolder)viewHolder).credit.setText(cashBook.getCredit());
-                ((CashBookHolder)viewHolder).balance.setText(cashBook.getBal());
+//                ((CashBookHolder)viewHolder).debit.setText(cashBook.getDebit());
+//                ((CashBookHolder)viewHolder).credit.setText(cashBook.getCredit());
+//                ((CashBookHolder)viewHolder).balance.setText(cashBook.getBal());
                 ((CashBookHolder)viewHolder).debit_bal.setText(cashBook.getDebitBal());
                 ((CashBookHolder)viewHolder).credit_bal.setText(cashBook.getCreditBal());
 
@@ -113,9 +113,9 @@ public class ReportsAdapter extends RecyclerView.Adapter {
             super(itemView);
 
             ac_name = itemView.findViewById(R.id.ac_name);
-            debit = itemView.findViewById(R.id.debit);
-            credit = itemView.findViewById(R.id.credit);
-            balance = itemView.findViewById(R.id.balance);
+//            debit = itemView.findViewById(R.id.debit);
+//            credit = itemView.findViewById(R.id.credit);
+//            balance = itemView.findViewById(R.id.balance);
             debit_bal = itemView.findViewById(R.id.debit_bal);
             credit_bal = itemView.findViewById(R.id.credit_bal);
 

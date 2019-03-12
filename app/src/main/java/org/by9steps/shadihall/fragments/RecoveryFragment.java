@@ -115,6 +115,7 @@ public class RecoveryFragment extends Fragment {
 
                                 }
 
+                                AppController.addCB = "View";
                                 RecoveryAdapter adapter = new RecoveryAdapter(getContext(),mList);
                                 recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
                                 recyclerView.setAdapter(adapter);

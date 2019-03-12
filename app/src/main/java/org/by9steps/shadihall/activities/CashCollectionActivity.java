@@ -50,7 +50,7 @@ public class CashCollectionActivity extends AppCompatActivity implements View.On
     TextInputLayout amount_layout;
     TextInputEditText amount;
     TextInputLayout debit_account_layout, credit_account_layout;
-    TextView debit_account, credit_account;
+    TextView debit_account, credit_account, tv_cr, tv_db;
     Button add;
 
     InputValidation inputValidation;
@@ -89,6 +89,8 @@ public class CashCollectionActivity extends AppCompatActivity implements View.On
         debit_account_layout = findViewById(R.id.debit_account_layout);
         credit_account = findViewById(R.id.credit_account);
         credit_account_layout = findViewById(R.id.credit_account_layout);
+        tv_cr = findViewById(R.id.tv_cr);
+        tv_db = findViewById(R.id.tv_db);
         add = findViewById(R.id.add);
 
         Date date1 = new Date();
@@ -98,13 +100,20 @@ public class CashCollectionActivity extends AppCompatActivity implements View.On
 
 
         if (!spinnerType.equals("Hide")){
+            tv_cr.setVisibility(View.GONE);
+            tv_db.setVisibility(View.GONE);
             debit_account.setOnClickListener(this);
             credit_account.setOnClickListener(this);
             debit_account.setCompoundDrawablesWithIntrinsicBounds(0,0,R.drawable.ic_arrow_drop,0);
             credit_account.setCompoundDrawablesWithIntrinsicBounds(0,0,R.drawable.ic_arrow_drop,0);
         }else {
-            credit_account_layout.setVisibility(View.GONE);
-            debit_account_layout.setVisibility(View.GONE);
+//            credit_account_layout.setVisibility(View.GONE);
+//            debit_account_layout.setVisibility(View.GONE);
+            List<User> list = User.listAll(User.class);
+            for (User u : list) {
+                credit_account.setText(u.getBookingIncomeID());
+                debit_account.setText(u.getCashID());
+            }
         }
 
         add.setOnClickListener(this);
