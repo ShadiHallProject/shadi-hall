@@ -1,7 +1,5 @@
 package org.by9steps.shadihall.activities;
 
-import android.app.DatePickerDialog;
-import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.support.design.widget.TextInputEditText;
@@ -12,8 +10,6 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.DatePicker;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -24,25 +20,23 @@ import com.android.volley.RetryPolicy;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Map;
-
 import org.by9steps.shadihall.AppController;
 import org.by9steps.shadihall.R;
 import org.by9steps.shadihall.helper.InputValidation;
-import org.by9steps.shadihall.model.Account3Name;
 import org.by9steps.shadihall.model.User;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import in.galaxyofandroid.spinerdialog.OnSpinerItemClick;
 import in.galaxyofandroid.spinerdialog.SpinnerDialog;
 
-public class CashCollectionActivity extends AppCompatActivity implements View.OnClickListener {
+public class AddExpenseActivity extends AppCompatActivity implements View.OnClickListener {
 
     TextInputLayout date_layout;
     TextView date;
@@ -59,18 +53,14 @@ public class CashCollectionActivity extends AppCompatActivity implements View.On
     String bookingID, spinnerType;
     ProgressDialog pDialog;
 
-    ArrayList<String> listDebit = new ArrayList<>();
-    ArrayList<String> listCredit = new ArrayList<>();
-    SpinnerDialog debitDialog, creditDialog;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_cash_collection);
+        setContentView(R.layout.activity_add_expense);
 
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setTitle("Cash Collection");
+            getSupportActionBar().setTitle("Expense Collection");
         }
 
         Intent intent = getIntent();
@@ -100,7 +90,6 @@ public class CashCollectionActivity extends AppCompatActivity implements View.On
         String d = curFormater.format(date1);
         date.setText(d);
 
-
         if (!spinnerType.equals("Hide")){
             tv_cr.setVisibility(View.GONE);
             tv_db.setVisibility(View.GONE);
@@ -111,24 +100,16 @@ public class CashCollectionActivity extends AppCompatActivity implements View.On
         }else {
 //            credit_account_layout.setVisibility(View.GONE);
 //            debit_account_layout.setVisibility(View.GONE);
-//            List<User> list = User.listAll(User.class);
+            List<User> list = User.listAll(User.class);
 //            for (User u : list) {
-                credit_account.setText("Income");
-                debit_account.setText("Cash");
+            credit_account.setText("Expense");
+            debit_account.setText("Cash");
 //            }
         }
 
         add.setOnClickListener(this);
 
-        List<Account3Name> list = Account3Name.listAll(Account3Name.class);
-        for (Account3Name a : list){
-            listCredit.add(a.getCredit());
-            listDebit.add(a.getDebit());
-        }
-
-
     }
-
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -144,30 +125,6 @@ public class CashCollectionActivity extends AppCompatActivity implements View.On
     public void onClick(View v) {
 
         switch (v.getId()){
-            case R.id.debit_account:
-                Log.e("CLICK","CLICK");
-                debitDialog = new SpinnerDialog(CashCollectionActivity.this,listDebit,"Debit Account");
-                debitDialog.bindOnSpinerListener(new OnSpinerItemClick() {
-                    @Override
-                    public void onClick(String s, int i) {
-                        Toast.makeText(CashCollectionActivity.this,"Item Selected",Toast.LENGTH_LONG).show();
-                        debit_account.setText(s);
-                    }
-                });
-                debitDialog.showSpinerDialog();
-                break;
-            case R.id.credit_account:
-                Log.e("CLICK","CLICK");
-                creditDialog = new SpinnerDialog(CashCollectionActivity.this,listCredit,"Credit Account");
-                creditDialog.bindOnSpinerListener(new OnSpinerItemClick() {
-                    @Override
-                    public void onClick(String s, int i) {
-                        Toast.makeText(CashCollectionActivity.this,"Item Selected",Toast.LENGTH_LONG).show();
-                        credit_account.setText(s);
-                    }
-                });
-                creditDialog.showSpinerDialog();
-                break;
             case R.id.add:
 
                 if (!inputValidation.isInputEditTextFilled(amount, amount_layout, getString(R.string.error_message_amount))) {
@@ -177,7 +134,7 @@ public class CashCollectionActivity extends AppCompatActivity implements View.On
                     String tag_json_obj = "json_obj_req";
                     String url = "http://69.167.137.121/plesk-site-preview/sky.com.pk/shadiHall/AddCashBook.php";
 
-                    pDialog = new ProgressDialog(CashCollectionActivity.this);
+                    pDialog = new ProgressDialog(AddExpenseActivity.this);
                     pDialog.setMessage("Loading...");
                     pDialog.setCancelable(false);
                     pDialog.show();
@@ -192,7 +149,7 @@ public class CashCollectionActivity extends AppCompatActivity implements View.On
                                         String success = jsonObject.getString("success");
                                         if (success.equals("1")){
                                             String message = jsonObject.getString("message");
-                                            Toast.makeText(CashCollectionActivity.this, message, Toast.LENGTH_SHORT).show();
+                                            Toast.makeText(AddExpenseActivity.this, message, Toast.LENGTH_SHORT).show();
                                             finish();
                                         }
                                     } catch (JSONException e) {
@@ -204,7 +161,7 @@ public class CashCollectionActivity extends AppCompatActivity implements View.On
                         public void onErrorResponse(VolleyError error) {
                             pDialog.dismiss();
                             Log.e("Error",error.toString());
-                            Toast.makeText(CashCollectionActivity.this, error.toString(), Toast.LENGTH_SHORT).show();
+                            Toast.makeText(AddExpenseActivity.this, error.toString(), Toast.LENGTH_SHORT).show();
                         }
                     }){
                         @Override
@@ -214,8 +171,8 @@ public class CashCollectionActivity extends AppCompatActivity implements View.On
                             List<User> list = User.listAll(User.class);
                             for (User u : list) {
                                 params.put("CBDate", date.getText().toString());
-                                params.put("DebitAccount", u.getCashID());
-                                params.put("CreditAccount", u.getBookingIncomeID());
+                                params.put("DebitAccount", u.getBookingExpenseID());
+                                params.put("CreditAccount", u.getCashID());
                                 params.put("CBRemarks", description.getText().toString());
                                 params.put("Amount", amount.getText().toString());
                                 params.put("ClientID", u.getClientID());
@@ -237,6 +194,4 @@ public class CashCollectionActivity extends AppCompatActivity implements View.On
         }
 
     }
-
-
 }

@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +15,7 @@ import android.widget.Toast;
 
 import org.by9steps.shadihall.R;
 import org.by9steps.shadihall.activities.MenuClickActivity;
+import org.by9steps.shadihall.fragments.ReportsFragment;
 import org.by9steps.shadihall.model.Account3Name;
 import org.by9steps.shadihall.model.CashBook;
 import org.by9steps.shadihall.model.Menu;
@@ -28,6 +30,8 @@ public class ReportsAdapter extends RecyclerView.Adapter {
     private Context mCtx;
     List<CashBook> mList;
     List<Account3Name> mList2;
+
+    int mCredit = 0, mDebit = 0;
 
     int typeSet;
 
@@ -73,6 +77,11 @@ public class ReportsAdapter extends RecyclerView.Adapter {
                 ((CashBookHolder)viewHolder).debit_bal.setText(cashBook.getDebitBal());
                 ((CashBookHolder)viewHolder).credit_bal.setText(cashBook.getCreditBal());
 
+                mCredit = mCredit + Integer.valueOf(cashBook.getCreditBal());
+                mDebit = mDebit + Integer.valueOf(cashBook.getDebitBal());
+
+                ReportsFragment.cre_total.setText(String.valueOf(mCredit));
+                ReportsFragment.deb_total.setText(String.valueOf(mDebit));
                 break;
             case Trail_Balance:
                 final Account3Name account3Name = mList2.get(position);

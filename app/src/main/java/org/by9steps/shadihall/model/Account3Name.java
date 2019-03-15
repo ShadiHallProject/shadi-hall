@@ -4,6 +4,7 @@ import com.orm.SugarRecord;
 
 public class Account3Name extends SugarRecord {
 
+    String AcTypeID;
     String AcTypeName;
     String AcGroupID;
     String AcGruopName;
@@ -17,7 +18,8 @@ public class Account3Name extends SugarRecord {
     String DebitBL;
     String CreditBL;
 
-    public Account3Name(String acTypeName, String acGroupID, String acGruopName, String accountID, String acName, String debit, String credit, String clientID, String maxDate, String bal, String debitBL, String creditBL) {
+    public Account3Name(String acTypeID, String acTypeName, String acGroupID, String acGruopName, String accountID, String acName, String debit, String credit, String clientID, String maxDate, String bal, String debitBL, String creditBL) {
+        AcTypeID = acTypeID;
         AcTypeName = acTypeName;
         AcGroupID = acGroupID;
         AcGruopName = acGruopName;
@@ -33,6 +35,10 @@ public class Account3Name extends SugarRecord {
     }
 
     public Account3Name() {
+    }
+
+    public String getAcTypeID() {
+        return AcTypeID;
     }
 
     public String getAcTypeName() {

@@ -240,6 +240,8 @@ public class BookCalendarFragment extends Fragment {
 
                                 FetchFromDb();
                                 pDialog.dismiss();
+                            }else {
+                                pDialog.dismiss();
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();

@@ -33,11 +33,13 @@ import com.android.volley.toolbox.StringRequest;
 import org.by9steps.shadihall.AppController;
 import org.by9steps.shadihall.R;
 import org.by9steps.shadihall.activities.CashCollectionActivity;
+import org.by9steps.shadihall.adapters.CashBookAdapter;
 import org.by9steps.shadihall.adapters.RecoveryAdapter;
 import org.by9steps.shadihall.adapters.ReportsAdapter;
 import org.by9steps.shadihall.adapters.SpinnerAdapter;
 import org.by9steps.shadihall.model.Account3Name;
 import org.by9steps.shadihall.model.CashBook;
+import org.by9steps.shadihall.model.CashEntry;
 import org.by9steps.shadihall.model.Recovery;
 import org.by9steps.shadihall.model.User;
 import org.json.JSONArray;
@@ -59,7 +61,7 @@ public class CashBookFragment extends Fragment {
 
     ProgressDialog mProgress;
     RecyclerView recyclerView;
-    List<Recovery> mList;
+    List<CashEntry> mList;
 
     public CashBookFragment() {
         // Required empty public constructor
@@ -82,7 +84,7 @@ public class CashBookFragment extends Fragment {
                 // Click action
                 Intent intent = new Intent(getContext(), CashCollectionActivity.class);
                 intent.putExtra("BookingID","0");
-                intent.putExtra("Spinner","Hide");
+                intent.putExtra("Spinner","View");
                 startActivity(intent);
             }
         });
@@ -106,7 +108,7 @@ public class CashBookFragment extends Fragment {
         mProgress.show();
 
         String tag_json_obj = "json_obj_req";
-        String u = "http://69.167.137.121/plesk-site-preview/sky.com.pk/shadiHall/GetRecoveries.php";
+        String u = "http://69.167.137.121/plesk-site-preview/sky.com.pk/shadiHall/GetCashbookEntry.php";
 
         StringRequest jsonObjectRequest = new StringRequest(com.android.volley.Request.Method.POST, u,
                 new Response.Listener<String>() {
@@ -118,37 +120,44 @@ public class CashBookFragment extends Fragment {
 
                         try {
                             jsonObj= new JSONObject(response);
-                            JSONArray jsonArray = jsonObj.getJSONArray("Recovery");
+                            JSONArray jsonArray = jsonObj.getJSONArray("CashBook");
                             String success = jsonObj.getString("success");
                             Log.e("Success",success);
                             if (success.equals("1")){
+                                mList.clear();
                                 for (int i = 0; i < jsonArray.length(); i++) {
                                     JSONObject jsonObject = jsonArray.getJSONObject(i);
-                                    Log.e("Recovery",jsonObject.toString());
+
+                                    String CashBookID = jsonObject.getString("CashBookID");
+                                    String CB_Date = jsonObject.getString("CBDate");
+                                    JSONObject jbb = new JSONObject(CB_Date);
+                                    String CBDate = jbb.getString("date");
+                                    String DebitAccount = jsonObject.getString("DebitAccount");
+                                    String CreditAccount = jsonObject.getString("CreditAccount");
+//                                    String CBRemarks = jsonObject.getString("CBRemarks");
+                                    String Amount = jsonObject.getString("Amount");
                                     String ClientID = jsonObject.getString("ClientID");
+                                    String ClientUserID = jsonObject.getString("ClientUserID");
                                     String BookingID = jsonObject.getString("BookingID");
-                                    String Recieved = jsonObject.getString("Recieved");
-                                    String Expensed = jsonObject.getString("Expensed");
-                                    String ChargesTotal = jsonObject.getString("ChargesTotal");
-                                    String Balance = jsonObject.getString("Balance");
-                                    String Profit = jsonObject.getString("Profit");
-                                    String EventName = jsonObject.getString("EventName");
-                                    String ed = jsonObject.getString("EventDate");
-                                    JSONObject jbb = new JSONObject(ed);
-                                    String EventDate = jbb.getString("date");
-                                    String ClientName = jsonObject.getString("ClientName");
+                                    String DebitAccountName = jsonObject.getString("DebitAccountName");
+                                    String CreditAccountName = jsonObject.getString("CreditAccountName");
+                                    String UserName = jsonObject.getString("UserName");
+//                                    String Updated_Date = jsonObject.getString("UpdatedDate");
+//                                    JSONObject jbbb = new JSONObject(Updated_Date);
+//                                    String UpdatedDate = jbbb.getString("date");
 
-                                    String pattern="yyyy-MM-dd";
+                                    DateFormat old = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+                                    String pattern="dd-MM-yyyy";
                                     DateFormat df = new SimpleDateFormat(pattern);
-                                    Date date = df.parse(EventDate);
-                                    String eventDate = df.format(date);
+                                    Date date = old.parse(CBDate);
+                                    String CBDate1 = df.format(date);
 
-                                    mList.add(new Recovery(ClientID,BookingID,Recieved,Expensed,ChargesTotal,Balance,Profit,EventName,eventDate,ClientName));
+                                    Log.e("SSSSSSS",CBDate1);
 
+                                    mList.add(new CashEntry(CashBookID,CBDate1,DebitAccount,CreditAccount,"ss",Amount,ClientID,ClientUserID,BookingID,DebitAccountName,CreditAccountName,UserName, "s"));
                                 }
 
-                                AppController.addCB = "Hide";
-                                RecoveryAdapter adapter = new RecoveryAdapter(getContext(),mList);
+                                CashBookAdapter adapter = new CashBookAdapter(getContext(),mList);
                                 recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
                                 recyclerView.setAdapter(adapter);
 

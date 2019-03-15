@@ -24,10 +24,12 @@ import com.orm.util.NamingHelper;
 import org.by9steps.shadihall.AppController;
 import org.by9steps.shadihall.R;
 import org.by9steps.shadihall.adapters.RecoveryAdapter;
+import org.by9steps.shadihall.adapters.ReportsAdapter;
 import org.by9steps.shadihall.bean.Dir;
 import org.by9steps.shadihall.model.Account1Type;
 import org.by9steps.shadihall.model.Account2Group;
 import org.by9steps.shadihall.model.Account3Name;
+import org.by9steps.shadihall.model.CashBook;
 import org.by9steps.shadihall.model.Recovery;
 import org.by9steps.shadihall.model.User;
 import org.by9steps.shadihall.viewbinder.DirectoryNodeBinder;
@@ -57,6 +59,7 @@ public class ChartOfAccFragment extends Fragment {
     private RecyclerView rv;
     private TreeViewAdapter adapter;
     ProgressDialog mProgress;
+    String currentDate;
 
     List<String> country = new ArrayList<>();
     List<String> city = new ArrayList<>();
@@ -75,7 +78,13 @@ public class ChartOfAccFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_chart_of_acc, container, false);
 
         rv = view.findViewById(R.id.rv);
-        getAccountGroups();
+        mProgress = new ProgressDialog(getContext());
+        getAccount3Name();
+
+
+        Date date = new Date();
+        SimpleDateFormat curFormater = new SimpleDateFormat("yyyy-MM-dd");
+        currentDate = curFormater.format(date);
 
 //        country.add("Pakistan");
 //
@@ -88,9 +97,6 @@ public class ChartOfAccFragment extends Fragment {
 //        town.add("Malir Town");
 //        town.add("New Karachi Town");
 
-        mProgress = new ProgressDialog(getContext());
-        getAccountTypes();
-
         return view;
     }
 
@@ -101,18 +107,40 @@ public class ChartOfAccFragment extends Fragment {
         TreeNode<Dir> ton;
         TreeNode<Dir> com;
 
-        List<Account1Type> list = Account1Type.listAll(Account1Type.class);
-        for (Account1Type a: list){
+//        List<Account1Type> list = Account1Type.listAll(Account1Type.class);
+//        for (Account1Type a: list){
+//            app = new TreeNode<>(new Dir(a.getAcTypeID(),a.getAcTypeName(),"CA"));
+//            nodes.add(app);
+//            List<Account3Name> list1 = Account3Name.find(Account3Name.class, NamingHelper.toSQLNameDefault("AcTypeID")+" = ?", a.getAcTypeID());
+//            for (Account3Name aa: list1){
+//                cit = new TreeNode<>(new Dir(aa.getAcGroupID(),aa.getAcGruopName(),"Add"));
+//                app.addChild(cit);
+//                List<Account3Name> list2 = Account3Name.find(Account3Name.class, NamingHelper.toSQLNameDefault("AcGroupID")+" = ?", aa.getAcGroupID());
+//                for (Account3Name aaa: list2){
+//                    ton = new TreeNode<>(new Dir(aaa.getAccountID(),aaa.getAcName(),"Edit"));
+//                    cit.addChild(ton);
+//                }
+//            }
+//        }
+
+        List<Account3Name> list = Account3Name.findWithQuery(Account3Name.class, "SELECT * FROM Account3_Name GROUP BY Ac_Type_Name");
+        for (Account3Name a: list){
             app = new TreeNode<>(new Dir(a.getAcTypeID(),a.getAcTypeName(),"CA"));
             nodes.add(app);
-            List<Account2Group> list1 = Account2Group.find(Account2Group.class, NamingHelper.toSQLNameDefault("AcTypeID")+" = ?", a.getAcTypeID());
-            for (Account2Group aa: list1){
-                cit = new TreeNode<>(new Dir(aa.getAcGroupID(),aa.getAcGruopName(),"Add"));
-                app.addChild(cit);
+                List<Account3Name> list1 = Account3Name.findWithQuery(Account3Name.class, "SELECT * FROM Account3_Name GROUP BY Ac_Gruop_Name");
+                Log.e("LOOP",a.getAcTypeID());
+            for (Account3Name aa: list1){
+                Log.e("TYPEID",a.getAcTypeID()+"  "+ aa.getAcGroupID());
+                if (a.getAcTypeID().equals(aa.getAcTypeID())) {
+                    cit = new TreeNode<>(new Dir(aa.getAcGroupID(), aa.getAcGruopName(), "Add"));
+                    app.addChild(cit);
+                }
                 List<Account3Name> list2 = Account3Name.find(Account3Name.class, NamingHelper.toSQLNameDefault("AcGroupID")+" = ?", aa.getAcGroupID());
                 for (Account3Name aaa: list2){
-                    ton = new TreeNode<>(new Dir(aaa.getAccountID(),aaa.getAcName(),"Edit"));
-                    cit.addChild(ton);
+                    if (aa.getAcTypeID().equals(aaa.getClientID())) {
+                        ton = new TreeNode<>(new Dir(aaa.getAccountID(), aaa.getAcName(), "Edit"));
+                        cit.addChild(ton);
+                    }
                 }
             }
         }
@@ -145,12 +173,95 @@ public class ChartOfAccFragment extends Fragment {
         rv.setAdapter(adapter);
     }
 
-
-    public void getAccountTypes(){
+    public void getAccount3Name(){
+        mProgress = new ProgressDialog(getContext());
         mProgress.setTitle("Loading");
         mProgress.setMessage("Please wait...");
         mProgress.setCanceledOnTouchOutside(false);
         mProgress.show();
+
+        String tag_json_obj = "json_obj_req";
+        String u = "http://69.167.137.121/plesk-site-preview/sky.com.pk/shadiHall/GetAccountDetails.php";
+
+        StringRequest jsonObjectRequest = new StringRequest(com.android.volley.Request.Method.POST, u,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        mProgress.dismiss();
+                        JSONObject jsonObj = null;
+
+                        try {
+                            jsonObj= new JSONObject(response);
+                            JSONArray jsonArray = jsonObj.getJSONArray("CashBook");
+                            String success = jsonObj.getString("success");
+                            if (success.equals("1")){
+                                Account3Name.deleteAll(Account3Name.class);
+                                for (int i = 0; i < jsonArray.length(); i++) {
+                                    JSONObject jsonObject = jsonArray.getJSONObject(i);
+                                    Log.e("Recovery",jsonObject.toString());
+                                    String AcTypeID = jsonObject.getString("AcTypeID");
+                                    String AcTypeName = jsonObject.getString("AcTypeName");
+                                    String AcGroupID = jsonObject.getString("AcGroupID");
+                                    String AcGruopName = jsonObject.getString("AcGruopName");
+                                    String AccountID = jsonObject.getString("AccountID");
+                                    String AcName = jsonObject.getString("AcName");
+                                    String Debit = jsonObject.getString("Debit");
+                                    String Credit = jsonObject.getString("Credit");
+                                    String ClientID = jsonObject.getString("ClientID");
+                                    String Bal = jsonObject.getString("Bal");
+                                    String DebitBL = jsonObject.getString("DebitBL");
+                                    String CreditBL = jsonObject.getString("CreditBL");
+                                    String ed = jsonObject.getString("MaxDate");
+                                    JSONObject jbb = new JSONObject(ed);
+                                    String MaxDate = jbb.getString("date");
+
+                                    Account3Name account3Name = new Account3Name(AcTypeID,AcTypeName,AcGroupID,AcGruopName,AccountID,AcName,Debit,Credit,ClientID,MaxDate,Bal,DebitBL,CreditBL);
+                                    account3Name.save();
+
+
+                                }
+                                initData();
+//                                getAccountTypes();
+
+                            }else {
+                                String message = jsonObj.getString("message");
+                                Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                mProgress.dismiss();
+                Log.e("Error",error.toString());
+                Toast.makeText(getContext(), error.toString(), Toast.LENGTH_LONG).show();
+            }
+        }){
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<String, String>();
+                List<User> list = User.listAll(User.class);
+                for (User u: list) {
+                    params.put("ClientID", u.getClientID());
+                    params.put("CBDate", currentDate);
+                }
+                return params;
+            }
+        };
+        int socketTimeout = 10000;//10 seconds - change to what you want
+        RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
+        jsonObjectRequest.setRetryPolicy(policy);
+        AppController.getInstance().addToRequestQueue(jsonObjectRequest, tag_json_obj);
+    }
+
+
+    public void getAccountTypes(){
+//        mProgress.setTitle("Loading");
+//        mProgress.setMessage("Please wait...");
+//        mProgress.setCanceledOnTouchOutside(false);
+//        mProgress.show();
 
         String tag_json_obj = "json_obj_req";
         String u = "http://69.167.137.121/plesk-site-preview/sky.com.pk/shadiHall/GetAccountType.php";

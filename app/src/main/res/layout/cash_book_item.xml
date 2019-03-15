@@ -9,10 +9,6 @@
         android:layout_height="wrap_content"
         card_view:cardBackgroundColor="#E6E6E6"
         card_view:cardCornerRadius="8dp"
-        card_view:cardElevation="8dp"
-        android:layout_marginLeft="@dimen/ten_dp"
-        android:layout_marginRight="@dimen/ten_dp"
-        android:layout_marginBottom="@dimen/ten_dp"
         android:layout_marginTop="5dp">
 
         <LinearLayout
@@ -20,48 +16,6 @@
             android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
-
-            <LinearLayout
-                android:layout_marginTop="5dp"
-                android:orientation="horizontal"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <TextView
-                    android:textAlignment="center"
-                    android:textSize="@dimen/textSize"
-                    android:textColor="@color/colorPrimaryDark"
-                    android:textStyle="bold"
-                    android:layout_weight="1"
-                    android:layout_margin="3dp"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="@string/ac_name"/>
-
-
-                <TextView
-                    android:textAlignment="center"
-                    android:textSize="@dimen/textSize"
-                    android:textColor="@color/colorPrimaryDark"
-                    android:textStyle="bold"
-                    android:layout_weight="1"
-                    android:layout_margin="3dp"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="@string/debit_bal"/>
-
-                <TextView
-                    android:textAlignment="center"
-                    android:textSize="@dimen/textSize"
-                    android:textColor="@color/colorPrimaryDark"
-                    android:textStyle="bold"
-                    android:layout_weight="1"
-                    android:layout_margin="3dp"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="@string/credit_bal"/>
-
-            </LinearLayout>
 
             <LinearLayout
                 android:layout_weight="1"

@@ -93,4 +93,8 @@
     <string name="enter_your_email_address">Enter Your Email Address</string>
     <string name="enter_your_salary">Enter Your Salary</string>
     <string name="enter_your_password">Enter Your Password</string>
+    <string name="user_name">User Name</string>
+    <string name="amount">Amount</string>
+    <string name="remarks">Remarks</string>
+    <string name="total">Total</string>
 </resources>

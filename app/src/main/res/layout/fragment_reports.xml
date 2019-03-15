@@ -37,22 +37,122 @@
             android:layout_height="match_parent"
             android:layout_weight="1.3"/>
 
+        <ImageView
+            android:padding="6dp"
+            android:background="@android:color/transparent"
+            android:id="@+id/add"
+            android:src="@drawable/ic_add_col"
+            android:layout_gravity="center"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1.3"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/heading"
+        android:layout_below="@+id/layout"
+        android:layout_marginTop="5dp"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:textAlignment="center"
+            android:textSize="@dimen/textSize"
+            android:textColor="@color/colorPrimaryDark"
+            android:textStyle="bold"
+            android:layout_weight="1"
+            android:layout_margin="3dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/ac_name"/>
+
+
+        <TextView
+            android:textAlignment="center"
+            android:textSize="@dimen/textSize"
+            android:textColor="@color/colorPrimaryDark"
+            android:textStyle="bold"
+            android:layout_weight="1"
+            android:layout_margin="3dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/debit_bal"/>
+
+        <TextView
+            android:textAlignment="center"
+            android:textSize="@dimen/textSize"
+            android:textColor="@color/colorPrimaryDark"
+            android:textStyle="bold"
+            android:layout_weight="1"
+            android:layout_margin="3dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/credit_bal"/>
+
     </LinearLayout>
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recycler"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/layout"/>
+        android:layout_below="@+id/heading"/>
 
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+    <!--<android.support.design.widget.FloatingActionButton-->
+        <!--android:id="@+id/fab"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_alignParentBottom="true"-->
+        <!--android:layout_alignParentRight="true"-->
+        <!--android:layout_margin="@dimen/fab_margin"-->
+        <!--android:backgroundTint="@color/colorPrimaryDark"-->
+        <!--android:src="@drawable/ic_add" />-->
+
+    <LinearLayout
+        android:id="@+id/footer"
         android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
-        android:layout_margin="@dimen/fab_margin"
-        android:backgroundTint="@color/colorPrimaryDark"
-        android:src="@drawable/ic_add" />
+        android:layout_marginTop="5dp"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:textAlignment="center"
+            android:textSize="@dimen/textSize"
+            android:textColor="@color/colorPrimaryDark"
+            android:textStyle="bold"
+            android:layout_weight="1"
+            android:layout_margin="3dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/total"/>
+
+
+        <TextView
+            android:id="@+id/deb_total"
+            android:textAlignment="center"
+            android:textSize="@dimen/textSize"
+            android:textColor="@color/colorPrimaryDark"
+            android:textStyle="bold"
+            android:layout_weight="1"
+            android:layout_margin="3dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/debit_bal"/>
+
+        <TextView
+            android:id="@+id/cre_total"
+            android:textAlignment="center"
+            android:textSize="@dimen/textSize"
+            android:textColor="@color/colorPrimaryDark"
+            android:textStyle="bold"
+            android:layout_weight="1"
+            android:layout_margin="3dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/credit_bal"/>
+
+    </LinearLayout>
 
 </RelativeLayout>

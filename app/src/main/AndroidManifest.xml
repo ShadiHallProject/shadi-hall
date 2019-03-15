@@ -21,7 +21,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".activities.ChaartOfAccAddActivity"/>
+        <activity android:name=".activities.TrailBalanceActivity"></activity>
+        <activity android:name=".activities.AddExpenseActivity" />
+        <activity android:name=".activities.ChaartOfAccAddActivity" />
         <activity android:name=".activities.CashCollectionActivity" />
         <activity android:name=".activities.OtpActivity" />
         <activity android:name=".activities.LoginActivity" />

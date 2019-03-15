@@ -16,9 +16,11 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.DefaultRetryPolicy;
+import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.RetryPolicy;
 import com.android.volley.VolleyError;
@@ -27,6 +29,7 @@ import com.android.volley.toolbox.StringRequest;
 import org.by9steps.shadihall.AppController;
 import org.by9steps.shadihall.R;
 import org.by9steps.shadihall.activities.CashCollectionActivity;
+import org.by9steps.shadihall.activities.ChaartOfAccAddActivity;
 import org.by9steps.shadihall.adapters.ReportsAdapter;
 import org.by9steps.shadihall.adapters.SpinnerAdapter;
 import org.by9steps.shadihall.model.Account2Group;
@@ -46,7 +49,7 @@ import java.util.Map;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class ReportsFragment extends Fragment {
+public class ReportsFragment extends Fragment implements View.OnClickListener {
 
     private static final String ARG_SPINNER_ID = "spinner_position";
 
@@ -56,7 +59,9 @@ public class ReportsFragment extends Fragment {
     int day,month,year;
     static Button date_picker;
     Spinner sp_acgroup;
-    ImageView refresh;
+    ImageView refresh, add;
+
+    public static TextView deb_total, cre_total;
 
     // TODO: Rename and change types of parameters
     private String spPosition;
@@ -92,31 +97,40 @@ public class ReportsFragment extends Fragment {
         recyclerView = view.findViewById(R.id.recycler);
         date_picker = view.findViewById(R.id.date_picker);
         sp_acgroup = view.findViewById(R.id.sp_acgroup);
+        deb_total = view.findViewById(R.id.deb_total);
+        cre_total = view.findViewById(R.id.cre_total);
         refresh = view.findViewById(R.id.refresh);
+        add = view.findViewById(R.id.add);
 
-        FloatingActionButton fab = view.findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                // Click action
-                Intent intent = new Intent(getContext(), CashCollectionActivity.class);
-                intent.putExtra("BookingID","0");
-                intent.putExtra("Spinner","View");
-                startActivity(intent);
-            }
-        });
+        add.setOnClickListener(this);
+//        FloatingActionButton fab = view.findViewById(R.id.fab);
+//        fab.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                // Click action
+//                startActivity(new Intent(getContext(), ChaartOfAccAddActivity.class));
+//            }
+//        });
 
         Date date = new Date();
         SimpleDateFormat curFormater = new SimpleDateFormat("yyyy/MM/dd");
-        currentDate = curFormater.format(date);
-        Log.e("DATEEE", currentDate);
-        date_picker.setText(new SimpleDateFormat("dd/MM/yyyy").format(date));
+//        currentDate = curFormater.format(date);
+//        Log.e("DATEEE", currentDate);
+        date_picker.setText(new SimpleDateFormat("MM/dd/yyyy").format(date));
 
         List<Account2Group> list = Account2Group.listAll(Account2Group.class);
-        SpinnerAdapter spinnerAdapter = new SpinnerAdapter(getContext(),list,"");
-        sp_acgroup.setAdapter(spinnerAdapter);
-        sp_acgroup.setSelection(Integer.valueOf(spPosition));
+        if (list == null || list.isEmpty()){
+            getAccountGroups();
+            list = Account2Group.listAll(Account2Group.class);
+            SpinnerAdapter spinnerAdapter = new SpinnerAdapter(getContext(),list,"");
+            sp_acgroup.setAdapter(spinnerAdapter);
+        }else {
+            SpinnerAdapter spinnerAdapter = new SpinnerAdapter(getContext(),list,"");
+            sp_acgroup.setAdapter(spinnerAdapter);
+            getCashBook();
+        }
 
+        sp_acgroup.setSelection(Integer.valueOf(spPosition));
         date_picker.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -124,8 +138,6 @@ public class ReportsFragment extends Fragment {
                 newFragment.show(getFragmentManager(), "DatePicker");
             }
         });
-
-        getCashBook();
 
         refresh.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -218,4 +230,73 @@ public class ReportsFragment extends Fragment {
         AppController.getInstance().addToRequestQueue(jsonObjectRequest, tag_json_obj);
     }
 
+    public void getAccountGroups(){
+        mProgress = new ProgressDialog(getContext());
+        mProgress.setTitle("Loading");
+        mProgress.setMessage("Please wait...");
+        mProgress.setCanceledOnTouchOutside(false);
+        mProgress.show();
+
+        String tag_json_obj = "json_obj_req";
+        String u = "http://69.167.137.121/plesk-site-preview/sky.com.pk/shadiHall/GetAccountGroup.php";
+
+        StringRequest jsonObjectRequest = new StringRequest(Request.Method.GET, u,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        Log.e("RES",response);
+                        JSONObject jsonObj = null;
+
+                        try {
+                            jsonObj= new JSONObject(response);
+                            JSONArray jsonArray = jsonObj.getJSONArray("Account2Group");
+                            String success = jsonObj.getString("success");
+                            Log.e("Success",success);
+                            if (success.equals("1")){
+                                Account2Group.deleteAll(Account2Group.class);
+                                for (int i = 0; i < jsonArray.length(); i++) {
+                                    JSONObject jsonObject = jsonArray.getJSONObject(i);
+                                    Log.e("Recovery",jsonObject.toString());
+                                    String AcGroupID = jsonObject.getString("AcGroupID");
+                                    String AcTypeID = jsonObject.getString("AcTypeID");
+                                    String AcGruopName = jsonObject.getString("AcGruopName");
+
+                                    Account2Group account2Group = new Account2Group(AcGroupID,AcTypeID,AcGruopName);
+                                    account2Group.save();
+
+                                }
+
+                                mProgress.dismiss();
+                                getCashBook();
+
+                            }else {
+                                String message = jsonObj.getString("message");
+                                Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                mProgress.dismiss();
+                Log.e("Error",error.toString());
+                Toast.makeText(getContext(), error.toString(), Toast.LENGTH_LONG).show();
+            }
+        });
+        int socketTimeout = 10000;//10 seconds - change to what you want
+        RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
+        jsonObjectRequest.setRetryPolicy(policy);
+        AppController.getInstance().addToRequestQueue(jsonObjectRequest, tag_json_obj);
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()){
+            case R.id.add:
+                startActivity(new Intent(getContext(),ChaartOfAccAddActivity.class));
+                break;
+        }
+    }
 }

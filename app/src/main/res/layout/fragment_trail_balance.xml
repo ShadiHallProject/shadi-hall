@@ -1,13 +1,73 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
     tools:context=".fragments.TrailBalanceFragment">
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/recycler"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+    <!--<android.support.v7.widget.RecyclerView-->
+        <!--android:id="@+id/recycler"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="match_parent"/>-->
 
-</RelativeLayout>
+    <android.support.v7.widget.CardView
+        android:id="@+id/trail_balance"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:padding="@dimen/sp_10"
+        android:layout_marginTop="@dimen/ten_dp"
+        card_view:cardBackgroundColor="#E6E6E6"
+        card_view:cardCornerRadius="8dp"
+        card_view:cardElevation="8dp">
+        <TextView
+            android:layout_gravity="center"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Complete Trial Balance"
+            android:textSize="@dimen/sp_18"
+            android:textAlignment="center"/>
+    </android.support.v7.widget.CardView>
+
+    <android.support.v7.widget.CardView
+        android:id="@+id/pl_statement"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:padding="@dimen/sp_10"
+        android:layout_marginTop="@dimen/ten_dp"
+        card_view:cardBackgroundColor="#E6E6E6"
+        card_view:cardCornerRadius="8dp"
+        card_view:cardElevation="8dp">
+
+        <TextView
+            android:layout_gravity="center"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Summerize Trial Balance"
+            android:textSize="@dimen/sp_18"
+            android:textAlignment="center"/>
+
+    </android.support.v7.widget.CardView>
+    <android.support.v7.widget.CardView
+        android:id="@+id/balance_sheet"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:padding="@dimen/sp_10"
+        android:layout_marginTop="@dimen/ten_dp"
+        card_view:cardBackgroundColor="#E6E6E6"
+        card_view:cardCornerRadius="8dp"
+        card_view:cardElevation="8dp">
+
+        <TextView
+            android:layout_gravity="center"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Month wise Trial Balanc"
+            android:textSize="@dimen/sp_18"
+            android:textAlignment="center"/>
+
+    </android.support.v7.widget.CardView>
+
+</LinearLayout>

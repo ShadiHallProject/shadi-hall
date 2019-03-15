@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="match_parent"
     xmlns:card_view="http://schemas.android.com/apk/res-auto">
 
     <android.support.v7.widget.CardView
@@ -34,7 +33,7 @@
                     android:layout_margin="3dp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/event_date"/>
+                    android:text="@string/user_name"/>
 
                 <TextView
                     android:textSize="@dimen/textSize"
@@ -44,7 +43,7 @@
                     android:layout_margin="3dp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/event_name"/>
+                    android:text="@string/debit_account"/>
 
                 <TextView
                     android:textSize="@dimen/textSize"
@@ -54,7 +53,7 @@
                     android:layout_margin="3dp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/client_name"/>
+                    android:text="@string/credit_account"/>
 
                 <TextView
                     android:textSize="@dimen/textSize"
@@ -64,7 +63,7 @@
                     android:layout_margin="3dp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/total_charges"/>
+                    android:text="@string/amount"/>
 
                 <TextView
                     android:textSize="@dimen/textSize"
@@ -74,7 +73,7 @@
                     android:layout_margin="3dp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/Recieved"/>
+                    android:text="@string/remarks"/>
 
                 <TextView
                     android:textSize="@dimen/textSize"
@@ -84,27 +83,8 @@
                     android:layout_margin="3dp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/expensed"/>
+                    android:text="@string/date"/>
 
-                <TextView
-                    android:textSize="@dimen/textSize"
-                    android:textColor="@color/colorPrimaryDark"
-                    android:textStyle="bold"
-                    android:layout_weight="1"
-                    android:layout_margin="3dp"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="@string/balance"/>
-
-                <TextView
-                    android:textSize="@dimen/textSize"
-                    android:textColor="@color/colorPrimaryDark"
-                    android:textStyle="bold"
-                    android:layout_weight="1"
-                    android:layout_margin="3dp"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="@string/profit"/>
 
             </LinearLayout>
 
@@ -117,7 +97,7 @@
 
                 <TextView
                     android:textSize="@dimen/textSize"
-                    android:id="@+id/event_date"
+                    android:id="@+id/user_name"
                     android:layout_weight="1"
                     android:layout_margin="3dp"
                     android:layout_width="match_parent"
@@ -125,7 +105,7 @@
                     android:text="@string/expensed"/>
 
                 <TextView
-                    android:id="@+id/event_name"
+                    android:id="@+id/deb_account"
                     android:textSize="@dimen/textSize"
                     android:layout_weight="1"
                     android:layout_margin="3dp"
@@ -135,7 +115,7 @@
 
                 <TextView
                     android:textSize="@dimen/textSize"
-                    android:id="@+id/client_name"
+                    android:id="@+id/cre_account"
                     android:layout_weight="1"
                     android:layout_margin="3dp"
                     android:layout_width="match_parent"
@@ -143,74 +123,33 @@
                     android:text="@string/expensed"/>
                 <TextView
                     android:textSize="@dimen/textSize"
-                    android:id="@+id/total_charges"
+                    android:id="@+id/amount"
                     android:layout_weight="1"
                     android:layout_margin="3dp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/Recieved"/>
 
-                <LinearLayout
-                    android:orientation="horizontal"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-
-                    <TextView
-                        android:id="@+id/recieved"
-                        android:textSize="@dimen/textSize"
-                        android:layout_weight="1"
-                        android:layout_margin="3dp"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="@string/Recieved"/>
-                    <ImageButton
-                        android:id="@+id/add"
-                        android:background="@android:color/transparent"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:src="@drawable/ic_add_col"/>
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:orientation="horizontal"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-
-                    <TextView
-                        android:id="@+id/expensed"
-                        android:textSize="@dimen/textSize"
-                        android:layout_weight="1"
-                        android:layout_margin="3dp"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="@string/Recieved"/>
-                    <ImageButton
-                        android:id="@+id/add_expense"
-                        android:background="@android:color/transparent"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:src="@drawable/ic_add_col"/>
-
-                </LinearLayout>
 
                 <TextView
+                    android:id="@+id/remarks"
                     android:textSize="@dimen/textSize"
-                    android:id="@+id/balance"
                     android:layout_weight="1"
                     android:layout_margin="3dp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/Recieved"/>
 
+
                 <TextView
-                    android:id="@+id/profit"
+                    android:id="@+id/date"
                     android:textSize="@dimen/textSize"
                     android:layout_weight="1"
                     android:layout_margin="3dp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/expensed"/>
+                    android:text="@string/Recieved"/>
+
             </LinearLayout>
 
 

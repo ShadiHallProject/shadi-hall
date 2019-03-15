@@ -27,12 +27,12 @@
         </android.support.design.widget.TextInputLayout>
 
             <android.support.design.widget.TextInputLayout
-                android:id="@+id/c_number_layout"
+                android:id="@+id/address_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
                 <android.support.design.widget.TextInputEditText
-                    android:id="@+id/c_number"
+                    android:id="@+id/address"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/enter_your_address"
@@ -41,12 +41,12 @@
             </android.support.design.widget.TextInputLayout>
 
         <android.support.design.widget.TextInputLayout
-            android:id="@+id/website_layout"
+            android:id="@+id/mobile_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
             <android.support.design.widget.TextInputEditText
-                android:id="@+id/website"
+                android:id="@+id/mobile"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/enter_your_mobile_no"
@@ -55,12 +55,12 @@
         </android.support.design.widget.TextInputLayout>
 
         <android.support.design.widget.TextInputLayout
-            android:id="@+id/persons_layout"
+            android:id="@+id/email_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
             <android.support.design.widget.TextInputEditText
-                android:id="@+id/persons"
+                android:id="@+id/email"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/enter_your_email_address"
@@ -69,12 +69,12 @@
         </android.support.design.widget.TextInputLayout>
 
         <android.support.design.widget.TextInputLayout
-            android:id="@+id/c_address_layout"
+            android:id="@+id/salary_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
             <android.support.design.widget.TextInputEditText
-                android:id="@+id/c_address"
+                android:id="@+id/salary"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/enter_your_salary"
@@ -101,12 +101,12 @@
         </android.support.design.widget.TextInputLayout>
 
         <android.support.design.widget.TextInputLayout
-            android:id="@+id/name_of_person_layout"
+            android:id="@+id/login_mobile_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
             <android.support.design.widget.TextInputEditText
-                android:id="@+id/name_of_person"
+                android:id="@+id/login_mobile"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/enter_your_mobile_no"
@@ -115,12 +115,12 @@
         </android.support.design.widget.TextInputLayout>
 
         <android.support.design.widget.TextInputLayout
-            android:id="@+id/email_layout"
+            android:id="@+id/password_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
             <android.support.design.widget.TextInputEditText
-                android:id="@+id/email"
+                android:id="@+id/password"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/enter_your_password"
@@ -130,7 +130,7 @@
 
         <Spinner
             android:layout_marginBottom="5dp"
-            android:id="@+id/sp_country"
+            android:id="@+id/spinner"
             android:layout_width="match_parent"
             android:layout_height="40dp"
             android:prompt="@string/sp_country"/>
@@ -138,7 +138,7 @@
 
         <Button
             android:layout_marginTop="5dp"
-            android:id="@+id/register"
+            android:id="@+id/add"
             android:text="@string/add"
             android:textAllCaps="false"
             android:background="@color/colorPrimaryDark"

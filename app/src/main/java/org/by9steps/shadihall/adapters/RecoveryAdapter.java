@@ -15,6 +15,7 @@ import android.widget.Toast;
 
 import org.by9steps.shadihall.AppController;
 import org.by9steps.shadihall.R;
+import org.by9steps.shadihall.activities.AddExpenseActivity;
 import org.by9steps.shadihall.activities.CashCollectionActivity;
 import org.by9steps.shadihall.activities.MenuClickActivity;
 import org.by9steps.shadihall.model.Menu;
@@ -67,6 +68,17 @@ public class RecoveryAdapter extends RecyclerView.Adapter {
                 intent.putExtra("BookingID",recovery.getBookingID());
                 intent.putExtra("Spinner","Hide");
                 mCtx.startActivity(intent);
+
+            }
+        });
+
+        ((ItemViewHolder)viewHolder).add_expense.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(mCtx, AddExpenseActivity.class);
+                intent.putExtra("BookingID",recovery.getBookingID());
+                intent.putExtra("Spinner","Hide");
+                mCtx.startActivity(intent);
             }
         });
 
@@ -80,7 +92,7 @@ public class RecoveryAdapter extends RecyclerView.Adapter {
     class ItemViewHolder extends RecyclerView.ViewHolder {
 
         TextView recieved, expensed, total_charges, balance, profit, event_name, event_date, client_name;
-        ImageButton add;
+        ImageButton add, add_expense;
 
 
         public ItemViewHolder(View itemView) {
@@ -95,6 +107,7 @@ public class RecoveryAdapter extends RecyclerView.Adapter {
             event_date = itemView.findViewById(R.id.event_date);
             client_name = itemView.findViewById(R.id.client_name);
             add = itemView.findViewById(R.id.add);
+            add_expense = itemView.findViewById(R.id.add_expense);
 
         }
     }

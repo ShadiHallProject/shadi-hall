@@ -2,8 +2,10 @@ package org.by9steps.shadihall.fragments;
 
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -20,6 +22,7 @@ import com.android.volley.toolbox.StringRequest;
 
 import org.by9steps.shadihall.AppController;
 import org.by9steps.shadihall.R;
+import org.by9steps.shadihall.activities.TrailBalanceActivity;
 import org.by9steps.shadihall.adapters.ReportsAdapter;
 import org.by9steps.shadihall.model.Account3Name;
 import org.by9steps.shadihall.model.CashBook;
@@ -37,11 +40,13 @@ import java.util.Map;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class TrailBalanceFragment extends Fragment {
+public class TrailBalanceFragment extends Fragment implements View.OnClickListener {
 
     ProgressDialog mProgress;
     RecyclerView recyclerView;
     String currentDate;
+
+    CardView trailBalance, plStatement, balanceSheet;
 
 
     public TrailBalanceFragment() {
@@ -55,15 +60,35 @@ public class TrailBalanceFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_trail_balance, container, false);
 
-        recyclerView = view.findViewById(R.id.recycler);
+
+        trailBalance = view.findViewById(R.id.trail_balance);
+        plStatement = view.findViewById(R.id.pl_statement);
+        balanceSheet = view.findViewById(R.id.balance_sheet);
+
+        trailBalance.setOnClickListener(this);
+
+//        recyclerView = view.findViewById(R.id.recycler);
 
         Date date = new Date();
         SimpleDateFormat curFormater = new SimpleDateFormat("yyyy-MM-dd");
         currentDate = curFormater.format(date);
 
-        getCashBook();
+//        getCashBook();
 
         return view;
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()){
+            case R.id.trail_balance:
+                startActivity(new Intent(getContext(), TrailBalanceActivity.class));
+                break;
+            case R.id.pl_statement:
+                break;
+            case R.id.balance_sheet:
+                break;
+        }
     }
 
     public void getCashBook(){
@@ -94,6 +119,7 @@ public class TrailBalanceFragment extends Fragment {
                                 for (int i = 0; i < jsonArray.length(); i++) {
                                     JSONObject jsonObject = jsonArray.getJSONObject(i);
                                     Log.e("Recovery",jsonObject.toString());
+                                    String AcTypeID = jsonObject.getString("AcTypeID");
                                     String AcTypeName = jsonObject.getString("AcTypeName");
                                     String AcGroupID = jsonObject.getString("AcGroupID");
                                     String AcGruopName = jsonObject.getString("AcGruopName");
@@ -102,15 +128,15 @@ public class TrailBalanceFragment extends Fragment {
                                     String Debit = jsonObject.getString("Debit");
                                     String Credit = jsonObject.getString("Credit");
                                     String ClientID = jsonObject.getString("ClientID");
-                                    String ed = jsonObject.getString("MaxDate");
-                                    JSONObject jbb = new JSONObject(ed);
-                                    String MaxDate = jbb.getString("date");
                                     String Bal = jsonObject.getString("Bal");
                                     String DebitBL = jsonObject.getString("DebitBL");
                                     String CreditBL = jsonObject.getString("CreditBL");
+                                    String ed = jsonObject.getString("MaxDate");
+                                    JSONObject jbb = new JSONObject(ed);
+                                    String MaxDate = jbb.getString("date");
 
                                     Log.e("MAxDAte",MaxDate);
-                                    Account3Name account3Name = new Account3Name(AcTypeName,AcGroupID,AcGruopName,AccountID,AcName,Debit,Credit,ClientID,MaxDate,Bal,DebitBL,CreditBL);
+                                    Account3Name account3Name = new Account3Name(AcTypeID,AcTypeName,AcGroupID,AcGruopName,AccountID,AcName,Debit,Credit,ClientID,MaxDate,Bal,DebitBL,CreditBL);
                                     account3Name.save();
 
 
@@ -153,5 +179,4 @@ public class TrailBalanceFragment extends Fragment {
         jsonObjectRequest.setRetryPolicy(policy);
         AppController.getInstance().addToRequestQueue(jsonObjectRequest, tag_json_obj);
     }
-
 }

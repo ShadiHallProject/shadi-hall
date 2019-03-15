@@ -294,12 +294,27 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                         pDialog.show();
                         StringRequest jsonObjectRequest = new StringRequest(Request.Method.POST, url,
                                 new Response.Listener<String>() {
+                                    JSONObject jsonObj = null;
                                     @Override
                                     public void onResponse(String response) {
-                                        pDialog.dismiss();
-                                        Log.e("Response",response);
-                                        Toast.makeText(RegisterActivity.this, response, Toast.LENGTH_SHORT).show();
-                                        finish();
+                                        try {
+                                            jsonObj= new JSONObject(response);
+                                            String success = jsonObj.getString("success");
+
+                                            if (success.equals("1")){
+                                                pDialog.dismiss();
+                                                Log.e("Response",response);
+                                                Toast.makeText(RegisterActivity.this, "User Register", Toast.LENGTH_SHORT).show();
+                                                finish();
+                                            }else if (success.equals("0")){
+                                                pDialog.dismiss();
+                                                String message = jsonObj.getString("message");
+                                                Toast.makeText(RegisterActivity.this, message, Toast.LENGTH_SHORT).show();
+                                            }
+
+                                        } catch (JSONException e) {
+                                            e.printStackTrace();
+                                        }
                                     }
                                 }, new Response.ErrorListener() {
                             @Override
