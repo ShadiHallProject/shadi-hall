@@ -76,6 +76,7 @@ public class DirectoryNodeBinder extends TreeViewBinder<DirectoryNodeBinder.View
                 @Override
                 public void onClick(View view) {
                     Intent intent = new Intent(mCtx, ChaartOfAccAddActivity.class);
+                    intent.putExtra("GroupID", dirNode.dirID);
                     mCtx.startActivity(intent);
                 }
             });

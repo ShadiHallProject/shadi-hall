@@ -9,9 +9,6 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-permission android:name="android.permission.SEND_SMS" />
-    <uses-permission android:name="android.permission.RECEIVE_SMS" />
-    <uses-permission android:name="android.permission.CALL_PHONE" />
 
     <application
         android:name=".AppController"
@@ -21,14 +18,34 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".activities.TrailBalanceActivity"></activity>
-        <activity android:name=".activities.AddExpenseActivity" />
-        <activity android:name=".activities.ChaartOfAccAddActivity" />
-        <activity android:name=".activities.CashCollectionActivity" />
-        <activity android:name=".activities.OtpActivity" />
-        <activity android:name=".activities.LoginActivity" />
+        <activity android:name=".activities.GeneralLedgerActivity"></activity>
+        <activity
+            android:name=".activities.ProfitLossActivity"
+            android:configChanges="orientation|screenSize|keyboardHidden" />
+        <activity
+            android:name=".activities.BalSheetActivity"
+            android:configChanges="orientation|screenSize|keyboardHidden" />
+        <activity
+            android:name=".activities.TrailBalanceActivity"
+            android:configChanges="orientation|screenSize|keyboardHidden" />
+        <activity
+            android:name=".activities.AddExpenseActivity"
+            android:configChanges="orientation|screenSize|keyboardHidden" />
+        <activity
+            android:name=".activities.ChaartOfAccAddActivity"
+            android:configChanges="orientation|screenSize|keyboardHidden" />
+        <activity
+            android:name=".activities.CashCollectionActivity"
+            android:configChanges="orientation|screenSize|keyboardHidden" />
+        <activity
+            android:name=".activities.OtpActivity"
+            android:configChanges="orientation|screenSize|keyboardHidden" />
+        <activity
+            android:name=".activities.LoginActivity"
+            android:configChanges="orientation|screenSize|keyboardHidden" />
         <activity
             android:name=".activities.SplashActivity"
+            android:configChanges="orientation|screenSize|keyboardHidden"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -36,14 +53,19 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activities.RegisterActivity" />
-        <activity android:name=".activities.MenuClickActivity" />
+        <activity
+            android:name=".activities.RegisterActivity"
+            android:configChanges="orientation|screenSize|keyboardHidden" />
+        <activity
+            android:name=".activities.MenuClickActivity"
+            android:configChanges="orientation|screenSize|keyboardHidden" />
         <activity
             android:name=".activities.DetailCalendarActivity"
+            android:configChanges="orientation|screenSize|keyboardHidden"
             android:label="@string/title_activity_detail_calendar" />
         <activity
             android:name=".activities.MainActivity"
-            android:configChanges="orientation|screenSize" />
+            android:configChanges="orientation|screenSize|keyboardHidden" />
     </application>
 
 </manifest>

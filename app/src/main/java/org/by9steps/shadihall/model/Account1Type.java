@@ -2,7 +2,10 @@ package org.by9steps.shadihall.model;
 
 import com.orm.SugarRecord;
 
-public class Account1Type extends SugarRecord {
+import java.io.Serializable;
+
+public class Account1Type implements Serializable {
+
     String AcTypeID;
     String AcTypeName;
 
@@ -20,5 +23,13 @@ public class Account1Type extends SugarRecord {
 
     public String getAcTypeName() {
         return AcTypeName;
+    }
+
+    public void setAcTypeID(String acTypeID) {
+        AcTypeID = acTypeID;
+    }
+
+    public void setAcTypeName(String acTypeName) {
+        AcTypeName = acTypeName;
     }
 }

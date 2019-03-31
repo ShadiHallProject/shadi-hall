@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto">
+
+    <android.support.v7.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        card_view:cardBackgroundColor="#E6E6E6"
+        card_view:cardCornerRadius="8dp"
+        android:layout_marginTop="5dp">
+
+
+        <LinearLayout
+            android:paddingTop="5dp"
+            android:paddingBottom="5dp"
+            android:layout_marginTop="5dp"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:textAlignment="center"
+                android:textSize="@dimen/textSize"
+                android:layout_margin="3dp"
+                android:layout_width="@dimen/hundred_dp"
+                android:layout_height="wrap_content"
+                android:text="@string/total"/>
+
+            <TextView
+                android:id="@+id/capital"
+                android:textAlignment="center"
+                android:textSize="@dimen/textSize"
+                android:layout_margin="3dp"
+                android:layout_width="@dimen/hundred_dp"
+                android:layout_height="wrap_content"
+                android:text="@string/Recieved"/>
+
+            <TextView
+                android:id="@+id/profit_loss"
+                android:textAlignment="center"
+                android:textSize="@dimen/textSize"
+                android:layout_margin="3dp"
+                android:layout_width="@dimen/hundred_dp"
+                android:layout_height="wrap_content"
+                android:text="@string/expensed"/>
+
+            <TextView
+                android:id="@+id/liabilities"
+                android:textAlignment="center"
+                android:textSize="@dimen/textSize"
+                android:layout_margin="3dp"
+                android:layout_width="@dimen/hundred_dp"
+                android:layout_height="wrap_content"
+                android:text="@string/expensed"/>
+
+            <TextView
+                android:id="@+id/c_p_l"
+                android:textAlignment="center"
+                android:textSize="@dimen/textSize"
+                android:layout_margin="3dp"
+                android:layout_width="@dimen/hundred_dp"
+                android:layout_height="wrap_content"
+                android:text="@string/Recieved"/>
+
+            <TextView
+                android:id="@+id/assets"
+                android:textAlignment="center"
+                android:textSize="@dimen/textSize"
+                android:layout_margin="3dp"
+                android:layout_width="@dimen/hundred_dp"
+                android:layout_height="wrap_content"
+                android:text="@string/expensed"/>
+
+            <TextView
+                android:visibility="gone"
+                android:id="@+id/sorting"
+                android:textAlignment="center"
+                android:textSize="@dimen/textSize"
+                android:layout_margin="3dp"
+                android:layout_width="@dimen/hundred_dp"
+                android:layout_height="wrap_content"
+                android:text="@string/expensed"/>
+
+
+        </LinearLayout>
+
+
+    </android.support.v7.widget.CardView>
+
+</RelativeLayout>

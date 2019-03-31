@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "350193558007",
+    "firebase_url": "https://shadi-hall.firebaseio.com",
+    "project_id": "shadi-hall",
+    "storage_bucket": "shadi-hall.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:350193558007:android:2e17561a645e0886",
+        "android_client_info": {
+          "package_name": "org.by9steps.shadihall"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "350193558007-m2jhhku18nl46sp70shd2drfbklfvm27.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBCvSKbIOU4lXsn8LG1pUS0HS6hp3UpZ2I"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

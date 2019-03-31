@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:padding="@dimen/twenty_dp"
+    tools:context=".fragments.ProfitLossFragment">
+
+    <android.support.v7.widget.CardView
+        android:id="@+id/profit_event"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:padding="@dimen/sp_10"
+        android:layout_marginTop="@dimen/ten_dp"
+        card_view:cardBackgroundColor="#E6E6E6"
+        card_view:cardCornerRadius="8dp"
+        card_view:cardElevation="8dp">
+        <TextView
+            android:layout_gravity="center"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Profit By Event"
+            android:textSize="@dimen/sp_18"
+            android:textAlignment="center"/>
+    </android.support.v7.widget.CardView>
+
+    <android.support.v7.widget.CardView
+        android:id="@+id/profit_date"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:padding="@dimen/sp_10"
+        android:layout_marginTop="@dimen/ten_dp"
+        card_view:cardBackgroundColor="#E6E6E6"
+        card_view:cardCornerRadius="8dp"
+        card_view:cardElevation="8dp">
+
+        <TextView
+            android:layout_gravity="center"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Profit By Date"
+            android:textSize="@dimen/sp_18"
+            android:textAlignment="center"/>
+
+    </android.support.v7.widget.CardView>
+
+    <android.support.v7.widget.CardView
+        android:id="@+id/profit_year"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:padding="@dimen/sp_10"
+        android:layout_marginTop="@dimen/ten_dp"
+        card_view:cardBackgroundColor="#E6E6E6"
+        card_view:cardCornerRadius="8dp"
+        card_view:cardElevation="8dp">
+
+        <TextView
+            android:layout_gravity="center"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Profit By Year"
+            android:textSize="@dimen/sp_18"
+            android:textAlignment="center"/>
+
+    </android.support.v7.widget.CardView>
+
+</LinearLayout>

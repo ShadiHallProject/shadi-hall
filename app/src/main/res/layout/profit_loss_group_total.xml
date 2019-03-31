@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto">
+
+    <android.support.v7.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        card_view:cardBackgroundColor="#E6E6E6"
+        card_view:cardCornerRadius="8dp"
+        android:layout_marginTop="5dp">
+
+        <LinearLayout
+            android:paddingTop="5dp"
+            android:paddingBottom="5dp"
+            android:layout_marginTop="5dp"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:textStyle="bold"
+                android:textAlignment="center"
+                android:textSize="@dimen/textSize"
+                android:layout_margin="3dp"
+                android:layout_width="@dimen/hundred_dp"
+                android:layout_height="wrap_content"
+                android:text="@string/total"/>
+
+            <TextView
+                android:textStyle="bold"
+                android:id="@+id/income"
+                android:textAlignment="center"
+                android:textSize="@dimen/textSize"
+                android:layout_margin="3dp"
+                android:layout_width="@dimen/hundred_dp"
+                android:layout_height="wrap_content"
+                android:text="@string/Recieved"/>
+
+            <TextView
+                android:textStyle="bold"
+                android:id="@+id/expense"
+                android:textAlignment="center"
+                android:textSize="@dimen/textSize"
+                android:layout_margin="3dp"
+                android:layout_width="@dimen/hundred_dp"
+                android:layout_height="wrap_content"
+                android:text="@string/expensed"/>
+
+            <TextView
+                android:textStyle="bold"
+                android:id="@+id/profit"
+                android:textAlignment="center"
+                android:textSize="@dimen/textSize"
+                android:layout_margin="3dp"
+                android:layout_width="@dimen/hundred_dp"
+                android:layout_height="wrap_content"
+                android:text="@string/expensed"/>
+
+
+        </LinearLayout>
+
+
+    </android.support.v7.widget.CardView>
+
+</RelativeLayout>

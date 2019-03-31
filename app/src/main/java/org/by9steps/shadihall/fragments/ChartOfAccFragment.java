@@ -23,14 +23,12 @@ import com.orm.util.NamingHelper;
 
 import org.by9steps.shadihall.AppController;
 import org.by9steps.shadihall.R;
-import org.by9steps.shadihall.adapters.RecoveryAdapter;
-import org.by9steps.shadihall.adapters.ReportsAdapter;
 import org.by9steps.shadihall.bean.Dir;
+import org.by9steps.shadihall.helper.DatabaseHelper;
 import org.by9steps.shadihall.model.Account1Type;
 import org.by9steps.shadihall.model.Account2Group;
 import org.by9steps.shadihall.model.Account3Name;
-import org.by9steps.shadihall.model.CashBook;
-import org.by9steps.shadihall.model.Recovery;
+import org.by9steps.shadihall.model.ChartOfAcc;
 import org.by9steps.shadihall.model.User;
 import org.by9steps.shadihall.viewbinder.DirectoryNodeBinder;
 import org.by9steps.shadihall.viewbinder.FileNodeBinder;
@@ -38,8 +36,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -65,6 +61,10 @@ public class ChartOfAccFragment extends Fragment {
     List<String> city = new ArrayList<>();
     List<String> town = new ArrayList<>();
 
+    DatabaseHelper databaseHelper;
+    List<ChartOfAcc> chartOfAccList;
+    String query = "";
+
 
     public ChartOfAccFragment() {
         // Required empty public constructor
@@ -78,24 +78,33 @@ public class ChartOfAccFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_chart_of_acc, container, false);
 
         rv = view.findViewById(R.id.rv);
+        databaseHelper = new DatabaseHelper(getContext());
         mProgress = new ProgressDialog(getContext());
-        getAccount3Name();
+//        getAccount3Name();
 
 
         Date date = new Date();
         SimpleDateFormat curFormater = new SimpleDateFormat("yyyy-MM-dd");
         currentDate = curFormater.format(date);
 
-//        country.add("Pakistan");
-//
-//        city.add( "Karachi");
-//        city.add("Lahore");
-//        city.add("Islamabad");
-//        city.add("Faisalabad");
-//
-//        town.add("Saddar Town");
-//        town.add("Malir Town");
-//        town.add("New Karachi Town");
+        List<User> list = User.listAll(User.class);
+        for (User u : list){
+            query = "SELECT        Account1Type.AcTypeID, Account1Type.AcTypeName, Account2Group.AcGroupID, Account2Group.AcGruopName, derivedtbl_1.AccountID, Account3Name.AcName, SUM(derivedtbl_1.Debit) AS Debit, SUM(derivedtbl_1.Credit) \n" +
+                    "                         AS Credit, derivedtbl_1.ClientID, SUM(derivedtbl_1.Debit) - SUM(derivedtbl_1.Credit) AS Bal, CASE WHEN (SUM(Debit) - SUM(Credit)) > 0 THEN (SUM(Debit) - SUM(Credit)) ELSE 0 END AS DebitBL, CASE WHEN (SUM(Debit) \n" +
+                    "                         - SUM(Credit)) < 0 THEN (SUM(Debit) - SUM(Credit)) ELSE 0 END AS CreditBL, MAX(derivedtbl_1.CBDate) AS MaxDate\n" +
+                    "FROM            (SELECT        CreditAccount AS AccountID, 0 AS Debit, Amount AS Credit, ClientID, CBDate\n" +
+                    "                          FROM            CashBook AS CashBook\n" +
+                    "                          WHERE        (ClientID = "+u.getClientID()+") AND (CBDate <= '"+currentDate+"')\n" +
+                    "                          UNION ALL\n" +
+                    "                          SELECT        DebitAccount AS AccountID, Amount AS Debit, 0 AS Credit, ClientID, CBDate\n" +
+                    "                          FROM            CashBook AS CashBook_1\n" +
+                    "                          WHERE        (ClientID = "+u.getClientID()+") AND (CBDate <= '"+currentDate+"')) AS derivedtbl_1 INNER JOIN\n" +
+                    "                         Account3Name ON derivedtbl_1.AccountID = Account3Name.AcNameID INNER JOIN\n" +
+                    "                         Account2Group ON Account3Name.AcGroupID = Account2Group.AcGroupID INNER JOIN\n" +
+                    "                         Account1Type ON Account2Group.AcTypeID = Account1Type.AcTypeID\n" +
+                    "GROUP BY derivedtbl_1.ClientID, derivedtbl_1.AccountID, Account3Name.AcName, Account2Group.AcGroupID, Account2Group.AcGruopName, Account1Type.AcTypeName, Account1Type.AcTypeID";
+        }
+        initData();
 
         return view;
     }
@@ -123,23 +132,26 @@ public class ChartOfAccFragment extends Fragment {
 //            }
 //        }
 
-        List<Account3Name> list = Account3Name.findWithQuery(Account3Name.class, "SELECT * FROM Account3_Name GROUP BY Ac_Type_Name");
-        for (Account3Name a: list){
+//        List<Account3Name> list = Account3Name.findWithQuery(Account3Name.class, "SELECT * FROM Account3_Name GROUP BY Ac_Type_Name");
+          List<Account1Type> list = databaseHelper.getAccount1Type("SELECT * FROM Account1Type");
+        for (Account1Type a: list){
             app = new TreeNode<>(new Dir(a.getAcTypeID(),a.getAcTypeName(),"CA"));
             nodes.add(app);
-                List<Account3Name> list1 = Account3Name.findWithQuery(Account3Name.class, "SELECT * FROM Account3_Name GROUP BY Ac_Gruop_Name");
+//                List<Account3Name> list1 = Account3Name.findWithQuery(Account3Name.class, "SELECT * FROM Account3_Name GROUP BY Ac_Gruop_Name");
+                List<Account2Group> list1 = databaseHelper.getAccount2Group("SELECT * FROM Account2Group");
                 Log.e("LOOP",a.getAcTypeID());
-            for (Account3Name aa: list1){
+            for (Account2Group aa: list1){
                 Log.e("TYPEID",a.getAcTypeID()+"  "+ aa.getAcGroupID());
                 if (a.getAcTypeID().equals(aa.getAcTypeID())) {
                     cit = new TreeNode<>(new Dir(aa.getAcGroupID(), aa.getAcGruopName(), "Add"));
                     app.addChild(cit);
-                }
-                List<Account3Name> list2 = Account3Name.find(Account3Name.class, NamingHelper.toSQLNameDefault("AcGroupID")+" = ?", aa.getAcGroupID());
-                for (Account3Name aaa: list2){
-                    if (aa.getAcTypeID().equals(aaa.getClientID())) {
-                        ton = new TreeNode<>(new Dir(aaa.getAccountID(), aaa.getAcName(), "Edit"));
-                        cit.addChild(ton);
+//                    List<Account3Name> list2 = Account3Name.find(Account3Name.class, NamingHelper.toSQLNameDefault("AcGroupID")+" = ?", aa.getAcGroupID());
+                    List<ChartOfAcc> list2 = databaseHelper.getChartofAccount(query);
+                    for (ChartOfAcc aaa: list2){
+                        if (aa.getAcGroupID().equals(aaa.getAcGroupID())) {
+                            ton = new TreeNode<>(new Dir(aaa.getAccountID(), aaa.getAcName(), "Edit"));
+                            cit.addChild(ton);
+                        }
                     }
                 }
             }
@@ -195,7 +207,7 @@ public class ChartOfAccFragment extends Fragment {
                             JSONArray jsonArray = jsonObj.getJSONArray("CashBook");
                             String success = jsonObj.getString("success");
                             if (success.equals("1")){
-                                Account3Name.deleteAll(Account3Name.class);
+//                                Account3Name.deleteAll(Account3Name.class);
                                 for (int i = 0; i < jsonArray.length(); i++) {
                                     JSONObject jsonObject = jsonArray.getJSONObject(i);
                                     Log.e("Recovery",jsonObject.toString());
@@ -215,8 +227,8 @@ public class ChartOfAccFragment extends Fragment {
                                     JSONObject jbb = new JSONObject(ed);
                                     String MaxDate = jbb.getString("date");
 
-                                    Account3Name account3Name = new Account3Name(AcTypeID,AcTypeName,AcGroupID,AcGruopName,AccountID,AcName,Debit,Credit,ClientID,MaxDate,Bal,DebitBL,CreditBL);
-                                    account3Name.save();
+//                                    Account3Name account3Name = new Account3Name(AcTypeID,AcTypeName,AcGroupID,AcGruopName,AccountID,AcName,Debit,Credit,ClientID,MaxDate,Bal,DebitBL,CreditBL);
+//                                    account3Name.save();
 
 
                                 }
@@ -280,15 +292,15 @@ public class ChartOfAccFragment extends Fragment {
                             String success = jsonObj.getString("success");
                             Log.e("Success",success);
                             if (success.equals("1")){
-                                Account1Type.deleteAll(Account1Type.class);
+//                                Account1Type.deleteAll(Account1Type.class);
                                 for (int i = 0; i < jsonArray.length(); i++) {
                                     JSONObject jsonObject = jsonArray.getJSONObject(i);
                                     Log.e("Recovery",jsonObject.toString());
                                     String AcTypeID = jsonObject.getString("AcTypeID");
                                     String AcTypeName = jsonObject.getString("AcTypeName");
 
-                                    Account1Type account1Type = new Account1Type(AcTypeID, AcTypeName);
-                                    account1Type.save();
+//                                    Account1Type account1Type = new Account1Type(AcTypeID, AcTypeName);
+//                                    account1Type.save();
 
                                 }
                                 getAccountGroups();
@@ -338,7 +350,7 @@ public class ChartOfAccFragment extends Fragment {
                             String success = jsonObj.getString("success");
                             Log.e("Success",success);
                             if (success.equals("1")){
-                                Account2Group.deleteAll(Account2Group.class);
+//                                Account2Group.deleteAll(Account2Group.class);
                                 for (int i = 0; i < jsonArray.length(); i++) {
                                     JSONObject jsonObject = jsonArray.getJSONObject(i);
                                     Log.e("Recovery",jsonObject.toString());
@@ -346,8 +358,8 @@ public class ChartOfAccFragment extends Fragment {
                                     String AcTypeID = jsonObject.getString("AcTypeID");
                                     String AcGruopName = jsonObject.getString("AcGruopName");
 
-                                    Account2Group account2Group = new Account2Group(AcGroupID,AcTypeID,AcGruopName);
-                                    account2Group.save();
+//                                    Account2Group account2Group = new Account2Group(AcGroupID,AcTypeID,AcGruopName);
+//                                    account2Group.save();
 
                                 }
                                 initData();

@@ -41,6 +41,7 @@
     <string name="error_message_persons">Enter Persons</string>
     <string name="error_message_website">Enter Website</string>
     <string name="error_message_email">Enter Email</string>
+    <string name="error_message_salary">Enter Salary</string>
     <string name="sp_country">Select Country</string>
     <string name="enter_phone_number">Enter Phone Number</string>
     <string name="error_message_phone">Enter Phone Number</string>
@@ -97,4 +98,23 @@
     <string name="amount">Amount</string>
     <string name="remarks">Remarks</string>
     <string name="total">Total</string>
+    <string name="actypename">AcType</string>
+    <string name="acgruopname">AcGruop</string>
+    <string name="cb_date">CB Date</string>
+    <string name="capital">Capital</string>
+    <string name="profitloss">ProfitLoss</string>
+    <string name="liabilities">Liabilities</string>
+    <string name="c_p_l">C + P + L</string>
+    <string name="assets">Assets</string>
+    <string name="sorting">Sorting</string>
+    <string name="month">Month</string>
+    <string name="income">Income</string>
+    <string name="expense">Expense</string>
+    <string name="cashbook_id">CashBook ID</string>
+    <string name="client_id">Client ID</string>
+    <string name="entry_no">Entry No</string>
+    <string name="selectedac">SelectedAc</string>
+    <string name="againstac">AgainstAc</string>
+    <string name="particulars">Particulars</string>
+    <string name="entry_of">Entry Of</string>
 </resources>

@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import java.util.concurrent.TimeUnit;
 import android.support.design.widget.TextInputEditText;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -17,6 +18,13 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
+
+import com.google.firebase.FirebaseException;
+import com.google.firebase.FirebaseTooManyRequestsException;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
+import com.google.firebase.auth.PhoneAuthCredential;
+import com.google.firebase.auth.PhoneAuthProvider;
 
 import org.by9steps.shadihall.R;
 import org.by9steps.shadihall.helper.InputValidation;
@@ -33,12 +41,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private InputValidation inputValidation;
 
     String ph;
-
-    //sms
-    ArrayList<PendingIntent> sentPI = new ArrayList<PendingIntent>();
-    ArrayList<PendingIntent> deliveredPI = new ArrayList<PendingIntent>();
-    BroadcastReceiver smsSentReceiver, smsDeliverReceiver;
-    PendingIntent s, d;
 
     //shared prefrences
     SharedPreferences sharedPreferences;
@@ -58,10 +60,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             getSupportActionBar().setTitle("Login");
         }
 
-        //sms
-        s = PendingIntent.getBroadcast(this, 0, new Intent("SENT"), 0);
-        d = PendingIntent.getBroadcast(this, 0, new Intent("DELEIVERED"), 0);
-
         //shared prefrences
         sharedPreferences = getSharedPreferences(mypreference,
                 Context.MODE_PRIVATE);
@@ -71,6 +69,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         loginBtn = findViewById(R.id.login_btn);
 
         loginBtn.setOnClickListener(this);
+
+
     }
 
     @Override
@@ -82,94 +82,17 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 if (!inputValidation.isInputEditTextFilled(phoneNum, phoneLayout, getString(R.string.error_message_phone))) {
                     return;
                 } else {
-                    try {
 
-                        final int min = 2111;
-                        final int max = 9999;
-                        final int random = new Random().nextInt((max - min) + 1) + min;
-
-                        SharedPreferences.Editor editor = sharedPreferences.edit();
-                        editor.putString(code, String.valueOf(random));
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
                         editor.putString(phone, ph);
                         editor.apply();
+                        Intent intent = new Intent(LoginActivity.this, OtpActivity.class);
+                    intent.putExtra("PHONE",ph);
+                    startActivity(intent);
 
-                        SmsManager smsManager = SmsManager.getDefault();
-                        String messageText = "Your verification code is:" + random;
-                        Log.e("OTP CODE",String.valueOf(random));
-                        ArrayList<String> mSMSMessage = smsManager.divideMessage(messageText);
-                        for (int i = 0; i < mSMSMessage.size(); i++) {
-                            sentPI.add(i, s);
-                            deliveredPI.add(i, d);
-                        }
-                        smsManager.sendMultipartTextMessage(phoneNum.getText().toString(), null, mSMSMessage, sentPI, deliveredPI);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
                 }
                 break;
         }
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        smsSentReceiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-
-                switch (getResultCode()) {
-                    case Activity.RESULT_OK:
-                        Toast.makeText(context, "SMS sent!", Toast.LENGTH_SHORT).show();
-                        startActivity(new Intent(LoginActivity.this, OtpActivity.class));
-                        finish();
-                        break;
-
-                    case SmsManager.RESULT_ERROR_GENERIC_FAILURE:
-                        Toast.makeText(context, "Generic failure!", Toast.LENGTH_SHORT).show();
-                        startActivity(new Intent(LoginActivity.this, OtpActivity.class));
-                        finish();
-                        break;
-
-                    case SmsManager.RESULT_ERROR_NO_SERVICE:
-                        Toast.makeText(context, "No service!", Toast.LENGTH_SHORT).show();
-                        break;
-
-                    case SmsManager.RESULT_ERROR_NULL_PDU:
-                        Toast.makeText(context, "Null PDU!", Toast.LENGTH_SHORT).show();
-                        break;
-
-                    case SmsManager.RESULT_ERROR_RADIO_OFF:
-                        Toast.makeText(context, "Radio off!", Toast.LENGTH_SHORT).show();
-                        break;
-
-                }
-
-            }
-        };
-
-        smsDeliverReceiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-
-                switch (getResultCode()) {
-                    case Activity.RESULT_OK:
-                        Toast.makeText(context, "SMS delivered!", Toast.LENGTH_SHORT).show();
-                        break;
-                    case Activity.RESULT_CANCELED:
-                        Toast.makeText(context, "SMS not delivered!", Toast.LENGTH_SHORT).show();
-                        break;
-                }
-            }
-        };
-
-        registerReceiver(smsSentReceiver, new IntentFilter("SENT"));
-        registerReceiver(smsDeliverReceiver, new IntentFilter("DELEIVERED"));
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        unregisterReceiver(smsSentReceiver);
-        unregisterReceiver(smsDeliverReceiver);
-    }
 }

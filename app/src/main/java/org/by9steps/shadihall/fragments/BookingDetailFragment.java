@@ -25,6 +25,8 @@ import com.android.volley.toolbox.StringRequest;
 import org.by9steps.shadihall.AppController;
 import org.by9steps.shadihall.R;
 import org.by9steps.shadihall.activities.CashCollectionActivity;
+import org.by9steps.shadihall.helper.DatabaseHelper;
+import org.by9steps.shadihall.model.Bookings;
 import org.by9steps.shadihall.model.User;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -51,6 +53,9 @@ public class BookingDetailFragment extends Fragment implements View.OnClickListe
              advance_fee, description;
     Button call, sms, edit, cash;
     String bookingID;
+
+    DatabaseHelper databaseHelper;
+    List<Bookings> bookingList;
 
     //shared prefrences
     SharedPreferences sharedPreferences;
@@ -111,6 +116,16 @@ public class BookingDetailFragment extends Fragment implements View.OnClickListe
         edit.setOnClickListener(this);
         cash.setOnClickListener(this);
 
+        databaseHelper = new DatabaseHelper(getContext());
+
+        String query = "";
+        List<User> list = User.listAll(User.class);
+        for (User u: list) {
+            query = "SELECT * FROM Booking WHERE ClientID =" + u.getClientID()+" AND EventDate = '"+eventDate+" 00:00:00.000000'";
+        }
+        bookingList = databaseHelper.getBookings(query);
+        Log.e("Booking",String.valueOf(bookingList.size()));
+
         //shared prefrences
         sharedPreferences = getContext().getSharedPreferences(mypreference,
                 Context.MODE_PRIVATE);
@@ -119,7 +134,21 @@ public class BookingDetailFragment extends Fragment implements View.OnClickListe
         }
 
 
-        getBooking();
+        for (Bookings b : bookingList){
+            booking_date.setText(b.getBookingDate());
+            event_date.setText(b.getEventDate());
+            client_name.setText(b.getClientName());
+            address.setText(b.getClientAddress());
+            client_mobile_no.setText(b.getClientMobile());
+            cnic_number.setText(b.getClientNic());
+            total_charges.setText(b.getChargesTotal());
+            event_name.setText(b.getEventName());
+            advance_fee.setText("123456");
+            description.setText(b.getDescription());
+            bookingID = b.getBookingID();
+        }
+
+//        getBooking();
 
 
         return view;

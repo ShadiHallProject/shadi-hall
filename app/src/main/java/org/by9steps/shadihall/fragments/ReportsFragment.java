@@ -4,7 +4,6 @@ package org.by9steps.shadihall.fragments;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -28,13 +27,12 @@ import com.android.volley.toolbox.StringRequest;
 
 import org.by9steps.shadihall.AppController;
 import org.by9steps.shadihall.R;
-import org.by9steps.shadihall.activities.CashCollectionActivity;
 import org.by9steps.shadihall.activities.ChaartOfAccAddActivity;
 import org.by9steps.shadihall.adapters.ReportsAdapter;
 import org.by9steps.shadihall.adapters.SpinnerAdapter;
+import org.by9steps.shadihall.helper.DatabaseHelper;
 import org.by9steps.shadihall.model.Account2Group;
-import org.by9steps.shadihall.model.Account3Name;
-import org.by9steps.shadihall.model.CashBook;
+import org.by9steps.shadihall.model.Reports;
 import org.by9steps.shadihall.model.User;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -60,6 +58,9 @@ public class ReportsFragment extends Fragment implements View.OnClickListener {
     static Button date_picker;
     Spinner sp_acgroup;
     ImageView refresh, add;
+
+    DatabaseHelper databaseHelper;
+    List<Reports> reportsList;
 
     public static TextView deb_total, cre_total;
 
@@ -102,6 +103,8 @@ public class ReportsFragment extends Fragment implements View.OnClickListener {
         refresh = view.findViewById(R.id.refresh);
         add = view.findViewById(R.id.add);
 
+        databaseHelper = new DatabaseHelper(getContext());
+
         add.setOnClickListener(this);
 //        FloatingActionButton fab = view.findViewById(R.id.fab);
 //        fab.setOnClickListener(new View.OnClickListener() {
@@ -113,24 +116,26 @@ public class ReportsFragment extends Fragment implements View.OnClickListener {
 //        });
 
         Date date = new Date();
-        SimpleDateFormat curFormater = new SimpleDateFormat("yyyy/MM/dd");
+        SimpleDateFormat curFormater = new SimpleDateFormat("yyyy-MM-dd");
 //        currentDate = curFormater.format(date);
 //        Log.e("DATEEE", currentDate);
-        date_picker.setText(new SimpleDateFormat("MM/dd/yyyy").format(date));
+        date_picker.setText(new SimpleDateFormat("yyyy-MM-dd").format(date));
 
-        List<Account2Group> list = Account2Group.listAll(Account2Group.class);
+        List<Account2Group> list = databaseHelper.getAccount2Group("SELECT * FROM Account2Group");
         if (list == null || list.isEmpty()){
             getAccountGroups();
-            list = Account2Group.listAll(Account2Group.class);
+            list = list = databaseHelper.getAccount2Group("SELECT * FROM Account2Group");
             SpinnerAdapter spinnerAdapter = new SpinnerAdapter(getContext(),list,"");
             sp_acgroup.setAdapter(spinnerAdapter);
         }else {
             SpinnerAdapter spinnerAdapter = new SpinnerAdapter(getContext(),list,"");
             sp_acgroup.setAdapter(spinnerAdapter);
-            getCashBook();
+//            getCashBook();
+
         }
 
         sp_acgroup.setSelection(Integer.valueOf(spPosition));
+
         date_picker.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -142,11 +147,42 @@ public class ReportsFragment extends Fragment implements View.OnClickListener {
         refresh.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                getCashBook();
+//                getCashBook();
+                getReports();
             }
         });
 
+        getReports();
+
         return view;
+    }
+
+    public void getReports(){
+
+
+        List<User> list = User.listAll(User.class);
+
+        for (User u : list){
+            String query = "SELECT        GroupTotal.AccountID, SUM(GroupTotal.Debit) AS Debit, SUM(GroupTotal.Credit) AS Credit, SUM(GroupTotal.Debit) - SUM(GroupTotal.Credit) AS Bal, CASE WHEN (SUM(Debit) - SUM(Credit)) > 0 THEN (SUM(Debit) - SUM(Credit))\n" +
+                    "                         ELSE 0 END AS DebitBal, CASE WHEN (SUM(Debit) - SUM(Credit)) < 0 THEN (SUM(Debit) - SUM(Credit)) ELSE 0 END AS CreditBal, Account3Name_2.AcName, Account3Name_2.AcGroupID\n" +
+                    "FROM            (SELECT        CashBook.DebitAccount AS AccountID, CashBook.Amount AS Debit, 0 AS Credit\n" +
+                    "                          FROM            CashBook INNER JOIN\n" +
+                    "                                                    Account3Name ON CashBook.DebitAccount = Account3Name.AcNameID\n" +
+                    "                          WHERE        (CashBook.ClientID = "+u.getClientID()+") AND (CashBook.CBDate <= '"+date_picker.getText().toString()+"') AND (Account3Name.AcGroupID = "+((Account2Group)sp_acgroup.getSelectedItem()).getAcGroupID()+")\n" +
+                    "                          UNION ALL\n" +
+                    "                          SELECT        CashBook_1.CreditAccount AS AccountID, 0 AS Debit, CashBook_1.Amount AS Credit\n" +
+                    "                          FROM            CashBook AS CashBook_1 INNER JOIN\n" +
+                    "                                                   Account3Name AS Account3Name_1 ON CashBook_1.CreditAccount = Account3Name_1.AcNameID\n" +
+                    "                          WHERE        (CashBook_1.ClientID = "+u.getClientID()+") AND (CashBook_1.CBDate <= '"+date_picker.getText().toString()+"') AND (Account3Name_1.AcGroupID = "+((Account2Group)sp_acgroup.getSelectedItem()).getAcGroupID()+")) AS GroupTotal INNER JOIN\n" +
+                    "                         Account3Name AS Account3Name_2 ON GroupTotal.AccountID = Account3Name_2.AcNameID\n" +
+                    "GROUP BY GroupTotal.AccountID, Account3Name_2.AcName, Account3Name_2.AcGroupID";
+            reportsList = databaseHelper.getReports(query);
+        }
+
+        ReportsAdapter adapter = new ReportsAdapter(getContext(),reportsList,ReportsAdapter.Cash_Book);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        recyclerView.setAdapter(adapter);
+
     }
 
     public void getCashBook(){
@@ -173,7 +209,7 @@ public class ReportsFragment extends Fragment implements View.OnClickListener {
                             String success = jsonObj.getString("success");
                             Log.e("Success",success);
                             if (success.equals("1")){
-                                CashBook.deleteAll(CashBook.class);
+//                                CashBook.deleteAll(CashBook.class);
                                 for (int i = 0; i < jsonArray.length(); i++) {
                                     JSONObject jsonObject = jsonArray.getJSONObject(i);
                                     Log.e("Recovery",jsonObject.toString());
@@ -186,15 +222,15 @@ public class ReportsFragment extends Fragment implements View.OnClickListener {
                                     String AcName = jsonObject.getString("AcName");
                                     String AcGroupID = jsonObject.getString("AcGroupID");
 
-                                    CashBook cashBook = new CashBook(AccountID,Debit,Credit,Bal,DebitBal,CreditBal,AcName,AcGroupID);
-                                    cashBook.save();
+//                                    CashBook cashBook = new CashBook(AccountID,Debit,Credit,Bal,DebitBal,CreditBal,AcName,AcGroupID);
+//                                    cashBook.save();
 
                                 }
 
-                                List<CashBook> mList = CashBook.listAll(CashBook.class);
-                                ReportsAdapter adapter = new ReportsAdapter(getContext(),mList,ReportsAdapter.Cash_Book);
-                                recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-                                recyclerView.setAdapter(adapter);
+//                                List<CashBook> mList = CashBook.listAll(CashBook.class);
+//                                ReportsAdapter adapter = new ReportsAdapter(getContext(),mList,ReportsAdapter.Cash_Book);
+//                                recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+//                                recyclerView.setAdapter(adapter);
 
                             }else {
                                 String message = jsonObj.getString("message");
@@ -253,7 +289,7 @@ public class ReportsFragment extends Fragment implements View.OnClickListener {
                             String success = jsonObj.getString("success");
                             Log.e("Success",success);
                             if (success.equals("1")){
-                                Account2Group.deleteAll(Account2Group.class);
+//                                Account2Group.deleteAll(Account2Group.class);
                                 for (int i = 0; i < jsonArray.length(); i++) {
                                     JSONObject jsonObject = jsonArray.getJSONObject(i);
                                     Log.e("Recovery",jsonObject.toString());
@@ -261,13 +297,12 @@ public class ReportsFragment extends Fragment implements View.OnClickListener {
                                     String AcTypeID = jsonObject.getString("AcTypeID");
                                     String AcGruopName = jsonObject.getString("AcGruopName");
 
-                                    Account2Group account2Group = new Account2Group(AcGroupID,AcTypeID,AcGruopName);
-                                    account2Group.save();
+                                    databaseHelper.createAccount2Group(new Account2Group(AcGroupID,AcTypeID,AcGruopName));
 
                                 }
 
                                 mProgress.dismiss();
-                                getCashBook();
+//                                getCashBook();
 
                             }else {
                                 String message = jsonObj.getString("message");

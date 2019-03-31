@@ -1,19 +1,16 @@
 package org.by9steps.shadihall.activities;
 
-import android.app.DatePickerDialog;
-import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.support.design.widget.TextInputEditText;
 import android.support.design.widget.TextInputLayout;
+import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.DatePicker;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -33,8 +30,10 @@ import java.util.Map;
 
 import org.by9steps.shadihall.AppController;
 import org.by9steps.shadihall.R;
+import org.by9steps.shadihall.fragments.SelectDateFragment;
+import org.by9steps.shadihall.helper.DatabaseHelper;
 import org.by9steps.shadihall.helper.InputValidation;
-import org.by9steps.shadihall.model.Account3Name;
+import org.by9steps.shadihall.model.ChartOfAcc;
 import org.by9steps.shadihall.model.User;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -45,7 +44,7 @@ import in.galaxyofandroid.spinerdialog.SpinnerDialog;
 public class CashCollectionActivity extends AppCompatActivity implements View.OnClickListener {
 
     TextInputLayout date_layout;
-    TextView date;
+    public static TextView date;
     TextInputLayout description_layout;
     TextInputEditText description;
     TextInputLayout amount_layout;
@@ -61,7 +60,13 @@ public class CashCollectionActivity extends AppCompatActivity implements View.On
 
     ArrayList<String> listDebit = new ArrayList<>();
     ArrayList<String> listCredit = new ArrayList<>();
+    ArrayList<String> mDebit = new ArrayList<>();
+    ArrayList<String> mCredit = new ArrayList<>();
     SpinnerDialog debitDialog, creditDialog;
+
+    DatabaseHelper databaseHelper;
+    List<ChartOfAcc> chartOfAccList;
+    String query = "", currentDate, dDebit = null, cCredit = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,6 +85,37 @@ public class CashCollectionActivity extends AppCompatActivity implements View.On
         }
 
         inputValidation = new InputValidation(this);
+        databaseHelper = new DatabaseHelper(this);
+
+        Date da = new Date();
+        SimpleDateFormat sf = new SimpleDateFormat("yyyy-MM-dd");
+        currentDate = sf.format(da);
+
+        List<User> list = User.listAll(User.class);
+        for (User u : list){
+            query = "SELECT        Account1Type.AcTypeID, Account1Type.AcTypeName, Account2Group.AcGroupID, Account2Group.AcGruopName, derivedtbl_1.AccountID, Account3Name.AcName, SUM(derivedtbl_1.Debit) AS Debit, SUM(derivedtbl_1.Credit) \n" +
+                    "                         AS Credit, derivedtbl_1.ClientID, SUM(derivedtbl_1.Debit) - SUM(derivedtbl_1.Credit) AS Bal, CASE WHEN (SUM(Debit) - SUM(Credit)) > 0 THEN (SUM(Debit) - SUM(Credit)) ELSE 0 END AS DebitBL, CASE WHEN (SUM(Debit) \n" +
+                    "                         - SUM(Credit)) < 0 THEN (SUM(Debit) - SUM(Credit)) ELSE 0 END AS CreditBL, MAX(derivedtbl_1.CBDate) AS MaxDate\n" +
+                    "FROM            (SELECT        CreditAccount AS AccountID, 0 AS Debit, Amount AS Credit, ClientID, CBDate\n" +
+                    "                          FROM            CashBook AS CashBook\n" +
+                    "                          WHERE        (ClientID = "+u.getClientID()+") AND (CBDate <= '"+currentDate+"')\n" +
+                    "                          UNION ALL\n" +
+                    "                          SELECT        DebitAccount AS AccountID, Amount AS Debit, 0 AS Credit, ClientID, CBDate\n" +
+                    "                          FROM            CashBook AS CashBook_1\n" +
+                    "                          WHERE        (ClientID = "+u.getClientID()+") AND (CBDate <= '"+currentDate+"')) AS derivedtbl_1 INNER JOIN\n" +
+                    "                         Account3Name ON derivedtbl_1.AccountID = Account3Name.AcNameID INNER JOIN\n" +
+                    "                         Account2Group ON Account3Name.AcGroupID = Account2Group.AcGroupID INNER JOIN\n" +
+                    "                         Account1Type ON Account2Group.AcTypeID = Account1Type.AcTypeID\n" +
+                    "GROUP BY derivedtbl_1.ClientID, derivedtbl_1.AccountID, Account3Name.AcName, Account2Group.AcGroupID, Account2Group.AcGruopName, Account1Type.AcTypeName, Account1Type.AcTypeID";
+        }
+
+        List<ChartOfAcc> li = databaseHelper.getChartofAccount(query);
+        for (ChartOfAcc a : li){
+            listCredit.add(a.getAcName());
+            mCredit.add(a.getAccountID());
+            listDebit.add(a.getAcName());
+            mDebit.add(a.getAccountID());
+        }
 
         date_layout = findViewById(R.id.date_layout);
         date = findViewById(R.id.date);
@@ -99,6 +135,14 @@ public class CashCollectionActivity extends AppCompatActivity implements View.On
         SimpleDateFormat curFormater = new SimpleDateFormat("dd-M-yyyy");
         String d = curFormater.format(date1);
         date.setText(d);
+        date.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AppController.date = "CashBook";
+                DialogFragment newFragment = new SelectDateFragment();
+                newFragment.show(getSupportFragmentManager(), "DatePicker");
+            }
+        });
 
 
         if (!spinnerType.equals("Hide")){
@@ -119,13 +163,6 @@ public class CashCollectionActivity extends AppCompatActivity implements View.On
         }
 
         add.setOnClickListener(this);
-
-        List<Account3Name> list = Account3Name.listAll(Account3Name.class);
-        for (Account3Name a : list){
-            listCredit.add(a.getCredit());
-            listDebit.add(a.getDebit());
-        }
-
 
     }
 
@@ -151,6 +188,8 @@ public class CashCollectionActivity extends AppCompatActivity implements View.On
                     @Override
                     public void onClick(String s, int i) {
                         Toast.makeText(CashCollectionActivity.this,"Item Selected",Toast.LENGTH_LONG).show();
+                        Log.e("DEBIT", mDebit.get(i));
+                        dDebit = mDebit.get(i);
                         debit_account.setText(s);
                     }
                 });
@@ -164,12 +203,18 @@ public class CashCollectionActivity extends AppCompatActivity implements View.On
                     public void onClick(String s, int i) {
                         Toast.makeText(CashCollectionActivity.this,"Item Selected",Toast.LENGTH_LONG).show();
                         credit_account.setText(s);
+                        Log.e("DEBIT", mCredit.get(i));
+                        cCredit = mCredit.get(i);
                     }
                 });
                 creditDialog.showSpinerDialog();
                 break;
             case R.id.add:
 
+                if (cCredit == null && dDebit == null){
+                    Toast.makeText(CashCollectionActivity.this,"Select Debit or Credit",Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 if (!inputValidation.isInputEditTextFilled(amount, amount_layout, getString(R.string.error_message_amount))) {
                     return;
                 }else{
@@ -214,8 +259,8 @@ public class CashCollectionActivity extends AppCompatActivity implements View.On
                             List<User> list = User.listAll(User.class);
                             for (User u : list) {
                                 params.put("CBDate", date.getText().toString());
-                                params.put("DebitAccount", u.getCashID());
-                                params.put("CreditAccount", u.getBookingIncomeID());
+                                params.put("DebitAccount", dDebit);
+                                params.put("CreditAccount", cCredit);
                                 params.put("CBRemarks", description.getText().toString());
                                 params.put("Amount", amount.getText().toString());
                                 params.put("ClientID", u.getClientID());

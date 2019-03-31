@@ -8,6 +8,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.support.annotation.NonNull;
+import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputEditText;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -18,6 +20,17 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import java.util.concurrent.TimeUnit;
+
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.TaskExecutors;
+import com.google.firebase.FirebaseException;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
+import com.google.firebase.auth.PhoneAuthCredential;
+import com.google.firebase.auth.PhoneAuthProvider;
 import com.orm.SugarContext;
 
 import org.by9steps.shadihall.AppController;
@@ -29,12 +42,19 @@ import java.util.Random;
 
 public class OtpActivity extends AppCompatActivity implements View.OnClickListener {
 
+    private FirebaseAuth mAuth;
+    private String mVerificationId = "";
+    public boolean mVerificationInProgress = false;
+    private PhoneAuthProvider.OnVerificationStateChangedCallbacks mCallbacks;
+    private PhoneAuthProvider.ForceResendingToken mResendToken;
+
+
     TextInputLayout otpLayout;
     TextInputEditText otpcode;
     Button otpBtn, resendOtp;
-    ProgressDialog pDialog;
+    ProgressDialog progressDialog;
 
-    String otp, savecode, ph;
+    String otp, savecode, ph, phonenum;
     private InputValidation inputValidation;
 
     //shared prefrences
@@ -44,12 +64,6 @@ public class OtpActivity extends AppCompatActivity implements View.OnClickListen
     public static final String phone = "phoneKey";
     public static final String login = "loginKey";
 
-    //sms
-    ArrayList<PendingIntent> sentPI = new ArrayList<PendingIntent>();
-    ArrayList<PendingIntent> deliveredPI = new ArrayList<PendingIntent>();
-    BroadcastReceiver smsSentReceiver, smsDeliverReceiver;
-    PendingIntent s, d;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -57,15 +71,13 @@ public class OtpActivity extends AppCompatActivity implements View.OnClickListen
         SugarContext.init(this);
 
         inputValidation = new InputValidation(this);
+        progressDialog = new ProgressDialog(this);
+        initFireBaseCallbacks();
 
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setTitle("Otp");
         }
-
-        //sms
-        s = PendingIntent.getBroadcast(this, 0, new Intent("SENT"), 0);
-        d = PendingIntent.getBroadcast(this, 0, new Intent("DELEIVERED"), 0);
 
         //shared prefrences
         sharedPreferences = getSharedPreferences(mypreference,
@@ -77,10 +89,15 @@ public class OtpActivity extends AppCompatActivity implements View.OnClickListen
         resendOtp = findViewById(R.id.resend_otp);
         otpBtn.setOnClickListener(this);
         resendOtp.setOnClickListener(this);
+
+        if (sharedPreferences.contains(phone))
+            ph = sharedPreferences.getString(phone, "");
+        phonenum = getIntent().getStringExtra("PHONE");
+        sendVerificationCode(phonenum);
     }
 
     @Override
-    public void onClick(View view) {
+    public void onClick(final View view) {
         switch (view.getId()) {
             case R.id.otp_btn:
                 otp = otpcode.getText().toString();
@@ -88,106 +105,19 @@ public class OtpActivity extends AppCompatActivity implements View.OnClickListen
                 if (!inputValidation.isInputEditTextFilled(otpcode, otpLayout, getString(R.string.error_message_otp))) {
                     return;
                 } else {
-                    if (sharedPreferences.contains(code))
-                        savecode = sharedPreferences.getString(code, "");
 
-                    if (otp.equals(savecode)) {
-                            if (sharedPreferences.contains(code))
-                                ph = sharedPreferences.getString(phone, "");
-                            startActivity(new Intent(OtpActivity.this, MainActivity.class));
-                            finish();
-                    } else {
-                        Toast.makeText(this, "Otp does not match! Please enter correct otp.", Toast.LENGTH_SHORT).show();
-                        resendOtp.setVisibility(View.VISIBLE);
-                    }
+                    verifyVerificationCode(otp);
+
                 }
 
                 break;
             case R.id.resend_otp:
-                try {
-                    if (sharedPreferences.contains(code))
-                        ph = sharedPreferences.getString(phone, "");
-                    final int min = 2111;
-                    final int max = 9999;
-                    final int random = new Random().nextInt((max - min) + 1) + min;
+                if (sharedPreferences.contains(phone))
+                    ph = sharedPreferences.getString(phone, "");
+                sendVerificationCode(ph);
 
-                    SharedPreferences.Editor editor = sharedPreferences.edit();
-                    editor.putString(code, String.valueOf(random));
-                    editor.apply();
-
-
-                    SmsManager smsManager = SmsManager.getDefault();
-                    String messageText = "Your verification code is:" + random;
-                    ArrayList<String> mSMSMessage = smsManager.divideMessage(messageText);
-                    for (int i = 0; i < mSMSMessage.size(); i++) {
-                        sentPI.add(i, s);
-                        deliveredPI.add(i, d);
-                    }
-                    smsManager.sendMultipartTextMessage(ph, null, mSMSMessage, sentPI, deliveredPI);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
                 break;
         }
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        smsSentReceiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-
-                switch (getResultCode()) {
-                    case Activity.RESULT_OK:
-                        Toast.makeText(context, "SMS sent!", Toast.LENGTH_SHORT).show();
-                        break;
-
-                    case SmsManager.RESULT_ERROR_GENERIC_FAILURE:
-                        Toast.makeText(context, "Generic failure!", Toast.LENGTH_SHORT).show();
-                        break;
-
-                    case SmsManager.RESULT_ERROR_NO_SERVICE:
-                        Toast.makeText(context, "No service!", Toast.LENGTH_SHORT).show();
-                        break;
-
-                    case SmsManager.RESULT_ERROR_NULL_PDU:
-                        Toast.makeText(context, "Null PDU!", Toast.LENGTH_SHORT).show();
-                        break;
-
-                    case SmsManager.RESULT_ERROR_RADIO_OFF:
-                        Toast.makeText(context, "Radio off!", Toast.LENGTH_SHORT).show();
-                        break;
-
-                }
-
-            }
-        };
-
-        smsDeliverReceiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-
-                switch (getResultCode()) {
-                    case Activity.RESULT_OK:
-                        Toast.makeText(context, "SMS delivered!", Toast.LENGTH_SHORT).show();
-                        break;
-                    case Activity.RESULT_CANCELED:
-                        Toast.makeText(context, "SMS not delivered!", Toast.LENGTH_SHORT).show();
-                        break;
-                }
-            }
-        };
-
-        registerReceiver(smsSentReceiver, new IntentFilter("SENT"));
-        registerReceiver(smsDeliverReceiver, new IntentFilter("DELEIVERED"));
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        unregisterReceiver(smsSentReceiver);
-        unregisterReceiver(smsDeliverReceiver);
     }
 
     @Override
@@ -198,5 +128,102 @@ public class OtpActivity extends AppCompatActivity implements View.OnClickListen
                 break;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    void initFireBaseCallbacks() {
+        mCallbacks = new PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
+            @Override
+            public void onVerificationCompleted(PhoneAuthCredential credential) {
+                Toast.makeText(OtpActivity.this, "Verification Complete", Toast.LENGTH_SHORT).show();
+                //Getting the code sent by SMS
+                String code = credential.getSmsCode();
+
+                //sometime the code is not detected automatically
+                //in this case the code will be null
+                //so user has to manually enter the code
+                if (code != null) {
+                    otpcode.setText(code);
+                    //verifying the code
+                    verifyVerificationCode(code);
+                }
+            }
+
+            @Override
+            public void onVerificationFailed(FirebaseException e) {
+                Toast.makeText(OtpActivity.this, "Verification Failed"+e.getMessage(), Toast.LENGTH_SHORT).show();
+                progressDialog.dismiss();
+            }
+
+            @Override
+            public void onCodeSent(String verificationId,
+                                   PhoneAuthProvider.ForceResendingToken token) {
+                Toast.makeText(OtpActivity.this, "Code Sent", Toast.LENGTH_SHORT).show();
+                progressDialog.dismiss();
+                mVerificationId = verificationId;
+                mResendToken = token;
+
+
+            }
+        };
+    }
+
+
+    //the method is sending verification code
+    //the country id is concatenated
+    //you can take the country id as user input as well
+    private void sendVerificationCode(String mobile) {
+        PhoneAuthProvider.getInstance().verifyPhoneNumber(
+                "+92"+mobile,
+                60,
+                TimeUnit.SECONDS,
+                TaskExecutors.MAIN_THREAD,
+                mCallbacks);
+    }
+
+    private void verifyVerificationCode(String code) {
+        progressDialog.setTitle("Otp verification");
+        progressDialog.setMessage("Please wait while we check your credentials");
+        progressDialog.show();
+        //creating the credential
+        PhoneAuthCredential credential = PhoneAuthProvider.getCredential(mVerificationId, code);
+
+        //signing the user
+        signInWithPhoneAuthCredential(credential);
+    }
+
+
+    private void signInWithPhoneAuthCredential(PhoneAuthCredential credential) {
+        FirebaseAuth.getInstance().signInWithCredential(credential)
+                .addOnCompleteListener(OtpActivity.this, new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if (task.isSuccessful()) {
+                            //verification successful we will start the profile activity
+                            Intent intent = new Intent(OtpActivity.this, MainActivity.class);
+                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                            startActivity(intent);
+                            progressDialog.dismiss();
+
+                        } else {
+
+                            //verification unsuccessful.. display an error message
+                            progressDialog.dismiss();
+                            String message = "Somthing is wrong, we will fix it soon...";
+
+                            if (task.getException() instanceof FirebaseAuthInvalidCredentialsException) {
+                                message = "Invalid code entered...";
+                            }
+
+                            Snackbar snackbar = Snackbar.make(findViewById(R.id.parent), message, Snackbar.LENGTH_LONG);
+                            snackbar.setAction("Dismiss", new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+
+                                }
+                            });
+                            snackbar.show();
+                        }
+                    }
+                });
     }
 }

@@ -6,6 +6,9 @@ import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.widget.DatePicker;
 
+import org.by9steps.shadihall.AppController;
+import org.by9steps.shadihall.activities.CashCollectionActivity;
+
 import java.util.Calendar;
 
 public class SelectDateFragment extends DialogFragment implements DatePickerDialog.OnDateSetListener {
@@ -23,7 +26,12 @@ public class SelectDateFragment extends DialogFragment implements DatePickerDial
         populateSetDate(yy, mm+1, dd);
     }
     public void populateSetDate(int year, int month, int day) {
-        ReportsFragment.date_picker.setText(month+"/"+day+"/"+year);
+        if (AppController.date.equals("CashBook")){
+            CashCollectionActivity.date.setText(day+"-"+month+"-"+year);
+        }else {
+            ReportsFragment.date_picker.setText(year+"-"+month+"-"+day);
+        }
+
     }
 
 }

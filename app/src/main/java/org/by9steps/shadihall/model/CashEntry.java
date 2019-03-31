@@ -15,21 +15,41 @@ public class CashEntry {
     String CreditAccountName;
     String UserName;
     String UpdatedDate;
+    String month;
 
-    public CashEntry(String cashBookID, String CBDate, String debitAccount, String creditAccount, String CBRemarks, String amount, String clientID, String clientUserID, String bookingID, String debitAccountName, String creditAccountName, String userName, String updatedDate) {
-        CashBookID = cashBookID;
-        this.CBDate = CBDate;
-        DebitAccount = debitAccount;
-        CreditAccount = creditAccount;
-        this.CBRemarks = CBRemarks;
-        Amount = amount;
-        ClientID = clientID;
-        ClientUserID = clientUserID;
-        BookingID = bookingID;
-        DebitAccountName = debitAccountName;
-        CreditAccountName = creditAccountName;
-        UserName = userName;
-        UpdatedDate = updatedDate;
+    private int isRow;
+
+    public static CashEntry createRow(String cashBookID, String CBDate, String debitAccount, String creditAccount, String CBRemarks, String amount, String clientID, String clientUserID, String bookingID, String debitAccountName, String creditAccountName, String userName, String updatedDate) {
+        CashEntry cashEntry = new CashEntry();
+        cashEntry.isRow = 1;
+        cashEntry.CashBookID = cashBookID;
+        cashEntry.CBDate = CBDate;
+        cashEntry.DebitAccount = debitAccount;
+        cashEntry.CreditAccount = creditAccount;
+        cashEntry.CBRemarks = CBRemarks;
+        cashEntry.Amount = amount;
+        cashEntry.ClientID = clientID;
+        cashEntry.ClientUserID = clientUserID;
+        cashEntry.BookingID = bookingID;
+        cashEntry.DebitAccountName = debitAccountName;
+        cashEntry.CreditAccountName = creditAccountName;
+        cashEntry.UserName = userName;
+        cashEntry.UpdatedDate = updatedDate;
+        return cashEntry;
+    }
+
+    public static CashEntry createTotal(String amount) {
+        CashEntry cashEntry = new CashEntry();
+        cashEntry.isRow = 2;
+        cashEntry.Amount = amount;
+        return cashEntry;
+    }
+
+    public static CashEntry createSection(String month) {
+        CashEntry cashEntry = new CashEntry();
+        cashEntry.isRow = 0;
+        cashEntry.month = month;
+        return cashEntry;
     }
 
 
@@ -83,5 +103,13 @@ public class CashEntry {
 
     public String getUpdatedDate() {
         return UpdatedDate;
+    }
+
+    public int isRow() {
+        return isRow;
+    }
+
+    public String getMonth() {
+        return month;
     }
 }

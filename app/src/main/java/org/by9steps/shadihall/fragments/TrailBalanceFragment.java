@@ -25,7 +25,6 @@ import org.by9steps.shadihall.R;
 import org.by9steps.shadihall.activities.TrailBalanceActivity;
 import org.by9steps.shadihall.adapters.ReportsAdapter;
 import org.by9steps.shadihall.model.Account3Name;
-import org.by9steps.shadihall.model.CashBook;
 import org.by9steps.shadihall.model.User;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -66,6 +65,8 @@ public class TrailBalanceFragment extends Fragment implements View.OnClickListen
         balanceSheet = view.findViewById(R.id.balance_sheet);
 
         trailBalance.setOnClickListener(this);
+        plStatement.setOnClickListener(this);
+        balanceSheet.setOnClickListener(this);
 
 //        recyclerView = view.findViewById(R.id.recycler);
 
@@ -80,13 +81,22 @@ public class TrailBalanceFragment extends Fragment implements View.OnClickListen
 
     @Override
     public void onClick(View v) {
+        Intent intent;
         switch (v.getId()){
             case R.id.trail_balance:
-                startActivity(new Intent(getContext(), TrailBalanceActivity.class));
+                intent = new Intent(getContext(),TrailBalanceActivity.class);
+                intent.putExtra("message","1");
+                startActivity(intent);
                 break;
             case R.id.pl_statement:
+                intent = new Intent(getContext(),TrailBalanceActivity.class);
+                intent.putExtra("message","2");
+                startActivity(intent);
                 break;
             case R.id.balance_sheet:
+                intent = new Intent(getContext(),TrailBalanceActivity.class);
+                intent.putExtra("message","3");
+                startActivity(intent);
                 break;
         }
     }
@@ -115,7 +125,7 @@ public class TrailBalanceFragment extends Fragment implements View.OnClickListen
                             String success = jsonObj.getString("success");
                             Log.e("Success",success);
                             if (success.equals("1")){
-                                Account3Name.deleteAll(Account3Name.class);
+//                                Account3Name.deleteAll(Account3Name.class);
                                 for (int i = 0; i < jsonArray.length(); i++) {
                                     JSONObject jsonObject = jsonArray.getJSONObject(i);
                                     Log.e("Recovery",jsonObject.toString());
@@ -136,16 +146,16 @@ public class TrailBalanceFragment extends Fragment implements View.OnClickListen
                                     String MaxDate = jbb.getString("date");
 
                                     Log.e("MAxDAte",MaxDate);
-                                    Account3Name account3Name = new Account3Name(AcTypeID,AcTypeName,AcGroupID,AcGruopName,AccountID,AcName,Debit,Credit,ClientID,MaxDate,Bal,DebitBL,CreditBL);
-                                    account3Name.save();
+//                                    Account3Name account3Name = new Account3Name(AcTypeID,AcTypeName,AcGroupID,AcGruopName,AccountID,AcName,Debit,Credit,ClientID,MaxDate,Bal,DebitBL,CreditBL);
+//                                    account3Name.save();
 
 
                                 }
 
-                                List<Account3Name> mList = CashBook.listAll(Account3Name.class);
-                                ReportsAdapter adapter = new ReportsAdapter(getContext(),mList,ReportsAdapter.Trail_Balance,"");
-                                recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-                                recyclerView.setAdapter(adapter);
+//                                List<Account3Name> mList = CashBook.listAll(Account3Name.class);
+//                                ReportsAdapter adapter = new ReportsAdapter(getContext(),mList,ReportsAdapter.Trail_Balance,"");
+//                                recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+//                                recyclerView.setAdapter(adapter);
 
                             }else {
                                 String message = jsonObj.getString("message");

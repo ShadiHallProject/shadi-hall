@@ -225,7 +225,7 @@ public class TreeFragment extends Fragment {
                 public void onErrorResponse(VolleyError error) {
                     Log.e("Error", error.toString());
                     pDialog.dismiss();
-                    Toast.makeText(getContext(), error.toString(), Toast.LENGTH_LONG).show();
+//                    Toast.makeText(getContext(), error.toString(), Toast.LENGTH_LONG).show();
                 }
             });
 

@@ -27,6 +27,7 @@ import org.by9steps.shadihall.AppController;
 import org.by9steps.shadihall.R;
 import org.by9steps.shadihall.activities.MainActivity;
 import org.by9steps.shadihall.activities.RegisterActivity;
+import org.by9steps.shadihall.helper.DatabaseHelper;
 import org.by9steps.shadihall.model.Bookings;
 import org.by9steps.shadihall.model.User;
 import org.json.JSONArray;
@@ -51,9 +52,10 @@ import static com.squareup.timessquare.CalendarPickerView.SelectionMode.SINGLE;
  */
 public class BookCalendarFragment extends Fragment {
 
+    DatabaseHelper databaseHelper;
     CalendarPickerView calendar;
     List<Date> dateList = new ArrayList<>();
-    List<Date> BookingList = new ArrayList<>();
+    List<Bookings> bookingList;
 
     Date today;
     Calendar LastYear, nextYear;
@@ -73,8 +75,14 @@ public class BookCalendarFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_book_calendar, container, false);
 
         calendar = view.findViewById(R.id.calendar);
+        databaseHelper = new DatabaseHelper(getContext());
 
-        getBookings();
+        String query = "";
+        List<User> list = User.listAll(User.class);
+        for (User u: list) {
+            query = "SELECT * FROM Booking WHERE ClientID =" + u.getClientID();
+        }
+        bookingList = databaseHelper.getBookings(query);
 
         LastYear = Calendar.getInstance();
         LastYear.add(Calendar.YEAR, -1);
@@ -114,7 +122,7 @@ public class BookCalendarFragment extends Fragment {
                     month = calselected.get(Calendar.MONTH)+1;
                     year = calselected.get(Calendar.YEAR);
                     String selectedDate = day + "-" + month + "-" + year;
-                    Toast.makeText(getContext(), "Click is\n" + selectedDate, Toast.LENGTH_LONG).show();
+//                    Toast.makeText(getContext(), "Click is\n" + selectedDate, Toast.LENGTH_LONG).show();
 
                     DateFormat df = new SimpleDateFormat(pattern);
                     selectedDate= df.format(calendar.getSelectedDate());
@@ -123,14 +131,14 @@ public class BookCalendarFragment extends Fragment {
                             .addToBackStack(null)
                             .commit();
 
-                    Toast.makeText(getContext(), selectedDate+"\nEvent Already Booked \n" + calselected.get(Calendar.DAY_OF_MONTH), Toast.LENGTH_LONG).show();
+                    Toast.makeText(getContext(), selectedDate+"\nEvent Already Booked \n" + calselected.get(Calendar.DAY_OF_MONTH), Toast.LENGTH_SHORT).show();
                 } else {
                     //new Activity
                     day = calselected.get(Calendar.DAY_OF_MONTH);
                     month = calselected.get(Calendar.MONTH)+1;
                     year = calselected.get(Calendar.YEAR);
                     String selectedDate = day + "-" + month + "-" + year;
-                    Toast.makeText(getContext(), "Click is\n" + selectedDate, Toast.LENGTH_LONG).show();
+//                    Toast.makeText(getContext(), "Click is\n" + selectedDate, Toast.LENGTH_LONG).show();
                     getActivity().getSupportFragmentManager().beginTransaction()
                             .replace(R.id.menu_container, BookingFormFragment.newInstance(selectedDate))
                             .addToBackStack(null)
@@ -147,6 +155,8 @@ public class BookCalendarFragment extends Fragment {
             }
         });
 
+        FetchFromDb();
+
         return  view;
     }
 
@@ -154,9 +164,9 @@ public class BookCalendarFragment extends Fragment {
     public void FetchFromDb() {
         dateList = new ArrayList<>();
 
-        List<Bookings> list = Bookings.listAll(Bookings.class);
+//        List<Bookings> list = Bookings.listAll(Bookings.class);
 
-        for (Bookings book : list) {
+        for (Bookings book : bookingList) {
             SimpleDateFormat sdf = new SimpleDateFormat(pattern);
             Date date = null;
             try {
@@ -212,7 +222,7 @@ public class BookCalendarFragment extends Fragment {
                             if (success.equals("1")) {
                                 JSONArray jsonArray = json.getJSONArray("Bookings");
                                 Log.e("SSSS", jsonArray.toString());
-                                Bookings.deleteAll(Bookings.class);
+//                                Bookings.deleteAll(Bookings.class);
                                 for (int i = 0; i < jsonArray.length(); i++) {
                                     JSONObject jsonObject = jsonArray.getJSONObject(i);
 
@@ -234,8 +244,8 @@ public class BookCalendarFragment extends Fragment {
 
                                     Log.e("SSSS",ClientName + ClientID);
 
-                                    Bookings bookings = new Bookings(BookingID,ClientName,ClientMobile,ClientAddress,ClientNic,EventName,BookingDate,EventDate,ChargesTotal,Description,ClientID,ClientUserID);
-                                    bookings.save();
+//                                    Bookings bookings = new Bookings(BookingID,ClientName,ClientMobile,ClientAddress,ClientNic,EventName,BookingDate,EventDate,ChargesTotal,Description,ClientID,ClientUserID);
+//                                    bookings.save();
                                 }
 
                                 FetchFromDb();

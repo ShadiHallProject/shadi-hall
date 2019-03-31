@@ -1,16 +1,13 @@
 package org.by9steps.shadihall.fragments;
 
 
-import android.app.DatePickerDialog;
-import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
 
 import java.util.ArrayList;
-import java.util.Calendar;
+
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -18,10 +15,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.DatePicker;
-import android.widget.ImageView;
-import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.android.volley.DefaultRetryPolicy;
@@ -34,13 +27,10 @@ import org.by9steps.shadihall.AppController;
 import org.by9steps.shadihall.R;
 import org.by9steps.shadihall.activities.CashCollectionActivity;
 import org.by9steps.shadihall.adapters.CashBookAdapter;
-import org.by9steps.shadihall.adapters.RecoveryAdapter;
-import org.by9steps.shadihall.adapters.ReportsAdapter;
-import org.by9steps.shadihall.adapters.SpinnerAdapter;
-import org.by9steps.shadihall.model.Account3Name;
+import org.by9steps.shadihall.helper.DatabaseHelper;
+import org.by9steps.shadihall.model.Bookings;
 import org.by9steps.shadihall.model.CashBook;
 import org.by9steps.shadihall.model.CashEntry;
-import org.by9steps.shadihall.model.Recovery;
 import org.by9steps.shadihall.model.User;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -63,6 +53,11 @@ public class CashBookFragment extends Fragment {
     RecyclerView recyclerView;
     List<CashEntry> mList;
 
+    DatabaseHelper databaseHelper;
+    List<CashBook> cashBooksList;
+
+    int m = 0, amount, gAmount;
+
     public CashBookFragment() {
         // Required empty public constructor
     }
@@ -75,6 +70,8 @@ public class CashBookFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_cash_book, container, false);
 
         recyclerView = view.findViewById(R.id.recycler);
+
+        databaseHelper = new DatabaseHelper(getContext());
 
 
         FloatingActionButton fab = view.findViewById(R.id.fab);
@@ -91,7 +88,53 @@ public class CashBookFragment extends Fragment {
 
         mList = new ArrayList<>();
 
-        getRecoveries();
+        String query = "";
+
+        List<User> list = User.listAll(User.class);
+        for (User u : list){
+            query = "SELECT        CashBook.CashBookID, CashBook.CBDate, CashBook.DebitAccount, CashBook.CreditAccount, CashBook.CBRemarks, CashBook.Amount, CashBook.ClientID, CashBook.ClientUserID, CashBook.BookingID, \n" +
+                    "                         Account3Name.AcName AS DebitAccountName, Account3Name_1.AcName AS CreditAccountName, Account3Name_2.AcName AS UserName, CashBook.UpdatedDate\n" +
+                    "FROM            CashBook INNER JOIN\n" +
+                    "                         Account3Name ON CashBook.DebitAccount = Account3Name.AcNameID INNER JOIN\n" +
+                    "                         Account3Name AS Account3Name_1 ON CashBook.CreditAccount = Account3Name_1.AcNameID INNER JOIN\n" +
+                    "                         Account3Name AS Account3Name_2 ON CashBook.ClientUserID = Account3Name_2.AcNameID\n" +
+                    "WHERE        (CashBook.ClientID = "+u.getClientID()+")";
+            cashBooksList = databaseHelper.getCashBookEntry(query);
+        }
+
+        for (CashBook c : cashBooksList){
+            String[] separated = c.getCBDate().split("-");
+
+            if (m == 0) {
+                mList.add(CashEntry.createSection(separated[1]+"/"+separated[2]));
+                mList.add(CashEntry.createRow(c.getCashBookID(),c.getCBDate(),c.getDebitAccount(),c.getCreditAccount(),"ss",c.getAmount(),c.getClientID(),c.getClientUserID(),c.getBookingID(),c.getDebitAccountName(),c.getCreditAccountName(),c.getUserName(), "s"));
+                m = Integer.valueOf(separated[1]);
+
+                amount = Integer.valueOf(c.getAmount()) + amount;
+                gAmount = Integer.valueOf(c.getAmount()) + gAmount;
+            }else if (m == Integer.valueOf(separated[1])){
+                amount = Integer.valueOf(c.getAmount()) + amount;
+                gAmount = Integer.valueOf(c.getAmount()) + gAmount;
+                mList.add(CashEntry.createRow(c.getCashBookID(),c.getCBDate(),c.getDebitAccount(),c.getCreditAccount(),"ss",c.getAmount(),c.getClientID(),c.getClientUserID(),c.getBookingID(),c.getDebitAccountName(),c.getCreditAccountName(),c.getUserName(), "s"));
+            }else {
+                mList.add(CashEntry.createTotal(String.valueOf(amount)));
+                amount = 0;
+                amount = Integer.valueOf(c.getAmount()) + amount;
+                gAmount = Integer.valueOf(c.getAmount()) + gAmount;
+
+                mList.add(CashEntry.createSection(separated[1]+"/"+separated[2]));
+                mList.add(CashEntry.createRow(c.getCashBookID(),c.getCBDate(),c.getDebitAccount(),c.getCreditAccount(),"ss",c.getAmount(),c.getClientID(),c.getClientUserID(),c.getBookingID(),c.getDebitAccountName(),c.getCreditAccountName(),c.getUserName(), "s"));
+                m = Integer.valueOf(separated[1]);
+            }
+        }
+
+        mList.add(CashEntry.createTotal(String.valueOf(amount)));
+        mList.add(CashEntry.createSection("Grand Total"));
+        mList.add(CashEntry.createTotal(String.valueOf(gAmount)));
+        CashBookAdapter adapter = new CashBookAdapter(getContext(),mList);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        recyclerView.setAdapter(adapter);
+//        getRecoveries();
 
 
         return view;
@@ -151,12 +194,33 @@ public class CashBookFragment extends Fragment {
                                     DateFormat df = new SimpleDateFormat(pattern);
                                     Date date = old.parse(CBDate);
                                     String CBDate1 = df.format(date);
+                                    String[] separated = CBDate1.split("-");
 
-                                    Log.e("SSSSSSS",CBDate1);
+                                    if (m == 0) {
+                                        mList.add(CashEntry.createSection(separated[1]+"/"+separated[2]));
+                                        mList.add(CashEntry.createRow(CashBookID,CBDate1,DebitAccount,CreditAccount,"ss",Amount,ClientID,ClientUserID,BookingID,DebitAccountName,CreditAccountName,UserName, "s"));
+                                        m = Integer.valueOf(separated[1]);
 
-                                    mList.add(new CashEntry(CashBookID,CBDate1,DebitAccount,CreditAccount,"ss",Amount,ClientID,ClientUserID,BookingID,DebitAccountName,CreditAccountName,UserName, "s"));
+                                        amount = Integer.valueOf(Amount) + amount;
+                                        gAmount = Integer.valueOf(Amount) + gAmount;
+                                    }else if (m == Integer.valueOf(separated[1])){
+                                        amount = Integer.valueOf(Amount) + amount;
+                                        gAmount = Integer.valueOf(Amount) + gAmount;
+                                        mList.add(CashEntry.createRow(CashBookID,CBDate1,DebitAccount,CreditAccount,"ss",Amount,ClientID,ClientUserID,BookingID,DebitAccountName,CreditAccountName,UserName, "s"));
+                                    }else {
+                                        mList.add(CashEntry.createTotal(String.valueOf(amount)));
+                                        amount = 0;
+                                        amount = Integer.valueOf(Amount) + amount;
+                                        gAmount = Integer.valueOf(Amount) + gAmount;
+
+                                        mList.add(CashEntry.createSection(separated[1]+"/"+separated[2]));
+                                        mList.add(CashEntry.createRow(CashBookID,CBDate1,DebitAccount,CreditAccount,"ss",Amount,ClientID,ClientUserID,BookingID,DebitAccountName,CreditAccountName,UserName, "s"));
+                                        m = Integer.valueOf(separated[1]);
+                                    }
                                 }
-
+                                mList.add(CashEntry.createTotal(String.valueOf(amount)));
+                                mList.add(CashEntry.createSection("Grand Total"));
+                                mList.add(CashEntry.createTotal(String.valueOf(gAmount)));
                                 CashBookAdapter adapter = new CashBookAdapter(getContext(),mList);
                                 recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
                                 recyclerView.setAdapter(adapter);

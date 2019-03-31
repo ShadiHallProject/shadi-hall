@@ -1,61 +1,161 @@
 package org.by9steps.shadihall.model;
 
-import com.orm.SugarRecord;
+import java.io.Serializable;
 
-public class CashBook extends SugarRecord {
+public class CashBook implements Serializable {
 
-    String AccountID;
-    String Debit;
-    String Credit;
-    String Bal;
-    String DebitBal;
-    String CreditBal;
-    String AcName;
-    String AcGroupID;
+    String CashBookID;
+    String CBDate;
+    String DebitAccount;
+    String CreditAccount;
+    String CBRemarks;
+    String Amount;
+    String ClientID;
+    String ClientUserID;
+    String NetCode;
+    String SysCode;
+    String UpdatedDate;
+    String BookingID;
 
-    public CashBook(String accountID, String debit, String credit, String bal, String debitBal, String creditBal, String acName, String acGroupID) {
-        AccountID = accountID;
-        Debit = debit;
-        Credit = credit;
-        Bal = bal;
-        DebitBal = debitBal;
-        CreditBal = creditBal;
-        AcName = acName;
-        AcGroupID = acGroupID;
-    }
+    String DebitAccountName;
+    String CreditAccountName;
+    String UserName;
 
     public CashBook() {
     }
 
-    public String getAccountID() {
-        return AccountID;
+    public CashBook(String cashBookID, String CBDate, String debitAccount, String creditAccount, String CBRemarks, String amount, String clientID, String clientUserID, String netCode, String sysCode, String updatedDate, String bookingID) {
+        CashBookID = cashBookID;
+        this.CBDate = CBDate;
+        DebitAccount = debitAccount;
+        CreditAccount = creditAccount;
+        this.CBRemarks = CBRemarks;
+        Amount = amount;
+        ClientID = clientID;
+        ClientUserID = clientUserID;
+        NetCode = netCode;
+        SysCode = sysCode;
+        UpdatedDate = updatedDate;
+        BookingID = bookingID;
     }
 
-    public String getDebit() {
-        return Debit;
+    public String getCashBookID() {
+        return CashBookID;
     }
 
-    public String getCredit() {
-        return Credit;
+    public void setCashBookID(String cashBookID) {
+        CashBookID = cashBookID;
     }
 
-    public String getBal() {
-        return Bal;
+    public String getCBDate() {
+        return CBDate;
     }
 
-    public String getDebitBal() {
-        return DebitBal;
+    public void setCBDate(String CBDate) {
+        this.CBDate = CBDate;
     }
 
-    public String getCreditBal() {
-        return CreditBal;
+    public String getDebitAccount() {
+        return DebitAccount;
     }
 
-    public String getAcName() {
-        return AcName;
+    public void setDebitAccount(String debitAccount) {
+        DebitAccount = debitAccount;
     }
 
-    public String getAcGroupID() {
-        return AcGroupID;
+    public String getCreditAccount() {
+        return CreditAccount;
+    }
+
+    public void setCreditAccount(String creditAccount) {
+        CreditAccount = creditAccount;
+    }
+
+    public String getCBRemarks() {
+        return CBRemarks;
+    }
+
+    public void setCBRemarks(String CBRemarks) {
+        this.CBRemarks = CBRemarks;
+    }
+
+    public String getAmount() {
+        return Amount;
+    }
+
+    public void setAmount(String amount) {
+        Amount = amount;
+    }
+
+    public String getClientID() {
+        return ClientID;
+    }
+
+    public void setClientID(String clientID) {
+        ClientID = clientID;
+    }
+
+    public String getClientUserID() {
+        return ClientUserID;
+    }
+
+    public void setClientUserID(String clientUserID) {
+        ClientUserID = clientUserID;
+    }
+
+    public String getNetCode() {
+        return NetCode;
+    }
+
+    public void setNetCode(String netCode) {
+        NetCode = netCode;
+    }
+
+    public String getSysCode() {
+        return SysCode;
+    }
+
+    public void setSysCode(String sysCode) {
+        SysCode = sysCode;
+    }
+
+    public String getUpdatedDate() {
+        return UpdatedDate;
+    }
+
+    public void setUpdatedDate(String updatedDate) {
+        UpdatedDate = updatedDate;
+    }
+
+    public String getBookingID() {
+        return BookingID;
+    }
+
+    public void setBookingID(String bookingID) {
+        BookingID = bookingID;
+    }
+
+    public String getDebitAccountName() {
+        return DebitAccountName;
+    }
+
+    public void setDebitAccountName(String debitAccountName) {
+        DebitAccountName = debitAccountName;
+    }
+
+    public String getCreditAccountName() {
+        return CreditAccountName;
+    }
+
+    public void setCreditAccountName(String creditAccountName) {
+        CreditAccountName = creditAccountName;
+    }
+
+    public String getUserName() {
+        return UserName;
+    }
+
+    public void setUserName(String userName) {
+        UserName = userName;
     }
 }
