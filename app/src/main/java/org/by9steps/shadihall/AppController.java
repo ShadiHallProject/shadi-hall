@@ -20,6 +20,9 @@ public class AppController extends Application {
     public static String profileType = "Edit";
     public static String addCB = "View";
     public static String date = "";
+    public static String internet = "No";
+    public static String fDate1 = "";
+    public static String fDate2 = "";
 
     public static String imageUrl = "http://69.167.137.121/plesk-site-preview/sky.com.pk/shadiHall/ClientImages";
 

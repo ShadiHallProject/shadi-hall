@@ -263,10 +263,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(KEY_UpdatedDate2, cashBook.getUpdatedDate());
         values.put(KEY_BookingID, cashBook.getBookingID());
 
-
+        Log.e("Values",values.toString());
 
         // insert row
-        db.insert(TABLE_CashBook, null, values);
+//        db.insert(TABLE_CashBook, null, values);
+        Log.e("OKK",String.valueOf(db.insert(TABLE_CashBook, null, values)));
+
     }
 
     /**
@@ -486,6 +488,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 cashBook.setCBDate(c.getString(c.getColumnIndex("CBDate")));
                 cashBook.setDebitAccount(c.getString(c.getColumnIndex("DebitAccount")));
                 cashBook.setCreditAccount(c.getString(c.getColumnIndex("CreditAccount")));
+                cashBook.setCBRemarks(c.getString(c.getColumnIndex("CBRemarks")));
                 cashBook.setAmount(c.getString(c.getColumnIndex("Amount")));
                 cashBook.setClientID(c.getString(c.getColumnIndex("ClientID")));
                 cashBook.setClientUserID(c.getString(c.getColumnIndex("ClientUserID")));
@@ -728,5 +731,42 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
 
         return mChartOfAcc;
+    }
+
+    //Get Entry CashBook
+    public List<CashBook> getCashBook(String query) {
+        List<CashBook> cashBooks = new ArrayList<>();
+
+
+        Log.e(LOG, query);
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor c = db.rawQuery(query, null);
+        Log.e("CashBook",String.valueOf(c.moveToFirst()));
+
+        // looping through all rows and adding to list
+        if (c.moveToFirst()) {
+            do {
+                CashBook cashBook = new CashBook();
+                Log.e("CashBook",c.getString(c.getColumnIndex(KEY_ClientID)));
+
+                cashBook.setCBDate(c.getString(c.getColumnIndex(KEY_CBDate)));
+                cashBook.setDebitAccount(c.getString(c.getColumnIndex(KEY_DebitAccount)));
+                cashBook.setCreditAccount(c.getString(c.getColumnIndex(KEY_CreditAccount)));
+                cashBook.setCBRemarks(c.getString(c.getColumnIndex(KEY_CBRemarks)));
+                cashBook.setAmount(c.getString(c.getColumnIndex(KEY_Amount)));
+                cashBook.setClientID(c.getString(c.getColumnIndex(KEY_ClientID2)));
+                cashBook.setClientUserID(c.getString(c.getColumnIndex(KEY_ClientUserID2)));
+                cashBook.setNetCode(c.getString(c.getColumnIndex(KEY_NetCode2)));
+                cashBook.setSysCode(c.getString(c.getColumnIndex(KEY_SysCode2)));
+                cashBook.setUpdatedDate(c.getString(c.getColumnIndex(KEY_UpdatedDate2)));
+                cashBook.setBookingID(c.getString(c.getColumnIndex(KEY_BookingID)));
+
+                // adding to todo list
+                cashBooks.add(cashBook);
+            } while (c.moveToNext());
+        }
+
+        return cashBooks;
     }
 }

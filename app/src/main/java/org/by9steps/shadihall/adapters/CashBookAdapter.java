@@ -9,24 +9,31 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
 import org.by9steps.shadihall.R;
+import org.by9steps.shadihall.model.CBSetting;
+import org.by9steps.shadihall.model.CashBook;
 import org.by9steps.shadihall.model.CashEntry;
 import org.by9steps.shadihall.model.ProfitLoss;
 import org.by9steps.shadihall.model.Recovery;
 
 import java.util.List;
+import java.util.ArrayList;
 
-public class CashBookAdapter extends RecyclerView.Adapter{
+public class CashBookAdapter extends RecyclerView.Adapter {
 
     private Context mCtx;
     List<CashEntry> mList;
+    List<CashEntry> mFilterList;
 
     public CashBookAdapter(Context mCtx, List<CashEntry> mList) {
         this.mCtx = mCtx;
         this.mList = mList;
+        this.mFilterList = mList;
         Log.e("LIST","sss");
     }
 
@@ -35,6 +42,7 @@ public class CashBookAdapter extends RecyclerView.Adapter{
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         if (viewType == 0){
             View v = LayoutInflater.from(parent.getContext()).inflate(android.R.layout.simple_list_item_1, parent, false);
+            v.findViewById(android.R.id.text1).setBackgroundColor(Color.parseColor("#f0749f"));
             v.findViewById(android.R.id.text1).setBackgroundColor(Color.parseColor("#f0749f"));
             return new CashBookAdapter.MonthViewHolder(v);
         }else if (viewType == 2){
@@ -54,6 +62,46 @@ public class CashBookAdapter extends RecyclerView.Adapter{
         final CashEntry cashEntry = mList.get(position);
 
         if (cashEntry.isRow() == 1) {
+
+            List<CBSetting> list = CBSetting.listAll(CBSetting.class);
+            for (CBSetting c : list){
+                if (!c.getDste()){
+                    ((ItemViewHolder) viewHolder).date.setVisibility(View.GONE);
+                }else {
+                    ((ItemViewHolder) viewHolder).date.setVisibility(View.VISIBLE);
+                }
+
+                if (!c.getCbId()){
+                    ((ItemViewHolder) viewHolder).cashBookID.setVisibility(View.GONE);
+                }else {
+                    ((ItemViewHolder) viewHolder).cashBookID.setVisibility(View.VISIBLE);
+                }
+
+                if (!c.getDebit()){
+                    ((ItemViewHolder) viewHolder).deb_account.setVisibility(View.GONE);
+                }else {
+                    ((ItemViewHolder) viewHolder).deb_account.setVisibility(View.VISIBLE);
+                }
+
+                if (!c.getCredit()){
+                    ((ItemViewHolder) viewHolder).cre_account.setVisibility(View.GONE);
+                }else {
+                    ((ItemViewHolder) viewHolder).cre_account.setVisibility(View.VISIBLE);
+                }
+
+                if (!c.getRemarks()){
+                    ((ItemViewHolder) viewHolder).remarks.setVisibility(View.GONE);
+                }else {
+                    ((ItemViewHolder) viewHolder).remarks.setVisibility(View.VISIBLE);
+                }
+
+                if (!c.getAmount()){
+                    ((ItemViewHolder) viewHolder).amount.setVisibility(View.GONE);
+                }else {
+                    ((ItemViewHolder) viewHolder).amount.setVisibility(View.VISIBLE);
+                }
+            }
+
             ((ItemViewHolder) viewHolder).cashBookID.setText(cashEntry.getCashBookID());
             ((ItemViewHolder) viewHolder).deb_account.setText(cashEntry.getDebitAccountName());
             ((ItemViewHolder) viewHolder).cre_account.setText(cashEntry.getCreditAccountName());
@@ -85,6 +133,11 @@ public class CashBookAdapter extends RecyclerView.Adapter{
         }else {
             return 1;
         }
+    }
+
+    public void filterList(List<CashEntry> filterdNames) {
+        this.mList = filterdNames;
+        notifyDataSetChanged();
     }
 
     class ItemViewHolder extends RecyclerView.ViewHolder {
@@ -129,4 +182,6 @@ public class CashBookAdapter extends RecyclerView.Adapter{
             textView = (TextView) itemView.findViewById(android.R.id.text1);
         }
     }
+
+
 }

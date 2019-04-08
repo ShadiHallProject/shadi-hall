@@ -91,6 +91,8 @@ public class SplashActivity extends AppCompatActivity {
                 splash_logo.startAnimation(animation);
                 if (isConnected()) {
                     getAccount3Name();
+                }else {
+                    AppController.internet = "Yes";
                 }
                 new Handler().postDelayed(new Runnable() {
                     @Override
@@ -120,11 +122,6 @@ public class SplashActivity extends AppCompatActivity {
     }
 
     public void getAccount3Name(){
-//        mProgress = new ProgressDialog(MainActivity.this);
-//        mProgress.setTitle("Loading");
-//        mProgress.setMessage("Please wait...");
-//        mProgress.setCanceledOnTouchOutside(false);
-//        mProgress.show();
 
         String tag_json_obj = "json_obj_req";
         String u = "http://69.167.137.121/plesk-site-preview/sky.com.pk/shadiHall/test.php";
@@ -194,11 +191,6 @@ public class SplashActivity extends AppCompatActivity {
     }
 
     public void getCashBook(){
-//        mProgress = new ProgressDialog(getContext());
-//        mProgress.setTitle("Loading");
-//        mProgress.setMessage("Please wait...");
-//        mProgress.setCanceledOnTouchOutside(false);
-//        mProgress.show();
 
         String tag_json_obj = "json_obj_req";
         String u = "http://69.167.137.121/plesk-site-preview/sky.com.pk/shadiHall/Test2.php";
@@ -229,7 +221,7 @@ public class SplashActivity extends AppCompatActivity {
                                     String CBDate1 = sf.format(date);
                                     String DebitAccount = jsonObject.getString("DebitAccount");
                                     String CreditAccount = jsonObject.getString("CreditAccount");
-                                    String CBRemarks = jsonObject.getString("CBRemarks");
+                                    String CBRemark = jsonObject.getString("CBRemarks");
                                     String Amount = jsonObject.getString("Amount");
                                     String ClientID = jsonObject.getString("ClientID");
                                     String ClientUserID = jsonObject.getString("ClientUserID");
@@ -240,7 +232,7 @@ public class SplashActivity extends AppCompatActivity {
 //                                    String UpdatedDate = jb.getString("date");
                                     String BookingID = jsonObject.getString("BookingID");
 
-                                    databaseHelper.createCashBook(new CashBook(CashBookID,CBDate1,DebitAccount,CreditAccount,CBRemarks,Amount,ClientID,ClientUserID,NetCode,SysCode,UpdatedDate,BookingID));
+                                    databaseHelper.createCashBook(new CashBook(CashBookID,CBDate1,DebitAccount,CreditAccount,CBRemark,Amount,ClientID,ClientUserID,NetCode,SysCode,UpdatedDate,BookingID));
                                 }
                                 getAccountGroups();
 //                                mProgress.dismiss();
@@ -270,11 +262,6 @@ public class SplashActivity extends AppCompatActivity {
     }
 
     public void getAccountGroups(){
-//        mProgress = new ProgressDialog(getContext());
-//        mProgress.setTitle("Loading");
-//        mProgress.setMessage("Please wait...");
-//        mProgress.setCanceledOnTouchOutside(false);
-//        mProgress.show();
 
         String tag_json_obj = "json_obj_req";
         String u = "http://69.167.137.121/plesk-site-preview/sky.com.pk/shadiHall/GetAccountGroup.php";
@@ -336,10 +323,6 @@ public class SplashActivity extends AppCompatActivity {
         String tag_json_obj = "json_obj_req";
         String url = "http://69.167.137.121/plesk-site-preview/sky.com.pk/shadiHall/GetBookings.php";
 
-//        pDialog = new ProgressDialog(getContext());
-//        pDialog.setMessage("Searching...");
-//        pDialog.setCancelable(false);
-//        pDialog.show();
 
         StringRequest jsonObjectRequest = new StringRequest(Request.Method.POST, url,
                 new Response.Listener<String>() {
@@ -416,10 +399,6 @@ public class SplashActivity extends AppCompatActivity {
     }
 
     public void getAccountTypes(){
-//        mProgress.setTitle("Loading");
-//        mProgress.setMessage("Please wait...");
-//        mProgress.setCanceledOnTouchOutside(false);
-//        mProgress.show();
 
         String tag_json_obj = "json_obj_req";
         String u = "http://69.167.137.121/plesk-site-preview/sky.com.pk/shadiHall/GetAccountType.php";

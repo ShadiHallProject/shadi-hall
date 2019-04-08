@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="@dimen/twenty_dp"
+    tools:context=".activities.CashBookSettingActivity">
+
+    <Switch
+        android:id="@+id/sw_date"
+        android:layout_margin="5dp"
+        android:textColor="@color/colorPrimaryDark"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Date"
+        android:textOff="No"
+        android:textOn="Yes"/>
+    <Switch
+        android:id="@+id/sw_id"
+        android:layout_margin="5dp"
+        android:textColor="@color/colorPrimaryDark"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Cash Book ID"
+        android:textOff="No"
+        android:textOn="Yes"/>
+    <Switch
+        android:id="@+id/sw_debit"
+        android:layout_margin="5dp"
+        android:textColor="@color/colorPrimaryDark"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Debit Account"
+        android:textOff="No"
+        android:textOn="Yes"/>
+    <Switch
+        android:id="@+id/sw_credit"
+        android:layout_margin="5dp"
+        android:textColor="@color/colorPrimaryDark"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Credit Account"
+        android:textOff="No"
+        android:textOn="Yes"/>
+    <Switch
+        android:id="@+id/sw_remarks"
+        android:layout_margin="5dp"
+        android:textColor="@color/colorPrimaryDark"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Remarks"
+        android:textOff="No"
+        android:textOn="Yes"/>
+    <Switch
+        android:id="@+id/sw_amount"
+        android:layout_margin="5dp"
+        android:textColor="@color/colorPrimaryDark"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Amount"
+        android:textOff="No"
+        android:textOn="Yes"/>
+
+</LinearLayout>
