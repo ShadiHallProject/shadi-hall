@@ -83,7 +83,7 @@
                     android:layout_height="match_parent"
                     android:hint="@string/debit_account"
                     android:gravity="center_vertical"
-                    android:textSize="15sp"
+                    android:textSize="12sp"
                     android:maxLines="1" />
 
             </LinearLayout>
@@ -122,7 +122,7 @@
                     android:layout_height="match_parent"
                     android:hint="@string/credit_account"
                     android:gravity="center_vertical"
-                    android:textSize="15sp"
+                    android:textSize="12sp"
                     android:maxLines="1" />
 
             </LinearLayout>

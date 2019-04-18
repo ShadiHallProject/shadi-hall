@@ -18,6 +18,7 @@ import org.by9steps.shadihall.model.GeneralLedger;
 import org.by9steps.shadihall.model.ProfitLoss;
 import org.by9steps.shadihall.model.Recovery;
 import org.by9steps.shadihall.model.Reports;
+import org.by9steps.shadihall.model.Spinner;
 import org.by9steps.shadihall.model.Summerize;
 
 import java.util.ArrayList;
@@ -31,7 +32,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String LOG = DatabaseHelper.class.getName();
 
     // Database Version
-    private static final int DATABASE_VERSION = 6;
+    private static final int DATABASE_VERSION = 8;
 
     // Database Name
     private static final String DATABASE_NAME = "ShadiHallUser";
@@ -75,6 +76,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String KEY_AcGruopName = "AcGruopName";
 
     // CashBook Table - column names
+    private static final String KEY_ID = "ID";
     private static final String KEY_CashBookID = "CashBookID";
     private static final String KEY_CBDate = "CBDate";
     private static final String KEY_DebitAccount = "DebitAccount";
@@ -131,7 +133,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     // CashBook table create statement
     private static final String CREATE_TABLE_CashBook = "CREATE TABLE "
-            + TABLE_CashBook + "(" + KEY_CashBookID + " TEXT,"
+            + TABLE_CashBook + "("+ KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + KEY_CashBookID + " TEXT,"
             + KEY_CBDate + " TEXT,"
             + KEY_DebitAccount + " TEXT,"
             + KEY_CreditAccount + " TEXT,"
@@ -198,6 +200,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_Account2Group);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_Account1Type);
 
+        if (newVersion > oldVersion) {
+            db.execSQL("ALTER TABLE "+TABLE_CashBook +" ADD COLUMN ID PRIMARY KEY AUTOINCREMENT");
+        }
+
         // create new tables
         onCreate(db);
     }
@@ -246,7 +252,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     /**
      * Creating a CashBook
      */
-    public void createCashBook(CashBook cashBook) {
+    public String createCashBook(CashBook cashBook) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
@@ -266,8 +272,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         Log.e("Values",values.toString());
 
         // insert row
-//        db.insert(TABLE_CashBook, null, values);
-        Log.e("OKK",String.valueOf(db.insert(TABLE_CashBook, null, values)));
+        String cid = String.valueOf(db.insert(TABLE_CashBook, null, values));
+//        Log.e("OKK",String.valueOf(db.insert(TABLE_CashBook, null, values)));
+        return cid;
 
     }
 
@@ -277,6 +284,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public void deleteCashBook() {
         SQLiteDatabase db = this.getWritableDatabase();
         db.execSQL("DELETE FROM "+ TABLE_CashBook);
+    }
+
+    /**
+     * Update a CashBook
+     */
+    public void updateCashBook(String query) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.execSQL(query);
     }
 
     /**
@@ -477,13 +492,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor c = db.rawQuery(query, null);
-
+        Log.e("CASHBOOKID",String.valueOf(c.getColumnName(0)));
 
         // looping through all rows and adding to list
-        if (c.moveToFirst()) {Log.e("SSSS",String.valueOf(c.getColumnIndex("CashBookID")));
+        if (c.moveToFirst()) {
             do {
                 CashBook cashBook = new CashBook();
-                Log.e("SSSSS",c.getString(c.getColumnIndex("CashBookID")));
+//                Log.e("CashBook",c.getString(c.getColumnIndex("ID")));
+//                cashBook.setcId(c.getString(c.getColumnIndex("ID")));
                 cashBook.setCashBookID(c.getString(c.getColumnIndex("CashBookID")));
                 cashBook.setCBDate(c.getString(c.getColumnIndex("CBDate")));
                 cashBook.setDebitAccount(c.getString(c.getColumnIndex("DebitAccount")));
@@ -748,8 +764,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         if (c.moveToFirst()) {
             do {
                 CashBook cashBook = new CashBook();
-                Log.e("CashBook",c.getString(c.getColumnIndex(KEY_ClientID)));
+                Log.e("CashBookIDDD",c.getString(c.getColumnIndex(KEY_ID)));
 
+                cashBook.setcId(c.getString(c.getColumnIndex(KEY_ID)));
                 cashBook.setCBDate(c.getString(c.getColumnIndex(KEY_CBDate)));
                 cashBook.setDebitAccount(c.getString(c.getColumnIndex(KEY_DebitAccount)));
                 cashBook.setCreditAccount(c.getString(c.getColumnIndex(KEY_CreditAccount)));
@@ -768,5 +785,40 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
 
         return cashBooks;
+    }
+
+    public String getAccountName(String query){
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor c = db.rawQuery(query, null);
+
+        String name = "";
+
+        if (c.moveToFirst()) {
+            do {
+//                cashBook.setcId(c.getString(c.getColumnIndex(KEY_ID)));
+                name = c.getString(c.getColumnIndex("AcName"));
+
+            } while (c.moveToNext());
+        }
+        return name;
+    }
+
+    public List<Spinner> getSpinnerAcName(String query){
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor c = db.rawQuery(query, null);
+
+        List<Spinner> spinners = new ArrayList<>();
+
+        if (c.moveToFirst()) {
+            do {
+                Spinner spinner = new Spinner();
+//                cashBook.setcId(c.getString(c.getColumnIndex(KEY_ID)));
+                spinner.setName(c.getString(c.getColumnIndex("AcName")));
+                spinner.setAcId(c.getString(c.getColumnIndex("AcNameID")));
+
+                spinners.add(spinner);
+            } while (c.moveToNext());
+        }
+        return spinners;
     }
 }

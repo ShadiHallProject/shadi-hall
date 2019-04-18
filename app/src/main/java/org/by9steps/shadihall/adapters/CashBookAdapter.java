@@ -9,12 +9,14 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
 import org.by9steps.shadihall.R;
+import org.by9steps.shadihall.activities.CashCollectionActivity;
 import org.by9steps.shadihall.model.CBSetting;
 import org.by9steps.shadihall.model.CashBook;
 import org.by9steps.shadihall.model.CashEntry;
@@ -42,7 +44,6 @@ public class CashBookAdapter extends RecyclerView.Adapter {
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         if (viewType == 0){
             View v = LayoutInflater.from(parent.getContext()).inflate(android.R.layout.simple_list_item_1, parent, false);
-            v.findViewById(android.R.id.text1).setBackgroundColor(Color.parseColor("#f0749f"));
             v.findViewById(android.R.id.text1).setBackgroundColor(Color.parseColor("#f0749f"));
             return new CashBookAdapter.MonthViewHolder(v);
         }else if (viewType == 2){
@@ -108,6 +109,20 @@ public class CashBookAdapter extends RecyclerView.Adapter {
             ((ItemViewHolder) viewHolder).amount.setText(cashEntry.getAmount());
             ((ItemViewHolder) viewHolder).remarks.setText(cashEntry.getCBRemarks());
             ((ItemViewHolder) viewHolder).date.setText(cashEntry.getCBDate());
+
+            ((ItemViewHolder) viewHolder).edit.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(mCtx, CashCollectionActivity.class);
+                    intent.putExtra("BookingID","0");
+                    intent.putExtra("Spinner","View");
+                    intent.putExtra("Type","Edit");
+                    intent.putExtra("CashBookID",cashEntry.getCashBookID());
+                    mCtx.startActivity(intent);
+                }
+            });
+
+
         }else if (cashEntry.isRow() == 2) {
             ((TotalViewHolder) viewHolder).amount.setText(cashEntry.getAmount());
         }else {
@@ -143,6 +158,7 @@ public class CashBookAdapter extends RecyclerView.Adapter {
     class ItemViewHolder extends RecyclerView.ViewHolder {
 
         TextView cashBookID, deb_account, cre_account, amount, remarks, date;
+        Button edit;
 
 
         public ItemViewHolder(View itemView) {
@@ -154,6 +170,7 @@ public class CashBookAdapter extends RecyclerView.Adapter {
             amount = itemView.findViewById(R.id.amount);
             remarks = itemView.findViewById(R.id.remarks);
             date = itemView.findViewById(R.id.date);
+            edit = itemView.findViewById(R.id.btn_edit);
 
         }
     }

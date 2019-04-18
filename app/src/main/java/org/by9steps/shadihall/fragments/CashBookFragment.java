@@ -8,10 +8,13 @@ import android.content.Context;
 import android.content.Intent;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.ArrayList;
 
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -19,13 +22,22 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.drawable.Drawable;
 import android.graphics.pdf.PdfDocument;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.CancellationSignal;
+import android.os.Environment;
+import android.os.ParcelFileDescriptor;
+import android.print.PageRange;
 import android.print.PrintAttributes;
 import android.print.PrintDocumentAdapter;
+import android.print.PrintDocumentInfo;
 import android.print.PrintJob;
 import android.print.PrintManager;
+import android.print.pdf.PrintedPdfDocument;
+import android.provider.DocumentsContract;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.design.widget.FloatingActionButton;
@@ -59,21 +71,35 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.DefaultRetryPolicy;
+import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.RetryPolicy;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
+import com.itextpdf.text.BaseColor;
+import com.itextpdf.text.Document;
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.Element;
+import com.itextpdf.text.Font;
+import com.itextpdf.text.PageSize;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.pdf.PdfPCell;
+import com.itextpdf.text.pdf.PdfPTable;
+import com.itextpdf.text.pdf.PdfWriter;
 
 import org.by9steps.shadihall.AppController;
 import org.by9steps.shadihall.R;
 import org.by9steps.shadihall.activities.CashBookSettingActivity;
 import org.by9steps.shadihall.activities.CashCollectionActivity;
+import org.by9steps.shadihall.activities.SplashActivity;
 import org.by9steps.shadihall.adapters.CashBookAdapter;
 import org.by9steps.shadihall.helper.DatabaseHelper;
 import org.by9steps.shadihall.model.Bookings;
 import org.by9steps.shadihall.model.CBSetting;
+import org.by9steps.shadihall.model.CBUpdate;
 import org.by9steps.shadihall.model.CashBook;
 import org.by9steps.shadihall.model.CashEntry;
+import org.by9steps.shadihall.model.UpdateDate;
 import org.by9steps.shadihall.model.User;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -88,8 +114,6 @@ import java.util.List;
 import java.util.Map;
 
 import android.widget.AdapterView.OnItemSelectedListener;
-
-import static android.content.Context.PRINT_SERVICE;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -116,6 +140,9 @@ public class CashBookFragment extends Fragment implements OnItemSelectedListener
     public static String fDate1, fDate2;
     public static Button date1;
     public static Button date2;
+
+    private static final String TAG = "PdfCreatorActivity";
+    private File pdfFile;
 
     public CashBookFragment() {
         // Required empty public constructor
@@ -147,6 +174,8 @@ public class CashBookFragment extends Fragment implements OnItemSelectedListener
         tv_remarks = view.findViewById(R.id.tv_remarks);
         tv_amount = view.findViewById(R.id.tv_amount);
 
+        databaseHelper = new DatabaseHelper(getContext());
+
         spinner.setOnItemSelectedListener(this);
 
         // Spinner Drop down elements
@@ -169,9 +198,6 @@ public class CashBookFragment extends Fragment implements OnItemSelectedListener
         spinner.setAdapter(dataAdapter);
 
 
-        databaseHelper = new DatabaseHelper(getContext());
-
-
         FloatingActionButton fab = view.findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -180,6 +206,8 @@ public class CashBookFragment extends Fragment implements OnItemSelectedListener
                 Intent intent = new Intent(getContext(), CashCollectionActivity.class);
                 intent.putExtra("BookingID","0");
                 intent.putExtra("Spinner","View");
+                intent.putExtra("Type","Add");
+                intent.putExtra("CashBookID","0");
                 startActivity(intent);
             }
         });
@@ -236,11 +264,24 @@ public class CashBookFragment extends Fragment implements OnItemSelectedListener
         if(item.getItemId() == android.R.id.home){
             getActivity().onBackPressed();
         }else if (item.getItemId() == R.id.action_print){
-            exportPdf();
+            try {
+                customPDF();
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (DocumentException e) {
+                e.printStackTrace();
+            }
+
             return true;
         }else if (item.getItemId() == R.id.action_settings){
             startActivity(new Intent(getContext(), CashBookSettingActivity.class));
             return true;
+        }else if (item.getItemId() == R.id.action_refresh){
+            if (isConnected()){
+                updateCashBook();
+            }else {
+                Toast.makeText(getContext(), "Please Check Your Internet Connection", Toast.LENGTH_SHORT).show();
+            }
         }
         return super.onOptionsItemSelected(item);
     }
@@ -307,7 +348,7 @@ public class CashBookFragment extends Fragment implements OnItemSelectedListener
 //                    "                         Account3Name AS Account3Name_1 ON CashBook.CreditAccount = Account3Name_1.AcNameID INNER JOIN\n" +
 //                    "                         Account3Name AS Account3Name_2 ON CashBook.ClientUserID = Account3Name_2.AcNameID\n" +
 //                    "WHERE        (CashBook.ClientID = "+u.getClientID()+")";
-            query = "SELECT        CashBook.CashBookID, CashBook.CBDate, CashBook.DebitAccount, CashBook.CreditAccount, CashBook.CBRemarks, CashBook.Amount, CashBook.ClientID, CashBook.ClientUserID, CashBook.BookingID, \n" +
+            query = "SELECT      CashBook.ID, CashBook.CashBookID, CashBook.CBDate, CashBook.DebitAccount, CashBook.CreditAccount, CashBook.CBRemarks, CashBook.Amount, CashBook.ClientID, CashBook.ClientUserID, CashBook.BookingID, \n" +
                     "                         Account3Name.AcName AS DebitAccountName, Account3Name_1.AcName AS CreditAccountName, Account3Name_2.AcName AS UserName, CashBook.UpdatedDate\n" +
                     "FROM            CashBook LEFT OUTER JOIN\n" +
                     "                         Account3Name AS Account3Name_1 ON CashBook.CreditAccount = Account3Name_1.AcNameID LEFT OUTER JOIN\n" +
@@ -320,7 +361,7 @@ public class CashBookFragment extends Fragment implements OnItemSelectedListener
 //        String s = "SELECT * FROM CashBook WHERE ClientID = 69";
 //        databaseHelper.getCashBook(s);
 
-        if (listSorting){
+        if (!listSorting){
             for (int i = cashBooksList.size()-1; i >= 0; i--){
                 String[] separated = cashBooksList.get(i).getCBDate().split("-");
                 if (m == 0) {
@@ -382,216 +423,6 @@ public class CashBookFragment extends Fragment implements OnItemSelectedListener
         recyclerView.setAdapter(adapter);
     }
 
-    public void getRecoveries(){
-        mProgress = new ProgressDialog(getContext());
-        mProgress.setTitle("Loading");
-        mProgress.setMessage("Please wait...");
-        mProgress.setCanceledOnTouchOutside(false);
-        mProgress.show();
-
-        String tag_json_obj = "json_obj_req";
-        String u = "http://69.167.137.121/plesk-site-preview/sky.com.pk/shadiHall/GetCashbookEntry.php";
-
-        StringRequest jsonObjectRequest = new StringRequest(com.android.volley.Request.Method.POST, u,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        Log.e("RES",response);
-                        mProgress.dismiss();
-                        JSONObject jsonObj = null;
-
-                        try {
-                            jsonObj= new JSONObject(response);
-                            JSONArray jsonArray = jsonObj.getJSONArray("CashBook");
-                            String success = jsonObj.getString("success");
-                            Log.e("Success",success);
-                            if (success.equals("1")){
-                                mList.clear();
-                                for (int i = 0; i < jsonArray.length(); i++) {
-                                    JSONObject jsonObject = jsonArray.getJSONObject(i);
-
-                                    String CashBookID = jsonObject.getString("CashBookID");
-                                    String CB_Date = jsonObject.getString("CBDate");
-                                    JSONObject jbb = new JSONObject(CB_Date);
-                                    String CBDate = jbb.getString("date");
-                                    String DebitAccount = jsonObject.getString("DebitAccount");
-                                    String CreditAccount = jsonObject.getString("CreditAccount");
-//                                    String CBRemarks = jsonObject.getString("CBRemarks");
-                                    String Amount = jsonObject.getString("Amount");
-                                    String ClientID = jsonObject.getString("ClientID");
-                                    String ClientUserID = jsonObject.getString("ClientUserID");
-                                    String BookingID = jsonObject.getString("BookingID");
-                                    String DebitAccountName = jsonObject.getString("DebitAccountName");
-                                    String CreditAccountName = jsonObject.getString("CreditAccountName");
-                                    String UserName = jsonObject.getString("UserName");
-//                                    String Updated_Date = jsonObject.getString("UpdatedDate");
-//                                    JSONObject jbbb = new JSONObject(Updated_Date);
-//                                    String UpdatedDate = jbbb.getString("date");
-
-                                    DateFormat old = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-                                    String pattern="dd-MM-yyyy";
-                                    DateFormat df = new SimpleDateFormat(pattern);
-                                    Date date = old.parse(CBDate);
-                                    String CBDate1 = df.format(date);
-                                    String[] separated = CBDate1.split("-");
-
-                                    if (m == 0) {
-                                        mList.add(CashEntry.createSection(separated[1]+"/"+separated[2]));
-                                        mList.add(CashEntry.createRow(CashBookID,CBDate1,DebitAccount,CreditAccount,"ss",Amount,ClientID,ClientUserID,BookingID,DebitAccountName,CreditAccountName,UserName, "s"));
-                                        m = Integer.valueOf(separated[1]);
-
-                                        amount = Integer.valueOf(Amount) + amount;
-                                        gAmount = Integer.valueOf(Amount) + gAmount;
-                                    }else if (m == Integer.valueOf(separated[1])){
-                                        amount = Integer.valueOf(Amount) + amount;
-                                        gAmount = Integer.valueOf(Amount) + gAmount;
-                                        mList.add(CashEntry.createRow(CashBookID,CBDate1,DebitAccount,CreditAccount,"ss",Amount,ClientID,ClientUserID,BookingID,DebitAccountName,CreditAccountName,UserName, "s"));
-                                    }else {
-                                        mList.add(CashEntry.createTotal(String.valueOf(amount)));
-                                        amount = 0;
-                                        amount = Integer.valueOf(Amount) + amount;
-                                        gAmount = Integer.valueOf(Amount) + gAmount;
-
-                                        mList.add(CashEntry.createSection(separated[1]+"/"+separated[2]));
-                                        mList.add(CashEntry.createRow(CashBookID,CBDate1,DebitAccount,CreditAccount,"ss",Amount,ClientID,ClientUserID,BookingID,DebitAccountName,CreditAccountName,UserName, "s"));
-                                        m = Integer.valueOf(separated[1]);
-                                    }
-                                }
-                                mList.add(CashEntry.createTotal(String.valueOf(amount)));
-                                mList.add(CashEntry.createSection("Grand Total"));
-                                mList.add(CashEntry.createTotal(String.valueOf(gAmount)));
-                                CashBookAdapter adapter = new CashBookAdapter(getContext(),mList);
-                                recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-                                recyclerView.setAdapter(adapter);
-
-                            }else {
-                                String message = jsonObj.getString("message");
-                                Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
-                            }
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        } catch (ParseException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                mProgress.dismiss();
-                Log.e("Error",error.toString());
-                Toast.makeText(getContext(), error.toString(), Toast.LENGTH_LONG).show();
-            }
-        }){
-            @Override
-            protected Map<String, String> getParams() {
-                Map<String, String> params = new HashMap<String, String>();
-                List<User> list = User.listAll(User.class);
-                for (User u: list) {
-                    params.put("ClientID", u.getClientID());
-                }
-                return params;
-            }
-        };
-        int socketTimeout = 10000;//10 seconds - change to what you want
-        RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
-        jsonObjectRequest.setRetryPolicy(policy);
-        AppController.getInstance().addToRequestQueue(jsonObjectRequest, tag_json_obj);
-    }
-
-    public void exportPdf(){
-        Toast.makeText(getContext(), "Click", Toast.LENGTH_SHORT).show();
-        bitmap = loadBitmapFromView(scrollView, scrollView.getChildAt(0).getWidth(), scrollView.getChildAt(0).getHeight());
-        createPdf();
-    }
-
-    public static Bitmap loadBitmapFromView(View v, int width, int height) {
-        Bitmap b = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-        Canvas c = new Canvas(b);
-        Drawable bgDrawable = v.getBackground();
-        if (bgDrawable != null)
-            bgDrawable.draw(c);
-        else
-            c.drawColor(Color.WHITE);
-        v.draw(c);
-
-        return b;
-    }
-
-    private void createPdf(){
-        WindowManager wm = (WindowManager) getContext().getSystemService(Context.WINDOW_SERVICE);
-        //  Display display = wm.getDefaultDisplay();
-        DisplayMetrics displaymetrics = new DisplayMetrics();
-        getActivity().getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
-        float hight = displaymetrics.heightPixels ;
-        float width = displaymetrics.widthPixels ;
-
-        int convertHighet = (int) scrollView.getChildAt(0).getHeight(), convertWidth = (int) scrollView.getChildAt(0).getWidth();
-
-//        Resources mResources = getResources();
-//        Bitmap bitmap = BitmapFactory.decodeResource(mResources, R.drawable.screenshot);
-
-        PdfDocument document = new PdfDocument();
-        PdfDocument.PageInfo pageInfo = new PdfDocument.PageInfo.Builder(convertWidth, convertHighet, 1).create();
-        PdfDocument.Page page = document.startPage(pageInfo);
-
-        Canvas canvas = page.getCanvas();
-
-        Paint paint = new Paint();
-        canvas.drawPaint(paint);
-
-        bitmap = Bitmap.createScaledBitmap(bitmap, convertWidth, convertHighet, true);
-        doPhotoPrint(bitmap);
-        paint.setColor(Color.BLUE);
-        canvas.drawBitmap(bitmap, 0, 0 , null);
-        document.finishPage(page);
-
-        // write the document content
-//        String targetPdf = "/sdcard/shadihall.pdf";
-//        File filePath;
-//        filePath = new File(targetPdf);
-//        try {
-//            document.writeTo(new FileOutputStream(filePath));
-//
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//            Toast.makeText(getContext(), "Something wrong: " + e.toString(), Toast.LENGTH_LONG).show();
-//        }
-//
-//        // close the document
-//        document.close();
-//        Toast.makeText(getContext(), "PDF of Scroll is created!!!", Toast.LENGTH_SHORT).show();
-
-//        openGeneratedPDF();
-
-    }
-    private void openGeneratedPDF(){
-        File file = new File("/sdcard/shadihall.pdf");
-        if (file.exists())
-        {
-            Intent intent=new Intent(Intent.ACTION_VIEW);
-            Uri uri = Uri.fromFile(file);
-            intent.setDataAndType(uri, "application/pdf");
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-
-            try
-            {
-                startActivity(intent);
-            }
-            catch(ActivityNotFoundException e)
-            {
-                Toast.makeText(getContext(), "No Application available to view pdf", Toast.LENGTH_LONG).show();
-            }
-        }
-    }
-
-    private void doPhotoPrint(Bitmap bitmap) {
-
-        PrintHelper photoPrinter = new PrintHelper(getActivity());
-        photoPrinter.setScaleMode(PrintHelper.SCALE_MODE_FIT);
-
-        photoPrinter.printBitmap("cashbook", bitmap);
-    }
-
     private void filter(String text) {Log.e("Search","SEARCH");
         //new array list that will hold the filtered data
         List<CashEntry> filterd = new ArrayList<>();
@@ -651,7 +482,7 @@ public class CashBookFragment extends Fragment implements OnItemSelectedListener
 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-        if (position!=1){
+        if (position!=1 && position != 0){
             getCashBook();
         }
         switch (position){
@@ -692,6 +523,7 @@ public class CashBookFragment extends Fragment implements OnItemSelectedListener
                         fDate2 = date2.getText().toString();
                         dateFilter();
                         dialog.dismiss();
+                        spinner.setSelection(0);
                     }
                 });
                 cancel.setOnClickListener(new View.OnClickListener() {
@@ -818,5 +650,339 @@ public class CashBookFragment extends Fragment implements OnItemSelectedListener
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(adapter);
     }
+
+    public void updateCashBook(){
+
+        String tag_json_obj = "json_obj_req";
+        String u = "http://69.167.137.121/plesk-site-preview/sky.com.pk/shadiHall/AddCashBook.php";
+
+        mProgress = new ProgressDialog(getContext());
+        mProgress.setMessage("Loading...");
+        mProgress.setCancelable(false);
+        mProgress.show();
+
+        StringRequest jsonObjectRequest = new StringRequest(com.android.volley.Request.Method.POST, u,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        Log.e("Response",response);
+                        JSONObject jsonObj = null;
+
+                        try {
+                            jsonObj= new JSONObject(response);
+                            String success = jsonObj.getString("success");
+                            if (success.equals("1")){
+                                JSONArray jsonArray = jsonObj.getJSONArray("CashBook");
+                                for (int i = 0; i < jsonArray.length(); i++) {
+                                    JSONObject jsonObject = jsonArray.getJSONObject(i);
+
+                                    String CashBookID = jsonObject.getString("CashBookID");
+                                    String cb = jsonObject.getString("CBDate");
+                                    JSONObject jbb = new JSONObject(cb);
+                                    String CBDate = jbb.getString("date");
+                                    SimpleDateFormat ss = new SimpleDateFormat("yyyy-MM-dd");
+                                    Date date = ss.parse(CBDate);
+                                    SimpleDateFormat sf = new SimpleDateFormat("yyyy-MM-dd");
+                                    String CBDate1 = sf.format(date);
+                                    String DebitAccount = jsonObject.getString("DebitAccount");
+                                    String CreditAccount = jsonObject.getString("CreditAccount");
+                                    String CBRemark = jsonObject.getString("CBRemarks");
+                                    String Amount = jsonObject.getString("Amount");
+                                    String ClientID = jsonObject.getString("ClientID");
+                                    String ClientUserID = jsonObject.getString("ClientUserID");
+                                    String NetCode = jsonObject.getString("NetCode");
+                                    String SysCode = jsonObject.getString("SysCode");
+                                    String UpdatedDat = jsonObject.getString("UpdatedDate");
+//                                    JSONObject jb = new JSONObject(ed);
+//                                    String UpdatedDate = jb.getString("date");
+                                    String BookingID = jsonObject.getString("BookingID");
+
+                                    List<UpdateDate> list = UpdateDate.listAll(UpdateDate.class);
+
+                                    for (UpdateDate u : list){
+                                        if (Integer.valueOf(CashBookID) > Integer.valueOf(u.getMaxID())){
+                                            databaseHelper.createCashBook(new CashBook(CashBookID,CBDate1,DebitAccount,CreditAccount,CBRemark,Amount,ClientID,ClientUserID,NetCode,SysCode,UpdatedDat,BookingID));
+                                        }else{
+                                            String query = "UPDATE CashBook SET CBDate = '"+CBDate1+"', SET DebitAccount = '"+DebitAccount+"', CreditAccount = '"+CreditAccount+"', CBRemarks '"+CBRemark+"', Amount = '"+Amount+"', ClientID = '"+ClientID+"', ClientUserID = '"+ClientUserID+"', NetCode = '"+NetCode+"', SysCode = '"+SysCode+"', UpdatedDate = '"+UpdatedDat+"', BookingID = '"+BookingID+
+                                                    "' WHERE CashBookID = "+CashBookID;
+                                            databaseHelper.updateCashBook(query);
+                                        }
+                                    }
+
+
+                                    Date da = new Date();
+                                    SimpleDateFormat sff = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                                    String d = sff.format(da);
+
+                                    if (i == jsonArray.length() - 1) {
+                                        UpdateDate updatedDate = UpdateDate.findById(UpdateDate.class, 1);
+                                        updatedDate.setCbDate(d);
+                                        updatedDate.setMaxID(CashBookID);
+                                        updatedDate.save();
+                                    }
+                                }
+
+                                sendUpdtae();
+                            }else if (success.equals("2")){
+                                sendUpdtae();
+                            }
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        } catch (ParseException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.e("Error",error.toString());
+                mProgress.dismiss();
+                Toast.makeText(getContext(), error.toString(), Toast.LENGTH_LONG).show();
+            }
+        }){
+            @Override
+            protected Map<String, String> getParams() {
+
+                Map<String, String> params = new HashMap<String, String>();
+                List<User> list = User.listAll(User.class);
+                List<UpdateDate> date = UpdateDate.listAll(UpdateDate.class);
+                for (User u : list) {
+                    for (UpdateDate d :date) {
+                        params.put("CBDate", d.getCbDate());
+                        params.put("ClientID", u.getClientID());
+                    }
+                }
+                return params;
+            }
+        };
+        int socketTimeout = 10000;//10 seconds
+        RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
+        jsonObjectRequest.setRetryPolicy(policy);
+        AppController.getInstance().addToRequestQueue(jsonObjectRequest, tag_json_obj);
+    }
+
+    public void sendUpdtae(){
+
+        List<CBUpdate> list = CBUpdate.listAll(CBUpdate.class);
+        if (list.size() == 0){
+            addCashBook();
+        }
+
+        for (final CBUpdate c : list){
+            String tag_json_obj = "json_obj_req";
+            String url = "http://69.167.137.121/plesk-site-preview/sky.com.pk/shadiHall/UpdateCashBook.php";
+
+            StringRequest jsonObjectRequest = new StringRequest(Request.Method.POST, url,
+                    new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
+                            Log.e("Update",response);
+                            try {
+                                JSONObject jsonObject = new JSONObject(response);
+                                String success = jsonObject.getString("success");
+                                Log.e("Success",success);
+                                if (success.equals("1")){
+                                    String message = jsonObject.getString("message");
+//                                    Toast.makeText(CashCollectionActivity.this, message, Toast.LENGTH_SHORT).show();
+                                    CBUpdate.deleteAll(CBUpdate.class);
+                                }
+                                addCashBook();
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Log.e("Error",error.toString());
+                    mProgress.dismiss();
+                    Toast.makeText(getContext(), error.toString(), Toast.LENGTH_SHORT).show();
+                }
+            }){
+                @Override
+                protected Map<String, String> getParams() {
+
+                    Map<String, String> params = new HashMap<String, String>();
+                    List<User> list = User.listAll(User.class);
+                    for (User u : list) {
+                        params.put("CashBookID", c.getCashBookID());
+                        params.put("CBDate", c.getCBDate());
+                        params.put("DebitAccount", c.getDebitAccount());
+                        params.put("CreditAccount", c.getCreditAccount());
+                        params.put("CBRemarks", c.getCBRemarks());
+                        params.put("Amount", c.getAmount());
+                        params.put("ClientID", u.getClientID());
+                        params.put("ClientUserID", u.getClientUserID());
+                        params.put("NetCode", "0");
+                        params.put("SysCode", "0");
+                        params.put("BookingID", "0");
+                    }
+                    return params;
+                }
+            };
+            int socketTimeout = 30000;//30 seconds - change to what you want
+            RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
+            jsonObjectRequest.setRetryPolicy(policy);
+            AppController.getInstance().addToRequestQueue(jsonObjectRequest, tag_json_obj);
+        }
+    }
+
+    public void addCashBook(){
+        String query = "SELECT * FROM CashBook WHERE CashBookID = 0";
+        List<CashBook> addCashBook = databaseHelper.getCashBook(query);
+        if (addCashBook.size() == 0){
+            mProgress.dismiss();
+        }
+
+        for (final CashBook c : addCashBook){
+            String tag_json_obj = "json_obj_req";
+            String url = "http://69.167.137.121/plesk-site-preview/sky.com.pk/shadiHall/AddCashBook.php";
+
+            StringRequest jsonObjectRequest = new StringRequest(Request.Method.POST, url,
+                    new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
+                            Log.e("ADD",response);
+                            try {
+                                JSONObject jsonObject = new JSONObject(response);
+                                String success = jsonObject.getString("success");
+                                Log.e("Success",success);
+                                if (success.equals("1")){
+                                    String id = jsonObject.getString("CBID");
+                                    String message = jsonObject.getString("message");
+                                    databaseHelper.updateCashBook("UPDATE CashBook SET CashBookID = '"+id+"' WHERE ID = "+c.getcId());
+//                                    Toast.makeText(CashCollectionActivity.this, message, Toast.LENGTH_SHORT).show();
+                                }
+                                getCashBook();
+                                mProgress.dismiss();
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Log.e("Error",error.toString());
+                    mProgress.dismiss();
+                    Toast.makeText(getContext(), error.toString(), Toast.LENGTH_SHORT).show();
+                }
+            }){
+                @Override
+                protected Map<String, String> getParams() {
+
+                    Map<String, String> params = new HashMap<String, String>();
+                    List<User> list = User.listAll(User.class);
+                    for (User u : list) {
+                        params.put("CBDate", c.getCBDate());
+                        params.put("DebitAccount", c.getDebitAccount());
+                        params.put("CreditAccount", c.getCreditAccount());
+                        params.put("CBRemarks", c.getCBRemarks());
+                        params.put("Amount", c.getAmount());
+                        params.put("ClientID", u.getClientID());
+                        params.put("ClientUserID", u.getClientUserID());
+                        params.put("NetCode", "0");
+                        params.put("SysCode", "0");
+                        params.put("BookingID", c.getBookingID());
+                    }
+                    return params;
+                }
+            };
+            int socketTimeout = 30000;//30 seconds - change to what you want
+            RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
+            jsonObjectRequest.setRetryPolicy(policy);
+            AppController.getInstance().addToRequestQueue(jsonObjectRequest, tag_json_obj);
+        }
+    }
+
+
+    //Check Internet Connection
+    public boolean isConnected() {
+        boolean connected = false;
+        try {
+            ConnectivityManager cm = (ConnectivityManager)getContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo nInfo = cm.getActiveNetworkInfo();
+            connected = nInfo != null && nInfo.isAvailable() && nInfo.isConnected();
+            return connected;
+        } catch (Exception e) {
+            Log.e("Connectivity Exception", e.getMessage());
+        }
+        return connected;
+    }
+
+    public void customPDF() throws FileNotFoundException, DocumentException {
+
+        File docsFolder = new File(Environment.getExternalStorageDirectory() + "/Documents");
+        if (!docsFolder.exists()) {
+            docsFolder.mkdir();
+            Log.i(TAG, "Created a new directory for PDF");
+        }
+
+        String pdfname = "CashBook.pdf";
+        pdfFile = new File(docsFolder.getAbsolutePath(), pdfname);
+        OutputStream output = new FileOutputStream(pdfFile);
+        Document document = new Document(PageSize.A4);
+        PdfPTable table = new PdfPTable(new float[]{3, 3, 3, 3, 3, 3});
+        table.getDefaultCell().setHorizontalAlignment(Element.ALIGN_CENTER);
+        table.getDefaultCell().setFixedHeight(50);
+        table.setTotalWidth(PageSize.A4.getWidth());
+        table.setWidthPercentage(100);
+        table.getDefaultCell().setVerticalAlignment(Element.ALIGN_MIDDLE);
+        table.addCell("Date");
+        table.addCell("CB ID");
+        table.addCell("Debit Account");
+        table.addCell("Credit Account");
+        table.addCell("Remarks");
+        table.addCell("Amount");
+        table.setHeaderRows(1);
+        PdfPCell[] cells = table.getRow(0).getCells();
+        for (int j = 0; j < cells.length; j++) {
+            cells[j].setBackgroundColor(BaseColor.PINK);
+        }
+
+        for (CashBook c : cashBooksList){
+            table.addCell(c.getCBDate());
+            table.addCell(c.getCashBookID());
+            table.addCell(c.getDebitAccountName());
+            table.addCell(c.getCreditAccountName());
+            table.addCell(c.getCBRemarks());
+            table.addCell(c.getAmount());
+        }
+
+        PdfWriter.getInstance(document, output);
+        document.open();
+
+        Font f = new Font(Font.FontFamily.TIMES_ROMAN, 30.0f, Font.UNDERLINE, BaseColor.BLACK);
+        Paragraph paragraph = new Paragraph("Cash Book \n\n", f);
+        paragraph.setAlignment(Element.ALIGN_CENTER);
+        document.add(paragraph);
+        document.add(table);
+        document.close();
+
+
+
+
+        customPDFView();
+
+    }
+
+
+
+    public void customPDFView(){
+        PackageManager packageManager = getContext().getPackageManager();
+        Intent testIntent = new Intent(Intent.ACTION_VIEW);
+        testIntent.setType("application/pdf");
+        List list = packageManager.queryIntentActivities(testIntent, PackageManager.MATCH_DEFAULT_ONLY);
+        if (list.size() > 0) {
+            Intent intent = new Intent();
+            intent.setAction(Intent.ACTION_VIEW);
+            Uri uri = Uri.fromFile(pdfFile);
+            intent.setDataAndType(uri, "application/pdf");
+            getContext().startActivity(intent);
+        } else {
+            Toast.makeText(getContext(), "Download a PDF Viewer to see the generated PDF", Toast.LENGTH_SHORT).show();
+        }
+    }
+
 }
 

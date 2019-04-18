@@ -4,6 +4,7 @@ import java.io.Serializable;
 
 public class CashBook implements Serializable {
 
+    String cId;
     String CashBookID;
     String CBDate;
     String DebitAccount;
@@ -157,5 +158,13 @@ public class CashBook implements Serializable {
 
     public void setUserName(String userName) {
         UserName = userName;
+    }
+
+    public String getcId() {
+        return cId;
+    }
+
+    public void setcId(String cId) {
+        this.cId = cId;
     }
 }

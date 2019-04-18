@@ -28,7 +28,14 @@ public class SelectDateFragment extends DialogFragment implements DatePickerDial
     }
     public void populateSetDate(int year, int month, int day) {
         if (AppController.date.equals("CashBook")){
-            CashCollectionActivity.date.setText(day+"-"+month+"-"+year);
+            String d = String.valueOf(day), m = String.valueOf(month);
+            if (month<10){
+                m = "0"+String.valueOf(month);
+            }
+            if (day<10){
+                d = "0"+String.valueOf(day);
+            }
+            CashCollectionActivity.date.setText(year+"-"+m+"-"+d);
         }else if (AppController.fDate1.equals("Date1")){
             String d = String.valueOf(day), m = String.valueOf(month);
             if (month<10){

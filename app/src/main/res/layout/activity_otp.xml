@@ -33,12 +33,29 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
-    <Button
-        android:id="@+id/resend_otp"
-        android:textAllCaps="false"
-        android:background="@android:color/transparent"
-        android:text="@string/resend_otp"
+    <LinearLayout
+        android:gravity="center"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/resend_otp"
+            android:textAllCaps="false"
+            android:background="@android:color/transparent"
+            android:text="@string/resend_otp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        <Button
+            android:id="@+id/resend_otp2"
+            android:textAllCaps="false"
+            android:background="@android:color/transparent"
+            android:text="Resen From APi"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+    </LinearLayout>
+
+
 
 </LinearLayout>
