@@ -138,6 +138,7 @@
                         android:textSize="@dimen/textSize"
                         android:textColor="@color/colorPrimaryDark"
                         android:textStyle="bold"
+                        android:layout_marginLeft="@dimen/ten_dp"
                         android:layout_margin="3dp"
                         android:layout_width="@dimen/hundred_dp"
                         android:layout_height="wrap_content"

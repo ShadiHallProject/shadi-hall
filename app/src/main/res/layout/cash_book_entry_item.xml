@@ -21,7 +21,6 @@
 
             <TextView
                 android:id="@+id/date"
-                android:textAlignment="center"
                 android:textSize="@dimen/textSize"
                 android:layout_margin="3dp"
                 android:layout_width="@dimen/hundred_dp"
@@ -39,7 +38,6 @@
 
             <TextView
                 android:id="@+id/deb_account"
-                android:textAlignment="center"
                 android:textSize="@dimen/textSize"
                 android:layout_margin="3dp"
                 android:layout_width="110dp"
@@ -48,7 +46,6 @@
 
             <TextView
                 android:id="@+id/cre_account"
-                android:textAlignment="center"
                 android:textSize="@dimen/textSize"
                 android:layout_margin="3dp"
                 android:layout_width="110dp"
@@ -57,7 +54,6 @@
 
             <TextView
                 android:id="@+id/remarks"
-                android:textAlignment="center"
                 android:textSize="@dimen/textSize"
                 android:layout_margin="3dp"
                 android:layout_width="@dimen/hundred_dp"
@@ -66,7 +62,7 @@
 
             <TextView
                 android:id="@+id/amount"
-                android:textAlignment="center"
+                android:textAlignment="textEnd"
                 android:textSize="@dimen/textSize"
                 android:layout_margin="3dp"
                 android:layout_width="@dimen/hundred_dp"
@@ -74,16 +70,26 @@
                 android:text="@string/Recieved"/>
 
             <LinearLayout
+                android:layout_marginLeft="5dp"
+                android:orientation="horizontal"
                 android:layout_width="100dp"
+                android:gravity="left"
                 android:layout_height="wrap_content">
 
                 <Button
                     android:background="@android:color/transparent"
                     android:textColor="@color/colorPrimaryDark"
                     android:id="@+id/btn_edit"
-                    android:layout_width="wrap_content"
+                    android:layout_width="50dp"
                     android:layout_height="wrap_content"
                     android:text="@string/edit"/>
+                <Button
+                    android:background="@android:color/transparent"
+                    android:textColor="@color/colorPrimaryDark"
+                    android:id="@+id/btn_print"
+                    android:layout_width="50dp"
+                    android:layout_height="wrap_content"
+                    android:text="@string/print"/>
 
             </LinearLayout>
 

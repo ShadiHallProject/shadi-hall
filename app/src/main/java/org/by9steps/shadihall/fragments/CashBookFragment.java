@@ -118,7 +118,7 @@ import android.widget.AdapterView.OnItemSelectedListener;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class CashBookFragment extends Fragment implements OnItemSelectedListener {
+public class CashBookFragment extends Fragment implements OnItemSelectedListener, View.OnClickListener {
 
     ProgressDialog mProgress;
     RecyclerView recyclerView;
@@ -130,9 +130,10 @@ public class CashBookFragment extends Fragment implements OnItemSelectedListener
     TextView tv_date,tv_id,tv_debit,tv_credit,tv_remarks,tv_amount;
 
     List<CashEntry> mList;
-    DatabaseHelper databaseHelper;
     List<CashBook> cashBooksList;
+    List<CashEntry> filterd;
     CashBookAdapter adapter;
+    DatabaseHelper databaseHelper;
 
     int m = 0, amount, gAmount , filter;
     Boolean listSorting = false;
@@ -140,6 +141,7 @@ public class CashBookFragment extends Fragment implements OnItemSelectedListener
     public static String fDate1, fDate2;
     public static Button date1;
     public static Button date2;
+    String orderBy = "CBDate";
 
     private static final String TAG = "PdfCreatorActivity";
     private File pdfFile;
@@ -177,6 +179,12 @@ public class CashBookFragment extends Fragment implements OnItemSelectedListener
         databaseHelper = new DatabaseHelper(getContext());
 
         spinner.setOnItemSelectedListener(this);
+        tv_date.setOnClickListener(this);
+        tv_id.setOnClickListener(this);
+        tv_debit.setOnClickListener(this);
+        tv_credit.setOnClickListener(this);
+        tv_remarks.setOnClickListener(this);
+        tv_amount.setOnClickListener(this);
 
         // Spinner Drop down elements
         List<String> categories = new ArrayList<String>();
@@ -214,14 +222,14 @@ public class CashBookFragment extends Fragment implements OnItemSelectedListener
 
         mList = new ArrayList<>();
 
-        header.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                listSorting = !listSorting;
-                getCashBook();
-//                doPrint();
-            }
-        });
+//        header.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                listSorting = !listSorting;
+//                getCashBook();
+////                doPrint();
+//            }
+//        });
 
         List<CBSetting> list = CBSetting.listAll(CBSetting.class);
         if (list.size() == 0){
@@ -246,11 +254,44 @@ public class CashBookFragment extends Fragment implements OnItemSelectedListener
 
             @Override
             public void afterTextChanged(Editable s) {
-
+                if (search.getText().toString().equals("")){
+                    filter = 0;
+//                    spinner.setSelection(0);
+                }
             }
         });
 
         return view;
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()){
+            case R.id.tv_date:
+                orderBy = "CBDate";
+                getCashBook();
+                break;
+            case R.id.tv_id:
+                orderBy = "CashBookID";
+                getCashBook();
+                break;
+            case R.id.tv_debit:
+                orderBy = "DebitAccount";
+                getCashBook();
+                break;
+            case R.id.tv_credit:
+                orderBy = "CreditAccount";
+                getCashBook();
+                break;
+            case R.id.tv_remarks:
+                orderBy = "CBRemarks";
+                getCashBook();
+                break;
+            case R.id.tv_amount:
+                orderBy = "Amount";
+                getCashBook();
+                break;
+        }
     }
 
     @Override
@@ -329,7 +370,6 @@ public class CashBookFragment extends Fragment implements OnItemSelectedListener
                 tv_amount.setVisibility(View.VISIBLE);
             }
         }
-        Log.e("Resume","Resume");
     }
 
     private void getCashBook(){
@@ -354,51 +394,51 @@ public class CashBookFragment extends Fragment implements OnItemSelectedListener
                     "                         Account3Name AS Account3Name_1 ON CashBook.CreditAccount = Account3Name_1.AcNameID LEFT OUTER JOIN\n" +
                     "                         Account3Name AS Account3Name_2 ON CashBook.ClientUserID = Account3Name_2.AcNameID LEFT OUTER JOIN\n" +
                     "                         Account3Name ON CashBook.DebitAccount = Account3Name.AcNameID\n" +
-                    "WHERE        (CashBook.ClientID = "+u.getClientID()+")";
+                    "WHERE        (CashBook.ClientID = "+u.getClientID()+") ORDER BY "+orderBy+" DESC";
             cashBooksList = databaseHelper.getCashBookEntry(query);
         }
 
 //        String s = "SELECT * FROM CashBook WHERE ClientID = 69";
 //        databaseHelper.getCashBook(s);
 
-        if (!listSorting){
-            for (int i = cashBooksList.size()-1; i >= 0; i--){
-                String[] separated = cashBooksList.get(i).getCBDate().split("-");
-                if (m == 0) {
-                    mList.add(CashEntry.createSection(separated[0]+"/"+separated[1]));
-                    mList.add(CashEntry.createRow(cashBooksList.get(i).getCashBookID(),cashBooksList.get(i).getCBDate(),cashBooksList.get(i).getDebitAccount(),cashBooksList.get(i).getCreditAccount(),cashBooksList.get(i).getCBRemarks(),cashBooksList.get(i).getAmount(),cashBooksList.get(i).getClientID(),cashBooksList.get(i).getClientUserID(),cashBooksList.get(i).getBookingID(),cashBooksList.get(i).getDebitAccountName(),cashBooksList.get(i).getCreditAccountName(),cashBooksList.get(i).getUserName(), cashBooksList.get(i).getUpdatedDate()));
-                    m = Integer.valueOf(separated[1]);
-
-                    amount = Integer.valueOf(cashBooksList.get(i).getAmount()) + amount;
-                    gAmount = Integer.valueOf(cashBooksList.get(i).getAmount()) + gAmount;
-                }else if (m == Integer.valueOf(separated[1])){
-                    amount = Integer.valueOf(cashBooksList.get(i).getAmount()) + amount;
-                    gAmount = Integer.valueOf(cashBooksList.get(i).getAmount()) + gAmount;
-                    mList.add(CashEntry.createRow(cashBooksList.get(i).getCashBookID(),cashBooksList.get(i).getCBDate(),cashBooksList.get(i).getDebitAccount(),cashBooksList.get(i).getCreditAccount(),cashBooksList.get(i).getCBRemarks(),cashBooksList.get(i).getAmount(),cashBooksList.get(i).getClientID(),cashBooksList.get(i).getClientUserID(),cashBooksList.get(i).getBookingID(),cashBooksList.get(i).getDebitAccountName(),cashBooksList.get(i).getCreditAccountName(),cashBooksList.get(i).getUserName(), cashBooksList.get(i).getUpdatedDate()));
-                }else {
-                    mList.add(CashEntry.createTotal(String.valueOf(amount)));
-                    amount = 0;
-                    amount = Integer.valueOf(cashBooksList.get(i).getAmount()) + amount;
-                    gAmount = Integer.valueOf(cashBooksList.get(i).getAmount()) + gAmount;
-
-                    mList.add(CashEntry.createSection(separated[0]+"/"+separated[1]));
-                    mList.add(CashEntry.createRow(cashBooksList.get(i).getCashBookID(),cashBooksList.get(i).getCBDate(),cashBooksList.get(i).getDebitAccount(),cashBooksList.get(i).getCreditAccount(),cashBooksList.get(i).getCBRemarks(),cashBooksList.get(i).getAmount(),cashBooksList.get(i).getClientID(),cashBooksList.get(i).getClientUserID(),cashBooksList.get(i).getBookingID(),cashBooksList.get(i).getDebitAccountName(),cashBooksList.get(i).getCreditAccountName(),cashBooksList.get(i).getUserName(), cashBooksList.get(i).getUpdatedDate()));
-                    m = Integer.valueOf(separated[1]);
-                }
-            }
-        }else {
+//        if (!listSorting){
+//            for (int i = cashBooksList.size()-1; i >= 0; i--){
+//                String[] separated = cashBooksList.get(i).getCBDate().split("-");
+//                if (m == 0) {
+//                    mList.add(CashEntry.createSection(separated[0]+"/"+separated[1]));
+//                    mList.add(CashEntry.createRow(cashBooksList.get(i).getCashBookID(),cashBooksList.get(i).getCBDate(),cashBooksList.get(i).getDebitAccount(),cashBooksList.get(i).getCreditAccount(),cashBooksList.get(i).getCBRemarks(),cashBooksList.get(i).getAmount(),cashBooksList.get(i).getClientID(),cashBooksList.get(i).getClientUserID(),cashBooksList.get(i).getBookingID(),cashBooksList.get(i).getDebitAccountName(),cashBooksList.get(i).getCreditAccountName(),cashBooksList.get(i).getUserName(), cashBooksList.get(i).getUpdatedDate()));
+//                    m = Integer.valueOf(separated[1]);
+//
+//                    amount = Integer.valueOf(cashBooksList.get(i).getAmount()) + amount;
+//                    gAmount = Integer.valueOf(cashBooksList.get(i).getAmount()) + gAmount;
+//                }else if (m == Integer.valueOf(separated[1])){
+//                    amount = Integer.valueOf(cashBooksList.get(i).getAmount()) + amount;
+//                    gAmount = Integer.valueOf(cashBooksList.get(i).getAmount()) + gAmount;
+//                    mList.add(CashEntry.createRow(cashBooksList.get(i).getCashBookID(),cashBooksList.get(i).getCBDate(),cashBooksList.get(i).getDebitAccount(),cashBooksList.get(i).getCreditAccount(),cashBooksList.get(i).getCBRemarks(),cashBooksList.get(i).getAmount(),cashBooksList.get(i).getClientID(),cashBooksList.get(i).getClientUserID(),cashBooksList.get(i).getBookingID(),cashBooksList.get(i).getDebitAccountName(),cashBooksList.get(i).getCreditAccountName(),cashBooksList.get(i).getUserName(), cashBooksList.get(i).getUpdatedDate()));
+//                }else {
+//                    mList.add(CashEntry.createTotal(String.valueOf(amount)));
+//                    amount = 0;
+//                    amount = Integer.valueOf(cashBooksList.get(i).getAmount()) + amount;
+//                    gAmount = Integer.valueOf(cashBooksList.get(i).getAmount()) + gAmount;
+//
+//                    mList.add(CashEntry.createSection(separated[0]+"/"+separated[1]));
+//                    mList.add(CashEntry.createRow(cashBooksList.get(i).getCashBookID(),cashBooksList.get(i).getCBDate(),cashBooksList.get(i).getDebitAccount(),cashBooksList.get(i).getCreditAccount(),cashBooksList.get(i).getCBRemarks(),cashBooksList.get(i).getAmount(),cashBooksList.get(i).getClientID(),cashBooksList.get(i).getClientUserID(),cashBooksList.get(i).getBookingID(),cashBooksList.get(i).getDebitAccountName(),cashBooksList.get(i).getCreditAccountName(),cashBooksList.get(i).getUserName(), cashBooksList.get(i).getUpdatedDate()));
+//                    m = Integer.valueOf(separated[1]);
+//                }
+//            }
+//        }else {
             for (CashBook c : cashBooksList){
 
                 String[] separated = c.getCBDate().split("-");
 
                 if (m == 0) {
-                    mList.add(CashEntry.createSection(separated[0]+"/"+separated[1]));
+                    mList.add(CashEntry.createSection(separated[0]+"/"+separated[1]+"/"+separated[2]));
                     mList.add(CashEntry.createRow(c.getCashBookID(),c.getCBDate(),c.getDebitAccount(),c.getCreditAccount(),c.getCBRemarks(),c.getAmount(),c.getClientID(),c.getClientUserID(),c.getBookingID(),c.getDebitAccountName(),c.getCreditAccountName(),c.getUserName(), c.getUpdatedDate()));
-                    m = Integer.valueOf(separated[1]);
+                    m = Integer.valueOf(separated[2]);
 
                     amount = Integer.valueOf(c.getAmount()) + amount;
                     gAmount = Integer.valueOf(c.getAmount()) + gAmount;
-                }else if (m == Integer.valueOf(separated[1])){
+                }else if (m == Integer.valueOf(separated[2])){
                     amount = Integer.valueOf(c.getAmount()) + amount;
                     gAmount = Integer.valueOf(c.getAmount()) + gAmount;
                     mList.add(CashEntry.createRow(c.getCashBookID(),c.getCBDate(),c.getDebitAccount(),c.getCreditAccount(),c.getCBRemarks(),c.getAmount(),c.getClientID(),c.getClientUserID(),c.getBookingID(),c.getDebitAccountName(),c.getCreditAccountName(),c.getUserName(), c.getUpdatedDate()));
@@ -408,12 +448,12 @@ public class CashBookFragment extends Fragment implements OnItemSelectedListener
                     amount = Integer.valueOf(c.getAmount()) + amount;
                     gAmount = Integer.valueOf(c.getAmount()) + gAmount;
 
-                    mList.add(CashEntry.createSection(separated[0]+"/"+separated[1]));
+                    mList.add(CashEntry.createSection(separated[0]+"/"+separated[1]+"/"+separated[2]));
                     mList.add(CashEntry.createRow(c.getCashBookID(),c.getCBDate(),c.getDebitAccount(),c.getCreditAccount(),c.getCBRemarks(),c.getAmount(),c.getClientID(),c.getClientUserID(),c.getBookingID(),c.getDebitAccountName(),c.getCreditAccountName(),c.getUserName(), c.getUpdatedDate()));
-                    m = Integer.valueOf(separated[1]);
+                    m = Integer.valueOf(separated[2]);
                 }
             }
-        }
+//        }
 
         mList.add(CashEntry.createTotal(String.valueOf(amount)));
         mList.add(CashEntry.createSection("Grand Total"));
@@ -425,7 +465,7 @@ public class CashBookFragment extends Fragment implements OnItemSelectedListener
 
     private void filter(String text) {Log.e("Search","SEARCH");
         //new array list that will hold the filtered data
-        List<CashEntry> filterd = new ArrayList<>();
+        filterd = new ArrayList<>();
 
         //looping through existing elements
         if (!text.isEmpty()) {
@@ -478,6 +518,7 @@ public class CashBookFragment extends Fragment implements OnItemSelectedListener
 
         //calling a method of the adapter class and passing the filtered list
         adapter.filterList(filterd);
+
     }
 
     @Override
@@ -486,6 +527,9 @@ public class CashBookFragment extends Fragment implements OnItemSelectedListener
             getCashBook();
         }
         switch (position){
+            case 0:
+                filter = 0;
+                break;
             case 1:
                 // custom dialog
                 final Dialog dialog = new Dialog(getContext());
@@ -692,9 +736,9 @@ public class CashBookFragment extends Fragment implements OnItemSelectedListener
                                     String ClientUserID = jsonObject.getString("ClientUserID");
                                     String NetCode = jsonObject.getString("NetCode");
                                     String SysCode = jsonObject.getString("SysCode");
-                                    String UpdatedDat = jsonObject.getString("UpdatedDate");
-//                                    JSONObject jb = new JSONObject(ed);
-//                                    String UpdatedDate = jb.getString("date");
+                                    String ed = jsonObject.getString("UpdatedDate");
+                                    JSONObject jb = new JSONObject(ed);
+                                    String UpdatedDat = jb.getString("date");
                                     String BookingID = jsonObject.getString("BookingID");
 
                                     List<UpdateDate> list = UpdateDate.listAll(UpdateDate.class);
@@ -716,7 +760,7 @@ public class CashBookFragment extends Fragment implements OnItemSelectedListener
 
                                     if (i == jsonArray.length() - 1) {
                                         UpdateDate updatedDate = UpdateDate.findById(UpdateDate.class, 1);
-                                        updatedDate.setCbDate(d);
+                                        updatedDate.setCbDate(UpdatedDat);
                                         updatedDate.setMaxID(CashBookID);
                                         updatedDate.save();
                                     }
@@ -785,7 +829,7 @@ public class CashBookFragment extends Fragment implements OnItemSelectedListener
                                 if (success.equals("1")){
                                     String message = jsonObject.getString("message");
 //                                    Toast.makeText(CashCollectionActivity.this, message, Toast.LENGTH_SHORT).show();
-                                    CBUpdate.deleteAll(CBUpdate.class);
+//                                    CBUpdate.deleteAll(CBUpdate.class);
                                 }
                                 addCashBook();
                             } catch (JSONException e) {
@@ -895,7 +939,6 @@ public class CashBookFragment extends Fragment implements OnItemSelectedListener
         }
     }
 
-
     //Check Internet Connection
     public boolean isConnected() {
         boolean connected = false;
@@ -940,13 +983,24 @@ public class CashBookFragment extends Fragment implements OnItemSelectedListener
             cells[j].setBackgroundColor(BaseColor.PINK);
         }
 
-        for (CashBook c : cashBooksList){
-            table.addCell(c.getCBDate());
-            table.addCell(c.getCashBookID());
-            table.addCell(c.getDebitAccountName());
-            table.addCell(c.getCreditAccountName());
-            table.addCell(c.getCBRemarks());
-            table.addCell(c.getAmount());
+        if (filter > 1){
+            for (CashEntry c : filterd){
+                table.addCell(c.getCBDate());
+                table.addCell(c.getCashBookID());
+                table.addCell(c.getDebitAccountName());
+                table.addCell(c.getCreditAccountName());
+                table.addCell(c.getCBRemarks());
+                table.addCell(c.getAmount());
+            }
+        }else {
+            for (CashBook c : cashBooksList){
+                table.addCell(c.getCBDate());
+                table.addCell(c.getCashBookID());
+                table.addCell(c.getDebitAccountName());
+                table.addCell(c.getCreditAccountName());
+                table.addCell(c.getCBRemarks());
+                table.addCell(c.getAmount());
+            }
         }
 
         PdfWriter.getInstance(document, output);
@@ -966,8 +1020,6 @@ public class CashBookFragment extends Fragment implements OnItemSelectedListener
 
     }
 
-
-
     public void customPDFView(){
         PackageManager packageManager = getContext().getPackageManager();
         Intent testIntent = new Intent(Intent.ACTION_VIEW);
@@ -983,6 +1035,5 @@ public class CashBookFragment extends Fragment implements OnItemSelectedListener
             Toast.makeText(getContext(), "Download a PDF Viewer to see the generated PDF", Toast.LENGTH_SHORT).show();
         }
     }
-
 }
 

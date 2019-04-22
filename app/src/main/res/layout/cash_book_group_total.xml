@@ -54,13 +54,13 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="3dp"
                 android:text="@string/total"
-                android:textAlignment="center"
+                android:textAlignment="viewStart"
                 android:textSize="@dimen/textSize" />
 
             <TextView
                 android:textStyle="bold"
                 android:id="@+id/amount"
-                android:textAlignment="center"
+                android:textAlignment="textEnd"
                 android:textSize="@dimen/textSize"
                 android:layout_margin="3dp"
                 android:layout_width="@dimen/hundred_dp"

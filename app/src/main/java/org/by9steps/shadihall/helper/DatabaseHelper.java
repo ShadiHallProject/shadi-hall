@@ -20,6 +20,7 @@ import org.by9steps.shadihall.model.Recovery;
 import org.by9steps.shadihall.model.Reports;
 import org.by9steps.shadihall.model.Spinner;
 import org.by9steps.shadihall.model.Summerize;
+import org.by9steps.shadihall.model.Voucher;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -820,5 +821,47 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             } while (c.moveToNext());
         }
         return spinners;
+    }
+
+    //Get Voucher
+    public List<Voucher> getPrintValues(String query) {
+        List<Voucher> vouchers = new ArrayList<>();
+
+
+        Log.e(LOG, query);
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor c = db.rawQuery(query, null);
+        Log.e("CashBook",String.valueOf(c.moveToFirst()));
+
+        // looping through all rows and adding to list
+        if (c.moveToFirst()) {
+            do {
+                Voucher voucher = new Voucher();
+                Log.e("CashBookIDDD",c.getString(c.getColumnIndex("CashBookID")));
+
+                voucher.setCashBookID(c.getString(c.getColumnIndex("CashBookID")));
+                voucher.setCBDate(c.getString(c.getColumnIndex("CBDate")));
+                voucher.setCBRemarks(c.getString(c.getColumnIndex("CBRemarks")));
+                voucher.setDebitAccount(c.getString(c.getColumnIndex("DebitAccount")));
+                voucher.setDebiterName(c.getString(c.getColumnIndex("DebiterName")));
+                voucher.setDebiterAddress(c.getString(c.getColumnIndex("DebiterAddress")));
+                voucher.setDebiterContactNo(c.getString(c.getColumnIndex("DebiterContactNo")));
+                voucher.setCreditAccount(c.getString(c.getColumnIndex("CreditAccount")));
+                voucher.setCrediterName(c.getString(c.getColumnIndex("CrediterName")));
+                voucher.setCrediterAddress(c.getString(c.getColumnIndex("CrediterAddress")));
+                voucher.setCrediterContactNo(c.getString(c.getColumnIndex("CrediterContactNo")));
+                voucher.setClientUserID(c.getString(c.getColumnIndex("ClientUserID")));
+                voucher.setPreparedBy(c.getString(c.getColumnIndex("PreparedBy")));
+                voucher.setAmount(c.getString(c.getColumnIndex("Amount")));
+                voucher.setClientID(c.getString(c.getColumnIndex("ClientID")));
+
+
+                // adding to todo list
+                vouchers.add(voucher);
+            } while (c.moveToNext());
+        }
+
+        return vouchers;
     }
 }

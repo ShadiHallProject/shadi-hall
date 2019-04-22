@@ -8,6 +8,10 @@ import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.Volley;
 
+import java.text.ParseException;
+import java.util.Date;
+import java.text.SimpleDateFormat;
+
 public class AppController extends Application {
 
     public static final String TAG = AppController.class
@@ -60,5 +64,19 @@ public class AppController extends Application {
         if (mRequestQueue != null) {
             mRequestQueue.cancelAll(tag);
         }
+    }
+    
+    public static String stringDateFormate(String sFormate, String dFormate, String date){
+        String mDate = null;
+        SimpleDateFormat sf = new SimpleDateFormat(sFormate);
+        try {
+            Date dd = sf.parse(date);
+            SimpleDateFormat ss = new SimpleDateFormat(dFormate);
+            mDate = ss.format(dd);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        return mDate;
     }
 }
