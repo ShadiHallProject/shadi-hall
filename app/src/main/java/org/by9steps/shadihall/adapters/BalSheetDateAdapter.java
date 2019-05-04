@@ -13,6 +13,7 @@ import android.widget.TextView;
 import org.by9steps.shadihall.R;
 import org.by9steps.shadihall.model.BalSheet;
 import org.by9steps.shadihall.model.ProfitLoss;
+import org.by9steps.shadihall.model.Recovery;
 
 import java.util.List;
 
@@ -133,5 +134,10 @@ public class BalSheetDateAdapter extends RecyclerView.Adapter{
 
             textView = (TextView) itemView.findViewById(android.R.id.text1);
         }
+    }
+
+    public void filterList(List<BalSheet> filterdNames) {
+        this.mList = filterdNames;
+        notifyDataSetChanged();
     }
 }

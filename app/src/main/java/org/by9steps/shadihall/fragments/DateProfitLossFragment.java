@@ -6,10 +6,18 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.EditText;
+import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.DefaultRetryPolicy;
@@ -22,6 +30,7 @@ import org.by9steps.shadihall.AppController;
 import org.by9steps.shadihall.R;
 import org.by9steps.shadihall.adapters.ProfitLossDateAdapter;
 import org.by9steps.shadihall.helper.DatabaseHelper;
+import org.by9steps.shadihall.model.BalSheet;
 import org.by9steps.shadihall.model.ProfitLoss;
 import org.by9steps.shadihall.model.User;
 import org.json.JSONArray;
@@ -40,9 +49,15 @@ import java.util.Map;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class DateProfitLossFragment extends Fragment {
+public class DateProfitLossFragment extends Fragment implements View.OnClickListener {
 
     ProgressDialog mProgress;
+    ProfitLossDateAdapter adapter;
+
+    String orderBy = "CBDate";
+    int status = 0;
+    String orderby = " ORDER BY " + orderBy + " DESC";
+    TextView dpl_date, dpl_profit, dpl_expense, dpl_income;
 
     RecyclerView recyclerView;
     List<ProfitLoss> mList = new ArrayList<>();
@@ -51,6 +66,13 @@ public class DateProfitLossFragment extends Fragment {
 
     DatabaseHelper databaseHelper;
     List<ProfitLoss> profitLossList;
+
+    List<ProfitLoss> filterdList;
+
+//    EditText search;
+    Spinner spinner;
+    SearchView searchView;
+    int filter;
 
     public DateProfitLossFragment() {
         // Required empty public constructor
@@ -63,8 +85,95 @@ public class DateProfitLossFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_date_profit_loss, container, false);
         recyclerView = view.findViewById(R.id.recycler);
+        searchView = view.findViewById(R.id.dpl_search);
+        spinner = view.findViewById(R.id.dpl_spinner);
+
+        dpl_date = view.findViewById(R.id.dpl_date);
+        dpl_income = view.findViewById(R.id.dpl_income);
+        dpl_expense = view.findViewById(R.id.dpl_expense);
+        dpl_profit = view.findViewById(R.id.dpl_profit);
+
+        dpl_date.setOnClickListener(this);
+        dpl_income.setOnClickListener(this);
+        dpl_expense.setOnClickListener(this);
+        dpl_profit.setOnClickListener(this);
 
         databaseHelper = new DatabaseHelper(getContext());
+
+        getProfitloss();
+
+//        getProfitLoss();
+
+        // Spinner Drop down elements
+        List<String> spinner_list = new ArrayList<String>();
+        spinner_list.add("Select");
+        spinner_list.add("Date");
+        spinner_list.add("Income");
+        spinner_list.add("Expense");
+        spinner_list.add("Profit");
+
+        // Creating adapter for spinner
+        ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_spinner_item, spinner_list);
+        // Drop down layout style - list view with radio button
+        dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        // attaching data adapter to spinner
+        spinner.setAdapter(dataAdapter);
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int position, long id) {
+                Toast.makeText(getContext(), String.valueOf(position), Toast.LENGTH_SHORT).show();
+                switch (position) {
+                    case 0:
+                        filter = 0;
+                        searchView.setQuery("",false);
+                        searchView.clearFocus();
+                        break;
+                    case 1:
+                        filter = 1;
+                        searchView.setQuery("",false);
+                        searchView.clearFocus();
+                        break;
+                    case 2:
+                        filter = 2;
+                        searchView.setQuery("",false);
+                        searchView.clearFocus();
+                        break;
+                    case 3:
+                        filter = 3;
+                        searchView.setQuery("",false);
+                        searchView.clearFocus();
+                        break;
+                    case 4:
+                        filter = 4;
+                        searchView.setQuery("",false);
+                        searchView.clearFocus();
+                        break;
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String s) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String s) {
+                filter(s);
+                return false;
+            }
+        });
+
+        return view;
+    }
+
+    public void getProfitloss(){
 
         List<User> list = User.listAll(User.class);
         for (User u : list){
@@ -85,7 +194,9 @@ public class DateProfitLossFragment extends Fragment {
                     "                          GROUP BY Account1Type_1.AcTypeName, CashBook_1.CBDate, CashBook_1.ClientID\n" +
                     "                          HAVING        (Account1Type_1.AcTypeName = 'Revenue')) AS derivedtbl_1\n" +
                     "GROUP BY ClientID, CBDate\n" +
-                    "HAVING        (ClientID = "+u.getClientID()+")";
+                    "HAVING        (ClientID = "+u.getClientID()+")"+ orderby;
+
+            Log.e("PROFIT-LOSS QUERY",query);
             profitLossList = databaseHelper.getProfitLoss(query);
         }
 
@@ -128,13 +239,9 @@ public class DateProfitLossFragment extends Fragment {
         mList.add(ProfitLoss.createTotal(String.valueOf(income),String.valueOf(expense),String.valueOf(profit)));
         mList.add(ProfitLoss.createSection("Grand Total"));
         mList.add(ProfitLoss.createTotal(String.valueOf(gIncome),String.valueOf(gExpense),String.valueOf(gProfit)));
-        ProfitLossDateAdapter adapter = new ProfitLossDateAdapter(getContext(),mList);
+        adapter = new ProfitLossDateAdapter(getContext(),mList);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(adapter);
-
-//        getProfitLoss();
-
-        return view;
     }
 
     public void getProfitLoss(){
@@ -255,5 +362,81 @@ public class DateProfitLossFragment extends Fragment {
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         jsonObjectRequest.setRetryPolicy(policy);
         AppController.getInstance().addToRequestQueue(jsonObjectRequest, tag_json_obj);
+    }
+
+    private void filter(String text) {
+        filterdList = new ArrayList<>();
+
+        //looping through existing elements
+        if (!text.isEmpty()) {
+            for (ProfitLoss s : mList) {
+                if (s.isRow()==1)
+                switch (filter) {
+                    case 1:
+                        if (s.getCBDate().toLowerCase().contains(text.toLowerCase())) {
+                            //adding the element to filtered list
+                            filterdList.add(s);
+                        }
+                        break;
+                    case 2:
+                        if (s.getIncome().toLowerCase().contains(text.toLowerCase())) {
+                            //adding the element to filtered list
+                            filterdList.add(s);
+                        }
+                        break;
+                    case 3:
+                        if (s.getExpense().toLowerCase().contains(text.toLowerCase())) {
+                            //adding the element to filtered list
+                            filterdList.add(s);
+                        }
+                        break;
+                    case 4:
+                        if (s.getProfit().toLowerCase().contains(text.toLowerCase())) {
+                            //adding the element to filtered list
+                            filterdList.add(s);
+                        }
+                        break;
+                }
+            }
+        } else {
+            filterdList = mList;
+        }
+
+        //calling a method of the adapter class and passing the filtered list
+        adapter.filterList(filterdList);
+
+    }
+
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()){
+            case R.id.dpl_date:
+                orderBy = "CBDate";
+                orderBy(orderBy);
+                break;
+            case R.id.dpl_income:
+                orderBy = "Income";
+                orderBy(orderBy);
+                break;
+            case R.id.dpl_expense:
+                orderBy = "Expense";
+                orderBy(orderBy);
+                break;
+            case R.id.dpl_profit:
+                orderBy = "Profit";
+                orderBy(orderBy);
+                break;
+        }
+    }
+
+    public void orderBy(String order_by){
+        if (status == 0) {
+            status = 1;
+            orderby = " ORDER BY " + order_by + " DESC";
+        } else {
+            status = 0;
+            orderby = " ORDER BY " + order_by + " ASC";
+        }
+        getProfitloss();
     }
 }

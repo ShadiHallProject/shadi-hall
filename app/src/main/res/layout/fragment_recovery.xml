@@ -3,122 +3,173 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".fragments.RecoveryFragment">
+
+    <LinearLayout
+        android:id="@+id/search_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <Spinner
+            android:id="@+id/recovery_spinner"
+            android:layout_width="120dp"
+            android:layout_height="45dp"
+            android:layout_gravity="center" />
+        <!--<Button-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:text="Filter"-->
+        <!--android:textColor="@color/colorPrimaryDark"-->
+        <!--android:id="@+id/btn_filter"/>-->
+
+        <!--<EditText
+            android:paddingTop="@dimen/ten_dp"
+            android:paddingBottom="@dimen/ten_dp"
+            android:drawableLeft="@drawable/ic_search_black_36dp"
+            android:layout_alignParentTop="true"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/recovery_search"/>-->
+        <android.support.v7.widget.SearchView
+            android:id="@+id/recovery_search"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:focusable="false"
+            app:iconifiedByDefault="false"
+            app:queryHint="Search..."
+            android:background="@android:color/transparent"/>
+
+    </LinearLayout>
 
     <HorizontalScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_alignParentTop="true"
+        android:layout_below="@id/search_layout"
         android:fillViewport="true"
         android:measureAllChildren="false"
         android:scrollbars="none">
 
         <LinearLayout
-            android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
 
 
             <LinearLayout
                 android:id="@+id/footer"
-                android:layout_marginTop="5dp"
-                android:orientation="horizontal"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:orientation="horizontal">
 
                 <TextView
-                    android:textAlignment="center"
-                    android:textSize="@dimen/textSize"
-                    android:textColor="@color/colorPrimaryDark"
-                    android:textStyle="bold"
-                    android:layout_margin="3dp"
+                    android:id="@+id/r_eventdate"
                     android:layout_width="@dimen/hundred_dp"
                     android:layout_height="wrap_content"
-                    android:text="@string/event_date"/>
+                    android:layout_margin="3dp"
+                    android:text="@string/event_date"
+                    android:textAlignment="center"
+                    android:textColor="@color/colorPrimaryDark"
+                    android:textSize="@dimen/textSize"
+                    android:textStyle="bold" />
 
                 <TextView
-                    android:textAlignment="center"
-                    android:textSize="@dimen/textSize"
-                    android:textColor="@color/colorPrimaryDark"
-                    android:textStyle="bold"
-                    android:layout_margin="3dp"
+                    android:id="@+id/r_eventname"
                     android:layout_width="@dimen/hundred_dp"
                     android:layout_height="wrap_content"
-                    android:text="@string/event_name"/>
+                    android:layout_margin="3dp"
+                    android:text="@string/event_name"
+                    android:textAlignment="center"
+                    android:textColor="@color/colorPrimaryDark"
+                    android:textSize="@dimen/textSize"
+                    android:textStyle="bold" />
 
                 <TextView
-                    android:id="@+id/cre_total"
-                    android:textAlignment="center"
-                    android:textSize="@dimen/textSize"
-                    android:textColor="@color/colorPrimaryDark"
-                    android:textStyle="bold"
-                    android:layout_margin="3dp"
+                    android:id="@+id/r_clientname"
                     android:layout_width="@dimen/hundred_dp"
                     android:layout_height="wrap_content"
-                    android:text="@string/client_name"/>
+                    android:layout_margin="3dp"
+                    android:text="@string/client_name"
+                    android:textAlignment="center"
+                    android:textColor="@color/colorPrimaryDark"
+                    android:textSize="@dimen/textSize"
+                    android:textStyle="bold" />
 
                 <TextView
-                    android:textAlignment="center"
-                    android:textSize="@dimen/textSize"
-                    android:textColor="@color/colorPrimaryDark"
-                    android:textStyle="bold"
-                    android:layout_margin="3dp"
+                    android:id="@+id/r_totalcharges"
                     android:layout_width="@dimen/hundred_dp"
                     android:layout_height="wrap_content"
-                    android:text="@string/total_charges"/>
+                    android:layout_margin="3dp"
+                    android:text="@string/total_charges"
+                    android:textAlignment="center"
+                    android:textColor="@color/colorPrimaryDark"
+                    android:textSize="@dimen/textSize"
+                    android:textStyle="bold" />
+
                 <TextView
-                    android:textAlignment="center"
-                    android:textSize="@dimen/textSize"
-                    android:textColor="@color/colorPrimaryDark"
-                    android:textStyle="bold"
-                    android:layout_margin="3dp"
+                    android:id="@+id/r_received"
                     android:layout_width="@dimen/hundred_dp"
                     android:layout_height="wrap_content"
-                    android:text="@string/Recieved"/>
+                    android:layout_margin="3dp"
+                    android:text="@string/Recieved"
+                    android:textAlignment="center"
+                    android:textColor="@color/colorPrimaryDark"
+                    android:textSize="@dimen/textSize"
+                    android:textStyle="bold" />
+
                 <ImageButton
                     android:id="@+id/add"
-                    android:background="@android:color/transparent"
                     android:layout_width="30dp"
-                    android:layout_height="wrap_content"/>
+                    android:layout_height="wrap_content"
+                    android:background="@android:color/transparent" />
+
                 <TextView
-                    android:textAlignment="center"
-                    android:textSize="@dimen/textSize"
-                    android:textColor="@color/colorPrimaryDark"
-                    android:textStyle="bold"
-                    android:layout_margin="3dp"
+                    android:id="@+id/r_expensed"
                     android:layout_width="@dimen/hundred_dp"
                     android:layout_height="wrap_content"
-                    android:text="@string/expensed"/>
+                    android:layout_margin="3dp"
+                    android:text="@string/expensed"
+                    android:textAlignment="center"
+                    android:textColor="@color/colorPrimaryDark"
+                    android:textSize="@dimen/textSize"
+                    android:textStyle="bold" />
+
                 <ImageButton
                     android:id="@+id/add_expense"
-                    android:background="@android:color/transparent"
                     android:layout_width="25dp"
-                    android:layout_height="wrap_content"/>
+                    android:layout_height="wrap_content"
+                    android:background="@android:color/transparent" />
+
                 <TextView
-                    android:textAlignment="center"
-                    android:textSize="@dimen/textSize"
-                    android:textColor="@color/colorPrimaryDark"
-                    android:textStyle="bold"
-                    android:layout_margin="3dp"
+                    android:id="@+id/r_balance"
                     android:layout_width="@dimen/hundred_dp"
                     android:layout_height="wrap_content"
-                    android:text="@string/balance"/>
-                <TextView
-                    android:textAlignment="center"
-                    android:textSize="@dimen/textSize"
-                    android:textColor="@color/colorPrimaryDark"
-                    android:textStyle="bold"
                     android:layout_margin="3dp"
+                    android:text="@string/balance"
+                    android:textAlignment="center"
+                    android:textColor="@color/colorPrimaryDark"
+                    android:textSize="@dimen/textSize"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/r_profit"
                     android:layout_width="@dimen/hundred_dp"
                     android:layout_height="wrap_content"
-                    android:text="@string/profit"/>
+                    android:layout_margin="3dp"
+                    android:text="@string/profit"
+                    android:textAlignment="center"
+                    android:textColor="@color/colorPrimaryDark"
+                    android:textSize="@dimen/textSize"
+                    android:textStyle="bold" />
 
             </LinearLayout>
 
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/recycler"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"/>
+                android:layout_height="match_parent" />
 
         </LinearLayout>
 

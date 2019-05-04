@@ -6,10 +6,18 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.EditText;
+import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.DefaultRetryPolicy;
@@ -36,9 +44,13 @@ import java.util.Map;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class MonthBalSheetFragment extends Fragment {
+public class MonthBalSheetFragment extends Fragment implements View.OnClickListener {
 
     ProgressDialog mProgress;
+    BalSheetDateAdapter adapter;
+
+    String orderBy = "CBDate";
+    TextView mbs_capital, mbs_month, mbs_profitloss, mbs_liabilities, mbs_cpl, mbs_assets;
 
     RecyclerView recyclerView;
     List<BalSheet> mList = new ArrayList<>();
@@ -48,6 +60,12 @@ public class MonthBalSheetFragment extends Fragment {
     DatabaseHelper databaseHelper;
     List<BalSheet> balSheetList;
 
+    List<BalSheet> filterdList;
+
+//    EditText search;
+    Spinner spinner;
+    SearchView searchView;
+    int filter;
 
     public MonthBalSheetFragment() {
         // Required empty public constructor
@@ -60,8 +78,24 @@ public class MonthBalSheetFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_month_bal_sheet, container, false);
         recyclerView = view.findViewById(R.id.recycler);
+        searchView = view.findViewById(R.id.mbs_search);
+        spinner = view.findViewById(R.id.mbs_spinner);
 
         databaseHelper = new DatabaseHelper(getContext());
+
+        mbs_month = view.findViewById(R.id.mbs_month);
+        mbs_capital = view.findViewById(R.id.mbs_capital);
+        mbs_profitloss = view.findViewById(R.id.mbs_profitloss);
+        mbs_liabilities = view.findViewById(R.id.mbs_liabilities);
+        mbs_cpl = view.findViewById(R.id.mbs_cpl);
+        mbs_assets = view.findViewById(R.id.mbs_assets);
+
+        mbs_month.setOnClickListener(this);
+        mbs_capital.setOnClickListener(this);
+        mbs_profitloss.setOnClickListener(this);
+        mbs_liabilities.setOnClickListener(this);
+        mbs_cpl.setOnClickListener(this);
+        mbs_assets.setOnClickListener(this);
 
 //        List<User> list = User.listAll(User.class);
 //        for (User u : list){
@@ -143,6 +177,69 @@ public class MonthBalSheetFragment extends Fragment {
 //        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 //        recyclerView.setAdapter(adapter);
         getBalSheet();
+
+        // Spinner Drop down elements
+        List<String> spinner_list = new ArrayList<String>();
+        spinner_list.add("Select");
+        spinner_list.add("Month");
+        spinner_list.add("Capital");
+        spinner_list.add("ProfitLoss");
+        spinner_list.add("Liabilities");
+        spinner_list.add("C+P+L");
+        spinner_list.add("Assets");
+
+        // Creating adapter for spinner
+        ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_spinner_item, spinner_list);
+        // Drop down layout style - list view with radio button
+        dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        // attaching data adapter to spinner
+        spinner.setAdapter(dataAdapter);
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int position, long id) {
+                switch (position) {
+                    case 0:
+                        filter = 0;
+                        break;
+                    case 1:
+                        filter = 1;
+                        break;
+                    case 2:
+                        filter = 2;
+                        break;
+                    case 3:
+                        filter = 3;
+                        break;
+                    case 4:
+                        filter = 4;
+                        break;
+                    case 5:
+                        filter = 5;
+                        break;
+                    case 6:
+                        filter = 6;
+                        break;
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String s) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String s) {
+                filter(s);
+                return false;
+            }
+        });
 
         return view;
     }
@@ -233,7 +330,7 @@ public class MonthBalSheetFragment extends Fragment {
                                 mList.add(BalSheet.createTotal(String.valueOf(capital),String.valueOf(profitLoss),String.valueOf(liabilities),String.valueOf(cpl),String.valueOf(assets)));
                                 mList.add(BalSheet.createSection("Grand Total"));
                                 mList.add(BalSheet.createTotal(String.valueOf(gCapital),String.valueOf(gProfitLoss),String.valueOf(gLiabilities),String.valueOf(gCpl),String.valueOf(gAssets)));
-                                BalSheetDateAdapter adapter = new BalSheetDateAdapter(getContext(),mList);
+                                adapter = new BalSheetDateAdapter(getContext(),mList);
                                 recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
                                 recyclerView.setAdapter(adapter);
 
@@ -270,5 +367,90 @@ public class MonthBalSheetFragment extends Fragment {
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         jsonObjectRequest.setRetryPolicy(policy);
         AppController.getInstance().addToRequestQueue(jsonObjectRequest, tag_json_obj);
+    }
+
+    private void filter(String text) {
+        filterdList = new ArrayList<>();
+
+        //looping through existing elements
+        if (!text.isEmpty()) {
+            for (BalSheet s : mList) {
+                if (s.isRow() == 1)
+                    switch (filter) {
+                        case 1:
+                            if (s.getCBDate().toLowerCase().contains(text.toLowerCase())) {
+                                //adding the element to filtered list
+                                filterdList.add(s);
+                            }
+                            break;
+                        case 2:
+                            if (s.getCapital().toLowerCase().contains(text.toLowerCase())) {
+                                //adding the element to filtered list
+                                filterdList.add(s);
+                            }
+                            break;
+                        case 3:
+                            if (s.getProfitLoss().toLowerCase().contains(text.toLowerCase())) {
+                                //adding the element to filtered list
+                                filterdList.add(s);
+                            }
+                            break;
+                        case 4:
+                            if (s.getLiabilities().toLowerCase().contains(text.toLowerCase())) {
+                                //adding the element to filtered list
+                                filterdList.add(s);
+                            }
+                            break;
+                        case 5:
+                            if (s.getC_P_L().toLowerCase().contains(text.toLowerCase())) {
+                                //adding the element to filtered list
+                                filterdList.add(s);
+                            }
+                            break;
+                        case 6:
+                            if (s.getAssets().toLowerCase().contains(text.toLowerCase())) {
+                                //adding the element to filtered list
+                                filterdList.add(s);
+                            }
+                            break;
+                    }
+            }
+        } else {
+            filterdList = mList;
+        }
+
+        //calling a method of the adapter class and passing the filtered list
+        adapter.filterList(filterdList);
+
+    }
+
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()){
+            case R.id.mbs_month:
+                orderBy = "CBDate";
+//                getCashBook();
+                break;
+            case R.id.mbs_capital:
+                orderBy = "Capital";
+//                getCashBook();
+                break;
+            case R.id.mbs_profitloss:
+                orderBy = "ProfitLoss";
+//                getCashBook();
+                break;
+            case R.id.mbs_liabilities:
+                orderBy = "Liabilities";
+//                getCashBook();
+                break;
+            case R.id.mbs_cpl:
+                orderBy = "C_P_L";
+//                getCashBook();
+                break;
+            case R.id.mbs_assets:
+                orderBy = "Assets";
+//                getCashBook();
+                break;
+        }
     }
 }

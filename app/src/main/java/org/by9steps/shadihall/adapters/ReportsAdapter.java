@@ -15,6 +15,7 @@ import org.by9steps.shadihall.fragments.ReportsFragment;
 import org.by9steps.shadihall.model.Account3Name;
 import org.by9steps.shadihall.model.BalSheet;
 import org.by9steps.shadihall.model.CashBook;
+import org.by9steps.shadihall.model.CashEntry;
 import org.by9steps.shadihall.model.ProfitLoss;
 import org.by9steps.shadihall.model.Reports;
 import org.by9steps.shadihall.model.Summerize;
@@ -286,5 +287,10 @@ public class ReportsAdapter extends RecyclerView.Adapter {
             sorting = itemView.findViewById(R.id.sorting);
 
         }
+    }
+
+    public void filterList(List<Reports> filterdNames) {
+        this.mList = filterdNames;
+        notifyDataSetChanged();
     }
 }

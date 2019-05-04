@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/ll"
     tools:context=".fragments.CashBookFragment">
 
@@ -27,14 +28,22 @@
                 <!--android:textColor="@color/colorPrimaryDark"-->
                 <!--android:id="@+id/btn_filter"/>-->
 
-            <EditText
+            <!--<EditText
                 android:paddingTop="@dimen/ten_dp"
                 android:paddingBottom="@dimen/ten_dp"
                 android:drawableLeft="@drawable/ic_search_black_36dp"
                 android:layout_alignParentTop="true"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/search"/>
+                android:id="@+id/search"/>-->
+            <android.support.v7.widget.SearchView
+                android:id="@+id/search"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:focusable="false"
+                app:iconifiedByDefault="false"
+                app:queryHint="Search..."
+                android:background="@android:color/transparent"/>
 
         </LinearLayout>
 

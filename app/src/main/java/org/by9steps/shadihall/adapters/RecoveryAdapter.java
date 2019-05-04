@@ -18,6 +18,7 @@ import org.by9steps.shadihall.R;
 import org.by9steps.shadihall.activities.AddExpenseActivity;
 import org.by9steps.shadihall.activities.CashCollectionActivity;
 import org.by9steps.shadihall.model.Recovery;
+import org.by9steps.shadihall.model.Reports;
 
 import java.text.DateFormat;
 import java.util.Date;
@@ -188,5 +189,10 @@ public class RecoveryAdapter extends RecyclerView.Adapter {
 
             textView = (TextView) itemView.findViewById(android.R.id.text1);
         }
+    }
+
+    public void filterList(List<Recovery> filterdNames) {
+        this.mList = filterdNames;
+        notifyDataSetChanged();
     }
 }

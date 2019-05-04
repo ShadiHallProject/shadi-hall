@@ -3,12 +3,50 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".fragments.DateBalSheetFragment">
+
+    <LinearLayout
+        android:id="@+id/search_layout"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <Spinner
+            android:layout_gravity="center"
+            android:id="@+id/dbs_spinner"
+            android:layout_width="120dp"
+            android:layout_height="45dp"/>
+        <!--<Button-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:text="Filter"-->
+        <!--android:textColor="@color/colorPrimaryDark"-->
+        <!--android:id="@+id/btn_filter"/>-->
+
+        <!--<EditText
+            android:paddingTop="@dimen/ten_dp"
+            android:paddingBottom="@dimen/ten_dp"
+            android:drawableLeft="@drawable/ic_search_black_36dp"
+            android:layout_alignParentTop="true"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/dbs_search"/>-->
+        <android.support.v7.widget.SearchView
+            android:id="@+id/dbs_search"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:focusable="false"
+            app:iconifiedByDefault="false"
+            app:queryHint="Search..."
+            android:background="@android:color/transparent"/>
+
+    </LinearLayout>
 
     <HorizontalScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_alignParentTop="true"
+        android:layout_below="@id/search_layout"
         android:fillViewport="true"
         android:measureAllChildren="false"
         android:scrollbars="none">
@@ -26,6 +64,7 @@
                 android:layout_height="wrap_content">
 
                 <TextView
+                    android:id="@+id/dbs_date"
                     android:textAlignment="center"
                     android:textSize="@dimen/textSize"
                     android:textColor="@color/colorPrimaryDark"
@@ -37,6 +76,7 @@
 
 
                 <TextView
+                    android:id="@+id/dbs_capital"
                     android:textAlignment="center"
                     android:textSize="@dimen/textSize"
                     android:textColor="@color/colorPrimaryDark"
@@ -47,7 +87,7 @@
                     android:text="@string/capital"/>
 
                 <TextView
-                    android:id="@+id/cre_total"
+                    android:id="@+id/dbs_profitloss"
                     android:textAlignment="center"
                     android:textSize="@dimen/textSize"
                     android:textColor="@color/colorPrimaryDark"
@@ -58,6 +98,7 @@
                     android:text="@string/profitloss"/>
 
                 <TextView
+                    android:id="@+id/dbs_liabilities"
                     android:textAlignment="center"
                     android:textSize="@dimen/textSize"
                     android:textColor="@color/colorPrimaryDark"
@@ -67,6 +108,7 @@
                     android:layout_height="wrap_content"
                     android:text="@string/liabilities"/>
                 <TextView
+                    android:id="@+id/dbs_cpl"
                     android:textAlignment="center"
                     android:textSize="@dimen/textSize"
                     android:textColor="@color/colorPrimaryDark"
@@ -76,6 +118,7 @@
                     android:layout_height="wrap_content"
                     android:text="@string/c_p_l"/>
                 <TextView
+                    android:id="@+id/dbs_assets"
                     android:textAlignment="center"
                     android:textSize="@dimen/textSize"
                     android:textColor="@color/colorPrimaryDark"

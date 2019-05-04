@@ -6,10 +6,15 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.DefaultRetryPolicy;
@@ -36,9 +41,12 @@ import java.util.Map;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class YearProfitLossFragment extends Fragment {
+public class YearProfitLossFragment extends Fragment implements View.OnClickListener {
 
     ProgressDialog mProgress;
+    ProfitLossDateAdapter adapter;
+    String orderBy = "CBDate";
+    TextView ypl_month, ypl_profit, ypl_expense, ypl_income;
 
     RecyclerView recyclerView;
     List<ProfitLoss> mList = new ArrayList<>();
@@ -47,6 +55,13 @@ public class YearProfitLossFragment extends Fragment {
 
     DatabaseHelper databaseHelper;
     List<ProfitLoss> profitLossList;
+
+    List<ProfitLoss> filterdList;
+
+    //    EditText search;
+    SearchView searchView;
+    Spinner spinner;
+    int filter;
 
     public YearProfitLossFragment() {
         // Required empty public constructor
@@ -60,6 +75,18 @@ public class YearProfitLossFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_year_profit_loss, container, false);
 
         recyclerView = view.findViewById(R.id.recycler);
+        searchView = view.findViewById(R.id.ypl_search);
+        spinner = view.findViewById(R.id.ypl_spinner);
+
+        ypl_month = view.findViewById(R.id.ypl_month);
+        ypl_income = view.findViewById(R.id.ypl_income);
+        ypl_expense = view.findViewById(R.id.ypl_expense);
+        ypl_profit = view.findViewById(R.id.ypl_profit);
+
+        ypl_month.setOnClickListener(this);
+        ypl_income.setOnClickListener(this);
+        ypl_expense.setOnClickListener(this);
+        ypl_profit.setOnClickListener(this);
 
         databaseHelper = new DatabaseHelper(getContext());
 
@@ -133,10 +160,87 @@ public class YearProfitLossFragment extends Fragment {
 
         getProfitLoss();
 
+        // Spinner Drop down elements
+        List<String> spinner_list = new ArrayList<String>();
+        spinner_list.add("Select");
+        spinner_list.add("Month");
+        spinner_list.add("Income");
+        spinner_list.add("Expense");
+        spinner_list.add("Profit");
+
+        // Creating adapter for spinner
+        ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_spinner_item, spinner_list);
+        // Drop down layout style - list view with radio button
+        dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        // attaching data adapter to spinner
+        spinner.setAdapter(dataAdapter);
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int position, long id) {
+                switch (position) {
+                    case 0:
+                        filter = 0;
+                        break;
+                    case 1:
+                        filter = 1;
+                        break;
+                    case 2:
+                        filter = 2;
+                        break;
+                    case 3:
+                        filter = 3;
+                        break;
+                    case 4:
+                        filter = 4;
+                        break;
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String s) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String s) {
+                filter(s);
+                return false;
+            }
+        });
+
         return view;
     }
 
-    public void getProfitLoss(){
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()){
+            case R.id.ypl_month:
+                orderBy = "CBDate";
+//                getCashBook();
+                break;
+            case R.id.ypl_income:
+                orderBy = "Income";
+//                getCashBook();
+                break;
+            case R.id.ypl_expense:
+                orderBy = "Expense";
+//                getCashBook();
+                break;
+            case R.id.ypl_profit:
+                orderBy = "Profit";
+//                getCashBook();
+                break;
+        }
+    }
+
+    public void getProfitLoss() {
         mProgress = new ProgressDialog(getContext());
         mProgress.setTitle("Loading");
         mProgress.setMessage("Please wait...");
@@ -154,15 +258,15 @@ public class YearProfitLossFragment extends Fragment {
                         JSONObject jsonObj = null;
 
                         try {
-                            jsonObj= new JSONObject(response);
+                            jsonObj = new JSONObject(response);
                             JSONArray jsonArray = jsonObj.getJSONArray("ProfitLoss");
-                            Log.e("SSSSS",jsonArray.toString());
+                            Log.e("SSSSS", jsonArray.toString());
                             String success = jsonObj.getString("success");
-                            if (success.equals("1")){
+                            if (success.equals("1")) {
 //                                Account3Name.deleteAll(Account3Name.class);
                                 for (int i = 0; i < jsonArray.length(); i++) {
                                     JSONObject jsonObject = jsonArray.getJSONObject(i);
-                                    Log.e("Recovery",jsonObject.toString());
+                                    Log.e("Recovery", jsonObject.toString());
                                     String ClientID = jsonObject.getString("ClientID");
                                     String CBDate = jsonObject.getString("Month1");
                                     String Income = jsonObject.getString("Income");
@@ -179,7 +283,7 @@ public class YearProfitLossFragment extends Fragment {
 
                                     if (m == 0) {
                                         mList.add(ProfitLoss.createSection(separated[1]));
-                                        mList.add(ProfitLoss.createRow(ClientID,CBDate,Income,Expense,Profit));
+                                        mList.add(ProfitLoss.createRow(ClientID, CBDate, Income, Expense, Profit));
                                         m = Integer.valueOf(separated[1]);
 
                                         income = Integer.valueOf(Income) + income;
@@ -188,17 +292,19 @@ public class YearProfitLossFragment extends Fragment {
                                         gIncome = Integer.valueOf(Income) + gIncome;
                                         gExpense = Integer.valueOf(Expense) + gExpense;
                                         gProfit = Integer.valueOf(Profit) + gProfit;
-                                    }else if (m == Integer.valueOf(separated[1])){
+                                    } else if (m == Integer.valueOf(separated[1])) {
                                         income = Integer.valueOf(Income) + income;
                                         expense = Integer.valueOf(Expense) + expense;
                                         profit = Integer.valueOf(Profit) + profit;
                                         gIncome = Integer.valueOf(Income) + gIncome;
                                         gExpense = Integer.valueOf(Expense) + gExpense;
                                         gProfit = Integer.valueOf(Profit) + gProfit;
-                                        mList.add(ProfitLoss.createRow(ClientID,CBDate,Income,Expense,Profit));
-                                    }else {
-                                        mList.add(ProfitLoss.createTotal(String.valueOf(income),String.valueOf(expense),String.valueOf(profit)));
-                                        income = 0; expense = 0; profit = 0;
+                                        mList.add(ProfitLoss.createRow(ClientID, CBDate, Income, Expense, Profit));
+                                    } else {
+                                        mList.add(ProfitLoss.createTotal(String.valueOf(income), String.valueOf(expense), String.valueOf(profit)));
+                                        income = 0;
+                                        expense = 0;
+                                        profit = 0;
                                         income = Integer.valueOf(Income) + income;
                                         expense = Integer.valueOf(Expense) + expense;
                                         profit = Integer.valueOf(Profit) + profit;
@@ -206,21 +312,21 @@ public class YearProfitLossFragment extends Fragment {
                                         gExpense = Integer.valueOf(Expense) + gExpense;
                                         gProfit = Integer.valueOf(Profit) + gProfit;
                                         mList.add(ProfitLoss.createSection(separated[1]));
-                                        mList.add(ProfitLoss.createRow(ClientID,CBDate,Income,Expense,Profit));
+                                        mList.add(ProfitLoss.createRow(ClientID, CBDate, Income, Expense, Profit));
                                         m = Integer.valueOf(separated[1]);
                                     }
                                 }
 
-                                mList.add(ProfitLoss.createTotal(String.valueOf(income),String.valueOf(expense),String.valueOf(profit)));
+                                mList.add(ProfitLoss.createTotal(String.valueOf(income), String.valueOf(expense), String.valueOf(profit)));
                                 mList.add(ProfitLoss.createSection("Grand Total"));
-                                mList.add(ProfitLoss.createTotal(String.valueOf(gIncome),String.valueOf(gExpense),String.valueOf(gProfit)));
-                                ProfitLossDateAdapter adapter = new ProfitLossDateAdapter(getContext(),mList);
+                                mList.add(ProfitLoss.createTotal(String.valueOf(gIncome), String.valueOf(gExpense), String.valueOf(gProfit)));
+                                adapter = new ProfitLossDateAdapter(getContext(), mList);
                                 recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
                                 recyclerView.setAdapter(adapter);
 
                                 mProgress.dismiss();
 
-                            }else {
+                            } else {
                                 String message = jsonObj.getString("message");
                                 Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
                             }
@@ -232,15 +338,15 @@ public class YearProfitLossFragment extends Fragment {
             @Override
             public void onErrorResponse(VolleyError error) {
                 mProgress.dismiss();
-                Log.e("Error",error.toString());
+                Log.e("Error", error.toString());
                 Toast.makeText(getContext(), error.toString(), Toast.LENGTH_LONG).show();
             }
-        }){
+        }) {
             @Override
             protected Map<String, String> getParams() {
                 Map<String, String> params = new HashMap<String, String>();
                 List<User> list = User.listAll(User.class);
-                for (User u: list) {
+                for (User u : list) {
                     params.put("ClientID", u.getClientID());
                     params.put("Year", "year");
                 }
@@ -251,6 +357,49 @@ public class YearProfitLossFragment extends Fragment {
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         jsonObjectRequest.setRetryPolicy(policy);
         AppController.getInstance().addToRequestQueue(jsonObjectRequest, tag_json_obj);
+    }
+
+    private void filter(String text) {
+        filterdList = new ArrayList<>();
+
+        //looping through existing elements
+        if (!text.isEmpty()) {
+            for (ProfitLoss s : mList) {
+                if (s.isRow() == 1)
+                    switch (filter) {
+                        case 1:
+                            if (s.getCBDate().toLowerCase().contains(text.toLowerCase())) {
+                                //adding the element to filtered list
+                                filterdList.add(s);
+                            }
+                            break;
+                        case 2:
+                            if (s.getIncome().toLowerCase().contains(text.toLowerCase())) {
+                                //adding the element to filtered list
+                                filterdList.add(s);
+                            }
+                            break;
+                        case 3:
+                            if (s.getExpense().toLowerCase().contains(text.toLowerCase())) {
+                                //adding the element to filtered list
+                                filterdList.add(s);
+                            }
+                            break;
+                        case 4:
+                            if (s.getProfit().toLowerCase().contains(text.toLowerCase())) {
+                                //adding the element to filtered list
+                                filterdList.add(s);
+                            }
+                            break;
+                    }
+            }
+        } else {
+            filterdList = mList;
+        }
+
+        //calling a method of the adapter class and passing the filtered list
+        adapter.filterList(filterdList);
+
     }
 
 }

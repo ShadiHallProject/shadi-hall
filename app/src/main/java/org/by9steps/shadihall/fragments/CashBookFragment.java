@@ -46,6 +46,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.print.PrintHelper;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
@@ -122,8 +123,9 @@ public class CashBookFragment extends Fragment implements OnItemSelectedListener
 
     ProgressDialog mProgress;
     RecyclerView recyclerView;
-    EditText search;
+//    EditText search;
     Spinner spinner;
+    SearchView searchView;
 //    ScrollView scrollView;
     HorizontalScrollView scrollView;
     LinearLayout header, pdfView;
@@ -142,6 +144,8 @@ public class CashBookFragment extends Fragment implements OnItemSelectedListener
     public static Button date1;
     public static Button date2;
     String orderBy = "CBDate";
+    int status = 0;
+    String orderby = " ORDER BY " + orderBy + " DESC";
 
     private static final String TAG = "PdfCreatorActivity";
     private File pdfFile;
@@ -167,7 +171,7 @@ public class CashBookFragment extends Fragment implements OnItemSelectedListener
         header = view.findViewById(R.id.header);
         scrollView = view.findViewById(R.id.scrollView);
         pdfView = view.findViewById(R.id.pdfView);
-        search = view.findViewById(R.id.search);
+        searchView = view.findViewById(R.id.search);
         spinner = view.findViewById(R.id.spinner);
         tv_date = view.findViewById(R.id.tv_date);
         tv_id = view.findViewById(R.id.tv_id);
@@ -241,23 +245,16 @@ public class CashBookFragment extends Fragment implements OnItemSelectedListener
 //        getCashBook();
 //        getRecoveries();
 
-        search.addTextChangedListener(new TextWatcher() {
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
+            public boolean onQueryTextSubmit(String s) {
+                return false;
             }
 
             @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                filter(s.toString());
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                if (search.getText().toString().equals("")){
-                    filter = 0;
-//                    spinner.setSelection(0);
-                }
+            public boolean onQueryTextChange(String s) {
+                filter(s);
+                return false;
             }
         });
 
@@ -269,27 +266,27 @@ public class CashBookFragment extends Fragment implements OnItemSelectedListener
         switch (v.getId()){
             case R.id.tv_date:
                 orderBy = "CBDate";
-                getCashBook();
+                orderBy(orderBy);
                 break;
             case R.id.tv_id:
                 orderBy = "CashBookID";
-                getCashBook();
+                orderBy(orderBy);
                 break;
             case R.id.tv_debit:
                 orderBy = "DebitAccount";
-                getCashBook();
+                orderBy(orderBy);
                 break;
             case R.id.tv_credit:
                 orderBy = "CreditAccount";
-                getCashBook();
+                orderBy(orderBy);
                 break;
             case R.id.tv_remarks:
                 orderBy = "CBRemarks";
-                getCashBook();
+                orderBy(orderBy);
                 break;
             case R.id.tv_amount:
                 orderBy = "Amount";
-                getCashBook();
+                orderBy(orderBy);
                 break;
         }
     }
@@ -394,7 +391,8 @@ public class CashBookFragment extends Fragment implements OnItemSelectedListener
                     "                         Account3Name AS Account3Name_1 ON CashBook.CreditAccount = Account3Name_1.AcNameID LEFT OUTER JOIN\n" +
                     "                         Account3Name AS Account3Name_2 ON CashBook.ClientUserID = Account3Name_2.AcNameID LEFT OUTER JOIN\n" +
                     "                         Account3Name ON CashBook.DebitAccount = Account3Name.AcNameID\n" +
-                    "WHERE        (CashBook.ClientID = "+u.getClientID()+") ORDER BY "+orderBy+" DESC";
+                    "WHERE        (CashBook.ClientID = "+u.getClientID()+")" + orderby;
+            Log.e("CASHBOOK QUERY",query);
             cashBooksList = databaseHelper.getCashBookEntry(query);
         }
 
@@ -463,7 +461,8 @@ public class CashBookFragment extends Fragment implements OnItemSelectedListener
         recyclerView.setAdapter(adapter);
     }
 
-    private void filter(String text) {Log.e("Search","SEARCH");
+    private void filter(String text) {
+        Log.e("Search","SEARCH");
         //new array list that will hold the filtered data
         filterd = new ArrayList<>();
 
@@ -529,8 +528,12 @@ public class CashBookFragment extends Fragment implements OnItemSelectedListener
         switch (position){
             case 0:
                 filter = 0;
+                searchView.setQuery("",false);
+                searchView.clearFocus();
                 break;
             case 1:
+                searchView.setQuery("",false);
+                searchView.clearFocus();
                 // custom dialog
                 final Dialog dialog = new Dialog(getContext());
                 dialog.setContentView(R.layout.date_filter_dialog);
@@ -583,18 +586,28 @@ public class CashBookFragment extends Fragment implements OnItemSelectedListener
                 break;
             case 2:
                 filter = 2;
+                searchView.setQuery("",false);
+                searchView.clearFocus();
                 break;
             case 3:
                 filter = 3;
+                searchView.setQuery("",false);
+                searchView.clearFocus();
                 break;
             case 4:
                 filter = 4;
+                searchView.setQuery("",false);
+                searchView.clearFocus();
                 break;
             case 5:
                 filter = 5;
+                searchView.setQuery("",false);
+                searchView.clearFocus();
                 break;
             case 6:
                 filter = 6;
+                searchView.setQuery("",false);
+                searchView.clearFocus();
                 break;
         }
     }
@@ -1034,6 +1047,16 @@ public class CashBookFragment extends Fragment implements OnItemSelectedListener
         } else {
             Toast.makeText(getContext(), "Download a PDF Viewer to see the generated PDF", Toast.LENGTH_SHORT).show();
         }
+    }
+    public void orderBy(String order_by){
+        if (status == 0) {
+            status = 1;
+            orderby = " ORDER BY " + order_by + " DESC";
+        } else {
+            status = 0;
+            orderby = " ORDER BY " + order_by + " ASC";
+        }
+        getCashBook();
     }
 }
 

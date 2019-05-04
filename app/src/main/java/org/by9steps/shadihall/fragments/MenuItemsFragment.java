@@ -73,8 +73,6 @@ public class MenuItemsFragment extends Fragment {
         modelList.add(new SectionModel("Entries",mEntries));
         modelList.add(new SectionModel("Reports",mReports));
 
-
-
         SectionViewAdapter adapter = new SectionViewAdapter(getContext(),modelList);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(adapter);
