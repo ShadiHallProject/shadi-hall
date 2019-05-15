@@ -10,6 +10,9 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
@@ -99,6 +102,15 @@ public class TrailBalanceFragment extends Fragment implements View.OnClickListen
                 startActivity(intent);
                 break;
         }
+    }
+
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if(item.getItemId() == android.R.id.home){
+            getActivity().onBackPressed();
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     public void getCashBook(){

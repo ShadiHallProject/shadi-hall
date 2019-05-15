@@ -2,7 +2,11 @@ package org.by9steps.shadihall.fragments;
 
 
 import android.app.ProgressDialog;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -11,6 +15,9 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -25,17 +32,46 @@ import com.android.volley.Response;
 import com.android.volley.RetryPolicy;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
+import com.itextpdf.text.BaseColor;
+import com.itextpdf.text.Chunk;
+import com.itextpdf.text.Document;
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.Element;
+import com.itextpdf.text.ExceptionConverter;
+import com.itextpdf.text.Font;
+import com.itextpdf.text.FontFactory;
+import com.itextpdf.text.Image;
+import com.itextpdf.text.PageSize;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.Phrase;
+import com.itextpdf.text.Rectangle;
+import com.itextpdf.text.pdf.ColumnText;
+import com.itextpdf.text.pdf.PdfContentByte;
+import com.itextpdf.text.pdf.PdfDate;
+import com.itextpdf.text.pdf.PdfDictionary;
+import com.itextpdf.text.pdf.PdfName;
+import com.itextpdf.text.pdf.PdfPCell;
+import com.itextpdf.text.pdf.PdfPTable;
+import com.itextpdf.text.pdf.PdfPageEventHelper;
+import com.itextpdf.text.pdf.PdfTemplate;
+import com.itextpdf.text.pdf.PdfWriter;
 
 import org.by9steps.shadihall.AppController;
 import org.by9steps.shadihall.R;
 import org.by9steps.shadihall.adapters.BalSheetDateAdapter;
 import org.by9steps.shadihall.helper.DatabaseHelper;
 import org.by9steps.shadihall.model.BalSheet;
+import org.by9steps.shadihall.model.ProfitLoss;
 import org.by9steps.shadihall.model.User;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -74,6 +110,10 @@ public class DateBalSheetFragment extends Fragment implements View.OnClickListen
     int filter;
     BalSheetDateAdapter adapter;
 
+    //Print
+    private static final String TAG = "PdfCreatorActivity";
+    private File pdfFile;
+    String d = "0";
 
     public DateBalSheetFragment() {
         // Required empty public constructor
@@ -85,6 +125,9 @@ public class DateBalSheetFragment extends Fragment implements View.OnClickListen
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_date_bal_sheet, container, false);
+
+        setHasOptionsMenu(true);
+
         recyclerView = view.findViewById(R.id.recycler);
 
         searchView = view.findViewById(R.id.dbs_search);
@@ -322,7 +365,7 @@ public class DateBalSheetFragment extends Fragment implements View.OnClickListen
                                     String[] separated = cbDate.split("-");
 
                                     if (m == 0) {
-                                        mList.add(BalSheet.createSection(separated[1] + "/" + separated[2]));
+                                        mList.add(BalSheet.createSection(separated[1] + "/" + separated[0]));
                                         mList.add(BalSheet.createRow(cbDate, Capital, ProfitLoss, Liabilities, C_P_L, Assets, ClientID));
                                         m = Integer.valueOf(separated[1]);
 
@@ -365,7 +408,7 @@ public class DateBalSheetFragment extends Fragment implements View.OnClickListen
                                         gLiabilities = Integer.valueOf(Liabilities) + gLiabilities;
                                         gCpl = Integer.valueOf(C_P_L) + gCpl;
                                         gAssets = Integer.valueOf(Assets) + gAssets;
-                                        mList.add(BalSheet.createSection(separated[1] + "/" + separated[2]));
+                                        mList.add(BalSheet.createSection(separated[1] + "/" + separated[0]));
                                         mList.add(BalSheet.createRow(cbDate, Capital, ProfitLoss, Liabilities, C_P_L, Assets, ClientID));
                                         m = Integer.valueOf(separated[1]);
                                     }
@@ -507,5 +550,426 @@ public class DateBalSheetFragment extends Fragment implements View.OnClickListen
             orderby = " ORDER BY " + order_by + " ASC";
         }
         getBalsheet();
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.cb_menu,menu);
+        MenuItem referesh = menu.findItem(R.id.action_refresh);
+        referesh.setVisible(false);
+        MenuItem settings = menu.findItem(R.id.action_settings);
+        settings.setVisible(false);
+        super.onCreateOptionsMenu(menu,inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if(item.getItemId() == android.R.id.home){
+            getActivity().onBackPressed();
+        }else if (item.getItemId() == R.id.action_print){
+            try {
+                createPdf();
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (DocumentException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    public void createPdf() throws IOException, DocumentException {
+
+        File docsFolder = new File(Environment.getExternalStorageDirectory() + "/Documents");
+        if (!docsFolder.exists()) {
+            docsFolder.mkdir();
+            Log.i(TAG, "Created a new directory for PDF");
+        }
+
+        String pdfname = "BalanceSheet.pdf";
+        pdfFile = new File(docsFolder.getAbsolutePath(), pdfname);
+        OutputStream output = new FileOutputStream(pdfFile);
+
+        Document document = new Document(PageSize.A4);
+        PdfWriter writer = PdfWriter.getInstance(document, output);
+        writer.createXmpMetadata();
+        writer.setTagged();
+        writer.setPageEvent(new Footer());
+        document.open();
+        document.addLanguage("en-us");
+
+        PdfDictionary parameters = new PdfDictionary();Log.e("PDFDocument","Created2");
+        parameters.put(PdfName.MODDATE, new PdfDate());
+
+        Font chapterFont = FontFactory.getFont(FontFactory.HELVETICA, 16, Font.BOLD);
+        Font paragraphFont = FontFactory.getFont(FontFactory.HELVETICA, 10, Font.BOLD);
+        Chunk chunk = new Chunk("Client Name", chapterFont);
+        Paragraph name = new Paragraph("Address",paragraphFont);
+        name.setIndentationLeft(0);
+        Paragraph contact = new Paragraph("Contact",paragraphFont);
+        contact.setIndentationLeft(0);
+
+        PdfPTable title = new PdfPTable(new float[]{3, 4, 3});
+        title.getDefaultCell().setHorizontalAlignment(Element.ALIGN_CENTER);
+        title.getDefaultCell().setFixedHeight(30);
+        title.setTotalWidth(PageSize.A4.getWidth());
+        title.setWidthPercentage(100);
+        title.getDefaultCell().setVerticalAlignment(Element.ALIGN_MIDDLE);
+        title.setSpacingBefore(5);
+        title.addCell(footerCell("", PdfPCell.ALIGN_CENTER));
+        PdfPCell cell = new PdfPCell(new Phrase("Balance Sheet By Date",chapterFont));
+        cell.setBorder(PdfPCell.NO_BORDER);
+        cell.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
+        cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+        title.addCell(cell);
+        title.addCell(footerCell("",PdfPCell.ALIGN_CENTER));
+
+        title.addCell(footerCell("",PdfPCell.ALIGN_CENTER));
+        title.addCell(footerCell("",PdfPCell.ALIGN_CENTER));
+        PdfPCell pCell = new PdfPCell(new Phrase(spinner.getSelectedItem()+": "+searchView.getQuery()));
+        pCell.setBorder(PdfPCell.NO_BORDER);
+        pCell.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
+        pCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+        title.addCell(pCell);
+
+        PdfPTable table = new PdfPTable(new float[]{3, 3, 3, 3, 3, 3});
+        table.getDefaultCell().setHorizontalAlignment(Element.ALIGN_CENTER);
+        table.getDefaultCell().setFixedHeight(40);
+        table.setTotalWidth(PageSize.A4.getWidth());
+        table.setWidthPercentage(100);
+        table.getDefaultCell().setVerticalAlignment(Element.ALIGN_MIDDLE);
+        table.setSpacingBefore(20);
+        table.addCell("");
+        table.addCell("Capital");
+        table.addCell("ProfitLoss");
+        table.addCell("Liabilities");
+        table.addCell("C + P + L");
+        table.addCell("Assets");
+        table.setHeaderRows(1);
+        PdfPCell[] cells = table.getRow(0).getCells();
+        for (int j = 0; j < cells.length; j++) {
+            cells[j].setBackgroundColor(BaseColor.PINK);
+        }
+
+        capital = 0; profitLoss = 0; liabilities = 0; cpl = 0; assets = 0; gCapital = 0;
+        gProfitLoss = 0; gLiabilities = 0; gCpl = 0; gAssets = 0; d = "0";
+
+        Font totalFont = FontFactory.getFont(FontFactory.HELVETICA, 13, Font.BOLD);
+        PdfPCell total = new PdfPCell(new Phrase("Total",totalFont));
+        total.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
+        total.setVerticalAlignment(Element.ALIGN_MIDDLE);
+        total.setFixedHeight(35);
+        String[] separated = null;
+        if (filter > 0){
+            for (BalSheet c : filterdList){
+                if (!c.getCBDate().equals(""))
+                    separated = c.getCBDate().split("-");
+                if (d.equals("0")){
+                    d = separated[1];
+
+                    PdfPCell section = new PdfPCell(new Phrase(separated[1]+"-"+separated[0],totalFont));
+                    section.setBorder(PdfPCell.NO_BORDER);
+                    section.setFixedHeight(30);
+                    section.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
+                    section.setVerticalAlignment(Element.ALIGN_MIDDLE);
+                    table.addCell(section);
+                    table.addCell(footerCell("",PdfPCell.ALIGN_RIGHT));
+                    table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
+                    table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
+                    table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
+                    table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
+
+                    table.addCell(getCell("", PdfPCell.ALIGN_LEFT));
+                    table.addCell(getCell(c.getCapital(), PdfPCell.ALIGN_RIGHT));
+                    table.addCell(getCell(c.getProfitLoss(), PdfPCell.ALIGN_RIGHT));
+                    table.addCell(getCell(c.getLiabilities(), PdfPCell.ALIGN_RIGHT));
+                    table.addCell(getCell(c.getC_P_L(), PdfPCell.ALIGN_RIGHT));
+                    table.addCell(getCell(c.getAssets(), PdfPCell.ALIGN_RIGHT));
+
+                    capital = Integer.valueOf(c.getCapital()) + capital;
+                    profitLoss = Integer.valueOf(c.getProfitLoss()) + profitLoss;
+                    liabilities = Integer.valueOf(c.getLiabilities()) + liabilities;
+                    cpl = Integer.valueOf(c.getC_P_L()) + cpl;
+                    assets = Integer.valueOf(c.getAssets()) + assets;
+                    gCapital = Integer.valueOf(c.getCapital()) + gCapital;
+                    gProfitLoss = Integer.valueOf(c.getProfitLoss()) + gProfitLoss;
+                    gLiabilities = Integer.valueOf(c.getLiabilities()) + gLiabilities;
+                    gCpl = Integer.valueOf(c.getC_P_L()) + gCpl;
+                    gAssets = Integer.valueOf(c.getAssets()) + gAssets;
+                }else if (d.equals(separated[1])){
+                    table.addCell(getCell("", PdfPCell.ALIGN_LEFT));
+                    table.addCell(getCell(c.getCapital(), PdfPCell.ALIGN_RIGHT));
+                    table.addCell(getCell(c.getProfitLoss(), PdfPCell.ALIGN_RIGHT));
+                    table.addCell(getCell(c.getLiabilities(), PdfPCell.ALIGN_RIGHT));
+                    table.addCell(getCell(c.getC_P_L(), PdfPCell.ALIGN_RIGHT));
+                    table.addCell(getCell(c.getAssets(), PdfPCell.ALIGN_RIGHT));
+
+                    capital = Integer.valueOf(c.getCapital()) + capital;
+                    profitLoss = Integer.valueOf(c.getProfitLoss()) + profitLoss;
+                    liabilities = Integer.valueOf(c.getLiabilities()) + liabilities;
+                    cpl = Integer.valueOf(c.getC_P_L()) + cpl;
+                    assets = Integer.valueOf(c.getAssets()) + assets;
+                    gCapital = Integer.valueOf(c.getCapital()) + gCapital;
+                    gProfitLoss = Integer.valueOf(c.getProfitLoss()) + gProfitLoss;
+                    gLiabilities = Integer.valueOf(c.getLiabilities()) + gLiabilities;
+                    gCpl = Integer.valueOf(c.getC_P_L()) + gCpl;
+                    gAssets = Integer.valueOf(c.getAssets()) + gAssets;
+                }else if (!d.equals("0") && !d.equals(separated[1])){
+                    d = separated[1];
+                    table.addCell(total);
+                    table.addCell(getCell(String.valueOf(capital), PdfPCell.ALIGN_RIGHT));
+                    table.addCell(getCell(String.valueOf(profitLoss), PdfPCell.ALIGN_RIGHT));
+                    table.addCell(getCell(String.valueOf(liabilities), PdfPCell.ALIGN_RIGHT));
+                    table.addCell(getCell(String.valueOf(cpl), PdfPCell.ALIGN_RIGHT));
+                    table.addCell(getCell(String.valueOf(assets), PdfPCell.ALIGN_RIGHT));
+                    capital = 0; profitLoss = 0; liabilities = 0; cpl = 0; assets = 0;
+
+                    PdfPCell section = new PdfPCell(new Phrase(separated[1]+"-"+separated[0],totalFont));
+                    section.setBorder(PdfPCell.NO_BORDER);
+                    section.setFixedHeight(30);
+                    section.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
+                    section.setVerticalAlignment(Element.ALIGN_MIDDLE);
+                    table.addCell(section);
+                    table.addCell(footerCell("",PdfPCell.ALIGN_RIGHT));
+                    table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
+                    table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
+                    table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
+                    table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
+
+                    table.addCell(getCell("", PdfPCell.ALIGN_LEFT));
+                    table.addCell(getCell(c.getCapital(), PdfPCell.ALIGN_RIGHT));
+                    table.addCell(getCell(c.getProfitLoss(), PdfPCell.ALIGN_RIGHT));
+                    table.addCell(getCell(c.getLiabilities(), PdfPCell.ALIGN_RIGHT));
+                    table.addCell(getCell(c.getC_P_L(), PdfPCell.ALIGN_RIGHT));
+                    table.addCell(getCell(c.getAssets(), PdfPCell.ALIGN_RIGHT));
+
+                    capital = Integer.valueOf(c.getCapital()) + capital;
+                    profitLoss = Integer.valueOf(c.getProfitLoss()) + profitLoss;
+                    liabilities = Integer.valueOf(c.getLiabilities()) + liabilities;
+                    cpl = Integer.valueOf(c.getC_P_L()) + cpl;
+                    assets = Integer.valueOf(c.getAssets()) + assets;
+                    gCapital = Integer.valueOf(c.getCapital()) + gCapital;
+                    gProfitLoss = Integer.valueOf(c.getProfitLoss()) + gProfitLoss;
+                    gLiabilities = Integer.valueOf(c.getLiabilities()) + gLiabilities;
+                    gCpl = Integer.valueOf(c.getC_P_L()) + gCpl;
+                    gAssets = Integer.valueOf(c.getAssets()) + gAssets;
+                }
+            }
+        }else {
+            for (BalSheet c : balSheetList){
+                separated = c.getCBDate().split("-");
+                if (d.equals("0")){
+                    d = separated[1];
+
+                    PdfPCell section = new PdfPCell(new Phrase(separated[1]+"-"+separated[0],totalFont));
+                    section.setBorder(PdfPCell.NO_BORDER);
+                    section.setFixedHeight(30);
+                    section.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
+                    section.setVerticalAlignment(Element.ALIGN_MIDDLE);
+                    table.addCell(section);
+                    table.addCell(footerCell("",PdfPCell.ALIGN_RIGHT));
+                    table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
+                    table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
+                    table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
+                    table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
+
+                    table.addCell(getCell("", PdfPCell.ALIGN_LEFT));
+                    table.addCell(getCell(c.getCapital(), PdfPCell.ALIGN_RIGHT));
+                    table.addCell(getCell(c.getProfitLoss(), PdfPCell.ALIGN_RIGHT));
+                    table.addCell(getCell(c.getLiabilities(), PdfPCell.ALIGN_RIGHT));
+                    table.addCell(getCell(c.getC_P_L(), PdfPCell.ALIGN_RIGHT));
+                    table.addCell(getCell(c.getAssets(), PdfPCell.ALIGN_RIGHT));
+
+                    capital = Integer.valueOf(c.getCapital()) + capital;
+                    profitLoss = Integer.valueOf(c.getProfitLoss()) + profitLoss;
+                    liabilities = Integer.valueOf(c.getLiabilities()) + liabilities;
+                    cpl = Integer.valueOf(c.getC_P_L()) + cpl;
+                    assets = Integer.valueOf(c.getAssets()) + assets;
+                    gCapital = Integer.valueOf(c.getCapital()) + gCapital;
+                    gProfitLoss = Integer.valueOf(c.getProfitLoss()) + gProfitLoss;
+                    gLiabilities = Integer.valueOf(c.getLiabilities()) + gLiabilities;
+                    gCpl = Integer.valueOf(c.getC_P_L()) + gCpl;
+                    gAssets = Integer.valueOf(c.getAssets()) + gAssets;
+                }else if (d.equals(separated[1])){
+                    table.addCell(getCell("", PdfPCell.ALIGN_LEFT));
+                    table.addCell(getCell(c.getCapital(), PdfPCell.ALIGN_RIGHT));
+                    table.addCell(getCell(c.getProfitLoss(), PdfPCell.ALIGN_RIGHT));
+                    table.addCell(getCell(c.getLiabilities(), PdfPCell.ALIGN_RIGHT));
+                    table.addCell(getCell(c.getC_P_L(), PdfPCell.ALIGN_RIGHT));
+                    table.addCell(getCell(c.getAssets(), PdfPCell.ALIGN_RIGHT));
+
+                    capital = Integer.valueOf(c.getCapital()) + capital;
+                    profitLoss = Integer.valueOf(c.getProfitLoss()) + profitLoss;
+                    liabilities = Integer.valueOf(c.getLiabilities()) + liabilities;
+                    cpl = Integer.valueOf(c.getC_P_L()) + cpl;
+                    assets = Integer.valueOf(c.getAssets()) + assets;
+                    gCapital = Integer.valueOf(c.getCapital()) + gCapital;
+                    gProfitLoss = Integer.valueOf(c.getProfitLoss()) + gProfitLoss;
+                    gLiabilities = Integer.valueOf(c.getLiabilities()) + gLiabilities;
+                    gCpl = Integer.valueOf(c.getC_P_L()) + gCpl;
+                    gAssets = Integer.valueOf(c.getAssets()) + gAssets;
+                }else if (!d.equals("0") && !d.equals(separated[1])){
+                    d = separated[1];
+                    table.addCell(total);
+                    table.addCell(getCell(String.valueOf(capital), PdfPCell.ALIGN_RIGHT));
+                    table.addCell(getCell(String.valueOf(profitLoss), PdfPCell.ALIGN_RIGHT));
+                    table.addCell(getCell(String.valueOf(liabilities), PdfPCell.ALIGN_RIGHT));
+                    table.addCell(getCell(String.valueOf(cpl), PdfPCell.ALIGN_RIGHT));
+                    table.addCell(getCell(String.valueOf(assets), PdfPCell.ALIGN_RIGHT));
+                    capital = 0; profitLoss = 0; liabilities = 0; cpl = 0; assets = 0;
+
+                    PdfPCell section = new PdfPCell(new Phrase(separated[1]+"-"+separated[0],totalFont));
+                    section.setBorder(PdfPCell.NO_BORDER);
+                    section.setFixedHeight(30);
+                    section.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
+                    section.setVerticalAlignment(Element.ALIGN_MIDDLE);
+                    table.addCell(section);
+                    table.addCell(footerCell("",PdfPCell.ALIGN_RIGHT));
+                    table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
+                    table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
+                    table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
+                    table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
+
+                    table.addCell(getCell("", PdfPCell.ALIGN_LEFT));
+                    table.addCell(getCell(c.getCapital(), PdfPCell.ALIGN_RIGHT));
+                    table.addCell(getCell(c.getProfitLoss(), PdfPCell.ALIGN_RIGHT));
+                    table.addCell(getCell(c.getLiabilities(), PdfPCell.ALIGN_RIGHT));
+                    table.addCell(getCell(c.getC_P_L(), PdfPCell.ALIGN_RIGHT));
+                    table.addCell(getCell(c.getAssets(), PdfPCell.ALIGN_RIGHT));
+
+                    capital = Integer.valueOf(c.getCapital()) + capital;
+                    profitLoss = Integer.valueOf(c.getProfitLoss()) + profitLoss;
+                    liabilities = Integer.valueOf(c.getLiabilities()) + liabilities;
+                    cpl = Integer.valueOf(c.getC_P_L()) + cpl;
+                    assets = Integer.valueOf(c.getAssets()) + assets;
+                    gCapital = Integer.valueOf(c.getCapital()) + gCapital;
+                    gProfitLoss = Integer.valueOf(c.getProfitLoss()) + gProfitLoss;
+                    gLiabilities = Integer.valueOf(c.getLiabilities()) + gLiabilities;
+                    gCpl = Integer.valueOf(c.getC_P_L()) + gCpl;
+                    gAssets = Integer.valueOf(c.getAssets()) + gAssets;
+                }
+            }
+        }
+
+        table.addCell(total);
+        table.addCell(getCell(String.valueOf(capital), PdfPCell.ALIGN_RIGHT));
+        table.addCell(getCell(String.valueOf(profitLoss), PdfPCell.ALIGN_RIGHT));
+        table.addCell(getCell(String.valueOf(liabilities), PdfPCell.ALIGN_RIGHT));
+        table.addCell(getCell(String.valueOf(cpl), PdfPCell.ALIGN_RIGHT));
+        table.addCell(getCell(String.valueOf(assets), PdfPCell.ALIGN_RIGHT));
+
+        table.addCell(getCell("Grand Total", PdfPCell.ALIGN_LEFT));
+        table.addCell(getCell(String.valueOf(gCapital), PdfPCell.ALIGN_RIGHT));
+        table.addCell(getCell(String.valueOf(gProfitLoss), PdfPCell.ALIGN_RIGHT));
+        table.addCell(getCell(String.valueOf(gLiabilities), PdfPCell.ALIGN_RIGHT));
+        table.addCell(getCell(String.valueOf(gCpl), PdfPCell.ALIGN_RIGHT));
+        table.addCell(getCell(String.valueOf(gAssets), PdfPCell.ALIGN_RIGHT));
+
+
+
+//        Footer footer = new Footer();
+
+        document.open();
+
+        Font f = new Font(Font.FontFamily.TIMES_ROMAN, 30.0f, Font.UNDERLINE, BaseColor.BLACK);
+        Paragraph paragraph = new Paragraph("Cash Book \n\n", f);
+        paragraph.setAlignment(Element.ALIGN_CENTER);
+        document.add(chunk);
+        document.add(name);
+        document.add(contact);
+        document.add(title);
+        document.add(table);
+
+        document.close();
+        customPDFView();
+        Log.e("PDFDocument","Created");
+    }
+
+    public PdfPCell getCell(String text, int alignment) {
+        PdfPCell cell = new PdfPCell(new Phrase(text));
+        cell.setPadding(0);
+        cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+        cell.setHorizontalAlignment(alignment);
+        cell.setMinimumHeight(35);
+        cell.setPadding(3);
+        return cell;
+    }
+
+    public PdfPCell footerCell(String text, int alignment) {
+        PdfPCell cell = new PdfPCell(new Phrase(text));
+        cell.setPadding(0);
+        cell.setHorizontalAlignment(alignment);
+        cell.setBorder(PdfPCell.NO_BORDER);
+        return cell;
+    }
+
+    public void customPDFView(){
+        PackageManager packageManager = getContext().getPackageManager();
+        Intent testIntent = new Intent(Intent.ACTION_VIEW);
+        testIntent.setType("application/pdf");
+        List list = packageManager.queryIntentActivities(testIntent, PackageManager.MATCH_DEFAULT_ONLY);
+        if (list.size() > 0) {
+            Intent intent = new Intent();
+            intent.setAction(Intent.ACTION_VIEW);
+            Uri uri = Uri.fromFile(pdfFile);
+            intent.setDataAndType(uri, "application/pdf");
+            getContext().startActivity(intent);
+        } else {
+            Toast.makeText(getContext(), "Download a PDF Viewer to see the generated PDF", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    class Footer extends PdfPageEventHelper {
+        Font font;
+        PdfTemplate t;
+        Image total;
+
+        @Override
+        public void onOpenDocument(PdfWriter writer, Document document) {
+            t = writer.getDirectContent().createTemplate(30, 16);
+            try {
+                total = Image.getInstance(t);
+                total.setRole(PdfName.ARTIFACT);
+                font =  new Font(Font.FontFamily.TIMES_ROMAN, 30.0f, Font.UNDERLINE, BaseColor.BLACK);
+            } catch (DocumentException de) {
+                throw new ExceptionConverter(de);
+            }
+        }
+
+        @Override
+        public void onEndPage(PdfWriter writer, Document document) {
+
+            PdfPTable table = new PdfPTable(new float[]{3, 4, 2});
+            table.getDefaultCell().setHorizontalAlignment(Element.ALIGN_CENTER);
+            table.getDefaultCell().setFixedHeight(20);
+            table.setTotalWidth(PageSize.A4.getWidth());
+            table.getDefaultCell().setBorder(Rectangle.BOTTOM);
+            Date dat = new Date();
+            SimpleDateFormat df = new SimpleDateFormat("EEE, d MMM yyyy");
+            table.addCell(footerCell(df.format(dat), PdfPCell.ALIGN_LEFT));
+            table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
+            Log.e("PAGE NUMBER",String.valueOf(writer.getPageNumber()));
+            table.addCell(footerCell(String.format("Page %d ", writer.getPageNumber() -1),PdfPCell.ALIGN_LEFT));
+            table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
+            table.addCell(footerCell("www.easysoft.com.pk",PdfPCell.ALIGN_LEFT));
+            table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
+
+            PdfContentByte canvas = writer.getDirectContent();
+            canvas.beginMarkedContentSequence(PdfName.ARTIFACT);
+            table.writeSelectedRows(0, -1, 36, 30, canvas);
+            canvas.endMarkedContentSequence();
+
+        }
+
+        @Override
+        public void onCloseDocument(PdfWriter writer, Document document) {
+            ColumnText.showTextAligned(t, Element.ALIGN_LEFT,
+                    new Phrase(String.valueOf(writer.getPageNumber()), font),
+                    2, 4, 0);
+        }
     }
 }

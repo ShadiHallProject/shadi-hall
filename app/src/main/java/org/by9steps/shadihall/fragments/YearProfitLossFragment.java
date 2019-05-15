@@ -9,6 +9,9 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -73,6 +76,8 @@ public class YearProfitLossFragment extends Fragment implements View.OnClickList
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_year_profit_loss, container, false);
+
+        setHasOptionsMenu(true);
 
         recyclerView = view.findViewById(R.id.recycler);
         searchView = view.findViewById(R.id.ypl_search);
@@ -400,6 +405,36 @@ public class YearProfitLossFragment extends Fragment implements View.OnClickList
         //calling a method of the adapter class and passing the filtered list
         adapter.filterList(filterdList);
 
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.cb_menu,menu);
+        MenuItem referesh = menu.findItem(R.id.action_refresh);
+        referesh.setVisible(false);
+        MenuItem settings = menu.findItem(R.id.action_settings);
+        settings.setVisible(false);
+        super.onCreateOptionsMenu(menu,inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if(item.getItemId() == android.R.id.home){
+            getActivity().onBackPressed();
+        }else if (item.getItemId() == R.id.action_print){
+//            try {
+//                createPdf();
+//            } catch (FileNotFoundException e) {
+//                e.printStackTrace();
+//            } catch (DocumentException e) {
+//                e.printStackTrace();
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
 }

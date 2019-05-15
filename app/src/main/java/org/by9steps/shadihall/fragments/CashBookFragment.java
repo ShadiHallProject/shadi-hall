@@ -3,7 +3,6 @@ package org.by9steps.shadihall.fragments;
 
 import android.app.Dialog;
 import android.app.ProgressDialog;
-import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 
@@ -15,41 +14,19 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.drawable.Drawable;
-import android.graphics.pdf.PdfDocument;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.CancellationSignal;
 import android.os.Environment;
-import android.os.ParcelFileDescriptor;
-import android.print.PageRange;
-import android.print.PrintAttributes;
-import android.print.PrintDocumentAdapter;
-import android.print.PrintDocumentInfo;
-import android.print.PrintJob;
-import android.print.PrintManager;
-import android.print.pdf.PrintedPdfDocument;
-import android.provider.DocumentsContract;
+
 import android.support.annotation.Nullable;
-import android.support.annotation.RequiresApi;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
-import android.support.v4.print.PrintHelper;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
-import android.text.Editable;
-import android.text.TextWatcher;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -57,8 +34,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
-import android.webkit.WebView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -78,14 +53,29 @@ import com.android.volley.RetryPolicy;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.itextpdf.text.BaseColor;
+import com.itextpdf.text.Chunk;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.Element;
+import com.itextpdf.text.ExceptionConverter;
 import com.itextpdf.text.Font;
+import com.itextpdf.text.FontFactory;
+import com.itextpdf.text.Image;
 import com.itextpdf.text.PageSize;
 import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.Phrase;
+import com.itextpdf.text.Rectangle;
+import com.itextpdf.text.pdf.BaseFont;
+import com.itextpdf.text.pdf.ColumnText;
+import com.itextpdf.text.pdf.ICC_Profile;
+import com.itextpdf.text.pdf.PdfContentByte;
+import com.itextpdf.text.pdf.PdfDate;
+import com.itextpdf.text.pdf.PdfDictionary;
+import com.itextpdf.text.pdf.PdfName;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
+import com.itextpdf.text.pdf.PdfPageEventHelper;
+import com.itextpdf.text.pdf.PdfTemplate;
 import com.itextpdf.text.pdf.PdfWriter;
 
 import org.by9steps.shadihall.AppController;
@@ -113,8 +103,12 @@ import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.StringTokenizer;
 
 import android.widget.AdapterView.OnItemSelectedListener;
+
+import static com.itextpdf.text.html.HtmlTags.ALIGN_LEFT;
+import static com.itextpdf.text.html.HtmlTags.FONT;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -139,7 +133,6 @@ public class CashBookFragment extends Fragment implements OnItemSelectedListener
 
     int m = 0, amount, gAmount , filter;
     Boolean listSorting = false;
-    private Bitmap bitmap;
     public static String fDate1, fDate2;
     public static Button date1;
     public static Button date2;
@@ -149,6 +142,10 @@ public class CashBookFragment extends Fragment implements OnItemSelectedListener
 
     private static final String TAG = "PdfCreatorActivity";
     private File pdfFile;
+
+    String d = "0";
+    int tot = 0;
+    String value = "Complete CashBook", f = "No";
 
     public CashBookFragment() {
         // Required empty public constructor
@@ -206,7 +203,7 @@ public class CashBookFragment extends Fragment implements OnItemSelectedListener
         // Drop down layout style - list view with radio button
         dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
-        // attaching data adapter to spinner
+                                                                                                                                                // attaching data adapter to spinner
         spinner.setAdapter(dataAdapter);
 
 
@@ -303,10 +300,14 @@ public class CashBookFragment extends Fragment implements OnItemSelectedListener
             getActivity().onBackPressed();
         }else if (item.getItemId() == R.id.action_print){
             try {
-                customPDF();
+//                customPDF();
+
+                createPdf();
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             } catch (DocumentException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
                 e.printStackTrace();
             }
 
@@ -571,6 +572,8 @@ public class CashBookFragment extends Fragment implements OnItemSelectedListener
                         dateFilter();
                         dialog.dismiss();
                         spinner.setSelection(0);
+                        f = "Date";
+
                     }
                 });
                 cancel.setOnClickListener(new View.OnClickListener() {
@@ -966,7 +969,18 @@ public class CashBookFragment extends Fragment implements OnItemSelectedListener
         return connected;
     }
 
-    public void customPDF() throws FileNotFoundException, DocumentException {
+    public void orderBy(String order_by){
+        if (status == 0) {
+            status = 1;
+            orderby = " ORDER BY " + order_by + " DESC";
+        } else {
+            status = 0;
+            orderby = " ORDER BY " + order_by + " ASC";
+        }
+        getCashBook();
+    }
+
+    public void createPdf() throws IOException, DocumentException {
 
         File docsFolder = new File(Environment.getExternalStorageDirectory() + "/Documents");
         if (!docsFolder.exists()) {
@@ -977,14 +991,65 @@ public class CashBookFragment extends Fragment implements OnItemSelectedListener
         String pdfname = "CashBook.pdf";
         pdfFile = new File(docsFolder.getAbsolutePath(), pdfname);
         OutputStream output = new FileOutputStream(pdfFile);
+
         Document document = new Document(PageSize.A4);
-        PdfPTable table = new PdfPTable(new float[]{3, 3, 3, 3, 3, 3});
+        PdfWriter writer = PdfWriter.getInstance(document, output);
+        writer.createXmpMetadata();
+        writer.setTagged();
+        writer.setPageEvent(new Footer());
+        document.open();
+        document.addLanguage("en-us");
+
+        PdfDictionary parameters = new PdfDictionary();Log.e("PDFDocument","Created2");
+        parameters.put(PdfName.MODDATE, new PdfDate());
+
+        Font chapterFont = FontFactory.getFont(FontFactory.HELVETICA, 16, Font.BOLD);
+        Font paragraphFont = FontFactory.getFont(FontFactory.HELVETICA, 10, Font.BOLD);
+        Chunk chunk = new Chunk("Client Name", chapterFont);
+        Paragraph name = new Paragraph("Address",paragraphFont);
+        name.setIndentationLeft(0);
+        Paragraph contact = new Paragraph("Contact",paragraphFont);
+        contact.setIndentationLeft(0);
+
+        PdfPTable title = new PdfPTable(new float[]{3, 3, 3});
+        title.getDefaultCell().setHorizontalAlignment(Element.ALIGN_CENTER);
+        title.getDefaultCell().setFixedHeight(30);
+        title.setTotalWidth(PageSize.A4.getWidth());
+        title.setWidthPercentage(100);
+        title.getDefaultCell().setVerticalAlignment(Element.ALIGN_MIDDLE);
+        title.setSpacingBefore(5);
+        title.addCell(footerCell("",PdfPCell.ALIGN_CENTER));
+        PdfPCell cell = new PdfPCell(new Phrase("Cash Book",chapterFont));
+        cell.setBorder(PdfPCell.NO_BORDER);
+        cell.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
+        cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+        title.addCell(cell);
+        title.addCell(footerCell("",PdfPCell.ALIGN_CENTER));
+
+//        PdfPTable param = new PdfPTable(new float[]{3, 3, 3});
+        title.addCell(footerCell("",PdfPCell.ALIGN_CENTER));
+        title.addCell(footerCell("",PdfPCell.ALIGN_CENTER));
+
+        PdfPCell pCell = null;
+        if (f.equals("Date")){
+            value = fDate1+" to "+fDate2;
+            pCell = new PdfPCell(new Phrase("Date"+": "+value,paragraphFont));
+        }else {
+            value = searchView.getQuery().toString().trim();
+            pCell = new PdfPCell(new Phrase(spinner.getSelectedItem().toString()+": "+value,paragraphFont));
+        }
+        pCell.setBorder(PdfPCell.NO_BORDER);
+        pCell.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
+        pCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+        title.addCell(pCell);
+
+        PdfPTable table = new PdfPTable(new float[]{3, 4, 4, 5, 3});
         table.getDefaultCell().setHorizontalAlignment(Element.ALIGN_CENTER);
-        table.getDefaultCell().setFixedHeight(50);
+        table.getDefaultCell().setFixedHeight(40);
         table.setTotalWidth(PageSize.A4.getWidth());
         table.setWidthPercentage(100);
         table.getDefaultCell().setVerticalAlignment(Element.ALIGN_MIDDLE);
-        table.addCell("Date");
+        table.setSpacingBefore(20);
         table.addCell("CB ID");
         table.addCell("Debit Account");
         table.addCell("Credit Account");
@@ -996,41 +1061,280 @@ public class CashBookFragment extends Fragment implements OnItemSelectedListener
             cells[j].setBackgroundColor(BaseColor.PINK);
         }
 
-        if (filter > 1){
+        tot = 0;
+        int mTotal = 0;
+
+        Font totalFont = FontFactory.getFont(FontFactory.HELVETICA, 13, Font.BOLD);
+        PdfPCell total = new PdfPCell(new Phrase("Total",totalFont));
+        total.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
+        total.setVerticalAlignment(Element.ALIGN_MIDDLE);
+        total.setFixedHeight(35);
+
+        if (filter > 1 && !searchView.getQuery().toString().equals("") && !f.equals("Date")){
+            d = "0";
             for (CashEntry c : filterd){
-                table.addCell(c.getCBDate());
-                table.addCell(c.getCashBookID());
-                table.addCell(c.getDebitAccountName());
-                table.addCell(c.getCreditAccountName());
-                table.addCell(c.getCBRemarks());
-                table.addCell(c.getAmount());
+                if (d.equals("0")){
+                    PdfPCell section = new PdfPCell(new Phrase(c.getCBDate(),totalFont));
+                    section.setBorder(PdfPCell.NO_BORDER);
+                    section.setFixedHeight(30);
+                    section.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
+                    section.setVerticalAlignment(Element.ALIGN_MIDDLE);
+                    table.addCell(section);
+                    table.addCell(footerCell("",PdfPCell.ALIGN_RIGHT));
+                    table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
+                    table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
+                    table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
+//                    table.addCell(footerCell("",PdfPCell.ALIGN_RIGHT));
+
+
+//                    table.addCell(getCell(c.getCBDate(),PdfPCell.ALIGN_LEFT));
+                    table.addCell(getCell(c.getCashBookID(),PdfPCell.ALIGN_RIGHT));
+                    table.addCell(getCell(c.getDebitAccountName(),PdfPCell.ALIGN_LEFT));
+                    table.addCell(getCell(c.getCreditAccountName(),PdfPCell.ALIGN_LEFT));
+                    table.addCell(getCell(c.getCBRemarks(),PdfPCell.ALIGN_LEFT));
+                    table.addCell(getCell(c.getAmount(),PdfPCell.ALIGN_RIGHT));
+
+                    tot = tot + Integer.valueOf(c.getAmount());
+                    mTotal = mTotal + Integer.valueOf(c.getAmount());
+                    d = c.getCBDate();
+                }else if(d.equals(c.getCBDate())){
+//                    table.addCell(getCell(c.getCBDate(),PdfPCell.ALIGN_LEFT));
+                    table.addCell(getCell(c.getCashBookID(),PdfPCell.ALIGN_RIGHT));
+                    table.addCell(getCell(c.getDebitAccountName(),PdfPCell.ALIGN_LEFT));
+                    table.addCell(getCell(c.getCreditAccountName(),PdfPCell.ALIGN_LEFT));
+                    table.addCell(getCell(c.getCBRemarks(),PdfPCell.ALIGN_LEFT));
+                    table.addCell(getCell(c.getAmount(),PdfPCell.ALIGN_RIGHT));
+
+                    tot = tot + Integer.valueOf(c.getAmount());
+                    mTotal = mTotal + Integer.valueOf(c.getAmount());
+                    d = c.getCBDate();
+                }else if (!d.equals(c.getCBDate()) && !d.equals("0")){
+//                    table.addCell("");
+                    table.addCell("");
+                    table.addCell("");
+                    table.addCell("");
+                    table.addCell(total);
+                    table.addCell(getCell(String.valueOf(tot),PdfPCell.ALIGN_RIGHT));
+                    tot = 0;
+
+                    PdfPCell section = new PdfPCell(new Phrase(c.getCBDate(),totalFont));
+                    section.setBorder(PdfPCell.NO_BORDER);
+                    section.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
+                    section.setVerticalAlignment(Element.ALIGN_MIDDLE);
+                    section.setFixedHeight(30);
+                    table.addCell(section);
+                    table.addCell(footerCell("",PdfPCell.ALIGN_RIGHT));
+                    table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
+                    table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
+                    table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
+//                    table.addCell(footerCell("",PdfPCell.ALIGN_RIGHT));
+
+//                    table.addCell(getCell(c.getCBDate(),PdfPCell.ALIGN_LEFT));
+                    table.addCell(getCell(c.getCashBookID(),PdfPCell.ALIGN_RIGHT));
+                    table.addCell(getCell(c.getDebitAccountName(),PdfPCell.ALIGN_LEFT));
+                    table.addCell(getCell(c.getCreditAccountName(),PdfPCell.ALIGN_LEFT));
+                    table.addCell(getCell(c.getCBRemarks(),PdfPCell.ALIGN_LEFT));
+                    table.addCell(getCell(c.getAmount(),PdfPCell.ALIGN_RIGHT));
+
+                    tot = tot + Integer.valueOf(c.getAmount());
+                    mTotal = mTotal + Integer.valueOf(c.getAmount());
+                    d = c.getCBDate();
+                }
             }
-        }else {
+        }else if (filter > 1 && searchView.getQuery().toString().equals("") && f.equals("Date")){
+            d = "0";
+            for (CashEntry c : filterd){
+                if (d.equals("0")){
+                    PdfPCell section = new PdfPCell(new Phrase(c.getCBDate(),totalFont));
+                    section.setBorder(PdfPCell.NO_BORDER);
+                    section.setFixedHeight(30);
+                    section.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
+                    section.setVerticalAlignment(Element.ALIGN_MIDDLE);
+                    table.addCell(section);
+                    table.addCell(footerCell("",PdfPCell.ALIGN_RIGHT));
+                    table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
+                    table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
+                    table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
+//                    table.addCell(footerCell("",PdfPCell.ALIGN_RIGHT));
+
+
+//                    table.addCell(getCell(c.getCBDate(),PdfPCell.ALIGN_LEFT));
+                    table.addCell(getCell(c.getCashBookID(),PdfPCell.ALIGN_RIGHT));
+                    table.addCell(getCell(c.getDebitAccountName(),PdfPCell.ALIGN_LEFT));
+                    table.addCell(getCell(c.getCreditAccountName(),PdfPCell.ALIGN_LEFT));
+                    table.addCell(getCell(c.getCBRemarks(),PdfPCell.ALIGN_LEFT));
+                    table.addCell(getCell(c.getAmount(),PdfPCell.ALIGN_RIGHT));
+
+                    tot = tot + Integer.valueOf(c.getAmount());
+                    mTotal = mTotal + Integer.valueOf(c.getAmount());
+                    d = c.getCBDate();
+                }else if(d.equals(c.getCBDate())){
+//                    table.addCell(getCell(c.getCBDate(),PdfPCell.ALIGN_LEFT));
+                    table.addCell(getCell(c.getCashBookID(),PdfPCell.ALIGN_RIGHT));
+                    table.addCell(getCell(c.getDebitAccountName(),PdfPCell.ALIGN_LEFT));
+                    table.addCell(getCell(c.getCreditAccountName(),PdfPCell.ALIGN_LEFT));
+                    table.addCell(getCell(c.getCBRemarks(),PdfPCell.ALIGN_LEFT));
+                    table.addCell(getCell(c.getAmount(),PdfPCell.ALIGN_RIGHT));
+
+                    tot = tot + Integer.valueOf(c.getAmount());
+                    mTotal = mTotal + Integer.valueOf(c.getAmount());
+                    d = c.getCBDate();
+                }else if (!d.equals(c.getCBDate()) && !d.equals("0")){
+//                    table.addCell("");
+                    table.addCell("");
+                    table.addCell("");
+                    table.addCell("");
+                    table.addCell(total);
+                    table.addCell(getCell(String.valueOf(tot),PdfPCell.ALIGN_RIGHT));
+                    tot = 0;
+
+                    PdfPCell section = new PdfPCell(new Phrase(c.getCBDate(),totalFont));
+                    section.setBorder(PdfPCell.NO_BORDER);
+                    section.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
+                    section.setVerticalAlignment(Element.ALIGN_MIDDLE);
+                    section.setFixedHeight(30);
+                    table.addCell(section);
+                    table.addCell(footerCell("",PdfPCell.ALIGN_RIGHT));
+                    table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
+                    table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
+                    table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
+//                    table.addCell(footerCell("",PdfPCell.ALIGN_RIGHT));
+
+//                    table.addCell(getCell(c.getCBDate(),PdfPCell.ALIGN_LEFT));
+                    table.addCell(getCell(c.getCashBookID(),PdfPCell.ALIGN_RIGHT));
+                    table.addCell(getCell(c.getDebitAccountName(),PdfPCell.ALIGN_LEFT));
+                    table.addCell(getCell(c.getCreditAccountName(),PdfPCell.ALIGN_LEFT));
+                    table.addCell(getCell(c.getCBRemarks(),PdfPCell.ALIGN_LEFT));
+                    table.addCell(getCell(c.getAmount(),PdfPCell.ALIGN_RIGHT));
+
+                    tot = tot + Integer.valueOf(c.getAmount());
+                    mTotal = mTotal + Integer.valueOf(c.getAmount());
+                    d = c.getCBDate();
+                }
+            }
+        } else {
+            d = "0";
             for (CashBook c : cashBooksList){
-                table.addCell(c.getCBDate());
-                table.addCell(c.getCashBookID());
-                table.addCell(c.getDebitAccountName());
-                table.addCell(c.getCreditAccountName());
-                table.addCell(c.getCBRemarks());
-                table.addCell(c.getAmount());
+
+                if (d.equals("0")){
+
+                    PdfPCell section = new PdfPCell(new Phrase(c.getCBDate(),totalFont));
+                    section.setBorder(PdfPCell.NO_BORDER);
+                    section.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
+                    section.setVerticalAlignment(Element.ALIGN_MIDDLE);
+                    section.setFixedHeight(30);
+                    table.addCell(section);
+                    table.addCell(footerCell("",PdfPCell.ALIGN_RIGHT));
+                    table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
+                    table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
+                    table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
+//                    table.addCell(footerCell("",PdfPCell.ALIGN_RIGHT));
+
+//                    table.addCell(getCell(c.getCBDate(),PdfPCell.ALIGN_LEFT));
+                    table.addCell(getCell(c.getCashBookID(),PdfPCell.ALIGN_RIGHT));
+                    table.addCell(getCell(c.getDebitAccountName(),PdfPCell.ALIGN_LEFT));
+                    table.addCell(getCell(c.getCreditAccountName(),PdfPCell.ALIGN_LEFT));
+                    table.addCell(getCell(c.getCBRemarks(),PdfPCell.ALIGN_LEFT));
+                    table.addCell(getCell(c.getAmount(),PdfPCell.ALIGN_RIGHT));
+
+                    tot = tot + Integer.valueOf(c.getAmount());
+                    mTotal = mTotal + Integer.valueOf(c.getAmount());
+                    d = c.getCBDate();
+                }else if(d.equals(c.getCBDate())){
+//                    table.addCell(getCell(c.getCBDate(),PdfPCell.ALIGN_LEFT));
+                    table.addCell(getCell(c.getCashBookID(),PdfPCell.ALIGN_RIGHT));
+                    table.addCell(getCell(c.getDebitAccountName(),PdfPCell.ALIGN_LEFT));
+                    table.addCell(getCell(c.getCreditAccountName(),PdfPCell.ALIGN_LEFT));
+                    table.addCell(getCell(c.getCBRemarks(),PdfPCell.ALIGN_LEFT));
+                    table.addCell(getCell(c.getAmount(),PdfPCell.ALIGN_RIGHT));
+
+                    tot = tot + Integer.valueOf(c.getAmount());
+                    mTotal = mTotal + Integer.valueOf(c.getAmount());
+                    d = c.getCBDate();
+                }else if (!d.equals(c.getCBDate()) && !d.equals("0")){
+//                    table.addCell("");
+                    table.addCell("");
+                    table.addCell("");
+                    table.addCell("");
+                    table.addCell(total);
+                    table.addCell(getCell(String.valueOf(tot),PdfPCell.ALIGN_RIGHT));
+                    tot = 0;
+
+                    PdfPCell section = new PdfPCell(new Phrase(c.getCBDate(),totalFont));
+                    section.setBorder(PdfPCell.NO_BORDER);
+                    section.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
+                    section.setVerticalAlignment(Element.ALIGN_MIDDLE);
+                    section.setFixedHeight(30);
+                    table.addCell(section);
+                    table.addCell(footerCell("",PdfPCell.ALIGN_RIGHT));
+                    table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
+                    table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
+                    table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
+//                    table.addCell(footerCell("",PdfPCell.ALIGN_RIGHT));
+
+//                    table.addCell(getCell(c.getCBDate(),PdfPCell.ALIGN_LEFT));
+                    table.addCell(getCell(c.getCashBookID(),PdfPCell.ALIGN_RIGHT));
+                    table.addCell(getCell(c.getDebitAccountName(),PdfPCell.ALIGN_LEFT));
+                    table.addCell(getCell(c.getCreditAccountName(),PdfPCell.ALIGN_LEFT));
+                    table.addCell(getCell(c.getCBRemarks(),PdfPCell.ALIGN_LEFT));
+                    table.addCell(getCell(c.getAmount(),PdfPCell.ALIGN_RIGHT));
+
+                    tot = tot + Integer.valueOf(c.getAmount());
+                    mTotal = mTotal + Integer.valueOf(c.getAmount());
+                    d = c.getCBDate();
+                }
             }
         }
 
-        PdfWriter.getInstance(document, output);
+//        table.addCell("");
+        table.addCell("");
+        table.addCell("");
+        table.addCell("");
+        table.addCell(total);
+        table.addCell(getCell(String.valueOf(tot),PdfPCell.ALIGN_RIGHT));
+
+//        table.addCell("");
+        table.addCell("");
+        table.addCell("");
+        table.addCell("");
+        table.addCell("Grand Total");
+        table.addCell(getCell(String.valueOf(mTotal),PdfPCell.ALIGN_RIGHT));
+
+//        Footer footer = new Footer();
+
         document.open();
 
         Font f = new Font(Font.FontFamily.TIMES_ROMAN, 30.0f, Font.UNDERLINE, BaseColor.BLACK);
         Paragraph paragraph = new Paragraph("Cash Book \n\n", f);
         paragraph.setAlignment(Element.ALIGN_CENTER);
-        document.add(paragraph);
+        document.add(chunk);
+        document.add(name);
+        document.add(contact);
+        document.add(title);
+//        document.add(param);
         document.add(table);
+
         document.close();
-
-
-
-
         customPDFView();
+        Log.e("PDFDocument","Created");
+    }
 
+    public PdfPCell getCell(String text, int alignment) {
+        PdfPCell cell = new PdfPCell(new Phrase(text));
+        cell.setPadding(0);
+        cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+        cell.setHorizontalAlignment(alignment);
+        cell.setMinimumHeight(30);
+        cell.setPadding(3);
+        return cell;
+    }
+
+    public PdfPCell footerCell(String text, int alignment) {
+        PdfPCell cell = new PdfPCell(new Phrase(text));
+        cell.setPadding(0);
+        cell.setHorizontalAlignment(alignment);
+        cell.setBorder(PdfPCell.NO_BORDER);
+        return cell;
     }
 
     public void customPDFView(){
@@ -1048,15 +1352,219 @@ public class CashBookFragment extends Fragment implements OnItemSelectedListener
             Toast.makeText(getContext(), "Download a PDF Viewer to see the generated PDF", Toast.LENGTH_SHORT).show();
         }
     }
-    public void orderBy(String order_by){
-        if (status == 0) {
-            status = 1;
-            orderby = " ORDER BY " + order_by + " DESC";
-        } else {
-            status = 0;
-            orderby = " ORDER BY " + order_by + " ASC";
+
+    class Footer extends PdfPageEventHelper {
+        Font font;
+        PdfTemplate t;
+        Image total;
+
+        @Override
+        public void onOpenDocument(PdfWriter writer, Document document) {
+            t = writer.getDirectContent().createTemplate(30, 16);
+            try {
+                total = Image.getInstance(t);
+                total.setRole(PdfName.ARTIFACT);
+                font =  new Font(Font.FontFamily.TIMES_ROMAN, 30.0f, Font.UNDERLINE, BaseColor.BLACK);
+            } catch (DocumentException de) {
+                throw new ExceptionConverter(de);
+            }
         }
-        getCashBook();
+
+        @Override
+        public void onEndPage(PdfWriter writer, Document document) {
+
+            PdfPTable table = new PdfPTable(new float[]{3, 4, 2});
+            table.getDefaultCell().setHorizontalAlignment(Element.ALIGN_CENTER);
+            table.getDefaultCell().setFixedHeight(20);
+            table.setTotalWidth(PageSize.A4.getWidth());
+            table.getDefaultCell().setBorder(Rectangle.BOTTOM);
+            Date dat = new Date();
+            SimpleDateFormat df = new SimpleDateFormat("EEE, d MMM yyyy");
+            table.addCell(footerCell(df.format(dat), PdfPCell.ALIGN_LEFT));
+            table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
+            Log.e("PAGE NUMBER",String.valueOf(writer.getPageNumber()));
+            table.addCell(footerCell(String.format("Page %s", writer.getPageNumber() - 1),PdfPCell.ALIGN_LEFT));
+            table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
+            table.addCell(footerCell("www.easysoft.com.pk",PdfPCell.ALIGN_LEFT));
+            table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
+
+            PdfContentByte canvas = writer.getDirectContent();
+            canvas.beginMarkedContentSequence(PdfName.ARTIFACT);
+            table.writeSelectedRows(0, -1, 36, 30, canvas);
+            canvas.endMarkedContentSequence();
+
+        }
+
+        @Override
+        public void onCloseDocument(PdfWriter writer, Document document) {
+            ColumnText.showTextAligned(t, Element.ALIGN_LEFT,
+                    new Phrase(String.valueOf(writer.getPageNumber()), font),
+                    2, 4, 0);
+        }
     }
+
+//    public void customPDF() throws IOException, DocumentException {
+//
+//        File docsFolder = new File(Environment.getExternalStorageDirectory() + "/Documents");
+//        if (!docsFolder.exists()) {
+//            docsFolder.mkdir();
+//            Log.i(TAG, "Created a new directory for PDF");
+//        }
+//
+//        String pdfname = "CashBook.pdf";
+//        pdfFile = new File(docsFolder.getAbsolutePath(), pdfname);
+//        OutputStream output = new FileOutputStream(pdfFile);
+//        Document document = new Document(PageSize.A4);
+//
+//        //Inserting Image in PDF
+//        Drawable da = getContext().getResources ().getDrawable (R.drawable.logo);
+//        Bitmap bitmap = ((BitmapDrawable)da).getBitmap();
+//        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+//        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+//        byte[] bitmapData = stream.toByteArray();
+//        Image image = Image.getInstance (bitmapData);//Header Image
+//        image.scaleAbsolute(540f, 72f);//image width,height
+//
+//
+//        Font chapterFont = FontFactory.getFont(FontFactory.HELVETICA, 16, Font.BOLD);
+//        Font paragraphFont = FontFactory.getFont(FontFactory.HELVETICA, 10, Font.BOLD);
+//        Chunk chunk = new Chunk("Client Name", chapterFont);
+//        Paragraph name = new Paragraph("Address",paragraphFont);
+//        name.setIndentationLeft(0);
+//        Paragraph contact = new Paragraph("Contact",paragraphFont);
+//        contact.setIndentationLeft(0);
+//
+//
+//
+//        PdfPTable table = new PdfPTable(new float[]{3, 3, 3, 3, 3, 3});
+//        table.getDefaultCell().setHorizontalAlignment(Element.ALIGN_CENTER);
+//        table.getDefaultCell().setFixedHeight(50);
+//        table.setTotalWidth(PageSize.A4.getWidth());
+//        table.setWidthPercentage(100);
+//        table.getDefaultCell().setVerticalAlignment(Element.ALIGN_MIDDLE);
+//        table.setSpacingBefore(20);
+//        table.addCell("Date");
+//        table.addCell("CB ID");
+//        table.addCell("Debit Account");
+//        table.addCell("Credit Account");
+//        table.addCell("Remarks");
+//        table.addCell("Amount");
+//        table.setHeaderRows(1);
+//        PdfPCell[] cells = table.getRow(0).getCells();
+//        for (int j = 0; j < cells.length; j++) {
+//            cells[j].setBackgroundColor(BaseColor.PINK);
+//        }
+//
+//        if (filter > 1){
+//            d = "0";
+//            for (CashEntry c : filterd){
+//                if (d.equals("0")){
+//                    table.addCell(c.getCBDate());
+//                    table.addCell(c.getCashBookID());
+//                    table.addCell(c.getDebitAccountName());
+//                    table.addCell(c.getCreditAccountName());
+//                    table.addCell(c.getCBRemarks());
+//                    table.addCell(c.getAmount());
+//
+//                    tot = tot + Integer.valueOf(c.getAmount());
+//                    d = c.getCBDate();
+//                }else if(d.equals(c.getCBDate())){
+//                    table.addCell(c.getCBDate());
+//                    table.addCell(c.getCashBookID());
+//                    table.addCell(c.getDebitAccountName());
+//                    table.addCell(c.getCreditAccountName());
+//                    table.addCell(c.getCBRemarks());
+//                    table.addCell(c.getAmount());
+//
+//                    tot = tot + Integer.valueOf(c.getAmount());
+//                    d = c.getCBDate();
+//                }else if (!d.equals(c.getCBDate()) && !d.equals("0")){
+//                    table.addCell("");
+//                    table.addCell("");
+//                    table.addCell("");
+//                    table.addCell("");
+//                    table.addCell("Total");
+//                    table.addCell(String.valueOf(tot));
+//                    tot = 0;
+//
+//                    table.addCell(c.getCBDate());
+//                    table.addCell(c.getCashBookID());
+//                    table.addCell(c.getDebitAccountName());
+//                    table.addCell(c.getCreditAccountName());
+//                    table.addCell(c.getCBRemarks());
+//                    table.addCell(c.getAmount());
+//
+//                    tot = tot + Integer.valueOf(c.getAmount());
+//                    d = c.getCBDate();
+//                }
+//            }
+//        }else {
+//            d = "0";
+//            for (CashBook c : cashBooksList){
+//
+//                if (d.equals("0")){
+//                    table.addCell(c.getCBDate());
+//                    table.addCell(c.getCashBookID());
+//                    table.addCell(c.getDebitAccountName());
+//                    table.addCell(c.getCreditAccountName());
+//                    table.addCell(c.getCBRemarks());
+//                    table.addCell(c.getAmount());
+//
+//                    tot = tot + Integer.valueOf(c.getAmount());
+//                    d = c.getCBDate();
+//                }else if(d.equals(c.getCBDate())){
+//                    table.addCell(c.getCBDate());
+//                    table.addCell(c.getCashBookID());
+//                    table.addCell(c.getDebitAccountName());
+//                    table.addCell(c.getCreditAccountName());
+//                    table.addCell(c.getCBRemarks());
+//                    table.addCell(c.getAmount());
+//
+//                    tot = tot + Integer.valueOf(c.getAmount());
+//                    d = c.getCBDate();
+//                }else if (!d.equals(c.getCBDate()) && !d.equals("0")){
+//                    table.addCell("");
+//                    table.addCell("");
+//                    table.addCell("");
+//                    table.addCell("");
+//                    table.addCell("Total");
+//                    table.addCell(String.valueOf(tot));
+//                    tot = 0;
+//
+//                    table.addCell(c.getCBDate());
+//                    table.addCell(c.getCashBookID());
+//                    table.addCell(c.getDebitAccountName());
+//                    table.addCell(c.getCreditAccountName());
+//                    table.addCell(c.getCBRemarks());
+//                    table.addCell(c.getAmount());
+//
+//                    tot = tot + Integer.valueOf(c.getAmount());
+//                    d = c.getCBDate();
+//                }
+//            }
+//        }
+//
+//        PdfWriter pdfWriter = PdfWriter.getInstance(document, output);
+////        Footer footer = new Footer();
+//
+//        document.open();
+//        pdfWriter.setPageEvent(new Footer());
+//
+//        Font f = new Font(Font.FontFamily.TIMES_ROMAN, 30.0f, Font.UNDERLINE, BaseColor.BLACK);
+//        Paragraph paragraph = new Paragraph("Cash Book \n\n", f);
+//        paragraph.setAlignment(Element.ALIGN_CENTER);
+//        document.add(chunk);
+//        document.add(name);
+//        document.add(contact);
+////        document.add(paragraph);
+//        document.add(table);
+//        document.close();
+//
+//
+//
+//
+//        customPDFView();
+//
+//    }
 }
 

@@ -11,6 +11,9 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -77,6 +80,9 @@ public class MonthBalSheetFragment extends Fragment implements View.OnClickListe
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_month_bal_sheet, container, false);
+
+        setHasOptionsMenu(true);
+
         recyclerView = view.findViewById(R.id.recycler);
         searchView = view.findViewById(R.id.mbs_search);
         spinner = view.findViewById(R.id.mbs_spinner);
@@ -452,5 +458,35 @@ public class MonthBalSheetFragment extends Fragment implements View.OnClickListe
 //                getCashBook();
                 break;
         }
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.cb_menu,menu);
+        MenuItem referesh = menu.findItem(R.id.action_refresh);
+        referesh.setVisible(false);
+        MenuItem settings = menu.findItem(R.id.action_settings);
+        settings.setVisible(false);
+        super.onCreateOptionsMenu(menu,inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if(item.getItemId() == android.R.id.home){
+            getActivity().onBackPressed();
+        }else if (item.getItemId() == R.id.action_print){
+//            try {
+//                createPdf();
+//            } catch (FileNotFoundException e) {
+//                e.printStackTrace();
+//            } catch (DocumentException e) {
+//                e.printStackTrace();
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }
