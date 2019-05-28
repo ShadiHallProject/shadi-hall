@@ -15,6 +15,7 @@ import org.by9steps.shadihall.model.Bookings;
 import org.by9steps.shadihall.model.CashBook;
 import org.by9steps.shadihall.model.ChartOfAcc;
 import org.by9steps.shadihall.model.GeneralLedger;
+import org.by9steps.shadihall.model.MonthTb;
 import org.by9steps.shadihall.model.ProfitLoss;
 import org.by9steps.shadihall.model.Recovery;
 import org.by9steps.shadihall.model.Reports;
@@ -590,6 +591,52 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return mSummerize;
     }
 
+    //Get MonthTB
+    public List<MonthTb> getMonthTB(String query) {
+        List<MonthTb> mMonthTb = new ArrayList<>();
+
+
+        Log.e(LOG, query);
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor c = db.rawQuery(query, null);
+        Log.e("SSSS",String.valueOf(c.moveToFirst()));
+
+        // looping through all rows and adding to list
+        if (c.moveToFirst()) {
+            do {
+                MonthTb monthTb = new MonthTb();
+                Log.e("SSSSS",c.getString(c.getColumnIndex("AcTypeID")));
+
+                monthTb.setClientID(c.getString(c.getColumnIndex("ClientID")));
+                monthTb.setAccountID(c.getString(c.getColumnIndex("AccountID")));
+                monthTb.setDebit(c.getString(c.getColumnIndex("Debit")));
+                monthTb.setCredit(c.getString(c.getColumnIndex("Credit")));
+                monthTb.setPrvBal(c.getString(c.getColumnIndex("PrvBal")));
+                monthTb.setPrvDebit(c.getString(c.getColumnIndex("PrvDebit")));
+                monthTb.setPrvCredit(c.getString(c.getColumnIndex("PrvCredit")));
+                monthTb.setTraDebit(c.getString(c.getColumnIndex("TraDebit")));
+                monthTb.setTraCredit(c.getString(c.getColumnIndex("TraCredit")));
+                monthTb.setTraBalance(c.getString(c.getColumnIndex("TraBalance")));
+                monthTb.setClosingBalnce(c.getString(c.getColumnIndex("ClosingBalnce")));
+                monthTb.setClosingDebit(c.getString(c.getColumnIndex("ClosingDebit")));
+                monthTb.setClosingCredit(c.getString(c.getColumnIndex("ClosingCredit")));
+                monthTb.setAcName(c.getString(c.getColumnIndex("AcName")));
+                monthTb.setAcGroupID(c.getString(c.getColumnIndex("AcGroupID")));
+                monthTb.setAcGruopName(c.getString(c.getColumnIndex("AcGruopName")));
+                monthTb.setAcTypeID(c.getString(c.getColumnIndex("AcTypeID")));
+                monthTb.setAcTypeName(c.getString(c.getColumnIndex("AcTypeName")));
+
+
+
+                // adding to todo list
+                mMonthTb.add(monthTb);
+            } while (c.moveToNext());
+        }
+
+        return mMonthTb;
+    }
+
     //Get Entry Account2Group
     public List<Account2Group> getAccount2Group(String query) {
         List<Account2Group> mAccount2Groups = new ArrayList<>();
@@ -652,7 +699,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         List<ProfitLoss> mProfitLoss = new ArrayList<>();
 
 
-        Log.e(LOG, query);
+        Log.e("Query", query);
 
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor c = db.rawQuery(query, null);
@@ -662,7 +709,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         if (c.moveToFirst()) {
             do {
                 ProfitLoss profitLoss = new ProfitLoss();
-                Log.e("SSSSS",c.getString(c.getColumnIndex("ClientID")));
+                Log.e("SSSSS",c.getString(c.getColumnIndex("CBDate")));
 
                 profitLoss.setClientID(c.getString(c.getColumnIndex("ClientID")));
                 profitLoss.setCBDate(c.getString(c.getColumnIndex("CBDate")));

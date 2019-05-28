@@ -37,7 +37,6 @@ public class ReportsAdapter extends RecyclerView.Adapter {
     List<BalSheet> mList4;
     List<ProfitLoss> mList5;
 
-    int mCredit = 0, mDebit = 0;
     String baSheet, proLoss;
 
     int typeSet;
@@ -109,12 +108,6 @@ public class ReportsAdapter extends RecyclerView.Adapter {
 //                ((CashBookHolder)viewHolder).balance.setText(cashBook.getBal());
                 ((CashBookHolder)viewHolder).debit_bal.setText(cashBook.getDebitBal());
                 ((CashBookHolder)viewHolder).credit_bal.setText(cashBook.getCreditBal());
-
-                mCredit = mCredit + Integer.valueOf(cashBook.getCreditBal());
-                mDebit = mDebit + Integer.valueOf(cashBook.getDebitBal());
-
-                ReportsFragment.cre_total.setText(String.valueOf(mCredit));
-                ReportsFragment.deb_total.setText(String.valueOf(mDebit));
 
                 ((CashBookHolder)viewHolder).itemView.setOnClickListener(new View.OnClickListener() {
                     @Override

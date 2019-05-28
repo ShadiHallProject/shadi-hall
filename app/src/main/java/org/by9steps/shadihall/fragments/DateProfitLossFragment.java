@@ -218,6 +218,10 @@ public class DateProfitLossFragment extends Fragment implements View.OnClickList
     }
 
     public void getProfitloss(){
+        mList.clear();
+        income = 0; expense = 0; profit = 0;
+        gIncome = 0; gExpense = 0; gProfit = 0;
+        m=0;
 
         List<User> list = User.listAll(User.class);
         for (User u : list){
@@ -240,7 +244,7 @@ public class DateProfitLossFragment extends Fragment implements View.OnClickList
                     "GROUP BY ClientID, CBDate\n" +
                     "HAVING        (ClientID = "+u.getClientID()+")"+ orderby;
 
-            Log.e("PROFIT-LOSS QUERY",query);
+//            Log.e("PROFIT-LOSS QUERY",query);
             profitLossList = databaseHelper.getProfitLoss(query);
         }
 
@@ -283,6 +287,7 @@ public class DateProfitLossFragment extends Fragment implements View.OnClickList
         mList.add(ProfitLoss.createTotal(String.valueOf(income),String.valueOf(expense),String.valueOf(profit)));
         mList.add(ProfitLoss.createSection("Grand Total"));
         mList.add(ProfitLoss.createTotal(String.valueOf(gIncome),String.valueOf(gExpense),String.valueOf(gProfit)));
+
         adapter = new ProfitLossDateAdapter(getContext(),mList);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(adapter);
@@ -481,6 +486,7 @@ public class DateProfitLossFragment extends Fragment implements View.OnClickList
             status = 0;
             orderby = " ORDER BY " + order_by + " ASC";
         }
+        Log.e("Order","By Click");
         getProfitloss();
     }
 
@@ -575,7 +581,7 @@ public class DateProfitLossFragment extends Fragment implements View.OnClickList
         table.setWidthPercentage(100);
         table.getDefaultCell().setVerticalAlignment(Element.ALIGN_MIDDLE);
         table.setSpacingBefore(20);
-        table.addCell("");
+        table.addCell("Date");
         table.addCell("Income");
         table.addCell("Expense");
         table.addCell("Profit");
@@ -610,7 +616,7 @@ public class DateProfitLossFragment extends Fragment implements View.OnClickList
                     table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
                     table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
 
-                    table.addCell(getCell("", PdfPCell.ALIGN_LEFT));
+                    table.addCell(getCell(c.getCBDate(), PdfPCell.ALIGN_LEFT));
                     table.addCell(getCell(c.getIncome(), PdfPCell.ALIGN_RIGHT));
                     table.addCell(getCell(c.getExpense(), PdfPCell.ALIGN_RIGHT));
                     table.addCell(getCell(c.getProfit(), PdfPCell.ALIGN_RIGHT));
@@ -622,7 +628,7 @@ public class DateProfitLossFragment extends Fragment implements View.OnClickList
                     gExpense = Integer.valueOf(c.getExpense()) + gExpense;
                     gProfit = Integer.valueOf(c.getProfit()) + gProfit;
                 }else if (d.equals(separated[1])){
-                    table.addCell(getCell("", PdfPCell.ALIGN_LEFT));
+                    table.addCell(getCell(c.getCBDate(), PdfPCell.ALIGN_LEFT));
                     table.addCell(getCell(c.getIncome(), PdfPCell.ALIGN_RIGHT));
                     table.addCell(getCell(c.getExpense(), PdfPCell.ALIGN_RIGHT));
                     table.addCell(getCell(c.getProfit(), PdfPCell.ALIGN_RIGHT));
@@ -651,7 +657,7 @@ public class DateProfitLossFragment extends Fragment implements View.OnClickList
                     table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
                     table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
 
-                    table.addCell(getCell("", PdfPCell.ALIGN_LEFT));
+                    table.addCell(getCell(c.getCBDate(), PdfPCell.ALIGN_LEFT));
                     table.addCell(getCell(c.getIncome(), PdfPCell.ALIGN_RIGHT));
                     table.addCell(getCell(c.getExpense(), PdfPCell.ALIGN_RIGHT));
                     table.addCell(getCell(c.getProfit(), PdfPCell.ALIGN_RIGHT));
@@ -680,7 +686,7 @@ public class DateProfitLossFragment extends Fragment implements View.OnClickList
                     table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
                     table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
 
-                    table.addCell(getCell("", PdfPCell.ALIGN_LEFT));
+                    table.addCell(getCell(c.getCBDate(), PdfPCell.ALIGN_LEFT));
                     table.addCell(getCell(c.getIncome(), PdfPCell.ALIGN_RIGHT));
                     table.addCell(getCell(c.getExpense(), PdfPCell.ALIGN_RIGHT));
                     table.addCell(getCell(c.getProfit(), PdfPCell.ALIGN_RIGHT));
@@ -692,7 +698,7 @@ public class DateProfitLossFragment extends Fragment implements View.OnClickList
                     gExpense = Integer.valueOf(c.getExpense()) + gExpense;
                     gProfit = Integer.valueOf(c.getProfit()) + gProfit;
                 }else if (d.equals(separated[1])){
-                    table.addCell(getCell("", PdfPCell.ALIGN_LEFT));
+                    table.addCell(getCell(c.getCBDate(), PdfPCell.ALIGN_LEFT));
                     table.addCell(getCell(c.getIncome(), PdfPCell.ALIGN_RIGHT));
                     table.addCell(getCell(c.getExpense(), PdfPCell.ALIGN_RIGHT));
                     table.addCell(getCell(c.getProfit(), PdfPCell.ALIGN_RIGHT));
@@ -721,7 +727,7 @@ public class DateProfitLossFragment extends Fragment implements View.OnClickList
                     table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
                     table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
 
-                    table.addCell(getCell("", PdfPCell.ALIGN_LEFT));
+                    table.addCell(getCell(c.getCBDate(), PdfPCell.ALIGN_LEFT));
                     table.addCell(getCell(c.getIncome(), PdfPCell.ALIGN_RIGHT));
                     table.addCell(getCell(c.getExpense(), PdfPCell.ALIGN_RIGHT));
                     table.addCell(getCell(c.getProfit(), PdfPCell.ALIGN_RIGHT));

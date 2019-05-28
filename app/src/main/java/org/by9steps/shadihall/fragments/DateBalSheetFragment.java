@@ -236,6 +236,11 @@ public class DateBalSheetFragment extends Fragment implements View.OnClickListen
 
     public void getBalsheet(){
 
+        mList.clear();
+        capital = 0; profitLoss = 0; liabilities = 0; cpl = 0; assets = 0;
+        gCapital = 0; gProfitLoss = 0; gLiabilities = 0; gCpl = 0; gAssets = 0;
+        m = 0;
+
         List<User> list = User.listAll(User.class);
         for (User u : list) {
             String query = "SELECT        CBDate, SUM(Capital) AS Capital, SUM(Expense) + SUM(Revenue) AS ProfitLoss, SUM(Liabilities) AS Liabilities, SUM(Expense) + SUM(Revenue) + SUM(Capital) + SUM(Liabilities) AS [C + P + L], SUM(Assets) AS Assets,\n" +
@@ -264,7 +269,7 @@ public class DateBalSheetFragment extends Fragment implements View.OnClickListen
         for (BalSheet b : balSheetList) {
             String[] separated = b.getCBDate().split("-");
             if (m == 0) {
-                mList.add(BalSheet.createSection(separated[1] + "/" + separated[2]));
+                mList.add(BalSheet.createSection(separated[0] + "/" + separated[1]));
                 mList.add(BalSheet.createRow(b.getCBDate(), b.getCapital(), b.getProfitLoss(), b.getLiabilities(), b.getC_P_L(), b.getAssets(), b.getClientID()));
                 m = Integer.valueOf(separated[1]);
 
@@ -307,7 +312,7 @@ public class DateBalSheetFragment extends Fragment implements View.OnClickListen
                 gLiabilities = Integer.valueOf(b.getLiabilities()) + gLiabilities;
                 gCpl = Integer.valueOf(b.getC_P_L()) + gCpl;
                 gAssets = Integer.valueOf(b.getAssets()) + gAssets;
-                mList.add(BalSheet.createSection(separated[1] + "/" + separated[2]));
+                mList.add(BalSheet.createSection(separated[0] + "/" + separated[1]));
                 mList.add(BalSheet.createRow(b.getCBDate(), b.getCapital(), b.getProfitLoss(), b.getLiabilities(), b.getC_P_L(), b.getAssets(), b.getClientID()));
                 m = Integer.valueOf(separated[1]);
             }
@@ -532,8 +537,8 @@ public class DateBalSheetFragment extends Fragment implements View.OnClickListen
                 orderBy(orderBy);
                 break;
             case R.id.dbs_cpl:
-                orderBy = "C_P_L";
-//                getBalsheet();
+                orderBy = "'C + P + L'";
+                orderBy(orderBy);
                 break;
             case R.id.dbs_assets:
                 orderBy = "Assets";
@@ -643,7 +648,7 @@ public class DateBalSheetFragment extends Fragment implements View.OnClickListen
         table.setWidthPercentage(100);
         table.getDefaultCell().setVerticalAlignment(Element.ALIGN_MIDDLE);
         table.setSpacingBefore(20);
-        table.addCell("");
+        table.addCell("Date");
         table.addCell("Capital");
         table.addCell("ProfitLoss");
         table.addCell("Liabilities");
@@ -683,7 +688,7 @@ public class DateBalSheetFragment extends Fragment implements View.OnClickListen
                     table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
                     table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
 
-                    table.addCell(getCell("", PdfPCell.ALIGN_LEFT));
+                    table.addCell(getCell(c.getCBDate(), PdfPCell.ALIGN_LEFT));
                     table.addCell(getCell(c.getCapital(), PdfPCell.ALIGN_RIGHT));
                     table.addCell(getCell(c.getProfitLoss(), PdfPCell.ALIGN_RIGHT));
                     table.addCell(getCell(c.getLiabilities(), PdfPCell.ALIGN_RIGHT));
@@ -701,7 +706,7 @@ public class DateBalSheetFragment extends Fragment implements View.OnClickListen
                     gCpl = Integer.valueOf(c.getC_P_L()) + gCpl;
                     gAssets = Integer.valueOf(c.getAssets()) + gAssets;
                 }else if (d.equals(separated[1])){
-                    table.addCell(getCell("", PdfPCell.ALIGN_LEFT));
+                    table.addCell(getCell(c.getCBDate(), PdfPCell.ALIGN_LEFT));
                     table.addCell(getCell(c.getCapital(), PdfPCell.ALIGN_RIGHT));
                     table.addCell(getCell(c.getProfitLoss(), PdfPCell.ALIGN_RIGHT));
                     table.addCell(getCell(c.getLiabilities(), PdfPCell.ALIGN_RIGHT));
@@ -740,7 +745,7 @@ public class DateBalSheetFragment extends Fragment implements View.OnClickListen
                     table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
                     table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
 
-                    table.addCell(getCell("", PdfPCell.ALIGN_LEFT));
+                    table.addCell(getCell(c.getCBDate(), PdfPCell.ALIGN_LEFT));
                     table.addCell(getCell(c.getCapital(), PdfPCell.ALIGN_RIGHT));
                     table.addCell(getCell(c.getProfitLoss(), PdfPCell.ALIGN_RIGHT));
                     table.addCell(getCell(c.getLiabilities(), PdfPCell.ALIGN_RIGHT));
@@ -777,7 +782,7 @@ public class DateBalSheetFragment extends Fragment implements View.OnClickListen
                     table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
                     table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
 
-                    table.addCell(getCell("", PdfPCell.ALIGN_LEFT));
+                    table.addCell(getCell(c.getCBDate(), PdfPCell.ALIGN_LEFT));
                     table.addCell(getCell(c.getCapital(), PdfPCell.ALIGN_RIGHT));
                     table.addCell(getCell(c.getProfitLoss(), PdfPCell.ALIGN_RIGHT));
                     table.addCell(getCell(c.getLiabilities(), PdfPCell.ALIGN_RIGHT));
@@ -795,7 +800,7 @@ public class DateBalSheetFragment extends Fragment implements View.OnClickListen
                     gCpl = Integer.valueOf(c.getC_P_L()) + gCpl;
                     gAssets = Integer.valueOf(c.getAssets()) + gAssets;
                 }else if (d.equals(separated[1])){
-                    table.addCell(getCell("", PdfPCell.ALIGN_LEFT));
+                    table.addCell(getCell(c.getCBDate(), PdfPCell.ALIGN_LEFT));
                     table.addCell(getCell(c.getCapital(), PdfPCell.ALIGN_RIGHT));
                     table.addCell(getCell(c.getProfitLoss(), PdfPCell.ALIGN_RIGHT));
                     table.addCell(getCell(c.getLiabilities(), PdfPCell.ALIGN_RIGHT));
@@ -834,7 +839,7 @@ public class DateBalSheetFragment extends Fragment implements View.OnClickListen
                     table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
                     table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
 
-                    table.addCell(getCell("", PdfPCell.ALIGN_LEFT));
+                    table.addCell(getCell(c.getCBDate(), PdfPCell.ALIGN_LEFT));
                     table.addCell(getCell(c.getCapital(), PdfPCell.ALIGN_RIGHT));
                     table.addCell(getCell(c.getProfitLoss(), PdfPCell.ALIGN_RIGHT));
                     table.addCell(getCell(c.getLiabilities(), PdfPCell.ALIGN_RIGHT));

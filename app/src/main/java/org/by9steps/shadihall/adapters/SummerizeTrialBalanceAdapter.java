@@ -1,6 +1,7 @@
 package org.by9steps.shadihall.adapters;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
@@ -10,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import org.by9steps.shadihall.R;
+import org.by9steps.shadihall.activities.MenuClickActivity;
 import org.by9steps.shadihall.model.ProfitLoss;
 import org.by9steps.shadihall.model.Recovery;
 import org.by9steps.shadihall.model.Summerize;
@@ -50,13 +52,22 @@ public class SummerizeTrialBalanceAdapter extends RecyclerView.Adapter {
         final Summerize summerize = mList.get(position);
 
         if (summerize.isRow() == 1) {
-            ((ItemViewHolder)viewHolder).ac_type.setText(summerize.getAcTypeName());
             ((ItemViewHolder)viewHolder).ac_group.setText(summerize.getAcGruopName());
 //                ((SummerizeTrailBalance)viewHolder).debit.setText(summerize.getDebit());
 //                ((SummerizeTrailBalance)viewHolder).credit.setText(summerize.getCredit());
 //                ((SummerizeTrailBalance)viewHolder).balance.setText(summerize.getBal());
             ((ItemViewHolder)viewHolder).debit_bal.setText(summerize.getDebitBL());
             ((ItemViewHolder)viewHolder).credit_bal.setText(summerize.getCreditBL());
+
+            ((ItemViewHolder)viewHolder).itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(mCtx, MenuClickActivity.class);
+                    intent.putExtra("message",summerize.getAcGruopName());
+                    intent.putExtra("position",String.valueOf(position));
+                    mCtx.startActivity(intent);
+                }
+            });
 
         }else if (summerize.isRow() == 2){
             ((TotalViewHolder)viewHolder).debit_bal.setText(summerize.getDebitBL());
@@ -94,7 +105,7 @@ public class SummerizeTrialBalanceAdapter extends RecyclerView.Adapter {
         public ItemViewHolder(View itemView) {
             super(itemView);
 
-            ac_type = itemView.findViewById(R.id.ac_type);
+//            ac_type = itemView.findViewById(R.id.ac_type);
             ac_group = itemView.findViewById(R.id.ac_group);
 //            debit = itemView.findViewById(R.id.debit);
 //            credit = itemView.findViewById(R.id.credit);

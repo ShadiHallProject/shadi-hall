@@ -11,82 +11,75 @@
         card_view:cardCornerRadius="8dp"
         android:layout_marginTop="5dp">
 
-
         <LinearLayout
-            android:paddingTop="5dp"
-            android:paddingBottom="5dp"
+            android:id="@+id/footer"
             android:layout_marginTop="5dp"
             android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
             <TextView
-                android:id="@+id/date"
+                android:id="@+id/mtb_acname"
                 android:textAlignment="textStart"
                 android:textSize="@dimen/textSize"
                 android:layout_margin="3dp"
                 android:layout_width="@dimen/hundred_dp"
                 android:layout_height="wrap_content"
-                android:text="@string/expensed"/>
+                android:text="@string/ac_name"/>
 
             <TextView
-                android:id="@+id/capital"
+                android:id="@+id/mtb_predebit"
                 android:textAlignment="textEnd"
                 android:textSize="@dimen/textSize"
                 android:layout_margin="3dp"
                 android:layout_width="@dimen/hundred_dp"
                 android:layout_height="wrap_content"
-                android:text="@string/Recieved"/>
-
+                android:text="@string/debit"/>
             <TextView
-                android:id="@+id/profit_loss"
+                android:id="@+id/mtb_precredit"
                 android:textAlignment="textEnd"
                 android:textSize="@dimen/textSize"
                 android:layout_margin="3dp"
                 android:layout_width="@dimen/hundred_dp"
                 android:layout_height="wrap_content"
-                android:text="@string/expensed"/>
+                android:text="@string/credit"/>
 
             <TextView
-                android:id="@+id/liabilities"
+                android:id="@+id/mtb_tradebit"
                 android:textAlignment="textEnd"
                 android:textSize="@dimen/textSize"
                 android:layout_margin="3dp"
                 android:layout_width="@dimen/hundred_dp"
                 android:layout_height="wrap_content"
-                android:text="@string/expensed"/>
+                android:text="@string/debit"/>
 
             <TextView
-                android:id="@+id/c_p_l"
+                android:id="@+id/mtb_tracredit"
                 android:textAlignment="textEnd"
                 android:textSize="@dimen/textSize"
                 android:layout_margin="3dp"
                 android:layout_width="@dimen/hundred_dp"
                 android:layout_height="wrap_content"
-                android:text="@string/Recieved"/>
-
+                android:text="@string/credit"/>
             <TextView
-                android:id="@+id/assets"
+                android:id="@+id/mtb_clodebit"
                 android:textAlignment="textEnd"
                 android:textSize="@dimen/textSize"
                 android:layout_margin="3dp"
                 android:layout_width="@dimen/hundred_dp"
                 android:layout_height="wrap_content"
-                android:text="@string/expensed"/>
+                android:text="@string/debit"/>
 
             <TextView
-                android:visibility="gone"
-                android:id="@+id/sorting"
+                android:id="@+id/mtb_clocredit"
                 android:textAlignment="textEnd"
                 android:textSize="@dimen/textSize"
                 android:layout_margin="3dp"
                 android:layout_width="@dimen/hundred_dp"
                 android:layout_height="wrap_content"
-                android:text="@string/expensed"/>
-
+                android:text="@string/credit"/>
 
         </LinearLayout>
-
 
     </android.support.v7.widget.CardView>
 

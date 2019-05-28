@@ -20,18 +20,18 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <TextView
-                android:id="@+id/ac_type"
-                android:textAlignment="center"
-                android:textSize="@dimen/textSize"
-                android:layout_margin="3dp"
-                android:layout_width="@dimen/hundred_dp"
-                android:layout_height="wrap_content"
-                android:text="@string/expensed"/>
+            <!--<TextView-->
+                <!--android:id="@+id/ac_type"-->
+                <!--android:textAlignment="center"-->
+                <!--android:textSize="@dimen/textSize"-->
+                <!--android:layout_margin="3dp"-->
+                <!--android:layout_width="@dimen/hundred_dp"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:text="@string/expensed"/>-->
 
             <TextView
                 android:id="@+id/ac_group"
-                android:textAlignment="center"
+                android:textAlignment="textStart"
                 android:textSize="@dimen/textSize"
                 android:layout_margin="3dp"
                 android:layout_width="@dimen/hundred_dp"
@@ -67,7 +67,7 @@
 
             <TextView
                 android:id="@+id/deb_balance"
-                android:textAlignment="center"
+                android:textAlignment="textEnd"
                 android:textSize="@dimen/textSize"
                 android:layout_margin="3dp"
                 android:layout_width="@dimen/hundred_dp"
@@ -76,7 +76,7 @@
 
             <TextView
                 android:id="@+id/cre_balance"
-                android:textAlignment="center"
+                android:textAlignment="textEnd"
                 android:textSize="@dimen/textSize"
                 android:layout_margin="3dp"
                 android:layout_width="@dimen/hundred_dp"

@@ -56,6 +56,30 @@ public class SelectDateFragment extends DialogFragment implements DatePickerDial
             }
             CashBookFragment.date2.setText(String.valueOf(year+"-" +m+"-"+d));
             AppController.fDate2 = "";
+        }else if (AppController.date.equals("Summarize")){
+            String d = String.valueOf(day), m = String.valueOf(month);
+            if (month<10){
+                m = "0"+String.valueOf(month);
+            }
+            if (day<10){
+                d = "0"+String.valueOf(day);
+            }
+            SummerizeTrailBalFragment.date_picker.setText(year+"-"+m+"-"+d);
+            AppController.date = "";
+        }else if (AppController.date.equals("MonthTB1") || AppController.date.equals("MonthTB2")){
+            String d = String.valueOf(day), m = String.valueOf(month);
+            if (month<10){
+                m = "0"+String.valueOf(month);
+            }
+            if (day<10){
+                d = "0"+String.valueOf(day);
+            }
+            if (AppController.date.equals("MonthTB1")) {
+                MonthTrialBalance.date_picker1.setText(year + "-" + m + "-" + d);
+            }else if (AppController.date.equals("MonthTB2")){
+                MonthTrialBalance.date_picker1.setText(year + "-" + m + "-" + d);
+            }
+            AppController.date = "";
         }else {
             ReportsFragment.date_picker.setText(year+"-"+month+"-"+day);
         }

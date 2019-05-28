@@ -17,21 +17,7 @@
             android:id="@+id/dpl_spinner"
             android:layout_width="120dp"
             android:layout_height="45dp"/>
-        <!--<Button-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:text="Filter"-->
-        <!--android:textColor="@color/colorPrimaryDark"-->
-        <!--android:id="@+id/btn_filter"/>-->
 
-        <!--<EditText
-            android:paddingTop="@dimen/ten_dp"
-            android:paddingBottom="@dimen/ten_dp"
-            android:drawableLeft="@drawable/ic_search_black_36dp"
-            android:layout_alignParentTop="true"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/dpl_search"/>-->
         <android.support.v7.widget.SearchView
             android:id="@+id/dpl_search"
             android:layout_width="match_parent"

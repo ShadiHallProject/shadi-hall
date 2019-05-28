@@ -7,6 +7,7 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -20,7 +21,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.DefaultRetryPolicy;
@@ -80,7 +84,7 @@ import java.util.Map;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class SummerizeTrailBalFragment extends Fragment {
+public class SummerizeTrailBalFragment extends Fragment implements View.OnClickListener {
 
     ProgressDialog mProgress;
     String currentDate;
@@ -90,10 +94,14 @@ public class SummerizeTrailBalFragment extends Fragment {
     List<Summerize> filterdList;
 
     RecyclerView recyclerView;
+    TextView acType, acGroup, debitBal, creditBal;
     List<Summerize> mList = new ArrayList<>();
     String m = "First";
     int debBal, creBal;
     int gDebBal, gCreBal;
+
+    static Button date_picker;
+    ImageView refresh;
 
     SearchView searchView;
     Spinner spinner;
@@ -103,6 +111,11 @@ public class SummerizeTrailBalFragment extends Fragment {
     //Print
     private static final String TAG = "PdfCreatorActivity";
     private File pdfFile;
+
+    //Sorting
+    String orderBy = "AcTypeName";
+    int status = 0;
+    String orderby = " ORDER BY " + orderBy + " DESC";
 
 
     public SummerizeTrailBalFragment() {
@@ -118,71 +131,31 @@ public class SummerizeTrailBalFragment extends Fragment {
 
         setHasOptionsMenu(true);
 
+        date_picker = view.findViewById(R.id.date_picker);
+        refresh = view.findViewById(R.id.refresh);
         recyclerView = view.findViewById(R.id.recycler);
         spinner = view.findViewById(R.id.sum_trial_spinner);
         searchView = view.findViewById(R.id.sum_trial_search);
+//        acType = view.findViewById(R.id.stb_acType);
+        acGroup = view.findViewById(R.id.stb_acGroup);
+        debitBal = view.findViewById(R.id.stb_debitBal);
+        creditBal = view.findViewById(R.id.stb_creditBal);
+
+//        acType.setOnClickListener(this);
+        acGroup.setOnClickListener(this);
+        debitBal.setOnClickListener(this);
+        creditBal.setOnClickListener(this);
+        refresh.setOnClickListener(this);
+        date_picker.setOnClickListener(this);
+
         databaseHelper = new DatabaseHelper(getContext());
 
         Date date = new Date();
         SimpleDateFormat curFormater = new SimpleDateFormat("yyyy-MM-dd");
-        currentDate = curFormater.format(date);
+        date_picker.setText(curFormater.format(date));
 
-        List<User> list = User.listAll(User.class);
-        for (User u : list){
-            String query = "SELECT        Account1Type.AcTypeID, Account1Type.AcTypeName, Account2Group.AcGroupID, Account2Group.AcGruopName, SUM(derivedtbl_1.Debit) AS Debit, SUM(derivedtbl_1.Credit) AS Credit, derivedtbl_1.ClientID,\n" +
-                    "                         SUM(derivedtbl_1.Debit) - SUM(derivedtbl_1.Credit) AS Bal, CASE WHEN (SUM(Debit) - SUM(Credit)) > 0 THEN (SUM(Debit) - SUM(Credit)) ELSE 0 END AS DebitBL, CASE WHEN (SUM(Debit) - SUM(Credit)) < 0 THEN (SUM(Debit)\n" +
-                    "                         - SUM(Credit)) ELSE 0 END AS CreditBL\n" +
-                    "FROM            (SELECT        CreditAccount AS AccountID, 0 AS Debit, Amount AS Credit, ClientID, CBDate\n" +
-                    "                          FROM            CashBook AS CashBook\n" +
-                    "                          WHERE        (ClientID = "+u.getClientID()+") AND (CBDate <= '"+currentDate+"')\n" +
-                    "                          UNION ALL\n" +
-                    "                          SELECT        DebitAccount AS AccountID, Amount AS Debit, 0 AS Credit, ClientID, CBDate\n" +
-                    "                          FROM            CashBook AS CashBook_1\n" +
-                    "                          WHERE        (ClientID = "+u.getClientID()+") AND (CBDate <= '"+currentDate+"')) AS derivedtbl_1 INNER JOIN\n" +
-                    "                         Account3Name ON derivedtbl_1.AccountID = Account3Name.AcNameID INNER JOIN\n" +
-                    "                         Account2Group ON Account3Name.AcGroupID = Account2Group.AcGroupID INNER JOIN\n" +
-                    "                         Account1Type ON Account2Group.AcTypeID = Account1Type.AcTypeID\n" +
-                    "GROUP BY derivedtbl_1.ClientID, Account2Group.AcGroupID, Account2Group.AcGruopName, Account1Type.AcTypeName, Account1Type.AcTypeID";
-            summerizeList = databaseHelper.getSummerizeTB(query);
-        }
-
-        for (Summerize s : summerizeList){
-            if (m.equals("First")) {
-                mList.add(Summerize.createSection(s.getAcTypeName()));
-                mList.add(Summerize.createRow(s.getAcTypeID(),s.getAcTypeName(),s.getAcGroupID(),s.getAcGruopName(),s.getDebit(),s.getCredit(),s.getClientID(),s.getBal(),s.getDebitBL(),s.getCreditBL()));
-                m = s.getAcTypeName();
-
-                debBal = Integer.valueOf(s.getDebitBL()) + debBal;
-                creBal = Integer.valueOf(s.getCreditBL()) + creBal;
-                gDebBal = Integer.valueOf(s.getDebitBL()) + gDebBal;
-                gCreBal = Integer.valueOf(s.getCreditBL()) + gCreBal;
-
-            }else if (m.equals(s.getAcTypeName())){
-                debBal = Integer.valueOf(s.getDebitBL()) + debBal;
-                creBal = Integer.valueOf(s.getCreditBL()) + creBal;
-                gDebBal = Integer.valueOf(s.getDebitBL()) + gDebBal;
-                gCreBal = Integer.valueOf(s.getCreditBL()) + gCreBal;
-                mList.add(Summerize.createRow(s.getAcTypeID(),s.getAcTypeName(),s.getAcGroupID(),s.getAcGruopName(),s.getDebit(),s.getCredit(),s.getClientID(),s.getBal(),s.getDebitBL(),s.getCreditBL()));
-            }else {
-                mList.add(Summerize.createTotal(String.valueOf(debBal),String.valueOf(creBal)));
-                debBal = 0; creBal = 0;
-                debBal = Integer.valueOf(s.getDebitBL()) + debBal;
-                creBal = Integer.valueOf(s.getCreditBL()) + creBal;
-                gDebBal = Integer.valueOf(s.getDebitBL()) + gDebBal;
-                gCreBal = Integer.valueOf(s.getCreditBL()) + gCreBal;
-                mList.add(Summerize.createSection(s.getAcTypeName()));
-                mList.add(Summerize.createRow(s.getAcTypeID(),s.getAcTypeName(),s.getAcGroupID(),s.getAcGruopName(),s.getDebit(),s.getCredit(),s.getClientID(),s.getBal(),s.getDebitBL(),s.getCreditBL()));
-                m = s.getAcTypeName();
-            }
-        }
-        mList.add(Summerize.createTotal(String.valueOf(debBal),String.valueOf(creBal)));
-        mList.add(Summerize.createSection("Grand Total"));
-        mList.add(Summerize.createTotal(String.valueOf(gDebBal),String.valueOf(gCreBal)));
-        adapter = new SummerizeTrialBalanceAdapter(getContext(),mList);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        recyclerView.setAdapter(adapter);
-        m = "First";
-//        getSummerize();
+//        m = "First";
+        getSummerize();
 
         // Spinner Drop down elements
         List<String> spinner_list = new ArrayList<String>();
@@ -253,114 +226,305 @@ public class SummerizeTrailBalFragment extends Fragment {
         return view;
     }
 
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()){
+            case R.id.stb_acGroup:
+                orderBy = "AcGruopName";
+                orderBy(orderBy);
+                break;
+//            case R.id.stb_acType:
+//                orderBy = "AcTypeName";
+//                orderBy(orderBy);
+//                break;
+            case R.id.stb_debitBal:
+                orderBy = "DebitBL";
+                orderBy(orderBy);
+                break;
+            case R.id.stb_creditBal:
+                orderBy = "CreditBL";
+                orderBy(orderBy);
+                break;
+            case R.id.date_picker:
+                AppController.date = "Summarize";
+                DialogFragment newFragment = new SelectDateFragment();
+                newFragment.show(getFragmentManager(), "DatePicker");
+                break;
+            case R.id.refresh:
+                getSummerize();
+                filter = 0;
+                searchView.setQuery("", false);
+                searchView.clearFocus();
+                break;
+        }
+    }
+
+    public void orderBy(String order_by){
+        if (status == 0) {
+            status = 1;
+            orderby = " ORDER BY " + order_by + " DESC";
+        } else {
+            status = 0;
+            orderby = " ORDER BY " + order_by + " ASC";
+        }
+        getSummerize();
+    }
 
     public void getSummerize(){
-        mProgress = new ProgressDialog(getContext());
-        mProgress.setTitle("Loading");
-        mProgress.setMessage("Please wait...");
-        mProgress.setCanceledOnTouchOutside(false);
-        mProgress.show();
 
-        String tag_json_obj = "json_obj_req";
-        String u = "http://69.167.137.121/plesk-site-preview/sky.com.pk/shadiHall/SummerizeTrailBalance.php";
+        mList.clear();
+        debBal = 0; creBal = 0;
+        gDebBal = 0; gCreBal = 0;
+        m = "First";
 
-        StringRequest jsonObjectRequest = new StringRequest(com.android.volley.Request.Method.POST, u,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        mProgress.dismiss();
-                        JSONObject jsonObj = null;
+        currentDate = date_picker.getText().toString();
 
-                        try {
-                            jsonObj= new JSONObject(response);
-                            JSONArray jsonArray = jsonObj.getJSONArray("Summerize");
-                            Log.e("SSSSS",jsonArray.toString());
-                            String success = jsonObj.getString("success");
-                            if (success.equals("1")){
-//                                Account3Name.deleteAll(Account3Name.class);
-                                for (int i = 0; i < jsonArray.length(); i++) {
-                                    JSONObject jsonObject = jsonArray.getJSONObject(i);
-                                    Log.e("Recovery",jsonObject.toString());
-                                    String AcTypeID = jsonObject.getString("AcTypeID");
-                                    String AcTypeName = jsonObject.getString("AcTypeName");
-                                    String AcGroupID = jsonObject.getString("AcGroupID");
-                                    String AcGruopName = jsonObject.getString("AcGruopName");
-                                    String Debit = jsonObject.getString("Debit");
-                                    String Credit = jsonObject.getString("Credit");
-                                    String ClientID = jsonObject.getString("ClientID");
-                                    String Bal = jsonObject.getString("Bal");
-                                    String DebitBL = jsonObject.getString("DebitBL");
-                                    String CreditBL = jsonObject.getString("CreditBL");
+        List<User> list = User.listAll(User.class);
+        for (User u : list){
+            String query = "SELECT        Account1Type.AcTypeID, Account1Type.AcTypeName, Account2Group.AcGroupID, Account2Group.AcGruopName, SUM(derivedtbl_1.Debit) AS Debit, SUM(derivedtbl_1.Credit) AS Credit, derivedtbl_1.ClientID,\n" +
+                    "                         SUM(derivedtbl_1.Debit) - SUM(derivedtbl_1.Credit) AS Bal, CASE WHEN (SUM(Debit) - SUM(Credit)) > 0 THEN (SUM(Debit) - SUM(Credit)) ELSE 0 END AS DebitBL, CASE WHEN (SUM(Debit) - SUM(Credit)) < 0 THEN (SUM(Debit)\n" +
+                    "                         - SUM(Credit)) ELSE 0 END AS CreditBL\n" +
+                    "FROM            (SELECT        CreditAccount AS AccountID, 0 AS Debit, Amount AS Credit, ClientID, CBDate\n" +
+                    "                          FROM            CashBook AS CashBook\n" +
+                    "                          WHERE        (ClientID = "+u.getClientID()+") AND (CBDate <= '"+currentDate+"')\n" +
+                    "                          UNION ALL\n" +
+                    "                          SELECT        DebitAccount AS AccountID, Amount AS Debit, 0 AS Credit, ClientID, CBDate\n" +
+                    "                          FROM            CashBook AS CashBook_1\n" +
+                    "                          WHERE        (ClientID = "+u.getClientID()+") AND (CBDate <= '"+currentDate+"')) AS derivedtbl_1 INNER JOIN\n" +
+                    "                         Account3Name ON derivedtbl_1.AccountID = Account3Name.AcNameID INNER JOIN\n" +
+                    "                         Account2Group ON Account3Name.AcGroupID = Account2Group.AcGroupID INNER JOIN\n" +
+                    "                         Account1Type ON Account2Group.AcTypeID = Account1Type.AcTypeID\n" +
+                    "GROUP BY derivedtbl_1.ClientID, Account2Group.AcGroupID, Account2Group.AcGruopName, Account1Type.AcTypeName, Account1Type.AcTypeID" + orderby;
+            summerizeList = databaseHelper.getSummerizeTB(query);
+        }
+//        int a = 0;
+//        List<Summerize> list1 = new ArrayList<>();
+//        List<Summerize> list2 = new ArrayList<>();
+//        List<Summerize> list3 = new ArrayList<>();
+//        List<Summerize> list4 = new ArrayList<>();
+//        for (Summerize s : summerizeList){
+//
+//            m = s.getAcTypeName();
+//
+//            if(m.equals("Assets And Liability")){
+//                list1.add(s);
+//            }else if (m.equals("Expense")){
+//                list2.add(s);
+//            }else if (m.equals("Revenue")){
+//                list3.add(s);
+//            }else if (m.equals("Capital")){
+//                list4.add(s);
+//            }
+//        }
+//
+//        debBal = 0; creBal = 0;
+//        for (Summerize s : list1){
+//            if (a == 0){
+//                mList.add(Summerize.createSection(s.getAcTypeName()));
+//                a = 1;
+//            }
+//            mList.add(Summerize.createRow(s.getAcTypeID(),s.getAcTypeName(),s.getAcGroupID(),s.getAcGruopName(),s.getDebit(),s.getCredit(),s.getClientID(),s.getBal(),s.getDebitBL(),s.getCreditBL()));
+//            debBal = Integer.valueOf(s.getDebitBL()) + debBal;
+//            creBal = Integer.valueOf(s.getCreditBL()) + creBal;
+//            gDebBal = Integer.valueOf(s.getDebitBL()) + gDebBal;
+//            gCreBal = Integer.valueOf(s.getCreditBL()) + gCreBal;
+//        }
+//        if (list1.size() > 0) {
+//            mList.add(Summerize.createTotal(String.valueOf(debBal), String.valueOf(creBal)));
+//        }
+//
+//        debBal = 0; creBal = 0;
+//        for (Summerize s : list2){
+//            if (a == 1){
+//                mList.add(Summerize.createSection(s.getAcTypeName()));
+//                a = 2;
+//            }
+//            mList.add(Summerize.createRow(s.getAcTypeID(),s.getAcTypeName(),s.getAcGroupID(),s.getAcGruopName(),s.getDebit(),s.getCredit(),s.getClientID(),s.getBal(),s.getDebitBL(),s.getCreditBL()));
+//            debBal = Integer.valueOf(s.getDebitBL()) + debBal;
+//            creBal = Integer.valueOf(s.getCreditBL()) + creBal;
+//            gDebBal = Integer.valueOf(s.getDebitBL()) + gDebBal;
+//            gCreBal = Integer.valueOf(s.getCreditBL()) + gCreBal;
+//        }
+//        if (list2.size() > 0) {
+//            mList.add(Summerize.createTotal(String.valueOf(debBal), String.valueOf(creBal)));
+//        }
+//        debBal = 0; creBal = 0;
+//        for (Summerize s : list3){
+//            if (a == 2){
+//                mList.add(Summerize.createSection(s.getAcTypeName()));
+//                a = 3;
+//            }
+//            mList.add(Summerize.createRow(s.getAcTypeID(),s.getAcTypeName(),s.getAcGroupID(),s.getAcGruopName(),s.getDebit(),s.getCredit(),s.getClientID(),s.getBal(),s.getDebitBL(),s.getCreditBL()));
+//            debBal = Integer.valueOf(s.getDebitBL()) + debBal;
+//            creBal = Integer.valueOf(s.getCreditBL()) + creBal;
+//            gDebBal = Integer.valueOf(s.getDebitBL()) + gDebBal;
+//            gCreBal = Integer.valueOf(s.getCreditBL()) + gCreBal;
+//        }
+//        if (list3.size() > 0) {
+//            mList.add(Summerize.createTotal(String.valueOf(debBal), String.valueOf(creBal)));
+//        }
+//        debBal = 0; creBal = 0;
+//        for (Summerize s : list4){
+//            if (a == 3){
+//                mList.add(Summerize.createSection(s.getAcTypeName()));
+//                a = 4;
+//            }
+//            mList.add(Summerize.createRow(s.getAcTypeID(),s.getAcTypeName(),s.getAcGroupID(),s.getAcGruopName(),s.getDebit(),s.getCredit(),s.getClientID(),s.getBal(),s.getDebitBL(),s.getCreditBL()));
+//            debBal = Integer.valueOf(s.getDebitBL()) + debBal;
+//            creBal = Integer.valueOf(s.getCreditBL()) + creBal;
+//            gDebBal = Integer.valueOf(s.getDebitBL()) + gDebBal;
+//            gCreBal = Integer.valueOf(s.getCreditBL()) + gCreBal;
+//        }
+//        if (list4.size() > 0) {
+//            mList.add(Summerize.createTotal(String.valueOf(debBal), String.valueOf(creBal)));
+//        }
 
-                                    if (m.equals("First")) {
-                                        mList.add(Summerize.createSection(AcTypeName));
-                                        mList.add(Summerize.createRow(AcTypeID,AcTypeName,AcGroupID,AcGruopName,Debit,Credit,ClientID,Bal,DebitBL,CreditBL));
-                                        m = AcTypeName;
 
-                                        debBal = Integer.valueOf(DebitBL) + debBal;
-                                        creBal = Integer.valueOf(CreditBL) + creBal;
-                                        gDebBal = Integer.valueOf(DebitBL) + gDebBal;
-                                        gCreBal = Integer.valueOf(CreditBL) + gCreBal;
+        for (Summerize s : summerizeList){
+            if (m.equals("First")) {
+                mList.add(Summerize.createSection(s.getAcTypeName()));
+                mList.add(Summerize.createRow(s.getAcTypeID(),s.getAcTypeName(),s.getAcGroupID(),s.getAcGruopName(),s.getDebit(),s.getCredit(),s.getClientID(),s.getBal(),s.getDebitBL(),s.getCreditBL()));
+                m = s.getAcTypeName();
 
-                                    }else if (m.equals(AcTypeName)){
-                                        debBal = Integer.valueOf(DebitBL) + debBal;
-                                        creBal = Integer.valueOf(CreditBL) + creBal;
-                                        gDebBal = Integer.valueOf(DebitBL) + gDebBal;
-                                        gCreBal = Integer.valueOf(CreditBL) + gCreBal;
-                                        mList.add(Summerize.createRow(AcTypeID,AcTypeName,AcGroupID,AcGruopName,Debit,Credit,ClientID,Bal,DebitBL,CreditBL));
-                                    }else {
-                                        mList.add(Summerize.createTotal(String.valueOf(debBal),String.valueOf(creBal)));
-                                        debBal = 0; creBal = 0;
-                                        debBal = Integer.valueOf(DebitBL) + debBal;
-                                        creBal = Integer.valueOf(CreditBL) + creBal;
-                                        gDebBal = Integer.valueOf(DebitBL) + gDebBal;
-                                        gCreBal = Integer.valueOf(CreditBL) + gCreBal;
-                                        mList.add(Summerize.createSection(AcTypeName));
-                                        mList.add(Summerize.createRow(AcTypeID,AcTypeName,AcGroupID,AcGruopName,Debit,Credit,ClientID,Bal,DebitBL,CreditBL));
-                                        m = AcTypeName;
-                                    }
-                                }
-                                mList.add(Summerize.createTotal(String.valueOf(debBal),String.valueOf(creBal)));
-                                mList.add(Summerize.createSection("Grand Total"));
-                                mList.add(Summerize.createTotal(String.valueOf(gDebBal),String.valueOf(gCreBal)));
-                                SummerizeTrialBalanceAdapter adapter = new SummerizeTrialBalanceAdapter(getContext(),mList);
-                                recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-                                recyclerView.setAdapter(adapter);
+                debBal = Integer.valueOf(s.getDebitBL()) + debBal;
+                creBal = Integer.valueOf(s.getCreditBL()) + creBal;
+                gDebBal = Integer.valueOf(s.getDebitBL()) + gDebBal;
+                gCreBal = Integer.valueOf(s.getCreditBL()) + gCreBal;
 
-                                mProgress.dismiss();
-
-                            }else {
-                                String message = jsonObj.getString("message");
-                                Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
-                            }
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                mProgress.dismiss();
-                Log.e("Error",error.toString());
-                Toast.makeText(getContext(), error.toString(), Toast.LENGTH_LONG).show();
+            }else if (m.equals(s.getAcTypeName())){
+                debBal = Integer.valueOf(s.getDebitBL()) + debBal;
+                creBal = Integer.valueOf(s.getCreditBL()) + creBal;
+                gDebBal = Integer.valueOf(s.getDebitBL()) + gDebBal;
+                gCreBal = Integer.valueOf(s.getCreditBL()) + gCreBal;
+                mList.add(Summerize.createRow(s.getAcTypeID(),s.getAcTypeName(),s.getAcGroupID(),s.getAcGruopName(),s.getDebit(),s.getCredit(),s.getClientID(),s.getBal(),s.getDebitBL(),s.getCreditBL()));
+            }else {
+                mList.add(Summerize.createTotal(String.valueOf(debBal),String.valueOf(creBal)));
+                debBal = 0; creBal = 0;
+                debBal = Integer.valueOf(s.getDebitBL()) + debBal;
+                creBal = Integer.valueOf(s.getCreditBL()) + creBal;
+                gDebBal = Integer.valueOf(s.getDebitBL()) + gDebBal;
+                gCreBal = Integer.valueOf(s.getCreditBL()) + gCreBal;
+                mList.add(Summerize.createSection(s.getAcTypeName()));
+                mList.add(Summerize.createRow(s.getAcTypeID(),s.getAcTypeName(),s.getAcGroupID(),s.getAcGruopName(),s.getDebit(),s.getCredit(),s.getClientID(),s.getBal(),s.getDebitBL(),s.getCreditBL()));
+                m = s.getAcTypeName();
             }
-        }){
-            @Override
-            protected Map<String, String> getParams() {
-                Map<String, String> params = new HashMap<String, String>();
-                List<User> list = User.listAll(User.class);
-                for (User u: list) {
-                    params.put("ClientID", u.getClientID());
-                    params.put("CBDate", currentDate);
-                }
-                return params;
-            }
-        };
-        int socketTimeout = 10000;//10 seconds - change to what you want
-        RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
-        jsonObjectRequest.setRetryPolicy(policy);
-        AppController.getInstance().addToRequestQueue(jsonObjectRequest, tag_json_obj);
+        }
+
+        mList.add(Summerize.createTotal(String.valueOf(debBal),String.valueOf(creBal)));
+        mList.add(Summerize.createSection("Grand Total"));
+        mList.add(Summerize.createTotal(String.valueOf(gDebBal),String.valueOf(gCreBal)));
+        adapter = new SummerizeTrialBalanceAdapter(getContext(),mList);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        recyclerView.setAdapter(adapter);
     }
+
+//    public void getSummerize(){
+//        mProgress = new ProgressDialog(getContext());
+//        mProgress.setTitle("Loading");
+//        mProgress.setMessage("Please wait...");
+//        mProgress.setCanceledOnTouchOutside(false);
+//        mProgress.show();
+//
+//        String tag_json_obj = "json_obj_req";
+//        String u = "http://69.167.137.121/plesk-site-preview/sky.com.pk/shadiHall/SummerizeTrailBalance.php";
+//
+//        StringRequest jsonObjectRequest = new StringRequest(com.android.volley.Request.Method.POST, u,
+//                new Response.Listener<String>() {
+//                    @Override
+//                    public void onResponse(String response) {
+//                        mProgress.dismiss();
+//                        JSONObject jsonObj = null;
+//
+//                        try {
+//                            jsonObj= new JSONObject(response);
+//                            JSONArray jsonArray = jsonObj.getJSONArray("Summerize");
+//                            Log.e("SSSSS",jsonArray.toString());
+//                            String success = jsonObj.getString("success");
+//                            if (success.equals("1")){
+////                                Account3Name.deleteAll(Account3Name.class);
+//                                for (int i = 0; i < jsonArray.length(); i++) {
+//                                    JSONObject jsonObject = jsonArray.getJSONObject(i);
+//                                    Log.e("Recovery",jsonObject.toString());
+//                                    String AcTypeID = jsonObject.getString("AcTypeID");
+//                                    String AcTypeName = jsonObject.getString("AcTypeName");
+//                                    String AcGroupID = jsonObject.getString("AcGroupID");
+//                                    String AcGruopName = jsonObject.getString("AcGruopName");
+//                                    String Debit = jsonObject.getString("Debit");
+//                                    String Credit = jsonObject.getString("Credit");
+//                                    String ClientID = jsonObject.getString("ClientID");
+//                                    String Bal = jsonObject.getString("Bal");
+//                                    String DebitBL = jsonObject.getString("DebitBL");
+//                                    String CreditBL = jsonObject.getString("CreditBL");
+//
+//                                    if (m.equals("First")) {
+//                                        mList.add(Summerize.createSection(AcTypeName));
+//                                        mList.add(Summerize.createRow(AcTypeID,AcTypeName,AcGroupID,AcGruopName,Debit,Credit,ClientID,Bal,DebitBL,CreditBL));
+//                                        m = AcTypeName;
+//
+//                                        debBal = Integer.valueOf(DebitBL) + debBal;
+//                                        creBal = Integer.valueOf(CreditBL) + creBal;
+//                                        gDebBal = Integer.valueOf(DebitBL) + gDebBal;
+//                                        gCreBal = Integer.valueOf(CreditBL) + gCreBal;
+//
+//                                    }else if (m.equals(AcTypeName)){
+//                                        debBal = Integer.valueOf(DebitBL) + debBal;
+//                                        creBal = Integer.valueOf(CreditBL) + creBal;
+//                                        gDebBal = Integer.valueOf(DebitBL) + gDebBal;
+//                                        gCreBal = Integer.valueOf(CreditBL) + gCreBal;
+//                                        mList.add(Summerize.createRow(AcTypeID,AcTypeName,AcGroupID,AcGruopName,Debit,Credit,ClientID,Bal,DebitBL,CreditBL));
+//                                    }else {
+//                                        mList.add(Summerize.createTotal(String.valueOf(debBal),String.valueOf(creBal)));
+//                                        debBal = 0; creBal = 0;
+//                                        debBal = Integer.valueOf(DebitBL) + debBal;
+//                                        creBal = Integer.valueOf(CreditBL) + creBal;
+//                                        gDebBal = Integer.valueOf(DebitBL) + gDebBal;
+//                                        gCreBal = Integer.valueOf(CreditBL) + gCreBal;
+//                                        mList.add(Summerize.createSection(AcTypeName));
+//                                        mList.add(Summerize.createRow(AcTypeID,AcTypeName,AcGroupID,AcGruopName,Debit,Credit,ClientID,Bal,DebitBL,CreditBL));
+//                                        m = AcTypeName;
+//                                    }
+//                                }
+//                                mList.add(Summerize.createTotal(String.valueOf(debBal),String.valueOf(creBal)));
+//                                mList.add(Summerize.createSection("Grand Total"));
+//                                mList.add(Summerize.createTotal(String.valueOf(gDebBal),String.valueOf(gCreBal)));
+//                                SummerizeTrialBalanceAdapter adapter = new SummerizeTrialBalanceAdapter(getContext(),mList);
+//                                recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+//                                recyclerView.setAdapter(adapter);
+//
+//                                mProgress.dismiss();
+//
+//                            }else {
+//                                String message = jsonObj.getString("message");
+//                                Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
+//                            }
+//                        } catch (JSONException e) {
+//                            e.printStackTrace();
+//                        }
+//                    }
+//                }, new Response.ErrorListener() {
+//            @Override
+//            public void onErrorResponse(VolleyError error) {
+//                mProgress.dismiss();
+//                Log.e("Error",error.toString());
+//                Toast.makeText(getContext(), error.toString(), Toast.LENGTH_LONG).show();
+//            }
+//        }){
+//            @Override
+//            protected Map<String, String> getParams() {
+//                Map<String, String> params = new HashMap<String, String>();
+//                List<User> list = User.listAll(User.class);
+//                for (User u: list) {
+//                    params.put("ClientID", u.getClientID());
+//                    params.put("CBDate", currentDate);
+//                }
+//                return params;
+//            }
+//        };
+//        int socketTimeout = 10000;//10 seconds - change to what you want
+//        RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
+//        jsonObjectRequest.setRetryPolicy(policy);
+//        AppController.getInstance().addToRequestQueue(jsonObjectRequest, tag_json_obj);
+//    }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
@@ -444,7 +608,7 @@ public class SummerizeTrailBalFragment extends Fragment {
             Log.i(TAG, "Created a new directory for PDF");
         }
 
-        String pdfname = "CashBook.pdf";
+        String pdfname = "TrialBalance.pdf";
         pdfFile = new File(docsFolder.getAbsolutePath(), pdfname);
         OutputStream output = new FileOutputStream(pdfFile);
 

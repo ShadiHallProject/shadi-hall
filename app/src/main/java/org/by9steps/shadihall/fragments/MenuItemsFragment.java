@@ -57,9 +57,9 @@ public class MenuItemsFragment extends Fragment {
         mReports = new ArrayList<>();
         mReports.add(new Menu("Cash Book",R.drawable.cash));
         mReports.add(new Menu("Booking",R.drawable.booking));
-        mReports.add(new Menu("Cash and Bank",R.drawable.cash));
+        mReports.add(new Menu("Cash And Bank",R.drawable.cash));
         mReports.add(new Menu("Employee",R.drawable.employee));
-        mReports.add(new Menu("Expense",R.drawable.goldenexpense));
+        mReports.add(new Menu("General Expense",R.drawable.goldenexpense));
         mReports.add(new Menu("Fixed Asset",R.drawable.goldenfixedassets));
         mReports.add(new Menu("Supplier",R.drawable.supplier));
         mReports.add(new Menu("Client",R.drawable.client));

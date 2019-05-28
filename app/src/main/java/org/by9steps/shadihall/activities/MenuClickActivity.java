@@ -71,6 +71,7 @@ public class MenuClickActivity extends AppCompatActivity {
 
 
         if (savedInstanceState == null) {
+            Log.e("MESSAGE",message);
             if (message.equals("Cash Book") && position.equals("0")) {
                 Log.e("Position", position);
                 Log.e("Message", message);
@@ -111,7 +112,11 @@ public class MenuClickActivity extends AppCompatActivity {
                 getSupportFragmentManager().beginTransaction()
                         .add(R.id.menu_container, new ListFragment())
                         .commit();
-            } else if (message.equals("Cash and Bank")) {
+            } else if (message.equals("Incom")) {
+                getSupportFragmentManager().beginTransaction()
+                        .add(R.id.menu_container, ReportsFragment.newInstance("6"))
+                        .commit();
+            }else if (message.equals("Cash And Bank")) {
                 getSupportFragmentManager().beginTransaction()
                         .add(R.id.menu_container, ReportsFragment.newInstance("0"))
                         .commit();
@@ -119,7 +124,7 @@ public class MenuClickActivity extends AppCompatActivity {
                 getSupportFragmentManager().beginTransaction()
                         .add(R.id.menu_container, ReportsFragment.newInstance("1"))
                         .commit();
-            } else if (message.equals("Expense")) {
+            } else if (message.equals("General Expense")) {
                 getSupportFragmentManager().beginTransaction()
                         .add(R.id.menu_container, ReportsFragment.newInstance("2"))
                         .commit();

@@ -152,7 +152,7 @@
         android:layout_height="wrap_content">
 
         <TextView
-            android:textAlignment="center"
+            android:textAlignment="textStart"
             android:textSize="@dimen/textSize"
             android:textColor="@color/colorPrimaryDark"
             android:textStyle="bold"
@@ -165,7 +165,7 @@
 
         <TextView
             android:id="@+id/deb_total"
-            android:textAlignment="center"
+            android:textAlignment="textEnd"
             android:textSize="@dimen/textSize"
             android:textColor="@color/colorPrimaryDark"
             android:textStyle="bold"
@@ -177,7 +177,7 @@
 
         <TextView
             android:id="@+id/cre_total"
-            android:textAlignment="center"
+            android:textAlignment="textEnd"
             android:textSize="@dimen/textSize"
             android:textColor="@color/colorPrimaryDark"
             android:textStyle="bold"

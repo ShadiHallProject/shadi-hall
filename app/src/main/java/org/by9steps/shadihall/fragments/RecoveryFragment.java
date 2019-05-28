@@ -89,7 +89,7 @@ public class RecoveryFragment extends Fragment implements View.OnClickListener {
     int m = 0, recieved, expense, chargesTotal, balance, profit;
     int gRecieved, gExpense, gChargesTotal, gBalance, gProfit;
 
-    String orderBy = "EventName";
+    String orderBy = "EventDate";
     int status = 0;
     String orderby = " ORDER BY " + orderBy + " DESC";
 
@@ -249,6 +249,10 @@ public class RecoveryFragment extends Fragment implements View.OnClickListener {
     }
 
     public void getRecoveryData(){
+
+        recieved = 0; expense = 0; chargesTotal = 0; balance = 0; profit = 0;
+        gRecieved = 0; gExpense = 0; gChargesTotal = 0; gBalance = 0; gProfit = 0;
+
         String query = "";
         List<User> list = User.listAll(User.class);
         for (User u : list) {
@@ -676,14 +680,14 @@ public class RecoveryFragment extends Fragment implements View.OnClickListener {
         title.addCell(pCell);
 
 
-        PdfPTable table = new PdfPTable(new float[]{3, 3, 3, 3, 3, 3, 3});
+        PdfPTable table = new PdfPTable(new float[]{3, 3, 3, 3, 3, 3, 3, 3});
         table.getDefaultCell().setHorizontalAlignment(Element.ALIGN_CENTER);
         table.getDefaultCell().setFixedHeight(40);
         table.setTotalWidth(PageSize.A4.getWidth());
         table.setWidthPercentage(100);
         table.getDefaultCell().setVerticalAlignment(Element.ALIGN_MIDDLE);
         table.setSpacingBefore(20);
-//        table.addCell("Event Date");
+        table.addCell("Event Date");
         table.addCell("Event Name");
         table.addCell("Client Name");
         table.addCell("Total Charges");
@@ -727,8 +731,9 @@ public class RecoveryFragment extends Fragment implements View.OnClickListener {
                     table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
                     table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
                     table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
+                    table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
 
-//                    table.addCell(getCell(c.getEventDate(), PdfPCell.ALIGN_LEFT));
+                    table.addCell(getCell(AppController.stringDateFormate("yyyy-MM-dd HH:mm:ss.SSS","yyyy-MM-dd",c.getEventDate()), PdfPCell.ALIGN_LEFT));
                     table.addCell(getCell(c.getEventName(), PdfPCell.ALIGN_LEFT));
                     table.addCell(getCell(c.getClientName(), PdfPCell.ALIGN_LEFT));
                     table.addCell(getCell(c.getChargesTotal(), PdfPCell.ALIGN_RIGHT));
@@ -748,7 +753,7 @@ public class RecoveryFragment extends Fragment implements View.OnClickListener {
                     gBalance = Integer.valueOf(c.getBalance()) + gBalance;
                     gProfit = Integer.valueOf(c.getProfit()) + gProfit;
                 }else if (d.equals(separated[1])){
-//                    table.addCell(getCell(c.getEventDate(), PdfPCell.ALIGN_LEFT));
+                    table.addCell(getCell(AppController.stringDateFormate("yyyy-MM-dd HH:mm:ss.SSS","yyyy-MM-dd",c.getEventDate()), PdfPCell.ALIGN_LEFT));
                     table.addCell(getCell(c.getEventName(), PdfPCell.ALIGN_LEFT));
                     table.addCell(getCell(c.getClientName(), PdfPCell.ALIGN_LEFT));
                     table.addCell(getCell(c.getChargesTotal(), PdfPCell.ALIGN_RIGHT));
@@ -771,7 +776,7 @@ public class RecoveryFragment extends Fragment implements View.OnClickListener {
 
                     d = separated[1];
 
-//                    table.addCell(getCell("", PdfPCell.ALIGN_LEFT));
+                    table.addCell(getCell("", PdfPCell.ALIGN_LEFT));
                     table.addCell(getCell("", PdfPCell.ALIGN_LEFT));
                     table.addCell(total);
                     table.addCell(getCell(String.valueOf(chargesTotal), PdfPCell.ALIGN_RIGHT));
@@ -792,13 +797,14 @@ public class RecoveryFragment extends Fragment implements View.OnClickListener {
                     table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
                     table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
                     table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
+                    table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
 
                     recieved = 0;
                     expense = 0;
                     chargesTotal = 0;
                     balance = 0;
                     profit = 0;
-//                    table.addCell(getCell(c.getEventDate(), PdfPCell.ALIGN_LEFT));
+                    table.addCell(getCell(AppController.stringDateFormate("yyyy-MM-dd HH:mm:ss.SSS","yyyy-MM-dd",c.getEventDate()), PdfPCell.ALIGN_LEFT));
                     table.addCell(getCell(c.getEventName(), PdfPCell.ALIGN_LEFT));
                     table.addCell(getCell(c.getClientName(), PdfPCell.ALIGN_LEFT));
                     table.addCell(getCell(c.getChargesTotal(), PdfPCell.ALIGN_RIGHT));
@@ -837,8 +843,9 @@ public class RecoveryFragment extends Fragment implements View.OnClickListener {
                     table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
                     table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
                     table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
+                    table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
 
-//                    table.addCell(getCell(c.getEventDate(), PdfPCell.ALIGN_LEFT));
+                    table.addCell(getCell(AppController.stringDateFormate("yyyy-MM-dd HH:mm:ss.SSS","yyyy-MM-dd",c.getEventDate()), PdfPCell.ALIGN_LEFT));
                     table.addCell(getCell(c.getEventName(), PdfPCell.ALIGN_LEFT));
                     table.addCell(getCell(c.getClientName(), PdfPCell.ALIGN_LEFT));
                     table.addCell(getCell(c.getChargesTotal(), PdfPCell.ALIGN_RIGHT));
@@ -858,7 +865,7 @@ public class RecoveryFragment extends Fragment implements View.OnClickListener {
                     gBalance = Integer.valueOf(c.getBalance()) + gBalance;
                     gProfit = Integer.valueOf(c.getProfit()) + gProfit;
                 }else if (d.equals(separated[1])){
-//                    table.addCell(getCell(c.getEventDate(), PdfPCell.ALIGN_LEFT));
+                    table.addCell(getCell(AppController.stringDateFormate("yyyy-MM-dd HH:mm:ss.SSS","yyyy-MM-dd",c.getEventDate()), PdfPCell.ALIGN_LEFT));
                     table.addCell(getCell(c.getEventName(), PdfPCell.ALIGN_LEFT));
                     table.addCell(getCell(c.getClientName(), PdfPCell.ALIGN_LEFT));
                     table.addCell(getCell(c.getChargesTotal(), PdfPCell.ALIGN_RIGHT));
@@ -881,7 +888,7 @@ public class RecoveryFragment extends Fragment implements View.OnClickListener {
 
                     d = separated[1];
 
-//                    table.addCell(getCell("", PdfPCell.ALIGN_LEFT));
+                    table.addCell(getCell("", PdfPCell.ALIGN_LEFT));
                     table.addCell(getCell("", PdfPCell.ALIGN_LEFT));
                     table.addCell(total);
                     table.addCell(getCell(String.valueOf(chargesTotal), PdfPCell.ALIGN_RIGHT));
@@ -902,13 +909,14 @@ public class RecoveryFragment extends Fragment implements View.OnClickListener {
                     table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
                     table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
                     table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
+                    table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
 
                     recieved = 0;
                     expense = 0;
                     chargesTotal = 0;
                     balance = 0;
                     profit = 0;
-//                    table.addCell(getCell(c.getEventDate(), PdfPCell.ALIGN_LEFT));
+                    table.addCell(getCell(AppController.stringDateFormate("yyyy-MM-dd HH:mm:ss.SSS","yyyy-MM-dd",c.getEventDate()), PdfPCell.ALIGN_LEFT));
                     table.addCell(getCell(c.getEventName(), PdfPCell.ALIGN_LEFT));
                     table.addCell(getCell(c.getClientName(), PdfPCell.ALIGN_LEFT));
                     table.addCell(getCell(c.getChargesTotal(), PdfPCell.ALIGN_RIGHT));
@@ -931,7 +939,7 @@ public class RecoveryFragment extends Fragment implements View.OnClickListener {
             }
         }
 
-//        table.addCell(getCell("", PdfPCell.ALIGN_LEFT));
+        table.addCell(getCell("", PdfPCell.ALIGN_LEFT));
         table.addCell(getCell("", PdfPCell.ALIGN_LEFT));
         table.addCell(total);
         table.addCell(getCell(String.valueOf(chargesTotal), PdfPCell.ALIGN_RIGHT));
@@ -940,7 +948,7 @@ public class RecoveryFragment extends Fragment implements View.OnClickListener {
         table.addCell(getCell(String.valueOf(balance), PdfPCell.ALIGN_RIGHT));
         table.addCell(getCell(String.valueOf(profit), PdfPCell.ALIGN_RIGHT));
 
-//        table.addCell(getCell("", PdfPCell.ALIGN_LEFT));
+        table.addCell(getCell("", PdfPCell.ALIGN_LEFT));
         table.addCell(getCell("", PdfPCell.ALIGN_LEFT));
         table.addCell(getCell("Grand Total", PdfPCell.ALIGN_CENTER));
         table.addCell(getCell(String.valueOf(gChargesTotal), PdfPCell.ALIGN_RIGHT));

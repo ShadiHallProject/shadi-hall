@@ -1,6 +1,7 @@
 package org.by9steps.shadihall;
 
 import android.app.Application;
+import android.icu.util.Calendar;
 import android.text.TextUtils;
 
 import com.android.volley.Request;
@@ -11,6 +12,7 @@ import com.android.volley.toolbox.Volley;
 import java.text.ParseException;
 import java.util.Date;
 import java.text.SimpleDateFormat;
+import java.util.Locale;
 
 public class AppController extends Application {
 

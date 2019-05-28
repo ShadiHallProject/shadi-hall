@@ -9,6 +9,7 @@ import org.by9steps.shadihall.R;
 import org.by9steps.shadihall.fragments.BookCalendarFragment;
 import org.by9steps.shadihall.fragments.ChartOfAccFragment;
 import org.by9steps.shadihall.fragments.ListFragment;
+import org.by9steps.shadihall.fragments.MonthTrialBalance;
 import org.by9steps.shadihall.fragments.SummerizeTrailBalFragment;
 
 public class TrailBalanceActivity extends AppCompatActivity {
@@ -40,7 +41,7 @@ public class TrailBalanceActivity extends AppCompatActivity {
                     .commit();
         }else if (message.equals("3")){
             getSupportFragmentManager().beginTransaction()
-                    .add(R.id.container, new ListFragment())
+                    .add(R.id.container, new MonthTrialBalance())
                     .commit();
         }
 

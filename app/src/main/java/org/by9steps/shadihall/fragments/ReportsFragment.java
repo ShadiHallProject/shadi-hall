@@ -119,7 +119,7 @@ public class ReportsFragment extends Fragment implements View.OnClickListener {
     //Print
     private File pdfFile;
 
-    public static TextView deb_total, cre_total;
+    public TextView deb_total, cre_total;
 
     // TODO: Rename and change types of parameters
     private String spPosition;
@@ -315,6 +315,14 @@ public class ReportsFragment extends Fragment implements View.OnClickListener {
             reportsList = databaseHelper.getReports(query);
             Log.e("REPORT-QUERY", query);
         }
+
+        int gCredit = 0, gDebit = 0;
+        for (Reports r : reportsList){
+            gDebit = gDebit + Integer.valueOf(r.getDebitBal());
+            gCredit = gCredit + Integer.valueOf(r.getCreditBal());
+        }
+        cre_total.setText(String.valueOf(gCredit));
+        deb_total.setText(String.valueOf(gDebit));
 
         adapter = new ReportsAdapter(getContext(), reportsList, ReportsAdapter.Cash_Book);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
