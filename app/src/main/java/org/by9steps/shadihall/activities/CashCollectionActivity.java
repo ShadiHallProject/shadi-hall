@@ -103,24 +103,10 @@ public class CashCollectionActivity extends AppCompatActivity implements View.On
 
         List<User> list = User.listAll(User.class);
         for (User u : list){
-//            query = "SELECT        Account1Type.AcTypeID, Account1Type.AcTypeName, Account2Group.AcGroupID, Account2Group.AcGruopName, derivedtbl_1.AccountID, Account3Name.AcName, SUM(derivedtbl_1.Debit) AS Debit, SUM(derivedtbl_1.Credit) \n" +
-//                    "                         AS Credit, derivedtbl_1.ClientID, SUM(derivedtbl_1.Debit) - SUM(derivedtbl_1.Credit) AS Bal, CASE WHEN (SUM(Debit) - SUM(Credit)) > 0 THEN (SUM(Debit) - SUM(Credit)) ELSE 0 END AS DebitBL, CASE WHEN (SUM(Debit) \n" +
-//                    "                         - SUM(Credit)) < 0 THEN (SUM(Debit) - SUM(Credit)) ELSE 0 END AS CreditBL, MAX(derivedtbl_1.CBDate) AS MaxDate\n" +
-//                    "FROM            (SELECT        CreditAccount AS AccountID, 0 AS Debit, Amount AS Credit, ClientID, CBDate\n" +
-//                    "                          FROM            CashBook AS CashBook\n" +
-//                    "                          WHERE        (ClientID = "+u.getClientID()+") AND (CBDate <= '"+currentDate+"')\n" +
-//                    "                          UNION ALL\n" +
-//                    "                          SELECT        DebitAccount AS AccountID, Amount AS Debit, 0 AS Credit, ClientID, CBDate\n" +
-//                    "                          FROM            CashBook AS CashBook_1\n" +
-//                    "                          WHERE        (ClientID = "+u.getClientID()+") AND (CBDate <= '"+currentDate+"')) AS derivedtbl_1 INNER JOIN\n" +
-//                    "                         Account3Name ON derivedtbl_1.AccountID = Account3Name.AcNameID INNER JOIN\n" +
-//                    "                         Account2Group ON Account3Name.AcGroupID = Account2Group.AcGroupID INNER JOIN\n" +
-//                    "                         Account1Type ON Account2Group.AcTypeID = Account1Type.AcTypeID\n" +
-//                    "GROUP BY derivedtbl_1.ClientID, derivedtbl_1.AccountID, Account3Name.AcName, Account2Group.AcGroupID, Account2Group.AcGruopName, Account1Type.AcTypeName, Account1Type.AcTypeID";
+
             query = "SELECT * FROM Account3Name WHERE ClientID = "+u.getClientID();
         }
 
-//        List<ChartOfAcc> li = databaseHelper.getChartofAccount(query);
         List<Spinner> li = databaseHelper.getSpinnerAcName(query);
         for (Spinner a : li){
             listCredit.add(a.getName());
@@ -143,10 +129,7 @@ public class CashCollectionActivity extends AppCompatActivity implements View.On
         tv_db = findViewById(R.id.tv_db);
         add = findViewById(R.id.add);
 
-        Date date1 = new Date();
-        SimpleDateFormat curFormater = new SimpleDateFormat("dd-M-yyyy");
-        String d = curFormater.format(date1);
-        date.setText(d);
+        date.setText(currentDate);
         date.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -158,20 +141,19 @@ public class CashCollectionActivity extends AppCompatActivity implements View.On
 
 
         if (!spinnerType.equals("Hide")){
-//            tv_cr.setVisibility(View.GONE);
-//            tv_db.setVisibility(View.GONE);
             debit_account.setOnClickListener(this);
             credit_account.setOnClickListener(this);
             debit_account.setCompoundDrawablesWithIntrinsicBounds(0,0,R.drawable.ic_arrow_drop,0);
             credit_account.setCompoundDrawablesWithIntrinsicBounds(0,0,R.drawable.ic_arrow_drop,0);
         }else {
-//            credit_account_layout.setVisibility(View.GONE);
-//            debit_account_layout.setVisibility(View.GONE);
-//            List<User> list = User.listAll(User.class);
-//            for (User u : list) {
-                credit_account.setText("Income");
-                debit_account.setText("Cash");
-//            }
+
+            credit_account.setText("Income");
+            debit_account.setText("Cash");
+            final List<User> l = User.listAll(User.class);
+            for (User u : l) {
+                dDebit = u.getCashID();
+                cCredit = u.getBookingIncomeID();
+            }
         }
 
         add.setOnClickListener(this);
@@ -259,7 +241,7 @@ public class CashCollectionActivity extends AppCompatActivity implements View.On
                     }
 
                     if (viewType.equals("Edit")){
-                        String query = "UPDATE CashBook SET CBDate = '"+dd+"', DebitAccount = '"+dDebit+"', CreditAccount = '"+cCredit+"', CBRemarks = '"+description.getText().toString()+"', Amount = '"+amount.getText().toString() +"' WHERE CashBookID = "+cbID;
+                        String query = "UPDATE CashBook SET CBDate = '"+dd+"', DebitAccount = '"+dDebit+"', CreditAccount = '"+cCredit+"', CBRemarks = '"+description.getText().toString()+"', Amount = '"+amount.getText().toString()+"', UpdatedDate = '0' WHERE CashBookID = "+cbID;
                         databaseHelper.updateCashBook(query);
                         CBUpdate cbUpdate = new CBUpdate(cbID,date.getText().toString(),dDebit,cCredit,description.getText().toString(),amount.getText().toString());
                         cbUpdate.save();
@@ -268,18 +250,10 @@ public class CashCollectionActivity extends AppCompatActivity implements View.On
                     }else {
                         final List<User> list = User.listAll(User.class);
 
-                        if (isConnected()){
-                            for (User u : list) {
-                                String id = databaseHelper.createCashBook(new CashBook("0", date.getText().toString(), dDebit, cCredit, description.getText().toString(), amount.getText().toString(), u.getClientID(),u.getClientUserID(),"0","0",currentDate,bookingID));
-//                                addCashBook(id);
-                            }
-                            clearCashe();
-                        }else {
-                            for (User u : list) {
-                                databaseHelper.createCashBook(new CashBook("0", date.getText().toString(), dDebit, cCredit, description.getText().toString(), amount.getText().toString(), u.getClientID(),u.getClientUserID(),"0","0",currentDate,bookingID));
-                            }
-                            clearCashe();
+                        for (User u : list) {
+                            databaseHelper.createCashBook(new CashBook("0", date.getText().toString(), dDebit, cCredit, description.getText().toString(), amount.getText().toString(), u.getClientID(),u.getClientUserID(),"0","0","0",bookingID));
                         }
+                        clearCashe();
                     }
 
                 }
@@ -287,72 +261,6 @@ public class CashCollectionActivity extends AppCompatActivity implements View.On
         }
     }
 
-    public void addCashBook(final String cid){
-        String query = "SELECT * FROM CashBook WHERE CashBookID = 0";
-        List<CashBook> addCashBook = databaseHelper.getCashBook(query);
-
-        for (final CashBook c : addCashBook){
-            String tag_json_obj = "json_obj_req";
-            String url = "http://69.167.137.121/plesk-site-preview/sky.com.pk/shadiHall/AddCashBook.php";
-
-            pDialog = new ProgressDialog(CashCollectionActivity.this);
-            pDialog.setMessage("Loading...");
-            pDialog.setCancelable(false);
-            pDialog.show();
-            StringRequest jsonObjectRequest = new StringRequest(Request.Method.POST, url,
-                    new Response.Listener<String>() {
-                        @Override
-                        public void onResponse(String response) {
-                            pDialog.dismiss();
-                            Log.e("Response",response);
-                            try {
-                                JSONObject jsonObject = new JSONObject(response);
-                                String success = jsonObject.getString("success");
-                                Log.e("Success",success);
-                                if (success.equals("1")){
-                                    String id = jsonObject.getString("CBID");
-                                    String message = jsonObject.getString("message");
-                                    databaseHelper.updateCashBook("UPDATE CashBook SET CashBookID = '"+id+"' WHERE ID = "+cid);
-//                                    Toast.makeText(CashCollectionActivity.this, message, Toast.LENGTH_SHORT).show();
-                                }
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    pDialog.dismiss();
-                    Log.e("Error",error.toString());
-//                    Toast.makeText(CashCollectionActivity.this, error.toString(), Toast.LENGTH_SHORT).show();
-                }
-            }){
-                @Override
-                protected Map<String, String> getParams() {
-
-                    Map<String, String> params = new HashMap<String, String>();
-                    List<User> list = User.listAll(User.class);
-                    for (User u : list) {
-                        params.put("CBDate", c.getCBDate());
-                        params.put("DebitAccount", c.getDebitAccount());
-                        params.put("CreditAccount", c.getCreditAccount());
-                        params.put("CBRemarks", c.getCBRemarks());
-                        params.put("Amount", c.getAmount());
-                        params.put("ClientID", u.getClientID());
-                        params.put("ClientUserID", u.getClientUserID());
-                        params.put("NetCode", "0");
-                        params.put("SysCode", "0");
-                        params.put("BookingID", c.getBookingID());
-                    }
-                    return params;
-                }
-            };
-            int socketTimeout = 30000;//30 seconds - change to what you want
-            RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
-            jsonObjectRequest.setRetryPolicy(policy);
-            AppController.getInstance().addToRequestQueue(jsonObjectRequest, tag_json_obj);
-        }
-    }
 
     public void clearCashe(){
         cCredit = null;

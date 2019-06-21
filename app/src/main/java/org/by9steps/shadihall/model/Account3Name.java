@@ -4,6 +4,7 @@ import java.io.Serializable;
 
 public class Account3Name implements Serializable {
 
+    String id;
     String AcNameID;
     String AcName;
     String AcGroupID;
@@ -47,6 +48,14 @@ public class Account3Name implements Serializable {
     }
 
     public Account3Name() {
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getAcNameID() {

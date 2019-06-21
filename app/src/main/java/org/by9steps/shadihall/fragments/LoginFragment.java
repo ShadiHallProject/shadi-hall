@@ -44,6 +44,7 @@ import org.by9steps.shadihall.model.AreaName;
 import org.by9steps.shadihall.model.Bookings;
 import org.by9steps.shadihall.model.CBUpdate;
 import org.by9steps.shadihall.model.CashBook;
+import org.by9steps.shadihall.model.TableSession;
 import org.by9steps.shadihall.model.UpdateDate;
 import org.by9steps.shadihall.model.User;
 import org.json.JSONArray;
@@ -71,6 +72,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
     private InputValidation inputValidation;
 
     String oNumber, uNumber, mPassword, ph;
+    String cId;
 
     //shared prefrences
     SharedPreferences sharedPreferences;
@@ -166,28 +168,26 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
                                             User.deleteAll(User.class);
                                             for (int i = 0; i < jsonArray.length(); i++) {
                                                 JSONObject jsonObject = jsonArray.getJSONObject(i);
-                                                String cId = jsonObject.getString("ClientID");
+                                                cId = jsonObject.getString("ClientID");
                                                 String cashID = jsonObject.getString("CashID");
                                                 String bookingIncomeID = jsonObject.getString("BookingIncomeID");
                                                 String bookingExpenseID = jsonObject.getString("BookingExpenseID");
                                                 String acNameID = jsonObject.getString("AcNameID");
                                                 String clientUserID = jsonObject.getString("ClientUserID");
                                                 String acName = jsonObject.getString("AcName");
+                                                String acAddress = jsonObject.getString("AcAddress");
+                                                String acContactNo = jsonObject.getString("AcContactNo");
 
                                                 User user = new User(cId,cashID,bookingIncomeID,bookingExpenseID,acNameID,clientUserID,acName);
                                                 user.save();
                                             }
-
-                                            SharedPreferences.Editor editor = sharedPreferences.edit();
-                                            editor.putString(log_in, "Yes");
-                                            editor.apply();
 
                                             databaseHelper = new DatabaseHelper(getContext());
 
                                             if (isConnected()) {
                                                 getAccount3Name();
                                             }else {
-                                                AppController.internet = "Yes";
+                                                Toast.makeText(getContext(), "Please Check Your Internet Connection", Toast.LENGTH_SHORT).show();
                                             }
 
                                         }else {
@@ -276,8 +276,15 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
                                     String UserRights = jsonObject.getString("UserRights");
                                     String SecurityRights = jsonObject.getString("SecurityRights");
                                     String Salary = jsonObject.getString("Salary");
+                                    String SessionDate = jsonObject.getString("SessionDate");
 
                                     databaseHelper.createAccount3Name(new Account3Name(AcNameID,AcName,AcGroupID,AcAddress,AcMobileNo,AcContactNo,AcEmailAddress,AcDebitBal,AcCreditBal,AcPassward,ClientID,ClientUserID,SysCode,NetCode,UpdatedDate,SerialNo,UserRights,SecurityRights,Salary));
+
+                                    if (i == jsonArray.length() - 1) {
+                                        TableSession.deleteAll(TableSession.class);
+                                        TableSession session = new TableSession("Account3Name", AcNameID, SessionDate);
+                                        session.save();
+                                    }
                                 }
                                 getCashBook();
 
@@ -296,7 +303,14 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
                 Log.e("Error",error.toString());
 //                Toast.makeText(SplashActivity.this, error.toString(), Toast.LENGTH_LONG).show();
             }
-        });
+        }){
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("ClientID", cId);
+                return params;
+            }
+        };
         int socketTimeout = 10000;//10 seconds
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         jsonObjectRequest.setRetryPolicy(policy);
@@ -344,8 +358,14 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
 //                                    JSONObject jb = new JSONObject(ed);
 //                                    String UpdatedDate = jb.getString("date");
                                     String BookingID = jsonObject.getString("BookingID");
+                                    String SessionDate = jsonObject.getString("SessionDate");
 
                                     databaseHelper.createCashBook(new CashBook(CashBookID,CBDate1,DebitAccount,CreditAccount,CBRemark,Amount,ClientID,ClientUserID,NetCode,SysCode,UpdatedDate,BookingID));
+
+                                    if (i == jsonArray.length() - 1) {
+                                        TableSession session = new TableSession("CashBook", CashBookID, SessionDate);
+                                        session.save();
+                                    }
 
                                     Date da = new Date();
                                     SimpleDateFormat sff = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -377,7 +397,14 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
                 Log.e("Error",error.toString());
 //                Toast.makeText(SplashActivity.this, error.toString(), Toast.LENGTH_LONG).show();
             }
-        });
+        }){
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("ClientID", cId);
+                return params;
+            }
+        };
         int socketTimeout = 10000;//10 seconds
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         jsonObjectRequest.setRetryPolicy(policy);
@@ -477,7 +504,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
                                     String ed = jsonObject.getString("EventDate");
                                     JSONObject jb = new JSONObject(ed);
                                     EventDate = jb.getString("date");
-                                    Log.e("EVENTDATE",EventDate);
+                                    Log.e("TEST",EventDate);
                                     ArrangePersons = jsonObject.getString("ArrangePersons");
                                     ChargesTotal = jsonObject.getString("ChargesTotal");
                                     Description = jsonObject.getString("Description");
@@ -485,13 +512,20 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
                                     ClientUserID = jsonObject.getString("ClientUserID");
                                     NetCode = jsonObject.getString("NetCode");
                                     SysCode = jsonObject.getString("SysCode");
+                                    Log.e("TEST","TEST");
                                     String up = jsonObject.getString("UpdatedDate");
                                     JSONObject jbb = new JSONObject(up);
                                     UpdatedDate = jbb.getString("date");
+                                    String SessionDate = jsonObject.getString("SessionDate");
 
-                                    Log.e("SSSS",ClientName + ClientID);
+                                    Log.e("TEST","SSSS");
 
                                     databaseHelper.createBooking(new Bookings(BookingID,ClientName,ClientMobile,ClientAddress,ClientNic,EventName,BookingDate,EventDate,ArrangePersons,ChargesTotal,Description,ClientID,ClientUserID,NetCode,SysCode,UpdatedDate));
+
+                                    if (i == jsonArray.length() - 1) {
+                                        TableSession session = new TableSession("Bookings", BookingID, SessionDate);
+                                        session.save();
+                                    }
                                 }
                                 getAccountTypes();
 
@@ -512,7 +546,14 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
 //                pDialog.dismiss();
 //                Toast.makeText(SplashActivity.this, error.toString(), Toast.LENGTH_LONG).show();
             }
-        });
+        }){
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("ClientID", cId);
+                return params;
+            }
+        };
 
         int socketTimeout = 10000;//10 seconds - change to what you want
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
@@ -548,6 +589,10 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
 
                                     databaseHelper.createAccount1Type(new Account1Type(AcTypeID,AcTypeName));
                                 }
+
+                                SharedPreferences.Editor editor = sharedPreferences.edit();
+                                editor.putString(log_in, "Yes");
+                                editor.apply();
 
                                 FragmentManager manager = getFragmentManager();
                                 assert manager != null;

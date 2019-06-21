@@ -60,10 +60,12 @@ public class MonthTrialBalanceAdapter extends RecyclerView.Adapter{
             ((ItemViewHolder)viewHolder).mtb_clodebit.setText(monthTb.getClosingDebit());
             ((ItemViewHolder)viewHolder).mtb_clocredit.setText(monthTb.getClosingCredit());
 
-            ((ItemViewHolder)viewHolder).mtb_acname.setOnClickListener(new View.OnClickListener() {
+            ((ItemViewHolder)viewHolder).itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    mCtx.startActivity(new Intent(mCtx, GeneralLedgerActivity.class));
+                    Intent intent = new Intent(mCtx,GeneralLedgerActivity.class);
+                    intent.putExtra("AcID",monthTb.getAccountID());
+                    mCtx.startActivity(intent);
                 }
             });
 

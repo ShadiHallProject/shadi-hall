@@ -16,6 +16,7 @@ public class ChartOfAcc implements Serializable {
     String DebitBL;
     String CreditBL;
     String MaxDate;
+    String Address;
 
     public ChartOfAcc() {
     }
@@ -138,5 +139,13 @@ public class ChartOfAcc implements Serializable {
 
     public void setMaxDate(String maxDate) {
         MaxDate = maxDate;
+    }
+
+    public String getAddress() {
+        return Address;
+    }
+
+    public void setAddress(String address) {
+        Address = address;
     }
 }

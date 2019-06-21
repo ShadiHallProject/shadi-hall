@@ -56,6 +56,7 @@ public class SplashActivity extends AppCompatActivity {
             Manifest.permission.ACCESS_NETWORK_STATE,
             Manifest.permission.READ_CONTACTS,
             Manifest.permission.CAMERA,
+            Manifest.permission.CALL_PHONE,
             Manifest.permission.READ_EXTERNAL_STORAGE};
 
     String rationale = "Please provide location permission so that you can ...";

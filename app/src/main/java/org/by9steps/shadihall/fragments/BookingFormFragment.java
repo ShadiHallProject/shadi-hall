@@ -29,7 +29,10 @@ import com.squareup.timessquare.CalendarPickerView;
 import org.by9steps.shadihall.AppController;
 import org.by9steps.shadihall.R;
 import org.by9steps.shadihall.activities.RegisterActivity;
+import org.by9steps.shadihall.helper.DatabaseHelper;
 import org.by9steps.shadihall.helper.InputValidation;
+import org.by9steps.shadihall.model.Bookings;
+import org.by9steps.shadihall.model.CashBook;
 import org.by9steps.shadihall.model.User;
 
 import java.text.DateFormat;
@@ -49,8 +52,10 @@ import java.util.Map;
 public class BookingFormFragment extends Fragment implements View.OnClickListener {
 
     private static final String ARG_BOOKING_DATE = "event_date";
+    private static final String ARG_BOOKING_ID = "booking_id";
 
     InputValidation inputValidation;
+    DatabaseHelper databaseHelper;
 
     TextInputLayout date_layout;
     TextView date;
@@ -77,13 +82,15 @@ public class BookingFormFragment extends Fragment implements View.OnClickListene
     Button add_event;
 
     ProgressDialog pDialog;
+    List<Bookings> bookingList;
 
-    private String eventDate;
+    private String eventDate, bookingID;
 
-    public static BookingFormFragment newInstance(String message) {
+    public static BookingFormFragment newInstance(String message, String bookingID) {
         BookingFormFragment fragment = new BookingFormFragment();
         Bundle args = new Bundle();
         args.putString(ARG_BOOKING_DATE, message);
+        args.putString(ARG_BOOKING_ID, bookingID);
         fragment.setArguments(args);
         return fragment;
     }
@@ -94,6 +101,7 @@ public class BookingFormFragment extends Fragment implements View.OnClickListene
 
         if (getArguments() != null) {
             eventDate = getArguments().getString(ARG_BOOKING_DATE);
+            bookingID = getArguments().getString(ARG_BOOKING_ID);
         }
     }
 
@@ -115,6 +123,7 @@ public class BookingFormFragment extends Fragment implements View.OnClickListene
         SugarContext.init(getContext());
 
         inputValidation = new InputValidation(getContext());
+        databaseHelper = new DatabaseHelper(getContext());
 
         date = view.findViewById(R.id.date);
         date_layout = view.findViewById(R.id.date_layout);
@@ -140,10 +149,34 @@ public class BookingFormFragment extends Fragment implements View.OnClickListene
         advance_fee_layout = view.findViewById(R.id.advance_fee_layout);
         add_event = view.findViewById(R.id.add);
 
+        if (!bookingID.equals("id")){
+            String query = "";
+            List<User> list = User.listAll(User.class);
+            for (User u: list) {
+                query = "SELECT * FROM Booking WHERE BookingID = " + bookingID;
+            }
+            bookingList = databaseHelper.getBookings(query);
+            for (Bookings b : bookingList){
+                date.setText(b.getBookingDate());
+                event_date.setText(b.getEventDate());
+                person_name.setText(b.getClientName());
+                address.setText(b.getClientAddress());
+                client_mobile_no.setText(b.getClientMobile());
+                cnic_number.setText(b.getClientNic());
+                total_charges.setText(b.getChargesTotal());
+                event_name.setText(b.getEventName());
+                total_persons.setText(b.getArrangePersons());
+                description.setText(b.getDescription());
+                advance_fee.setText(b.getAmount());
+                advance_fee.setVisibility(View.GONE);
+                add_event.setText(getString(R.string.update));
+            }
+        }
+
         add_event.setOnClickListener(this);
 
         Date d = new Date();
-        SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
         date.setText(formatter.format(d));
 
         event_date.setText(eventDate);
@@ -155,21 +188,6 @@ public class BookingFormFragment extends Fragment implements View.OnClickListene
     public void onClick(View view) {
         switch (view.getId()){
             case R.id.add:
-//                String pattern="yyyy-MM-dd";
-//                DateFormat df = new SimpleDateFormat(pattern);
-//                Date d1 = null, d2 = null;
-//                try {
-//                    d1 = df.parse(event_date.getText().toString());
-//                    d2 = df.parse(date.getText().toString());
-//                } catch (ParseException e) {
-//                    e.printStackTrace();
-//                }
-//                final String eventDate = df.format(d1);
-//                final String bookingDate = df.format(d2);
-//                Log.e("DATE",d1+"   "+d2);
-//                if (!inputValidation.isInputEditTextFilled(event_date, event_date_layout, getString(R.string.error_message_c_name))) {
-//                    return;
-//                }
                 if (!inputValidation.isInputEditTextFilled(person_name, person_name_layout, getString(R.string.error_message_c_name))) {
                     return;
                 }
@@ -191,70 +209,50 @@ public class BookingFormFragment extends Fragment implements View.OnClickListene
                 if (!inputValidation.isInputEditTextFilled(total_persons, total_persons_layout, getString(R.string.error_message_c_name))) {
                     return;
                 }
-                if (!inputValidation.isInputEditTextFilled(advance_fee, advance_fee_layout, getString(R.string.error_message_c_name))) {
-                    return;
+                if (bookingID.equals("id")) {
+                    if (!inputValidation.isInputEditTextFilled(advance_fee, advance_fee_layout, getString(R.string.error_message_c_name))) {
+                        return;
+                    }
                 }
                 if (!inputValidation.isInputEditTextFilled(description, description_layout, getString(R.string.error_message_c_name))) {
                     return;
                 }
                 else {
-                    String tag_json_obj = "json_obj_req";
-                    String url = "http://69.167.137.121/plesk-site-preview/sky.com.pk/shadiHall/AddEvent.php";
 
-                    pDialog = new ProgressDialog(getContext());
-                    pDialog.setMessage("Searching...");
-                    pDialog.setCancelable(false);
-                    pDialog.show();
-                    StringRequest jsonObjectRequest = new StringRequest(Request.Method.POST, url,
-                            new Response.Listener<String>() {
-                                @Override
-                                public void onResponse(String response) {
-                                    pDialog.dismiss();
-                                    Log.e("Response",response);
-                                    Toast.makeText(getContext(), response, Toast.LENGTH_SHORT).show();
-                                }
-                            }, new Response.ErrorListener() {
-                        @Override
-                        public void onErrorResponse(VolleyError error) {
-                            pDialog.dismiss();
-                            Log.e("Error",error.toString());
-                            Toast.makeText(getContext(), error.toString(), Toast.LENGTH_SHORT).show();
+                    final List<User> list = User.listAll(User.class);
+
+                    for (User u : list) {
+                        if (bookingID.equals("id")) {
+                            databaseHelper.createBooking(new Bookings("o", person_name.getText().toString(), client_mobile_no.getText().toString(), address.getText().toString(),
+                                    cnic_number.getText().toString(), event_name.getText().toString(), date.getText().toString(), event_date.getText().toString() + " 00:00:00.000000",
+                                    total_persons.getText().toString(), total_charges.getText().toString(), description.getText().toString(), u.getClientID(), u.getClientUserID(),
+                                    "0", "0", "0", advance_fee.getText().toString()));
+                            clearCashe();
+                        }else {
+                            String query = "UPDATE Booking SET ClientName = '"+person_name.getText().toString()+"', ClientMobile = '"+client_mobile_no.getText().toString()
+                                    +"', ClientAddress = '"+address.getText().toString()+"', ClientNic = '"+cnic_number.getText().toString()+"', EventName = '"+event_name.getText().toString()
+                                    +"', ArrangePersons = '"+total_persons.getText().toString()+"', ChargesTotal = '"+total_charges.getText().toString()+"', Description = '"+description.getText().toString()
+                                    +"', UpdatedDate = '0', Advance = '"+advance_fee.getText().toString()+"' WHERE BookingID = "+bookingID;
+                            databaseHelper.updateBooking(query);
+                            Toast.makeText(getContext(), "Booking Update", Toast.LENGTH_SHORT).show();
                         }
-                    }){
-                        @Override
-                        protected Map<String, String> getParams() {
-                            List<User> list = User.listAll(User.class);
-                            Map<String, String> params = new HashMap<String, String>();
-                            for (User u : list) {
-                                params.put("ClientName", person_name.getText().toString());
-                                params.put("ClientMobile", client_mobile_no.getText().toString());
-                                params.put("ClientAddress", address.getText().toString());
-                                params.put("ClientNic", cnic_number.getText().toString());
-                                params.put("EventName", event_name.getText().toString());
-                                params.put("BookingDate", date.getText().toString());
-                                params.put("EventDate", event_date.getText().toString());
-                                params.put("ArrangePersons", total_persons.getText().toString());
-                                params.put("ChargesTotal", total_charges.getText().toString());
-                                params.put("Description", description.getText().toString());
-                                params.put("ClientID", u.getClientID());
-                                params.put("ClientUserID", u.getClientUserID());
-                                params.put("NetCode", "0");
-                                params.put("SysCode", "0");
-                                params.put("DebitAccount", u.getCashID());
-                                params.put("CreditAccount", u.getBookingIncomeID());
-                                params.put("Amount", advance_fee.getText().toString());
-                            }
-                            return params;
-                        }
-                    };
-                    int socketTimeout = 30000;//30 seconds - change to what you want
-                    RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
-                    jsonObjectRequest.setRetryPolicy(policy);
-                    AppController.getInstance().addToRequestQueue(jsonObjectRequest, tag_json_obj);
+                    }
+
                 }
                 break;
         }
 
+    }
+    public void clearCashe(){
+        person_name.setText("");
+        client_mobile_no.setText("");
+        address.setText("");
+        cnic_number.setText("");
+        event_name.setText("");
+        total_persons.setText("");
+        total_charges.setText("");
+        description.setText("");
+        advance_fee.setText("");
     }
 
 }

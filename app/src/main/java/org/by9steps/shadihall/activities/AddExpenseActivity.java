@@ -22,7 +22,9 @@ import com.android.volley.toolbox.StringRequest;
 
 import org.by9steps.shadihall.AppController;
 import org.by9steps.shadihall.R;
+import org.by9steps.shadihall.helper.DatabaseHelper;
 import org.by9steps.shadihall.helper.InputValidation;
+import org.by9steps.shadihall.model.CashBook;
 import org.by9steps.shadihall.model.User;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -52,6 +54,7 @@ public class AddExpenseActivity extends AppCompatActivity implements View.OnClic
 
     String bookingID, spinnerType;
     ProgressDialog pDialog;
+    DatabaseHelper databaseHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,6 +73,7 @@ public class AddExpenseActivity extends AppCompatActivity implements View.OnClic
         }
 
         inputValidation = new InputValidation(this);
+        databaseHelper = new DatabaseHelper(this);
 
         date_layout = findViewById(R.id.date_layout);
         date = findViewById(R.id.date);
@@ -86,7 +90,7 @@ public class AddExpenseActivity extends AppCompatActivity implements View.OnClic
         add = findViewById(R.id.add);
 
         Date date1 = new Date();
-        SimpleDateFormat curFormater = new SimpleDateFormat("dd-M-yyyy");
+        SimpleDateFormat curFormater = new SimpleDateFormat("yyyy-MM-dd");
         String d = curFormater.format(date1);
         date.setText(d);
 
@@ -131,63 +135,69 @@ public class AddExpenseActivity extends AppCompatActivity implements View.OnClic
                     return;
                 }else{
 
-                    String tag_json_obj = "json_obj_req";
-                    String url = "http://69.167.137.121/plesk-site-preview/sky.com.pk/shadiHall/AddCashBook.php";
+                    final List<User> list = User.listAll(User.class);
 
-                    pDialog = new ProgressDialog(AddExpenseActivity.this);
-                    pDialog.setMessage("Loading...");
-                    pDialog.setCancelable(false);
-                    pDialog.show();
-                    StringRequest jsonObjectRequest = new StringRequest(Request.Method.POST, url,
-                            new Response.Listener<String>() {
-                                @Override
-                                public void onResponse(String response) {
-                                    pDialog.dismiss();
-                                    Log.e("Response",response);
-                                    try {
-                                        JSONObject jsonObject = new JSONObject(response);
-                                        String success = jsonObject.getString("success");
-                                        if (success.equals("1")){
-                                            String message = jsonObject.getString("message");
-                                            Toast.makeText(AddExpenseActivity.this, message, Toast.LENGTH_SHORT).show();
-                                            finish();
-                                        }
-                                    } catch (JSONException e) {
-                                        e.printStackTrace();
-                                    }
-                                }
-                            }, new Response.ErrorListener() {
-                        @Override
-                        public void onErrorResponse(VolleyError error) {
-                            pDialog.dismiss();
-                            Log.e("Error",error.toString());
-                            Toast.makeText(AddExpenseActivity.this, error.toString(), Toast.LENGTH_SHORT).show();
-                        }
-                    }){
-                        @Override
-                        protected Map<String, String> getParams() {
+                    for (User u : list) {
+                        databaseHelper.createCashBook(new CashBook("0", date.getText().toString(), u.getBookingExpenseID(), u.getCashID(), description.getText().toString(), amount.getText().toString(), u.getClientID(),u.getClientUserID(),"0","0","0",bookingID));
+                    }
 
-                            Map<String, String> params = new HashMap<String, String>();
-                            List<User> list = User.listAll(User.class);
-                            for (User u : list) {
-                                params.put("CBDate", date.getText().toString());
-                                params.put("DebitAccount", u.getBookingExpenseID());
-                                params.put("CreditAccount", u.getCashID());
-                                params.put("CBRemarks", description.getText().toString());
-                                params.put("Amount", amount.getText().toString());
-                                params.put("ClientID", u.getClientID());
-                                params.put("ClientUserID", u.getClientUserID());
-                                params.put("NetCode", "0");
-                                params.put("SysCode", "0");
-                                params.put("BookingID", bookingID);
-                            }
-                            return params;
-                        }
-                    };
-                    int socketTimeout = 30000;//30 seconds - change to what you want
-                    RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
-                    jsonObjectRequest.setRetryPolicy(policy);
-                    AppController.getInstance().addToRequestQueue(jsonObjectRequest, tag_json_obj);
+//                    String tag_json_obj = "json_obj_req";
+//                    String url = "http://69.167.137.121/plesk-site-preview/sky.com.pk/shadiHall/AddCashBook.php";
+//
+//                    pDialog = new ProgressDialog(AddExpenseActivity.this);
+//                    pDialog.setMessage("Loading...");
+//                    pDialog.setCancelable(false);
+//                    pDialog.show();
+//                    StringRequest jsonObjectRequest = new StringRequest(Request.Method.POST, url,
+//                            new Response.Listener<String>() {
+//                                @Override
+//                                public void onResponse(String response) {
+//                                    pDialog.dismiss();
+//                                    Log.e("Response",response);
+//                                    try {
+//                                        JSONObject jsonObject = new JSONObject(response);
+//                                        String success = jsonObject.getString("success");
+//                                        if (success.equals("1")){
+//                                            String message = jsonObject.getString("message");
+//                                            Toast.makeText(AddExpenseActivity.this, message, Toast.LENGTH_SHORT).show();
+//                                            finish();
+//                                        }
+//                                    } catch (JSONException e) {
+//                                        e.printStackTrace();
+//                                    }
+//                                }
+//                            }, new Response.ErrorListener() {
+//                        @Override
+//                        public void onErrorResponse(VolleyError error) {
+//                            pDialog.dismiss();
+//                            Log.e("Error",error.toString());
+//                            Toast.makeText(AddExpenseActivity.this, error.toString(), Toast.LENGTH_SHORT).show();
+//                        }
+//                    }){
+//                        @Override
+//                        protected Map<String, String> getParams() {
+//
+//                            Map<String, String> params = new HashMap<String, String>();
+//                            List<User> list = User.listAll(User.class);
+//                            for (User u : list) {
+//                                params.put("CBDate", date.getText().toString());
+//                                params.put("DebitAccount", u.getBookingExpenseID());
+//                                params.put("CreditAccount", u.getCashID());
+//                                params.put("CBRemarks", description.getText().toString());
+//                                params.put("Amount", amount.getText().toString());
+//                                params.put("ClientID", u.getClientID());
+//                                params.put("ClientUserID", u.getClientUserID());
+//                                params.put("NetCode", "0");
+//                                params.put("SysCode", "0");
+//                                params.put("BookingID", bookingID);
+//                            }
+//                            return params;
+//                        }
+//                    };
+//                    int socketTimeout = 30000;//30 seconds - change to what you want
+//                    RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
+//                    jsonObjectRequest.setRetryPolicy(policy);
+//                    AppController.getInstance().addToRequestQueue(jsonObjectRequest, tag_json_obj);
 
                 }
                 break;

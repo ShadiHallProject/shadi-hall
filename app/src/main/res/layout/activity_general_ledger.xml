@@ -6,10 +6,85 @@
     android:layout_height="match_parent"
     tools:context=".activities.GeneralLedgerActivity">
 
+    <LinearLayout
+        android:padding="@dimen/ten_dp"
+        android:gravity="center"
+        android:layout_marginBottom="5dp"
+        android:id="@+id/layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_weight=".8"
+            android:layout_margin="1dp"
+            android:id="@+id/debit_account"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/select_account"
+            android:gravity="center_vertical"
+            android:textSize="12sp"
+            android:maxLines="1" />
+
+        <!--<Spinner-->
+            <!--android:layout_margin="2dp"-->
+            <!--android:layout_gravity="center"-->
+            <!--android:layout_weight=".8"-->
+            <!--android:id="@+id/sp_acgroup"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"/>-->
+        <Button
+            android:layout_margin="2dp"
+            android:layout_weight=".8"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/date_picker1"/>
+        <Button
+            android:layout_margin="2dp"
+            android:layout_weight=".8"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/date_picker2"/>
+        <ImageView
+            android:padding="6dp"
+            android:background="@android:color/transparent"
+            android:id="@+id/refresh"
+            app:srcCompat="@drawable/ic_refresh"
+            android:layout_gravity="center"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/search_layout"
+        android:layout_below="@id/layout"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <Spinner
+            android:layout_gravity="center"
+            android:id="@+id/gl_spinner"
+            android:layout_width="120dp"
+            android:layout_height="45dp"/>
+
+        <android.support.v7.widget.SearchView
+            android:id="@+id/report_search"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:focusable="false"
+            app:iconifiedByDefault="false"
+            app:queryHint="Search..."
+            android:background="@android:color/transparent"/>
+
+    </LinearLayout>
+
     <HorizontalScrollView
+        android:layout_below="@+id/search_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_alignParentTop="true"
         android:fillViewport="true"
         android:measureAllChildren="false"
         android:scrollbars="none">
@@ -34,21 +109,9 @@
                     android:layout_margin="3dp"
                     android:layout_width="@dimen/hundred_dp"
                     android:layout_height="wrap_content"
-                    android:text="@string/client_id"/>
-
-
-                <TextView
-                    android:textAlignment="center"
-                    android:textSize="@dimen/textSize"
-                    android:textColor="@color/colorPrimaryDark"
-                    android:textStyle="bold"
-                    android:layout_margin="3dp"
-                    android:layout_width="@dimen/hundred_dp"
-                    android:layout_height="wrap_content"
-                    android:text="@string/entry_no"/>
+                    android:text="@string/cb_id"/>
 
                 <TextView
-                    android:id="@+id/cre_total"
                     android:textAlignment="center"
                     android:textSize="@dimen/textSize"
                     android:textColor="@color/colorPrimaryDark"
@@ -66,24 +129,6 @@
                     android:layout_margin="3dp"
                     android:layout_width="@dimen/hundred_dp"
                     android:layout_height="wrap_content"
-                    android:text="@string/selectedac"/>
-                <TextView
-                    android:textAlignment="center"
-                    android:textSize="@dimen/textSize"
-                    android:textColor="@color/colorPrimaryDark"
-                    android:textStyle="bold"
-                    android:layout_margin="3dp"
-                    android:layout_width="@dimen/hundred_dp"
-                    android:layout_height="wrap_content"
-                    android:text="@string/againstac"/>
-                <TextView
-                    android:textAlignment="center"
-                    android:textSize="@dimen/textSize"
-                    android:textColor="@color/colorPrimaryDark"
-                    android:textStyle="bold"
-                    android:layout_margin="3dp"
-                    android:layout_width="@dimen/hundred_dp"
-                    android:layout_height="wrap_content"
                     android:text="@string/account_name"/>
                 <TextView
                     android:textAlignment="center"
@@ -93,7 +138,7 @@
                     android:layout_margin="3dp"
                     android:layout_width="@dimen/hundred_dp"
                     android:layout_height="wrap_content"
-                    android:text="@string/particulars"/>
+                    android:text="@string/remarks"/>
                 <TextView
                     android:textAlignment="center"
                     android:textSize="@dimen/textSize"
@@ -112,15 +157,6 @@
                     android:layout_width="@dimen/hundred_dp"
                     android:layout_height="wrap_content"
                     android:text="@string/credit"/>
-                <TextView
-                    android:textAlignment="center"
-                    android:textSize="@dimen/textSize"
-                    android:textColor="@color/colorPrimaryDark"
-                    android:textStyle="bold"
-                    android:layout_margin="3dp"
-                    android:layout_width="@dimen/hundred_dp"
-                    android:layout_height="wrap_content"
-                    android:text="@string/entry_of"/>
                 <TextView
                     android:textAlignment="center"
                     android:textSize="@dimen/textSize"

@@ -9,6 +9,7 @@ import android.widget.DatePicker;
 
 import org.by9steps.shadihall.AppController;
 import org.by9steps.shadihall.activities.CashCollectionActivity;
+import org.by9steps.shadihall.activities.GeneralLedgerActivity;
 
 import java.util.Calendar;
 
@@ -77,7 +78,21 @@ public class SelectDateFragment extends DialogFragment implements DatePickerDial
             if (AppController.date.equals("MonthTB1")) {
                 MonthTrialBalance.date_picker1.setText(year + "-" + m + "-" + d);
             }else if (AppController.date.equals("MonthTB2")){
-                MonthTrialBalance.date_picker1.setText(year + "-" + m + "-" + d);
+                MonthTrialBalance.date_picker2.setText(year + "-" + m + "-" + d);
+            }
+            AppController.date = "";
+        }else if (AppController.date.equals("GL1") || AppController.date.equals("GL2")){
+            String d = String.valueOf(day), m = String.valueOf(month);
+            if (month<10){
+                m = "0"+String.valueOf(month);
+            }
+            if (day<10){
+                d = "0"+String.valueOf(day);
+            }
+            if (AppController.date.equals("GL1")) {
+                GeneralLedgerActivity.date_picker1.setText(year + "-" + m + "-" + d);
+            }else if (AppController.date.equals("GL2")){
+                GeneralLedgerActivity.date_picker2.setText(year + "-" + m + "-" + d);
             }
             AppController.date = "";
         }else {

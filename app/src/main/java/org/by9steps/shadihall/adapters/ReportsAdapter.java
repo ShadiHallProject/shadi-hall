@@ -112,7 +112,9 @@ public class ReportsAdapter extends RecyclerView.Adapter {
                 ((CashBookHolder)viewHolder).itemView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        mCtx.startActivity(new Intent(mCtx, GeneralLedgerActivity.class));
+                        Intent intent = new Intent(mCtx,GeneralLedgerActivity.class);
+                        intent.putExtra("AcID",cashBook.getAccountID());
+                        mCtx.startActivity(intent);
                     }
                 });
                 break;

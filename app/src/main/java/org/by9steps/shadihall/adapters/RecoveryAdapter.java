@@ -90,6 +90,8 @@ public class RecoveryAdapter extends RecyclerView.Adapter {
                     Intent intent = new Intent(mCtx, CashCollectionActivity.class);
                     intent.putExtra("BookingID", recovery.getBookingID());
                     intent.putExtra("Spinner", "Hide");
+                    intent.putExtra("Type", "New");
+                    intent.putExtra("CashBookID", "Id");
                     mCtx.startActivity(intent);
 
                 }

@@ -2,8 +2,11 @@ package org.by9steps.shadihall.fragments;
 
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -598,8 +601,6 @@ public class RecoveryFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.cb_menu,menu);
-        MenuItem referesh = menu.findItem(R.id.action_refresh);
-        referesh.setVisible(false);
         MenuItem settings = menu.findItem(R.id.action_settings);
         settings.setVisible(false);
         super.onCreateOptionsMenu(menu,inflater);
@@ -621,8 +622,28 @@ public class RecoveryFragment extends Fragment implements View.OnClickListener {
             }
 
             return true;
+        }else if (item.getItemId() == R.id.action_refresh){
+            if (isConnected()){
+                Toast.makeText(getContext(), "Internet Connected", Toast.LENGTH_SHORT).show();
+            }else {
+                Toast.makeText(getContext(), "Please Check Your Internet Connection", Toast.LENGTH_SHORT).show();
+            }
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    //Check Internet Connection
+    public boolean isConnected() {
+        boolean connected = false;
+        try {
+            ConnectivityManager cm = (ConnectivityManager)getContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo nInfo = cm.getActiveNetworkInfo();
+            connected = nInfo != null && nInfo.isAvailable() && nInfo.isConnected();
+            return connected;
+        } catch (Exception e) {
+            Log.e("Connectivity Exception", e.getMessage());
+        }
+        return connected;
     }
 
     public void createPdf() throws IOException, DocumentException {

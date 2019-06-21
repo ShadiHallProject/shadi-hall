@@ -6,6 +6,7 @@ import java.io.Serializable;
 
 public class Bookings implements Serializable {
 
+    String id;
     String BookingID;
     String ClientName;
     String ClientMobile;
@@ -22,6 +23,7 @@ public class Bookings implements Serializable {
     String NetCode;
     String SysCode;
     String UpdatedDate;
+    String Amount;
 
     public Bookings() {
     }
@@ -43,6 +45,34 @@ public class Bookings implements Serializable {
         NetCode = netCode;
         SysCode = sysCode;
         UpdatedDate = updatedDate;
+    }
+
+    public Bookings(String bookingID, String clientName, String clientMobile, String clientAddress, String clientNic, String eventName, String bookingDate, String eventDate, String arrangePersons, String chargesTotal, String description, String clientID, String clientUserID, String netCode, String sysCode, String updatedDate, String amount) {
+        BookingID = bookingID;
+        ClientName = clientName;
+        ClientMobile = clientMobile;
+        ClientAddress = clientAddress;
+        ClientNic = clientNic;
+        EventName = eventName;
+        BookingDate = bookingDate;
+        EventDate = eventDate;
+        ArrangePersons = arrangePersons;
+        ChargesTotal = chargesTotal;
+        Description = description;
+        ClientID = clientID;
+        ClientUserID = clientUserID;
+        NetCode = netCode;
+        SysCode = sysCode;
+        UpdatedDate = updatedDate;
+        Amount = amount;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getBookingID() {
@@ -171,5 +201,13 @@ public class Bookings implements Serializable {
 
     public void setUpdatedDate(String updatedDate) {
         UpdatedDate = updatedDate;
+    }
+
+    public String getAmount() {
+        return Amount;
+    }
+
+    public void setAmount(String amount) {
+        Amount = amount;
     }
 }

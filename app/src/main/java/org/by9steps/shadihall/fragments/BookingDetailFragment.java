@@ -121,6 +121,7 @@ public class BookingDetailFragment extends Fragment implements View.OnClickListe
         String query = "";
         List<User> list = User.listAll(User.class);
         for (User u: list) {
+//            query = "SELECT * FROM Booking WHERE ClientID =" + u.getClientID();
             query = "SELECT * FROM Booking WHERE ClientID =" + u.getClientID()+" AND EventDate = '"+eventDate+" 00:00:00.000000'";
         }
         bookingList = databaseHelper.getBookings(query);
@@ -148,113 +149,8 @@ public class BookingDetailFragment extends Fragment implements View.OnClickListe
             bookingID = b.getBookingID();
         }
 
-//        getBooking();
-
-
         return view;
     }
-
-
-    public void getBooking(){
-        mProgress = new ProgressDialog(getContext());
-        mProgress.setTitle("Loading");
-        mProgress.setMessage("Please wait...");
-        mProgress.setCanceledOnTouchOutside(false);
-        mProgress.show();
-
-        String tag_json_obj = "json_obj_req";
-        String u = "http://69.167.137.121/plesk-site-preview/sky.com.pk/shadiHall/GetBookings.php";
-
-        StringRequest jsonObjectRequest = new StringRequest(com.android.volley.Request.Method.POST, u,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        Log.e("RES",response);
-                        mProgress.dismiss();
-                        JSONObject jsonObj = null;
-
-                        try {
-                            jsonObj= new JSONObject(response);
-                            JSONArray jsonArray = jsonObj.getJSONArray("Bookings");
-                            String success = jsonObj.getString("success");
-                            Log.e("Success",success);
-                            if (success.equals("1")){
-                                for (int i = 0; i < jsonArray.length(); i++) {
-                                    JSONObject jsonObject = jsonArray.getJSONObject(i);
-                                    Log.e("BOOKING",jsonObject.toString());
-                                    String BookingID = jsonObject.getString("BookingID");
-                                    String ClientName = jsonObject.getString("ClientName");
-                                    String ClientMobile = jsonObject.getString("ClientMobile");
-                                    String ClientAddress = jsonObject.getString("ClientAddress");
-                                    String ClientNic = jsonObject.getString("ClientNic");
-                                    String EventName = jsonObject.getString("EventName");
-                                    String bd = jsonObject.getString("BookingDate");
-                                    JSONObject jb = new JSONObject(bd);
-                                    String BookingDate = jb.getString("date");
-                                    String ed = jsonObject.getString("EventDate");
-                                    JSONObject jbb = new JSONObject(ed);
-                                    String EventDate = jbb.getString("date");
-                                    String ChargesTotal = jsonObject.getString("ChargesTotal");
-                                    String Description = jsonObject.getString("Description");
-                                    String ClientID = jsonObject.getString("ClientID");
-                                    String ClientUserID = jsonObject.getString("ClientUserID");
-
-                                    String pattern="yyyy-MM-dd";
-                                    DateFormat df = new SimpleDateFormat(pattern);
-                                    Date date = df.parse(BookingDate);
-                                    String bookingDate = df.format(date);
-                                    date = df.parse(EventDate);
-                                    String eventDate = df.format(date);
-
-                                    booking_date.setText(bookingDate);
-                                    event_date.setText(eventDate);
-                                    client_name.setText(ClientName);
-                                    address.setText(ClientAddress);
-                                    client_mobile_no.setText(ClientMobile);
-                                    cnic_number.setText(ClientNic);
-                                    total_charges.setText(ChargesTotal);
-                                    event_name.setText(EventName);
-                                    advance_fee.setText("123456");
-                                    description.setText(Description);
-                                    bookingID = BookingID;
-
-                                }
-
-                            }else {
-                                String message = jsonObj.getString("message");
-                                Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
-                            }
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        } catch (ParseException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                mProgress.dismiss();
-                Log.e("Error",error.toString());
-                Toast.makeText(getContext(), error.toString(), Toast.LENGTH_LONG).show();
-            }
-        }){
-            @Override
-            protected Map<String, String> getParams() {
-                Map<String, String> params = new HashMap<String, String>();
-                List<User> list = User.listAll(User.class);
-                for (User u: list) {
-                    params.put("EventDate", eventDate);
-                    params.put("ClientID", u.getClientID());
-                }
-                return params;
-            }
-        };
-        int socketTimeout = 10000;//10 seconds - change to what you want
-        RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
-        jsonObjectRequest.setRetryPolicy(policy);
-        AppController.getInstance().addToRequestQueue(jsonObjectRequest, tag_json_obj);
-    }
-
 
     @Override
     public void onClick(View v) {
@@ -272,11 +168,17 @@ public class BookingDetailFragment extends Fragment implements View.OnClickListe
                 startActivity(i);
                 break;
             case R.id.edit:
+                getActivity().getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.menu_container, BookingFormFragment.newInstance(event_date.getText().toString(), bookingID))
+                        .addToBackStack(null)
+                        .commit();
                 break;
             case R.id.cash:
                 Intent inte = new Intent(getContext(), CashCollectionActivity.class);
                 inte.putExtra("BookingID",bookingID);
                 inte.putExtra("Spinner","Hide");
+                inte.putExtra("Type","Add");
+                inte.putExtra("CashBookID","");
                 startActivity(inte);
                 break;
         }

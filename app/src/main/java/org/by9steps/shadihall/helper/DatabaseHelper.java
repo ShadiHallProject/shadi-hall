@@ -109,11 +109,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String KEY_NetCode3 = "NetCode";
     private static final String KEY_SysCode3 = "SysCode";
     private static final String KEY_UpdatedDate3 = "UpdatedDate";
+    private static final String KEY_Advance = "Advance";
 
     // Table Create Statements
     // Account3Name table create statement
     private static final String CREATE_TABLE_Account3Name = "CREATE TABLE "
-            + TABLE_Account3Name + "(" + KEY_AcNameID + " TEXT,"
+            + TABLE_Account3Name + "(" + KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + KEY_AcNameID + " TEXT,"
             + KEY_AcName + " TEXT,"
             + KEY_AcGroupID + " TEXT,"
             + KEY_AcAddress + " TEXT,"
@@ -150,7 +151,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     // Booking table create statement
     private static final String CREATE_TABLE_Booking = "CREATE TABLE "
-            + TABLE_Booking + "(" + KEY_BookingID3 + " TEXT,"
+            + TABLE_Booking + "(" + KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +KEY_BookingID3 + " TEXT,"
             + KEY_ClientName + " TEXT,"
             + KEY_ClientMobile + " TEXT,"
             + KEY_ClientAddress + " TEXT,"
@@ -165,7 +166,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             + KEY_ClientUserID3 + " TEXT,"
             + KEY_NetCode3 + " TEXT,"
             + KEY_SysCode3 + " TEXT,"
-            + KEY_UpdatedDate3 + " TEXT" + ")";
+            + KEY_UpdatedDate3 + " TEXT,"
+            + KEY_Advance + " TEXT"+ ")";
 
     // Account2Group table create statement
     private static final String CREATE_TABLE_Account2Group = "CREATE TABLE "
@@ -244,11 +246,27 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     /**
+     * Update a Account3Name
+     */
+    public void updateAccount3Name(String query) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.execSQL(query);
+    }
+
+    /**
      * Deleting a Account3Name
      */
     public void deleteAccount3Name() {
         SQLiteDatabase db = this.getWritableDatabase();
         db.execSQL("DELETE FROM "+ TABLE_Account3Name);
+    }
+
+    /**
+     * Deleting a Account3Name
+     */
+    public void deleteAccount3NameEntry(String query) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.execSQL(query);
     }
 
     /**
@@ -319,9 +337,19 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(KEY_NetCode3, bookings.getNetCode());
         values.put(KEY_SysCode3, bookings.getSysCode());
         values.put(KEY_UpdatedDate3, bookings.getUpdatedDate());
+        values.put(KEY_Advance, bookings.getAmount());
 
         // insert row
-        db.insert(TABLE_Booking, null, values);
+        String s = String.valueOf(db.insert(TABLE_Booking, null, values));
+        Log.e("BOOKING", s);
+    }
+
+    /**
+     * Update a Booking
+     */
+    public void updateBooking(String query) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.execSQL(query);
     }
 
     /**
@@ -429,6 +457,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             do {
                 Bookings generalLedger = new Bookings();
                 Log.e("SSSSS",c.getString(c.getColumnIndex("EventDate")));
+                generalLedger.setId(c.getString(c.getColumnIndex(KEY_ID)));
                 generalLedger.setBookingID(c.getString(c.getColumnIndex("BookingID")));
                 generalLedger.setClientName(c.getString(c.getColumnIndex("ClientName")));
                 generalLedger.setClientMobile(c.getString(c.getColumnIndex("ClientMobile")));
@@ -441,6 +470,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 generalLedger.setDescription(c.getString(c.getColumnIndex("Description")));
                 generalLedger.setClientID(c.getString(c.getColumnIndex("ClientID")));
                 generalLedger.setClientUserID(c.getString(c.getColumnIndex("ClientUserID")));
+                generalLedger.setArrangePersons(c.getString(c.getColumnIndex(KEY_ArrangePersons)));
+                generalLedger.setAmount(c.getString(c.getColumnIndex(KEY_Advance)));
 
                 // adding to todo list
                 mGeneralLedger.add(generalLedger);
@@ -666,6 +697,63 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return mAccount2Groups;
     }
 
+    //Get Entry Account2Group
+    public List<Account3Name> getAccount3Name(String query) {
+        List<Account3Name> mAccount3Name = new ArrayList<>();
+
+
+        Log.e(LOG, query);
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor c = db.rawQuery(query, null);
+        Log.e("SSSS",String.valueOf(c.moveToFirst()));
+
+        // looping through all rows and adding to list
+        if (c.moveToFirst()) {
+            do {
+                Account3Name account3Name = new Account3Name();
+
+                Log.e("SSSSS",c.getString(c.getColumnIndex(KEY_AcNameID)));
+
+                account3Name.setId(c.getString(c.getColumnIndex(KEY_ID)));
+                account3Name.setAcNameID(c.getString(c.getColumnIndex(KEY_AcNameID)));
+                account3Name.setAcName(c.getString(c.getColumnIndex(KEY_AcName)));
+                account3Name.setAcGroupID(c.getString(c.getColumnIndex(KEY_AcGroupID)));
+                account3Name.setAcAddress(c.getString(c.getColumnIndex(KEY_AcAddress)));
+                account3Name.setAcMobileNo(c.getString(c.getColumnIndex(KEY_AcMobileNo)));
+                account3Name.setAcContactNo(c.getString(c.getColumnIndex(KEY_AcContactNo)));
+                account3Name.setAcEmailAddress(c.getString(c.getColumnIndex(KEY_AcEmailAddress)));
+                account3Name.setAcDebitBal(c.getString(c.getColumnIndex(KEY_AcDebitBal)));
+                account3Name.setAcCreditBal(c.getString(c.getColumnIndex(KEY_AcCreditBal)));
+                account3Name.setSalary(c.getString(c.getColumnIndex(KEY_Salary)));
+                account3Name.setAcPassward(c.getString(c.getColumnIndex(KEY_AcPassward)));
+                account3Name.setSecurityRights(c.getString(c.getColumnIndex(KEY_SecurityRights)));
+
+                // adding to todo list
+                mAccount3Name.add(account3Name);
+            } while (c.moveToNext());
+        }
+
+        return mAccount3Name;
+    }
+
+    //Get Entry Account2Group
+    public Boolean findAccount3Name(String query) {
+
+        Log.e(LOG, query);
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor c = db.rawQuery(query, null);
+        Log.e("SSSS",String.valueOf(c.moveToFirst()));
+
+        // looping through all rows and adding to list
+        if (c.moveToFirst()) {
+            return true;
+        }
+
+        return false;
+    }
+
     //Get Entry Account1Type
     public List<Account1Type> getAccount1Type(String query) {
         List<Account1Type> mAccount1Type = new ArrayList<>();
@@ -815,6 +903,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 Log.e("CashBookIDDD",c.getString(c.getColumnIndex(KEY_ID)));
 
                 cashBook.setcId(c.getString(c.getColumnIndex(KEY_ID)));
+                cashBook.setCashBookID(c.getString(c.getColumnIndex(KEY_CashBookID)));
                 cashBook.setCBDate(c.getString(c.getColumnIndex(KEY_CBDate)));
                 cashBook.setDebitAccount(c.getString(c.getColumnIndex(KEY_DebitAccount)));
                 cashBook.setCreditAccount(c.getString(c.getColumnIndex(KEY_CreditAccount)));

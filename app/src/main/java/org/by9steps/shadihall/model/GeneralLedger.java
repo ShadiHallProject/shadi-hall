@@ -19,23 +19,26 @@ public class GeneralLedger implements Serializable {
 
     private int isRow;
 
-    public GeneralLedger(String clientID, String entryNo, String date, String selectedAc, String againstAc, String accountName, String particulars, String debit, String credit, String entryOf, String balance) {
-        ClientID = clientID;
-        EntryNo = entryNo;
-        Date = date;
-        SelectedAc = selectedAc;
-        AgainstAc = againstAc;
-        AccountName = accountName;
-        Particulars = particulars;
-        Debit = debit;
-        Credit = credit;
-        EntryOf = entryOf;
-        Balance = balance;
-    }
-
     public static GeneralLedger createRow(String clientID, String entryNo, String date, String selectedAc, String againstAc, String accountName, String particulars, String debit, String credit, String entryOf, String balance) {
         GeneralLedger generalLedger = new GeneralLedger();
         generalLedger.isRow = 1;
+        generalLedger.ClientID = clientID;
+        generalLedger.EntryNo = entryNo;
+        generalLedger.Date = date;
+        generalLedger.SelectedAc = selectedAc;
+        generalLedger.AgainstAc = againstAc;
+        generalLedger.AccountName = accountName;
+        generalLedger.Particulars = particulars;
+        generalLedger.Debit = debit;
+        generalLedger.Credit = credit;
+        generalLedger.EntryOf = entryOf;
+        generalLedger.Balance = balance;
+        return generalLedger;
+    }
+
+    public static GeneralLedger createTotal(String clientID, String entryNo, String date, String selectedAc, String againstAc, String accountName, String particulars, String debit, String credit, String entryOf, String balance) {
+        GeneralLedger generalLedger = new GeneralLedger();
+        generalLedger.isRow = 2;
         generalLedger.ClientID = clientID;
         generalLedger.EntryNo = entryNo;
         generalLedger.Date = date;

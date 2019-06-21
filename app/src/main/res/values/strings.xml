@@ -54,7 +54,6 @@
     <string name="action_location">Set GPS Location</string>
     <string name="action_change_password">Change Password</string>
     <string name="action_sms_settings">SMS Setting</string>
-    <string name="update">Update</string>
     <string name="add_event">Add Event</string>
     <string name="address">Address</string>
     <string name="client_mobile_no">Client Mobile No</string>
@@ -202,4 +201,6 @@
     <string name="closingdebit">ClosingDebit</string>
     <string name="closingcredit">ClosingCredit</string>
     <string name="transaction">Transaction</string>
+    <string name="select_account">Select Account</string>
+    <string name="update">Update</string>
 </resources>

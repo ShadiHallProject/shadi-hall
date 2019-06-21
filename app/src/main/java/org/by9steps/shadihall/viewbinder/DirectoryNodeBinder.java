@@ -76,7 +76,10 @@ public class DirectoryNodeBinder extends TreeViewBinder<DirectoryNodeBinder.View
                 @Override
                 public void onClick(View view) {
                     Intent intent = new Intent(mCtx, ChaartOfAccAddActivity.class);
+                    intent.putExtra("AcNameID", dirNode.dirID);
                     intent.putExtra("GroupID", dirNode.dirID);
+                    intent.putExtra("GroupName",dirNode.dirName);
+                    intent.putExtra("Type","Add");
                     mCtx.startActivity(intent);
                 }
             });
@@ -89,6 +92,10 @@ public class DirectoryNodeBinder extends TreeViewBinder<DirectoryNodeBinder.View
                 @Override
                 public void onClick(View view) {
                     Intent intent = new Intent(mCtx, ChaartOfAccAddActivity.class);
+                    intent.putExtra("AcNameID", dirNode.dirID);
+                    intent.putExtra("GroupID", dirNode.groupID);
+                    intent.putExtra("GroupName",dirNode.dirName);
+                    intent.putExtra("Type","Edit");
                     mCtx.startActivity(intent);
                 }
             });

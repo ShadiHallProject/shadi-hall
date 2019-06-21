@@ -29,15 +29,6 @@
                 android:text="@string/expensed"/>
 
             <TextView
-                android:id="@+id/entry_no"
-                android:textAlignment="center"
-                android:textSize="@dimen/textSize"
-                android:layout_margin="3dp"
-                android:layout_width="@dimen/hundred_dp"
-                android:layout_height="wrap_content"
-                android:text="@string/Recieved"/>
-
-            <TextView
                 android:id="@+id/date"
                 android:textAlignment="center"
                 android:textSize="@dimen/textSize"
@@ -45,24 +36,6 @@
                 android:layout_width="@dimen/hundred_dp"
                 android:layout_height="wrap_content"
                 android:text="@string/expensed"/>
-
-            <TextView
-                android:id="@+id/selected_ac"
-                android:textAlignment="center"
-                android:textSize="@dimen/textSize"
-                android:layout_margin="3dp"
-                android:layout_width="@dimen/hundred_dp"
-                android:layout_height="wrap_content"
-                android:text="@string/expensed"/>
-
-            <TextView
-                android:id="@+id/against_ac"
-                android:textAlignment="center"
-                android:textSize="@dimen/textSize"
-                android:layout_margin="3dp"
-                android:layout_width="@dimen/hundred_dp"
-                android:layout_height="wrap_content"
-                android:text="@string/Recieved"/>
 
             <TextView
                 android:id="@+id/account_name"
@@ -74,7 +47,7 @@
                 android:text="@string/Recieved"/>
 
             <TextView
-                android:id="@+id/particulars"
+                android:id="@+id/remarks"
                 android:textAlignment="center"
                 android:textSize="@dimen/textSize"
                 android:layout_margin="3dp"
@@ -93,15 +66,6 @@
 
             <TextView
                 android:id="@+id/credit"
-                android:textAlignment="center"
-                android:textSize="@dimen/textSize"
-                android:layout_margin="3dp"
-                android:layout_width="@dimen/hundred_dp"
-                android:layout_height="wrap_content"
-                android:text="@string/Recieved"/>
-
-            <TextView
-                android:id="@+id/entry_of"
                 android:textAlignment="center"
                 android:textSize="@dimen/textSize"
                 android:layout_margin="3dp"
