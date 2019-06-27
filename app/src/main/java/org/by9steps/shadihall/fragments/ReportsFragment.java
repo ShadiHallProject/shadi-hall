@@ -737,7 +737,7 @@ public class ReportsFragment extends Fragment implements View.OnClickListener {
                         try {
                             jsonObj= new JSONObject(response);
                             String success = jsonObj.getString("success");
-                            Log.e("Sarem",jsonObj.toString());
+                            Log.e("Account3Name1",jsonObj.toString());
                             if (success.equals("1")){
                                 JSONArray jsonArray = jsonObj.getJSONArray("Account3Name");
                                 for (int i = 0; i < jsonArray.length(); i++) {
@@ -772,7 +772,7 @@ public class ReportsFragment extends Fragment implements View.OnClickListener {
                                         List<TableSession> se = TableSession.find(TableSession.class,"table_Name = ?","Account3Name");
                                         for (TableSession s : se){
                                             s.setMaxID(AcNameID);
-                                            s.setUpdateDate(SessionDate);
+                                            s.setInsertDate(SessionDate);
                                             s.save();
                                         }
 
@@ -783,7 +783,7 @@ public class ReportsFragment extends Fragment implements View.OnClickListener {
                             }else {
                                 String message = jsonObj.getString("message");
 //                                Toast.makeText(SplashActivity.this, message, Toast.LENGTH_SHORT).show();
-                            }Log.e("SSSSS","SAREMS1");
+                            }
                             updateAccount3Name();
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -833,6 +833,7 @@ public class ReportsFragment extends Fragment implements View.OnClickListener {
                         try {
                             jsonObj= new JSONObject(response);
                             String success = jsonObj.getString("success");
+                            Log.e("Account3Name2",jsonObj.toString());
                             if (success.equals("1")){
                                 JSONArray jsonArray = jsonObj.getJSONArray("Account3Name");
                                 for (int i = 0; i < jsonArray.length(); i++) {
@@ -932,11 +933,11 @@ public class ReportsFragment extends Fragment implements View.OnClickListener {
                         try {
                             jsonObj= new JSONObject(response);
                             String success = jsonObj.getString("success");
+                            Log.e("CashBook1",jsonObj.toString());
                             if (success.equals("1")){
                                 JSONArray jsonArray = jsonObj.getJSONArray("CashBook");
                                 for (int i = 0; i < jsonArray.length(); i++) {
                                     JSONObject jsonObject = jsonArray.getJSONObject(i);
-                                    Log.e("Account3Name",jsonObject.toString());
                                     String CashBookID = jsonObject.getString("CashBookID");
                                     String cb = jsonObject.getString("CBDate");
                                     JSONObject jbb = new JSONObject(cb);
@@ -965,13 +966,11 @@ public class ReportsFragment extends Fragment implements View.OnClickListener {
                                         List<TableSession> se = TableSession.find(TableSession.class,"table_Name = ?","CashBook");
                                         for (TableSession s : se){
                                             s.setMaxID(CashBookID);
-                                            s.setUpdateDate(SessionDate);
+                                            s.setInsertDate(SessionDate);
                                             s.save();
                                         }
                                     }
-
                                 }
-
                             }else {
                                 String message = jsonObj.getString("message");
 //                                Toast.makeText(SplashActivity.this, message, Toast.LENGTH_SHORT).show();
@@ -1025,7 +1024,7 @@ public class ReportsFragment extends Fragment implements View.OnClickListener {
 
                         try {
                             jsonObj= new JSONObject(response);
-                            Log.e("UPDATE CB",response);
+                            Log.e("CashBook2",response);
                             String success = jsonObj.getString("success");
                             if (success.equals("1")){
                                 JSONArray jsonArray = jsonObj.getJSONArray("CashBook");
@@ -1066,7 +1065,6 @@ public class ReportsFragment extends Fragment implements View.OnClickListener {
                                             s.save();
                                         }
                                     }
-
 
                                 }
 
@@ -1121,17 +1119,15 @@ public class ReportsFragment extends Fragment implements View.OnClickListener {
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-
+                        Log.e("Booking1",response);
                         String text = "", BookingID = "", ClientName = "", ClientMobile = "", ClientAddress = "", ClientNic = "", EventName = "", BookingDate = "", EventDate = "",
                                 ArrangePersons ="", ChargesTotal = "",Description = "", ClientID ="", ClientUserID = "", NetCode = "",SysCode = "", UpdatedDate = "";
                         try {
                             JSONObject json = new JSONObject(response);
                             String success = json.getString("success");
-                            Log.e("Response",success);
 
                             if (success.equals("1")) {
                                 JSONArray jsonArray = json.getJSONArray("Bookings");
-                                Log.e("SSSS", jsonArray.toString());
                                 for (int i = 0; i < jsonArray.length(); i++) {
                                     JSONObject jsonObject = jsonArray.getJSONObject(i);
 
@@ -1160,14 +1156,15 @@ public class ReportsFragment extends Fragment implements View.OnClickListener {
                                     JSONObject jbb = new JSONObject(up);
                                     UpdatedDate = jbb.getString("date");
                                     String SessionDate = jsonObject.getString("SessionDate");
+                                    String Shift = jsonObject.getString("Shift");
 
-                                    databaseHelper.createBooking(new Bookings(BookingID,ClientName,ClientMobile,ClientAddress,ClientNic,EventName,BookingDate,EventDate,ArrangePersons,ChargesTotal,Description,ClientID,ClientUserID,NetCode,SysCode,UpdatedDate));
+                                    databaseHelper.createBooking(new Bookings(BookingID,ClientName,ClientMobile,ClientAddress,ClientNic,EventName,BookingDate,EventDate,ArrangePersons,ChargesTotal,Description,ClientID,ClientUserID,NetCode,SysCode,UpdatedDate,Shift));
 
                                     if (i == jsonArray.length() - 1) {
                                         List<TableSession> se = TableSession.find(TableSession.class,"table_Name = ?","Bookings");
                                         for (TableSession s : se){
                                             s.setMaxID(BookingID);
-                                            s.setUpdateDate(SessionDate);
+                                            s.setInsertDate(SessionDate);
                                             s.save();
                                         }
                                     }
@@ -1199,7 +1196,7 @@ public class ReportsFragment extends Fragment implements View.OnClickListener {
                 for (User u : list) {
                     params.put("ClientID", u.getClientID());
                 }
-                List<TableSession> tableSessions = TableSession.find(TableSession.class,"table_Name = ?","CashBook");
+                List<TableSession> tableSessions = TableSession.find(TableSession.class,"table_Name = ?","Bookings");
                 for (TableSession t : tableSessions){
                     params.put("MaxID",t.getMaxID());
                 }
@@ -1229,11 +1226,10 @@ public class ReportsFragment extends Fragment implements View.OnClickListener {
                         try {
                             JSONObject json = new JSONObject(response);
                             String success = json.getString("success");
-                            Log.e("Response",success);
+                            Log.e("Booking2",json.toString());
 
                             if (success.equals("1")) {
                                 JSONArray jsonArray = json.getJSONArray("Bookings");
-                                Log.e("SSSS", jsonArray.toString());
                                 for (int i = 0; i < jsonArray.length(); i++) {
                                     JSONObject jsonObject = jsonArray.getJSONObject(i);
 
@@ -1264,8 +1260,8 @@ public class ReportsFragment extends Fragment implements View.OnClickListener {
                                     String SessionDate = jsonObject.getString("SessionDate");
 
                                     String query = "UPDATE Booking SET BookingID = '"+BookingID+"', ClientName = '"+ClientName+"', ClientMobile = '"+ClientMobile+"', ClientAddress = '"+ClientAddress+"', ClientNic = '"+ClientNic
-                                            +"', EventName = '"+EventName+"', BookingDate = '"+BookingDate+"', EventDate = '"+EventDate+"', ArrangePersons '"+ArrangePersons+"', ChargesTotal = '"+ChargesTotal+"', Description = '"+Description
-                                            +"', ClientID = '"+ClientID+"', ClientUserID '"+ClientUserID+"', NetCode = '"+NetCode+"', SysCode = '"+SysCode+"', UpdatedDate = '"+UpdatedDate+"' WHERE BookingID = "+ BookingID;
+                                            +"', EventName = '"+EventName+"', BookingDate = '"+BookingDate+"', EventDate = '"+EventDate+"', ArrangePersons ='"+ArrangePersons+"', ChargesTotal = '"+ChargesTotal+"', Description = '"+Description
+                                            +"', ClientID = '"+ClientID+"', ClientUserID = '"+ClientUserID+"', NetCode = '"+NetCode+"', SysCode = '"+SysCode+"', UpdatedDate = '"+UpdatedDate+"' WHERE BookingID = "+ BookingID;
                                     databaseHelper.updateBooking(query);
 
                                     if (i == jsonArray.length() - 1) {
@@ -1305,7 +1301,7 @@ public class ReportsFragment extends Fragment implements View.OnClickListener {
                 for (User u : list) {
                     params.put("ClientID", u.getClientID());
                 }
-                List<TableSession> tableSessions = TableSession.find(TableSession.class,"table_Name = ?","CashBook");
+                List<TableSession> tableSessions = TableSession.find(TableSession.class,"table_Name = ?","Bookings");
                 for (TableSession t : tableSessions){
                     params.put("MaxID",t.getMaxID());
                     params.put("SessionDate",t.getUpdateDate());
@@ -1332,11 +1328,10 @@ public class ReportsFragment extends Fragment implements View.OnClickListener {
                     new Response.Listener<String>() {
                         @Override
                         public void onResponse(String response) {
-                            Log.e("Response DD",response);
+                            Log.e("CashBook3",response);
                             try {
                                 JSONObject jsonObject = new JSONObject(response);
                                 String success = jsonObject.getString("success");
-                                Log.e("SuccessSS",success);
                                 if (success.equals("1")){
                                     String id = jsonObject.getString("CBID");
                                     String UpdatedDate = jsonObject.getString("UpdatedDate");
@@ -1346,7 +1341,7 @@ public class ReportsFragment extends Fragment implements View.OnClickListener {
                                     List<TableSession> se = TableSession.find(TableSession.class,"table_Name = ?","CashBook");
                                     for (TableSession s : se){
                                         s.setMaxID(id);
-                                        s.setUpdateDate(UpdatedDate);
+                                        s.setInsertDate(UpdatedDate);
                                         s.save();
                                     }
                                 }
@@ -1403,7 +1398,7 @@ public class ReportsFragment extends Fragment implements View.OnClickListener {
                     new Response.Listener<String>() {
                         @Override
                         public void onResponse(String response) {
-                            Log.e("Response CB",response);
+                            Log.e("CashBook4",response);
                             try {
                                 JSONObject jsonObject = new JSONObject(response);
                                 String success = jsonObject.getString("success");
@@ -1476,7 +1471,7 @@ public class ReportsFragment extends Fragment implements View.OnClickListener {
                     new Response.Listener<String>() {
                         @Override
                         public void onResponse(String response) {
-                            Log.e("Booking Boo",response);
+                            Log.e("Booking3",response);
                             try {
                                 JSONObject jsonObject = new JSONObject(response);
                                 String success = jsonObject.getString("success");
@@ -1487,16 +1482,18 @@ public class ReportsFragment extends Fragment implements View.OnClickListener {
                                     String message = jsonObject.getString("message");
                                     databaseHelper.updateCashBook("UPDATE Booking SET BookingID = '"+ id +"', UpdatedDate = '"+UpdatedDate+"' WHERE ID = "+c.getId());
 
-                                    List<TableSession> se = TableSession.find(TableSession.class,"table_Name = ?","Booking");
+                                    List<TableSession> se = TableSession.find(TableSession.class,"table_Name = ?","Bookings");
                                     for (TableSession s : se){
                                         s.setMaxID(id);
-                                        s.setUpdateDate(UpdatedDate);
+                                        s.setInsertDate(UpdatedDate);
                                         s.save();
                                     }
                                 }
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }Log.e("Sarem","CashBook7");
+//                            addAccount3Name();
+                            mProgress.dismiss();
                         }
                     }, new Response.ErrorListener() {
                 @Override
@@ -1529,6 +1526,7 @@ public class ReportsFragment extends Fragment implements View.OnClickListener {
                         params.put("DebitAccount", u.getCashID());
                         params.put("CreditAccount", u.getBookingIncomeID());
                         params.put("Amount", c.getAmount());
+                        params.put("Shift", c.getShift());
                     }
                     return params;
                 }
@@ -1542,7 +1540,7 @@ public class ReportsFragment extends Fragment implements View.OnClickListener {
     }
 
     public void updateBooking(){
-        String query = "SELECT * FROM Booking WHERE UpdatedDate = 0";
+        String query = "SELECT * FROM Booking WHERE UpdatedDate = 0 AND BookingID != 'o'";
         final List<Bookings> addBooking = databaseHelper.getBookings(query);
         Log.e("BookingID UP", String.valueOf(addBooking.size()));
 
@@ -1554,7 +1552,7 @@ public class ReportsFragment extends Fragment implements View.OnClickListener {
                     new Response.Listener<String>() {
                         @Override
                         public void onResponse(String response) {
-                            Log.e("Response CB",response);
+                            Log.e("Booking4",response);
                             try {
                                 JSONObject jsonObject = new JSONObject(response);
                                 String success = jsonObject.getString("success");
@@ -1564,7 +1562,7 @@ public class ReportsFragment extends Fragment implements View.OnClickListener {
                                     String message = jsonObject.getString("message");
                                     databaseHelper.updateCashBook("UPDATE Booking SET UpdatedDate = '"+UpdatedDate+"' WHERE ID = "+c.getId());
 
-                                    List<TableSession> se = TableSession.find(TableSession.class,"table_Name = ?","Booking");
+                                    List<TableSession> se = TableSession.find(TableSession.class,"table_Name = ?","Bookings");
                                     for (TableSession s : se){
                                         s.setUpdateDate(UpdatedDate);
                                         s.save();
@@ -1630,7 +1628,7 @@ public class ReportsFragment extends Fragment implements View.OnClickListener {
                     new Response.Listener<String>() {
                         @Override
                         public void onResponse(String response) {
-                            Log.e("Response CB",response);
+                            Log.e("Account3Name3",response);
                             try {
                                 JSONObject jsonObject = new JSONObject(response);
                                 String success = jsonObject.getString("success");
@@ -1644,7 +1642,7 @@ public class ReportsFragment extends Fragment implements View.OnClickListener {
                                     List<TableSession> se = TableSession.find(TableSession.class,"table_Name = ?","Account3Name");
                                     for (TableSession s : se){
                                         s.setMaxID(id);
-                                        s.setUpdateDate(UpdatedDate);
+                                        s.setInsertDate(UpdatedDate);
                                         s.save();
                                     }
                                 }else {
@@ -1707,7 +1705,7 @@ public class ReportsFragment extends Fragment implements View.OnClickListener {
                     new Response.Listener<String>() {
                         @Override
                         public void onResponse(String response) {
-                            Log.e("Response CB",response);
+                            Log.e("Account3Name4",response);
                             try {
                                 JSONObject jsonObject = new JSONObject(response);
                                 String success = jsonObject.getString("success");
@@ -1763,5 +1761,6 @@ public class ReportsFragment extends Fragment implements View.OnClickListener {
             AppController.getInstance().addToRequestQueue(jsonObjectRequest, tag_json_obj);
         }
         mProgress.dismiss();
+        getReports();
     }
 }

@@ -3,8 +3,10 @@ package org.by9steps.shadihall.fragments;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
@@ -13,6 +15,7 @@ import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -33,6 +36,7 @@ import org.by9steps.shadihall.AppController;
 import org.by9steps.shadihall.R;
 import org.by9steps.shadihall.activities.LoginActivity;
 import org.by9steps.shadihall.activities.MainActivity;
+import org.by9steps.shadihall.activities.MapsActivity;
 import org.by9steps.shadihall.activities.RegisterActivity;
 import org.by9steps.shadihall.activities.SplashActivity;
 import org.by9steps.shadihall.helper.DatabaseHelper;
@@ -82,6 +86,11 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
 
     DatabaseHelper databaseHelper;
 
+    //GPS Enable
+    LocationManager lm;
+    boolean gps_enabled = false;
+    boolean network_enabled = false;
+
 
     public LoginFragment() {
         // Required empty public constructor
@@ -117,6 +126,8 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
             ph = sharedPreferences.getString(phone,"");
             user_number.setText(ph);
         }
+
+        lm = (LocationManager)getContext().getSystemService(Context.LOCATION_SERVICE);
 
         return view;
     }
@@ -223,15 +234,51 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
 
                 break;
             case R.id.create_account:
-                Intent intent = new Intent(getContext(), RegisterActivity.class);
-                intent.putExtra("TYPE", "Register");
-                startActivity(intent);
+                if (isGpsEnabled()) {
+                    Intent intent = new Intent(getContext(), MapsActivity.class);
+                    startActivity(intent);
+                }
                 break;
             case R.id.log_out:
                 startActivity(new Intent(getContext(), LoginActivity.class));
                 getActivity().finish();
                 break;
         }
+    }
+
+    private Boolean isGpsEnabled(){
+        try {
+            gps_enabled = lm.isProviderEnabled(LocationManager.GPS_PROVIDER);
+        } catch(Exception ex) {}
+
+        try {
+            network_enabled = lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+        } catch(Exception ex) {}
+
+        if(!gps_enabled && !network_enabled) {
+            // notify user
+
+            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getContext());
+            alertDialogBuilder.setMessage(R.string.gps_network_not_enabled);
+            alertDialogBuilder.setPositiveButton(R.string.open_location_settings,
+                    new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface arg0, int arg1) {
+                            startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+                        }
+                    });
+
+            alertDialogBuilder.setNegativeButton(R.string.Cancel,new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    getActivity().finish();
+                }
+            });
+
+            AlertDialog alertDialog = alertDialogBuilder.create();
+            alertDialog.show();
+        }
+        return gps_enabled;
     }
 
     public void getAccount3Name(){
@@ -282,7 +329,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
 
                                     if (i == jsonArray.length() - 1) {
                                         TableSession.deleteAll(TableSession.class);
-                                        TableSession session = new TableSession("Account3Name", AcNameID, SessionDate);
+                                        TableSession session = new TableSession("Account3Name", AcNameID, SessionDate, SessionDate);
                                         session.save();
                                     }
                                 }
@@ -363,7 +410,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
                                     databaseHelper.createCashBook(new CashBook(CashBookID,CBDate1,DebitAccount,CreditAccount,CBRemark,Amount,ClientID,ClientUserID,NetCode,SysCode,UpdatedDate,BookingID));
 
                                     if (i == jsonArray.length() - 1) {
-                                        TableSession session = new TableSession("CashBook", CashBookID, SessionDate);
+                                        TableSession session = new TableSession("CashBook", CashBookID, SessionDate, SessionDate);
                                         session.save();
                                     }
 
@@ -377,13 +424,13 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
                                         updateDate.save();
                                     }
                                 }
-                                getAccountGroups();
 //                                mProgress.dismiss();
 
                             }else {
                                 String message = jsonObj.getString("message");
 //                                Toast.makeText(SplashActivity.this, message, Toast.LENGTH_SHORT).show();
                             }
+                            getAccountGroups();
                         } catch (JSONException e) {
                             e.printStackTrace();
                         } catch (ParseException e) {
@@ -517,23 +564,24 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
                                     JSONObject jbb = new JSONObject(up);
                                     UpdatedDate = jbb.getString("date");
                                     String SessionDate = jsonObject.getString("SessionDate");
+                                    String Shift = jsonObject.getString("Shift");
 
                                     Log.e("TEST","SSSS");
 
-                                    databaseHelper.createBooking(new Bookings(BookingID,ClientName,ClientMobile,ClientAddress,ClientNic,EventName,BookingDate,EventDate,ArrangePersons,ChargesTotal,Description,ClientID,ClientUserID,NetCode,SysCode,UpdatedDate));
+                                    databaseHelper.createBooking(new Bookings(BookingID,ClientName,ClientMobile,ClientAddress,ClientNic,EventName,BookingDate,EventDate,ArrangePersons,ChargesTotal,Description,ClientID,ClientUserID,NetCode,SysCode,UpdatedDate,Shift));
 
                                     if (i == jsonArray.length() - 1) {
-                                        TableSession session = new TableSession("Bookings", BookingID, SessionDate);
+                                        TableSession session = new TableSession("Bookings", BookingID, SessionDate, SessionDate);
                                         session.save();
                                     }
                                 }
-                                getAccountTypes();
 
 //                                FetchFromDb();
 //                                pDialog.dismiss();
                             }else {
 //                                pDialog.dismiss();
                             }
+                            getAccountTypes();
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }

@@ -6,6 +6,7 @@ import android.content.Context;
 import android.icu.util.Calendar;
 import android.text.TextUtils;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
@@ -18,6 +19,7 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
 import org.by9steps.shadihall.activities.CashCollectionActivity;
+import org.by9steps.shadihall.activities.EventCashBookActivity;
 import org.by9steps.shadihall.helper.DatabaseHelper;
 import org.by9steps.shadihall.model.Account3Name;
 import org.by9steps.shadihall.model.Bookings;
@@ -107,7 +109,7 @@ public class AppController extends Application {
         return mDate;
     }
 
-     public void refereshTables(Context context){
+    public void refereshTables(Context context){
         databaseHelper = new DatabaseHelper(context);
         mProgress = new ProgressDialog(context);
         mProgress.setMessage("Loading...");
@@ -131,7 +133,7 @@ public class AppController extends Application {
                         try {
                             jsonObj= new JSONObject(response);
                             String success = jsonObj.getString("success");
-                            Log.e("Sarem",jsonObj.toString());
+                            Log.e("Account3Name1",jsonObj.toString());
                             if (success.equals("1")){
                                 JSONArray jsonArray = jsonObj.getJSONArray("Account3Name");
                                 for (int i = 0; i < jsonArray.length(); i++) {
@@ -177,7 +179,7 @@ public class AppController extends Application {
                             }else {
                                 String message = jsonObj.getString("message");
 //                                Toast.makeText(SplashActivity.this, message, Toast.LENGTH_SHORT).show();
-                            }Log.e("SSSSS","SAREMS1");
+                            }
                             updateAccount3Name();
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -227,6 +229,7 @@ public class AppController extends Application {
                         try {
                             jsonObj= new JSONObject(response);
                             String success = jsonObj.getString("success");
+                            Log.e("Account3Name2",jsonObj.toString());
                             if (success.equals("1")){
                                 JSONArray jsonArray = jsonObj.getJSONArray("Account3Name");
                                 for (int i = 0; i < jsonArray.length(); i++) {
@@ -264,7 +267,7 @@ public class AppController extends Application {
                                     if (i == jsonArray.length() - 1) {
                                         List<TableSession> se = TableSession.find(TableSession.class,"table_Name = ?","Account3Name");
                                         for (TableSession s : se){
-                                            s.setMaxID(AcNameID);
+//                                            s.setMaxID(AcNameID);
                                             s.setUpdateDate(SessionDate);
                                             s.save();
                                         }
@@ -275,8 +278,8 @@ public class AppController extends Application {
                             }else {
                                 String message = jsonObj.getString("message");
 //                                Toast.makeText(SplashActivity.this, message, Toast.LENGTH_SHORT).show();
-                            }
-                            getCashBook();
+                            }Log.e("Sarem","CashBook1");
+                            getCashBook1();
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -311,7 +314,7 @@ public class AppController extends Application {
         AppController.getInstance().addToRequestQueue(jsonObjectRequest, tag_json_obj);
     }
 
-    public void getCashBook(){
+    public void getCashBook1(){
 
         String tag_json_obj = "json_obj_req";
         String u = "http://69.167.137.121/plesk-site-preview/sky.com.pk/shadiHall/RefreshCashBook.php";
@@ -326,11 +329,11 @@ public class AppController extends Application {
                         try {
                             jsonObj= new JSONObject(response);
                             String success = jsonObj.getString("success");
+                            Log.e("CashBook1",jsonObj.toString());
                             if (success.equals("1")){
                                 JSONArray jsonArray = jsonObj.getJSONArray("CashBook");
                                 for (int i = 0; i < jsonArray.length(); i++) {
                                     JSONObject jsonObject = jsonArray.getJSONObject(i);
-                                    Log.e("Account3Name",jsonObject.toString());
                                     String CashBookID = jsonObject.getString("CashBookID");
                                     String cb = jsonObject.getString("CBDate");
                                     JSONObject jbb = new JSONObject(cb);
@@ -363,13 +366,14 @@ public class AppController extends Application {
                                             s.save();
                                         }
                                     }
+//                                    getCashBook();
 
                                 }
 
                             }else {
                                 String message = jsonObj.getString("message");
 //                                Toast.makeText(SplashActivity.this, message, Toast.LENGTH_SHORT).show();
-                            }
+                            }Log.e("Sarem","CashBook2");
                             updateCashBook();
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -419,6 +423,7 @@ public class AppController extends Application {
 
                         try {
                             jsonObj= new JSONObject(response);
+                            Log.e("CashBook2",response);
                             String success = jsonObj.getString("success");
                             if (success.equals("1")){
                                 JSONArray jsonArray = jsonObj.getJSONArray("CashBook");
@@ -447,27 +452,28 @@ public class AppController extends Application {
                                     String BookingID = jsonObject.getString("BookingID");
                                     String SessionDate = jsonObject.getString("SessionDate");
 
-                                    String query = "UPDATE CashBook SET CBDate = '"+CBDate1+"', DebitAccount = '"+DebitAccount+"', CreditAccount = '"+CreditAccount+"', CBRemarks '"+CBRemark+"', Amount = '"+Amount+"', ClientID = '"+ClientID+"', ClientUserID = '"+ClientUserID+"', NetCode = '"+NetCode+"', SysCode = '"+SysCode+"', UpdatedDate = '"+UpdatedDate+"', BookingID = '"+BookingID+
+                                    String query = "UPDATE CashBook SET CBDate = '"+CBDate1+"', DebitAccount = '"+DebitAccount+"', CreditAccount = '"+CreditAccount+"', CBRemarks = '"+CBRemark+"', Amount = '"+Amount+"', ClientID = '"+ClientID+"', ClientUserID = '"+ClientUserID+"', NetCode = '"+NetCode+"', SysCode = '"+SysCode+"', UpdatedDate = '"+UpdatedDate+"', BookingID = '"+BookingID+
                                             "' WHERE CashBookID = "+CashBookID;
                                     databaseHelper.updateCashBook(query);
 
                                     if (i == jsonArray.length() - 1) {
                                         List<TableSession> se = TableSession.find(TableSession.class,"table_Name = ?","CashBook");
                                         for (TableSession s : se){
-                                            s.setMaxID(CashBookID);
+//                                            s.setMaxID(CashBookID);
                                             s.setUpdateDate(SessionDate);
                                             s.save();
                                         }
                                     }
-
-
+//                                    getCashBook();
                                 }
+
+
 
                             }else {
                                 String message = jsonObj.getString("message");
 //                                Toast.makeText(SplashActivity.this, message, Toast.LENGTH_SHORT).show();
-                            }
-                            getBookings();
+                            }Log.e("Sarem","CashBook3");
+                            getBookings1();
                         } catch (JSONException e) {
                             e.printStackTrace();
                         } catch (ParseException e) {
@@ -492,6 +498,7 @@ public class AppController extends Application {
                 List<TableSession> tableSessions = TableSession.find(TableSession.class,"table_Name = ?","CashBook");
                 for (TableSession t : tableSessions){
                     params.put("MaxID",t.getMaxID());
+                    Log.e("UPDATE DATE",t.getUpdateDate());
                     params.put("SessionDate",t.getUpdateDate());
                 }
                 return params;
@@ -503,7 +510,7 @@ public class AppController extends Application {
         AppController.getInstance().addToRequestQueue(jsonObjectRequest, tag_json_obj);
     }
 
-    public void getBookings(){
+    public void getBookings1(){
         // Tag used to cancel the request
         String tag_json_obj = "json_obj_req";
         String url = "http://69.167.137.121/plesk-site-preview/sky.com.pk/shadiHall/RefreshBooking.php";
@@ -519,11 +526,10 @@ public class AppController extends Application {
                         try {
                             JSONObject json = new JSONObject(response);
                             String success = json.getString("success");
-                            Log.e("Response",success);
+                            Log.e("Booking1",json.toString());
 
                             if (success.equals("1")) {
                                 JSONArray jsonArray = json.getJSONArray("Bookings");
-                                Log.e("SSSS", jsonArray.toString());
                                 for (int i = 0; i < jsonArray.length(); i++) {
                                     JSONObject jsonObject = jsonArray.getJSONObject(i);
 
@@ -553,7 +559,7 @@ public class AppController extends Application {
                                     UpdatedDate = jbb.getString("date");
                                     String SessionDate = jsonObject.getString("SessionDate");
 
-                                    databaseHelper.createBooking(new Bookings(BookingID,ClientName,ClientMobile,ClientAddress,ClientNic,EventName,BookingDate,EventDate,ArrangePersons,ChargesTotal,Description,ClientID,ClientUserID,NetCode,SysCode,UpdatedDate));
+//                                    databaseHelper.createBooking(new Bookings(BookingID,ClientName,ClientMobile,ClientAddress,ClientNic,EventName,BookingDate,EventDate,ArrangePersons,ChargesTotal,Description,ClientID,ClientUserID,NetCode,SysCode,UpdatedDate));
 
                                     if (i == jsonArray.length() - 1) {
                                         List<TableSession> se = TableSession.find(TableSession.class,"table_Name = ?","Bookings");
@@ -569,7 +575,7 @@ public class AppController extends Application {
 //                                pDialog.dismiss();
                             }else {
 //                                pDialog.dismiss();
-                            }
+                            }Log.e("Sarem","CashBook4");
                             updateBookings();
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -621,11 +627,10 @@ public class AppController extends Application {
                         try {
                             JSONObject json = new JSONObject(response);
                             String success = json.getString("success");
-                            Log.e("Response",success);
+                            Log.e("Booking2",json.toString());
 
                             if (success.equals("1")) {
                                 JSONArray jsonArray = json.getJSONArray("Bookings");
-                                Log.e("SSSS", jsonArray.toString());
                                 for (int i = 0; i < jsonArray.length(); i++) {
                                     JSONObject jsonObject = jsonArray.getJSONObject(i);
 
@@ -663,7 +668,7 @@ public class AppController extends Application {
                                     if (i == jsonArray.length() - 1) {
                                         List<TableSession> se = TableSession.find(TableSession.class,"table_Name = ?","Bookings");
                                         for (TableSession s : se){
-                                            s.setMaxID(BookingID);
+//                                            s.setMaxID(BookingID);
                                             s.setUpdateDate(SessionDate);
                                             s.save();
                                         }
@@ -675,7 +680,7 @@ public class AppController extends Application {
 //                                mProgress.dismiss();
                             }else {
 //                                mProgress.dismiss();
-                            }
+                            }Log.e("Sarem","CashBook5");
                             addCashBook();
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -724,18 +729,25 @@ public class AppController extends Application {
                     new Response.Listener<String>() {
                         @Override
                         public void onResponse(String response) {
-                            Log.e("Response",response);
+                            Log.e("CashBook3",response);
                             try {
                                 JSONObject jsonObject = new JSONObject(response);
                                 String success = jsonObject.getString("success");
-                                Log.e("SuccessSS",success);
                                 if (success.equals("1")){
                                     String id = jsonObject.getString("CBID");
                                     String UpdatedDate = jsonObject.getString("UpdatedDate");
                                     String message = jsonObject.getString("message");
                                     databaseHelper.updateCashBook("UPDATE CashBook SET CashBookID = '"+id+"', UpdatedDate = '"+UpdatedDate+"' WHERE ID = "+c.getcId());
-//                                    Toast.makeText(CashCollectionActivity.this, message, Toast.LENGTH_SHORT).show();
+
+                                    List<TableSession> se = TableSession.find(TableSession.class,"table_Name = ?","CashBook");
+                                    for (TableSession s : se){
+                                        s.setMaxID(id);
+                                        s.setUpdateDate(UpdatedDate);
+                                        s.save();
+                                    }
+//                                    getCashBook();
                                 }
+
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
@@ -771,12 +783,14 @@ public class AppController extends Application {
             RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
             jsonObjectRequest.setRetryPolicy(policy);
             AppController.getInstance().addToRequestQueue(jsonObjectRequest, tag_json_obj);
-        }
+        }Log.e("Sarem","CashBook5");
         addCashBook2();
     }
+
     public void addCashBook2(){
         String query = "SELECT * FROM CashBook WHERE UpdatedDate = 0";
         List<CashBook> addCashBook = databaseHelper.getCashBook(query);
+        Log.e("CASHBOOK UP", String.valueOf(addCashBook.size()));
 
         for (final CashBook c : addCashBook){
             String tag_json_obj = "json_obj_req";
@@ -786,16 +800,22 @@ public class AppController extends Application {
                     new Response.Listener<String>() {
                         @Override
                         public void onResponse(String response) {
-                            Log.e("Response",response);
+                            Log.e("CashBook4",response);
                             try {
                                 JSONObject jsonObject = new JSONObject(response);
                                 String success = jsonObject.getString("success");
-                                Log.e("Success",success);
+                                Log.e("Success CB",success);
                                 if (success.equals("1")){
                                     String UpdatedDate = jsonObject.getString("UpdatedDate");
                                     String message = jsonObject.getString("message");
                                     databaseHelper.updateCashBook("UPDATE CashBook SET UpdatedDate = '"+UpdatedDate+"' WHERE ID = "+c.getcId());
-//                                    Toast.makeText(CashCollectionActivity.this, message, Toast.LENGTH_SHORT).show();
+
+                                    List<TableSession> se = TableSession.find(TableSession.class,"table_Name = ?","CashBook");
+                                    for (TableSession s : se){
+                                        s.setUpdateDate(UpdatedDate);
+                                        s.save();
+                                    }
+//                                    getCashBook();
                                 }
                             } catch (JSONException e) {
                                 e.printStackTrace();
@@ -815,6 +835,7 @@ public class AppController extends Application {
                     Map<String, String> params = new HashMap<String, String>();
                     List<User> list = User.listAll(User.class);
                     for (User u : list) {
+                        params.put("CashBookID", c.getCashBookID());
                         params.put("CBDate", c.getCBDate());
                         params.put("DebitAccount", c.getDebitAccount());
                         params.put("CreditAccount", c.getCreditAccount());
@@ -834,11 +855,14 @@ public class AppController extends Application {
             jsonObjectRequest.setRetryPolicy(policy);
             AppController.getInstance().addToRequestQueue(jsonObjectRequest, tag_json_obj);
         }
+        Log.e("Sarem","CashBook6");
         addBooking();
+        //For Refresh Recycler
+//        mProgress.dismiss();
     }
 
     public void addBooking(){
-        String query = "SELECT * FROM Booking WHERE BookingID = 0 AND UpdatedDate = 0";
+        String query = "SELECT * FROM Booking WHERE BookingID = 'o' AND UpdatedDate = 0";
         final List<Bookings> addBooking = databaseHelper.getBookings(query);
         Log.e("BookingID UP", String.valueOf(addBooking.size()));
 
@@ -850,22 +874,30 @@ public class AppController extends Application {
                     new Response.Listener<String>() {
                         @Override
                         public void onResponse(String response) {
-                            Log.e("Response CB",response);
+                            Log.e("Booking3",response);
                             try {
                                 JSONObject jsonObject = new JSONObject(response);
                                 String success = jsonObject.getString("success");
-                                Log.e("Success CB",success);
+                                Log.e("Success Boo",success);
                                 if (success.equals("1")){
                                     String id = jsonObject.getString("BookingID");
                                     String UpdatedDate = jsonObject.getString("UpdatedDate");
                                     String message = jsonObject.getString("message");
                                     databaseHelper.updateCashBook("UPDATE Booking SET BookingID = '"+ id +"', UpdatedDate = '"+UpdatedDate+"' WHERE ID = "+c.getId());
-//                                    Toast.makeText(CashCollectionActivity.this, message, Toast.LENGTH_SHORT).show();
+
+                                    List<TableSession> se = TableSession.find(TableSession.class,"table_Name = ?","Booking");
+                                    for (TableSession s : se){
+                                        s.setMaxID(id);
+                                        s.setUpdateDate(UpdatedDate);
+                                        s.save();
+                                    }
                                 }
                             } catch (JSONException e) {
                                 e.printStackTrace();
-                            }
-                            getCashBook();
+                            }Log.e("Sarem","CashBook7");
+//                            addAccount3Name();
+
+                            mProgress.dismiss();
                         }
                     }, new Response.ErrorListener() {
                 @Override
@@ -907,39 +939,41 @@ public class AppController extends Application {
             jsonObjectRequest.setRetryPolicy(policy);
             AppController.getInstance().addToRequestQueue(jsonObjectRequest, tag_json_obj);
         }
-//        mProgress.dismiss();
-//        updateBooking();
+        updateBooking();
     }
 
     public void updateBooking(){
-        String query = "SELECT * FROM Booking WHERE UpdatedDate = 0";
+        String query = "SELECT * FROM Booking WHERE UpdatedDate = 0 AND BookingID != 'o'";
         final List<Bookings> addBooking = databaseHelper.getBookings(query);
         Log.e("BookingID UP", String.valueOf(addBooking.size()));
 
         for (final Bookings c : addBooking){
             String tag_json_obj = "json_obj_req";
-            String url = "http://69.167.137.121/plesk-site-preview/sky.com.pk/shadiHall/AddEvent.php";
+            String url = "http://69.167.137.121/plesk-site-preview/sky.com.pk/shadiHall/UpdateEvent.php";
 
             StringRequest jsonObjectRequest = new StringRequest(Request.Method.POST, url,
                     new Response.Listener<String>() {
                         @Override
                         public void onResponse(String response) {
-                            Log.e("Response CB",response);
+                            Log.e("Booking4",response);
                             try {
                                 JSONObject jsonObject = new JSONObject(response);
                                 String success = jsonObject.getString("success");
                                 Log.e("Success CB",success);
                                 if (success.equals("1")){
-                                    String id = jsonObject.getString("BookingID");
                                     String UpdatedDate = jsonObject.getString("UpdatedDate");
                                     String message = jsonObject.getString("message");
                                     databaseHelper.updateCashBook("UPDATE Booking SET UpdatedDate = '"+UpdatedDate+"' WHERE ID = "+c.getId());
-//                                    Toast.makeText(CashCollectionActivity.this, message, Toast.LENGTH_SHORT).show();
+
+                                    List<TableSession> se = TableSession.find(TableSession.class,"table_Name = ?","Booking");
+                                    for (TableSession s : se){
+                                        s.setUpdateDate(UpdatedDate);
+                                        s.save();
+                                    }
                                 }
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
-                            getCashBook();
                         }
                     }, new Response.ErrorListener() {
                 @Override
@@ -955,6 +989,7 @@ public class AppController extends Application {
                     Map<String, String> params = new HashMap<String, String>();
                     List<User> list = User.listAll(User.class);
                     for (User u : list) {
+                        params.put("BookingID", c.getBookingID());
                         params.put("ClientName", c.getClientName());
                         params.put("ClientMobile", c.getClientMobile());
                         params.put("ClientAddress", c.getClientAddress());
@@ -971,7 +1006,6 @@ public class AppController extends Application {
                         params.put("SysCode", "0");
                         params.put("DebitAccount", u.getCashID());
                         params.put("CreditAccount", u.getBookingIncomeID());
-                        params.put("Amount", c.getAmount());
                     }
                     return params;
                 }
@@ -981,8 +1015,7 @@ public class AppController extends Application {
             jsonObjectRequest.setRetryPolicy(policy);
             AppController.getInstance().addToRequestQueue(jsonObjectRequest, tag_json_obj);
         }
-        //For Refresh Recycler
-//        mProgress.dismiss();
+        addAccount3Name();
     }
 
     public void addAccount3Name(){
@@ -998,7 +1031,7 @@ public class AppController extends Application {
                     new Response.Listener<String>() {
                         @Override
                         public void onResponse(String response) {
-                            Log.e("Response CB",response);
+                            Log.e("Account3Name3",response);
                             try {
                                 JSONObject jsonObject = new JSONObject(response);
                                 String success = jsonObject.getString("success");
@@ -1009,17 +1042,21 @@ public class AppController extends Application {
                                     String message = jsonObject.getString("message");
                                     databaseHelper.updateCashBook("UPDATE Account3Name SET AcNameID = '"+ id +"', UpdatedDate = '"+UpdatedDate+"' WHERE ID = "+c.getId());
 
-                                        List<TableSession> se = TableSession.find(TableSession.class,"table_Name = ?","Account3Name");
-                                        for (TableSession s : se){
-                                            s.setMaxID(id);
-                                            s.setUpdateDate(UpdatedDate);
-                                            s.save();
-                                        }
+                                    List<TableSession> se = TableSession.find(TableSession.class,"table_Name = ?","Account3Name");
+                                    for (TableSession s : se){
+                                        s.setMaxID(id);
+                                        s.setUpdateDate(UpdatedDate);
+                                        s.save();
+                                    }
+                                }else {
+                                    databaseHelper.deleteAccount3NameEntry("DELETE FROM Account3Name WHERE ID = "+c.getId());
+                                    String message = jsonObject.getString("message");
+                                    Toast.makeText(mInstance, message, Toast.LENGTH_SHORT).show();
                                 }
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
-                            getCashBook();
+                            mProgress.dismiss();
                         }
                     }, new Response.ErrorListener() {
                 @Override
@@ -1054,6 +1091,79 @@ public class AppController extends Application {
             jsonObjectRequest.setRetryPolicy(policy);
             AppController.getInstance().addToRequestQueue(jsonObjectRequest, tag_json_obj);
         }
+//        mProgress.dismiss();
+        updateAccount3Name1();
+    }
+
+    public void updateAccount3Name1(){
+        String query = "SELECT * FROM Account3Name WHERE UpdatedDate = 0";
+        final List<Account3Name> addBooking = databaseHelper.getAccount3Name(query);
+        Log.e("BookingID UP", String.valueOf(addBooking.size()));
+
+        for (final Account3Name c : addBooking){
+            String tag_json_obj = "json_obj_req";
+            String url = "http://69.167.137.121/plesk-site-preview/sky.com.pk/shadiHall/UpdateCharofAcc.php";
+
+            StringRequest jsonObjectRequest = new StringRequest(Request.Method.POST, url,
+                    new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
+                            Log.e("Account3Name4",response);
+                            try {
+                                JSONObject jsonObject = new JSONObject(response);
+                                String success = jsonObject.getString("success");
+                                Log.e("Success CB",success);
+                                if (success.equals("1")){
+                                    String UpdatedDate = jsonObject.getString("UpdatedDate");
+                                    String message = jsonObject.getString("message");
+                                    databaseHelper.updateCashBook("UPDATE Account3Name SET UpdatedDate = '"+UpdatedDate+"' WHERE ID = "+c.getId());
+
+                                    List<TableSession> se = TableSession.find(TableSession.class,"table_Name = ?","Account3Name");
+                                    for (TableSession s : se){
+                                        s.setUpdateDate(UpdatedDate);
+                                        s.save();
+                                    }
+                                }
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                            mProgress.dismiss();
+                        }
+                    }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    mProgress.dismiss();
+                    Log.e("Error",error.toString());
+//                    Toast.makeText(CashCollectionActivity.this, error.toString(), Toast.LENGTH_SHORT).show();
+                }
+            }){
+                @Override
+                protected Map<String, String> getParams() {
+
+                    Map<String, String> params = new HashMap<String, String>();
+                    List<User> list = User.listAll(User.class);
+                    for (User u : list) {
+                        params.put("AcNameID", c.getAcNameID());
+                        params.put("AcName", c.getAcName());
+                        params.put("AcAddress", c.getAcAddress());
+                        params.put("AcContactNo", c.getAcContactNo());
+                        params.put("AcEmailAddress", c.getAcEmailAddress());
+                        params.put("Salary", c.getSalary());
+                        params.put("AcMobileNo", c.getAcMobileNo());
+                        params.put("AcPassward", c.getAcPassward());
+                        params.put("SecurityRights", c.getSecurityRights());
+                        params.put("ClientID", u.getClientID());
+                        params.put("AcGroupID", c.getAcGroupID());
+                    }
+                    return params;
+                }
+            };
+            int socketTimeout = 30000;//30 seconds - change to what you want
+            RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
+            jsonObjectRequest.setRetryPolicy(policy);
+            AppController.getInstance().addToRequestQueue(jsonObjectRequest, tag_json_obj);
+        }
+//        getCashBook();
         mProgress.dismiss();
     }
 }

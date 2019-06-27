@@ -31,7 +31,7 @@
             <TextView
                 android:textStyle="bold"
                 android:id="@+id/income"
-                android:textAlignment="center"
+                android:textAlignment="textEnd"
                 android:textSize="@dimen/textSize"
                 android:layout_margin="3dp"
                 android:layout_width="@dimen/hundred_dp"
@@ -41,7 +41,7 @@
             <TextView
                 android:textStyle="bold"
                 android:id="@+id/expense"
-                android:textAlignment="center"
+                android:textAlignment="textEnd"
                 android:textSize="@dimen/textSize"
                 android:layout_margin="3dp"
                 android:layout_width="@dimen/hundred_dp"
@@ -51,7 +51,7 @@
             <TextView
                 android:textStyle="bold"
                 android:id="@+id/profit"
-                android:textAlignment="center"
+                android:textAlignment="textEnd"
                 android:textSize="@dimen/textSize"
                 android:layout_margin="3dp"
                 android:layout_width="@dimen/hundred_dp"

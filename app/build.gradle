@@ -9,6 +9,7 @@ android {
         targetSdkVersion 28
         versionCode 4
         versionName "1.0"
+        multiDexEnabled true
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
     }
@@ -56,6 +57,11 @@ dependencies {
     implementation 'com.github.MdFarhanRaja:SearchableSpinner:1.2'
     implementation 'com.google.firebase:firebase-auth:16.2.0'
     implementation 'com.google.firebase:firebase-core:16.0.8'
+
+    //Google Location
+    implementation "com.google.android.gms:play-services-location:16.0.0"
+    implementation "com.google.android.gms:play-services-places:16.1.0"
+    implementation 'com.google.android.gms:play-services-maps:16.1.0'
 
 //    implementation files('libs/jxl.jar')
 }

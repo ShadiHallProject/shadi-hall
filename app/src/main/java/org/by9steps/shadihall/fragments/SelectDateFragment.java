@@ -95,6 +95,16 @@ public class SelectDateFragment extends DialogFragment implements DatePickerDial
                 GeneralLedgerActivity.date_picker2.setText(year + "-" + m + "-" + d);
             }
             AppController.date = "";
+        }else if (AppController.date.equals("Booking")){
+            String d = String.valueOf(day), m = String.valueOf(month);
+            if (month<10){
+                m = "0"+String.valueOf(month);
+            }
+            if (day<10){
+                d = "0"+String.valueOf(day);
+            }
+            BookingFormFragment.event_date.setText(year+"-"+m+"-"+d);
+            AppController.date = "";
         }else {
             ReportsFragment.date_picker.setText(year+"-"+month+"-"+day);
         }

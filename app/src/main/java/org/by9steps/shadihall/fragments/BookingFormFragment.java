@@ -6,14 +6,18 @@ import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.support.design.widget.TextInputEditText;
 import android.support.design.widget.TextInputLayout;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.DatePicker;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -23,6 +27,7 @@ import com.android.volley.Response;
 import com.android.volley.RetryPolicy;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
+import com.itextpdf.text.DocumentException;
 import com.orm.SugarContext;
 import com.squareup.timessquare.CalendarPickerView;
 
@@ -35,6 +40,8 @@ import org.by9steps.shadihall.model.Bookings;
 import org.by9steps.shadihall.model.CashBook;
 import org.by9steps.shadihall.model.User;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -53,6 +60,7 @@ public class BookingFormFragment extends Fragment implements View.OnClickListene
 
     private static final String ARG_BOOKING_DATE = "event_date";
     private static final String ARG_BOOKING_ID = "booking_id";
+    private static final String ARG_EVENT_SHIFT = "event_shift";
 
     InputValidation inputValidation;
     DatabaseHelper databaseHelper;
@@ -60,7 +68,9 @@ public class BookingFormFragment extends Fragment implements View.OnClickListene
     TextInputLayout date_layout;
     TextView date;
     TextInputLayout event_date_layout;
-    TextView event_date;
+    static Button event_date;
+    TextInputLayout event_shift_layout;
+    TextView event_shift;
     TextInputLayout person_name_layout;
     TextInputEditText person_name;
     TextInputLayout address_layout;
@@ -83,14 +93,16 @@ public class BookingFormFragment extends Fragment implements View.OnClickListene
 
     ProgressDialog pDialog;
     List<Bookings> bookingList;
+    String id;
 
-    private String eventDate, bookingID;
+    private String eventDate, bookingID, eventShift;
 
-    public static BookingFormFragment newInstance(String message, String bookingID) {
+    public static BookingFormFragment newInstance(String message, String bookingID, String eventShift) {
         BookingFormFragment fragment = new BookingFormFragment();
         Bundle args = new Bundle();
         args.putString(ARG_BOOKING_DATE, message);
         args.putString(ARG_BOOKING_ID, bookingID);
+        args.putString(ARG_EVENT_SHIFT, eventShift);
         fragment.setArguments(args);
         return fragment;
     }
@@ -102,6 +114,7 @@ public class BookingFormFragment extends Fragment implements View.OnClickListene
         if (getArguments() != null) {
             eventDate = getArguments().getString(ARG_BOOKING_DATE);
             bookingID = getArguments().getString(ARG_BOOKING_ID);
+            eventShift = getArguments().getString(ARG_EVENT_SHIFT);
         }
     }
 
@@ -115,7 +128,7 @@ public class BookingFormFragment extends Fragment implements View.OnClickListene
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_booking_form, container, false);
-
+        setHasOptionsMenu(true);
         if (((AppCompatActivity)getActivity()).getSupportActionBar() != null) {
             ((AppCompatActivity)getActivity()).getSupportActionBar().setTitle("Add New Event");
         }
@@ -129,6 +142,8 @@ public class BookingFormFragment extends Fragment implements View.OnClickListene
         date_layout = view.findViewById(R.id.date_layout);
         event_date = view.findViewById(R.id.event_date);
         event_date_layout = view.findViewById(R.id.event_date_layout);
+        event_shift = view.findViewById(R.id.event_shift);
+        event_shift_layout = view.findViewById(R.id.event_shift_layout);
         person_name = view.findViewById(R.id.name_of_person);
         person_name_layout = view.findViewById(R.id.name_of_person_layout);
         address = view.findViewById(R.id.address);
@@ -149,11 +164,14 @@ public class BookingFormFragment extends Fragment implements View.OnClickListene
         advance_fee_layout = view.findViewById(R.id.advance_fee_layout);
         add_event = view.findViewById(R.id.add);
 
+        event_shift.setText(eventShift);
+        event_date.setText(eventDate);
+
         if (!bookingID.equals("id")){
             String query = "";
             List<User> list = User.listAll(User.class);
             for (User u: list) {
-                query = "SELECT * FROM Booking WHERE BookingID = " + bookingID;
+                query = "SELECT * FROM Booking WHERE BookingID = '" + bookingID+"'";
             }
             bookingList = databaseHelper.getBookings(query);
             for (Bookings b : bookingList){
@@ -170,18 +188,27 @@ public class BookingFormFragment extends Fragment implements View.OnClickListene
                 advance_fee.setText(b.getAmount());
                 advance_fee.setVisibility(View.GONE);
                 add_event.setText(getString(R.string.update));
+                event_shift.setText(b.getShift());
+                id = b.getId();
             }
         }
 
         add_event.setOnClickListener(this);
+        event_date.setOnClickListener(this);
 
         Date d = new Date();
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
         date.setText(formatter.format(d));
 
-        event_date.setText(eventDate);
-
         return view;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if(item.getItemId() == android.R.id.home){
+            getActivity().onBackPressed();
+        }
+        return true;
     }
 
     @Override
@@ -209,7 +236,7 @@ public class BookingFormFragment extends Fragment implements View.OnClickListene
                 if (!inputValidation.isInputEditTextFilled(total_persons, total_persons_layout, getString(R.string.error_message_c_name))) {
                     return;
                 }
-                if (bookingID.equals("id")) {
+                if (bookingID.equals("id") || bookingID.equals("o")) {
                     if (!inputValidation.isInputEditTextFilled(advance_fee, advance_fee_layout, getString(R.string.error_message_c_name))) {
                         return;
                     }
@@ -226,19 +253,25 @@ public class BookingFormFragment extends Fragment implements View.OnClickListene
                             databaseHelper.createBooking(new Bookings("o", person_name.getText().toString(), client_mobile_no.getText().toString(), address.getText().toString(),
                                     cnic_number.getText().toString(), event_name.getText().toString(), date.getText().toString(), event_date.getText().toString() + " 00:00:00.000000",
                                     total_persons.getText().toString(), total_charges.getText().toString(), description.getText().toString(), u.getClientID(), u.getClientUserID(),
-                                    "0", "0", "0", advance_fee.getText().toString()));
+                                    "0", "0", "0", advance_fee.getText().toString(), event_shift.getText().toString()));
                             clearCashe();
                         }else {
                             String query = "UPDATE Booking SET ClientName = '"+person_name.getText().toString()+"', ClientMobile = '"+client_mobile_no.getText().toString()
                                     +"', ClientAddress = '"+address.getText().toString()+"', ClientNic = '"+cnic_number.getText().toString()+"', EventName = '"+event_name.getText().toString()
                                     +"', ArrangePersons = '"+total_persons.getText().toString()+"', ChargesTotal = '"+total_charges.getText().toString()+"', Description = '"+description.getText().toString()
-                                    +"', UpdatedDate = '0', Advance = '"+advance_fee.getText().toString()+"' WHERE BookingID = "+bookingID;
+                                    +"', UpdatedDate = '0', Advance = '"+advance_fee.getText().toString()+"' WHERE ID = "+id;
                             databaseHelper.updateBooking(query);
                             Toast.makeText(getContext(), "Booking Update", Toast.LENGTH_SHORT).show();
+                            getActivity().onBackPressed();
                         }
                     }
 
                 }
+                break;
+            case R.id.event_date:
+                AppController.date = "Booking";
+                DialogFragment newFragment = new SelectDateFragment();
+                newFragment.show(getFragmentManager(), "DatePicker");
                 break;
         }
 

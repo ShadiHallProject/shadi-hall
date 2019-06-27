@@ -1,11 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".fragments.BookCalendarFragment">
 
+    <LinearLayout
+        android:id="@+id/layout"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <Button
+            android:id="@+id/btn_day_booking"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textColor="@android:color/white"
+            android:background="@color/colorPrimaryDark"
+            android:text="Day Booking"/>
+        <Button
+            android:id="@+id/btn_night_booking"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textColor="@android:color/white"
+            android:background="@color/colorPrimary"
+            android:text="Night Booking"/>
+
+    </LinearLayout>
+
     <com.squareup.timessquare.CalendarPickerView
+        android:layout_below="@+id/layout"
         android:id="@+id/calendar"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -18,4 +44,4 @@
         <!--tools:layout_editor_absoluteX="26dp"-->
         <!--tools:layout_editor_absoluteY="191dp"/>-->
 
-</FrameLayout>
+</RelativeLayout>

@@ -603,6 +603,8 @@ public class RecoveryFragment extends Fragment implements View.OnClickListener {
         inflater.inflate(R.menu.cb_menu,menu);
         MenuItem settings = menu.findItem(R.id.action_settings);
         settings.setVisible(false);
+        MenuItem refresh = menu.findItem(R.id.action_refresh);
+        refresh.setVisible(false);
         super.onCreateOptionsMenu(menu,inflater);
     }
 

@@ -65,6 +65,17 @@
                 android:orientation="horizontal">
 
                 <TextView
+                    android:id="@+id/r_bookingID"
+                    android:layout_width="@dimen/hundred_dp"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="3dp"
+                    android:text="@string/bookingid"
+                    android:textAlignment="center"
+                    android:textColor="@color/colorPrimaryDark"
+                    android:textSize="@dimen/textSize"
+                    android:textStyle="bold" />
+
+                <TextView
                     android:id="@+id/r_eventdate"
                     android:layout_width="@dimen/hundred_dp"
                     android:layout_height="wrap_content"

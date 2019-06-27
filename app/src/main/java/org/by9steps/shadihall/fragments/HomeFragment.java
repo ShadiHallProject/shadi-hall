@@ -1,6 +1,7 @@
 package org.by9steps.shadihall.fragments;
 
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -17,6 +18,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import org.by9steps.shadihall.R;
+import org.by9steps.shadihall.activities.MainActivity;
+import org.by9steps.shadihall.activities.MapsActivity;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -95,7 +98,7 @@ public class HomeFragment extends Fragment {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_map) {
-            Toast.makeText(getContext(), "coming soon", Toast.LENGTH_SHORT).show();
+            startActivity(new Intent(getContext(), MapsActivity.class));
         }
 
         return super.onOptionsItemSelected(item);

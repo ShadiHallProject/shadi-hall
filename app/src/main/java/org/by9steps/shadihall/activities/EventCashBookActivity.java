@@ -1,22 +1,33 @@
-package org.by9steps.shadihall.fragments;
+package org.by9steps.shadihall.activities;
 
-
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
+import android.os.Environment;
+import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.DialogFragment;
+import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ImageView;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.HorizontalScrollView;
+import android.widget.LinearLayout;
+import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.DefaultRetryPolicy;
@@ -25,189 +36,629 @@ import com.android.volley.Response;
 import com.android.volley.RetryPolicy;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
+import com.itextpdf.text.BaseColor;
+import com.itextpdf.text.Chunk;
+import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
-import com.orm.util.NamingHelper;
+import com.itextpdf.text.Element;
+import com.itextpdf.text.ExceptionConverter;
+import com.itextpdf.text.Font;
+import com.itextpdf.text.FontFactory;
+import com.itextpdf.text.Image;
+import com.itextpdf.text.PageSize;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.Phrase;
+import com.itextpdf.text.Rectangle;
+import com.itextpdf.text.pdf.ColumnText;
+import com.itextpdf.text.pdf.PdfContentByte;
+import com.itextpdf.text.pdf.PdfDate;
+import com.itextpdf.text.pdf.PdfDictionary;
+import com.itextpdf.text.pdf.PdfName;
+import com.itextpdf.text.pdf.PdfPCell;
+import com.itextpdf.text.pdf.PdfPTable;
+import com.itextpdf.text.pdf.PdfPageEventHelper;
+import com.itextpdf.text.pdf.PdfTemplate;
+import com.itextpdf.text.pdf.PdfWriter;
 
 import org.by9steps.shadihall.AppController;
 import org.by9steps.shadihall.R;
-import org.by9steps.shadihall.bean.Dir;
+import org.by9steps.shadihall.adapters.CashBookAdapter;
+import org.by9steps.shadihall.adapters.RecoveryAdapter;
+import org.by9steps.shadihall.fragments.CashBookFragment;
+import org.by9steps.shadihall.fragments.RecoveryFragment;
+import org.by9steps.shadihall.fragments.SelectDateFragment;
 import org.by9steps.shadihall.helper.DatabaseHelper;
-import org.by9steps.shadihall.model.Account1Type;
-import org.by9steps.shadihall.model.Account2Group;
 import org.by9steps.shadihall.model.Account3Name;
 import org.by9steps.shadihall.model.Bookings;
+import org.by9steps.shadihall.model.CBSetting;
 import org.by9steps.shadihall.model.CashBook;
-import org.by9steps.shadihall.model.ChartOfAcc;
+import org.by9steps.shadihall.model.CashEntry;
+import org.by9steps.shadihall.model.Recovery;
 import org.by9steps.shadihall.model.TableSession;
 import org.by9steps.shadihall.model.User;
-import org.by9steps.shadihall.viewbinder.DirectoryNodeBinder;
-import org.by9steps.shadihall.viewbinder.FileNodeBinder;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import tellh.com.recyclertreeview_lib.TreeNode;
-import tellh.com.recyclertreeview_lib.TreeViewAdapter;
+public class EventCashBookActivity extends AppCompatActivity implements View.OnClickListener, AdapterView.OnItemSelectedListener {
 
-/**
- * A simple {@link Fragment} subclass.
- */
-public class ChartOfAccFragment extends Fragment {
-
-    private RecyclerView rv;
-    private TreeViewAdapter adapter;
     ProgressDialog mProgress;
-    String currentDate;
+    RecyclerView recyclerView;
+    //    EditText search;
+    Spinner spinner;
+    SearchView searchView;
+    //    ScrollView scrollView;
+    HorizontalScrollView scrollView;
+    LinearLayout header, pdfView;
+    TextView tv_date,tv_id,tv_debit,tv_credit,tv_remarks,tv_amount;
 
-    List<String> country = new ArrayList<>();
-    List<String> city = new ArrayList<>();
-    List<String> town = new ArrayList<>();
-
+    List<CashEntry> mList;
+    List<CashBook> cashBooksList;
+    List<CashEntry> filterd;
+    CashBookAdapter adapter;
     DatabaseHelper databaseHelper;
-    List<ChartOfAcc> chartOfAccList;
-    String query = "";
 
+    int m = 0, amount, gAmount , filter;
+    Boolean listSorting = false;
+    public static String fDate1, fDate2;
+    public static Button date1;
+    public static Button date2;
+    String orderBy = "CBDate";
+    int status = 0;
+    String orderby = " ORDER BY " + orderBy + " DESC";
 
-    public ChartOfAccFragment() {
-        // Required empty public constructor
-    }
+    private static final String TAG = "PdfCreatorActivity";
+    private File pdfFile;
 
+    String d = "0";
+    int tot = 0;
+    String value = "Complete CashBook", f = "No";
+
+    String creditAc, bookingID, type;
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_chart_of_acc, container, false);
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_event_cash_book);
 
-        rv = view.findViewById(R.id.rv);
-        databaseHelper = new DatabaseHelper(getContext());
-        mProgress = new ProgressDialog(getContext());
-        setHasOptionsMenu(true);
+        recyclerView = findViewById(R.id.recycler);
+        header = findViewById(R.id.header);
+        scrollView = findViewById(R.id.scrollView);
+        pdfView = findViewById(R.id.pdfView);
+        searchView = findViewById(R.id.search);
+        spinner = findViewById(R.id.spinner);
+        tv_date = findViewById(R.id.tv_date);
+        tv_id = findViewById(R.id.tv_id);
+        tv_debit = findViewById(R.id.tv_debit);
+        tv_credit = findViewById(R.id.tv_credit);
+        tv_remarks = findViewById(R.id.tv_remarks);
+        tv_amount = findViewById(R.id.tv_amount);
 
+        databaseHelper = new DatabaseHelper(this);
 
-        Date date = new Date();
-        SimpleDateFormat curFormater = new SimpleDateFormat("yyyy-MM-dd");
-        currentDate = curFormater.format(date);
+        spinner.setOnItemSelectedListener(this);
+        tv_date.setOnClickListener(this);
+        tv_id.setOnClickListener(this);
+        tv_debit.setOnClickListener(this);
+        tv_credit.setOnClickListener(this);
+        tv_remarks.setOnClickListener(this);
+        tv_amount.setOnClickListener(this);
 
-        List<User> list = User.listAll(User.class);
-        for (User u : list){
-            query = "SELECT        Account1Type.AcTypeID, Account1Type.AcTypeName, Account2Group.AcGroupID, Account2Group.AcGruopName, derivedtbl_1.AccountID, Account3Name.AcName, SUM(derivedtbl_1.Debit) AS Debit, SUM(derivedtbl_1.Credit) \n" +
-                    "                         AS Credit, derivedtbl_1.ClientID, SUM(derivedtbl_1.Debit) - SUM(derivedtbl_1.Credit) AS Bal, CASE WHEN (SUM(Debit) - SUM(Credit)) > 0 THEN (SUM(Debit) - SUM(Credit)) ELSE 0 END AS DebitBL, CASE WHEN (SUM(Debit) \n" +
-                    "                         - SUM(Credit)) < 0 THEN (SUM(Debit) - SUM(Credit)) ELSE 0 END AS CreditBL, MAX(derivedtbl_1.CBDate) AS MaxDate\n" +
-                    "FROM            (SELECT        CreditAccount AS AccountID, 0 AS Debit, Amount AS Credit, ClientID, CBDate\n" +
-                    "                          FROM            CashBook AS CashBook\n" +
-                    "                          WHERE        (ClientID = "+u.getClientID()+") AND (CBDate <= '"+currentDate+"')\n" +
-                    "                          UNION ALL\n" +
-                    "                          SELECT        DebitAccount AS AccountID, Amount AS Debit, 0 AS Credit, ClientID, CBDate\n" +
-                    "                          FROM            CashBook AS CashBook_1\n" +
-                    "                          WHERE        (ClientID = "+u.getClientID()+") AND (CBDate <= '"+currentDate+"')) AS derivedtbl_1 INNER JOIN\n" +
-                    "                         Account3Name ON derivedtbl_1.AccountID = Account3Name.AcNameID INNER JOIN\n" +
-                    "                         Account2Group ON Account3Name.AcGroupID = Account2Group.AcGroupID INNER JOIN\n" +
-                    "                         Account1Type ON Account2Group.AcTypeID = Account1Type.AcTypeID\n" +
-                    "GROUP BY derivedtbl_1.ClientID, derivedtbl_1.AccountID, Account3Name.AcName, Account2Group.AcGroupID, Account2Group.AcGruopName, Account1Type.AcTypeName, Account1Type.AcTypeID";
+        Intent intent = getIntent();
+        if (intent != null){
+            creditAc = intent.getStringExtra("CreditAc");
+            bookingID = intent.getStringExtra("BookingId");
+            type = intent.getStringExtra("Type");
         }
-        initData();
 
-        return view;
-    }
+        if (getSupportActionBar()!=null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setTitle("Booking "+type);
+        }
 
-    private void initData() {
-        List<TreeNode> nodes = new ArrayList<>();
-        TreeNode<Dir> app = null;
-        TreeNode<Dir> cit = null;
-        TreeNode<Dir> ton;
-        TreeNode<Dir> com;
+        // Spinner Drop down elements
+        List<String> categories = new ArrayList<String>();
+        categories.add("Select");
+        categories.add("Date");
+        categories.add("CB ID");
+        categories.add("Deb Account");
+        categories.add("Cre Account");
+        categories.add("Remarks");
+        categories.add("Amount");
 
+        // Creating adapter for spinner
+        ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, categories);
 
-          List<Account1Type> list = databaseHelper.getAccount1Type("SELECT * FROM Account1Type");
-        for (Account1Type a: list){
-            app = new TreeNode<>(new Dir(a.getAcTypeID(),a.getAcTypeName(),"CA"));
-            nodes.add(app);
-                List<Account2Group> list1 = databaseHelper.getAccount2Group("SELECT * FROM Account2Group");
-                Log.e("LOOP",a.getAcTypeID());
-            for (Account2Group aa: list1){
-                Log.e("TYPEID",a.getAcTypeID()+"  "+ aa.getAcGroupID());
-                if (a.getAcTypeID().equals(aa.getAcTypeID())) {
-                    cit = new TreeNode<>(new Dir(aa.getAcGroupID(), aa.getAcGruopName(), "Add"));
-                    app.addChild(cit);
-                    List<Account3Name> list2 = databaseHelper.getAccount3Name("SELECT * FROM Account3Name");
-                    for (Account3Name aaa: list2){
-                        if (aa.getAcGroupID().equals(aaa.getAcGroupID())) {
-                            ton = new TreeNode<>(new Dir(aaa.getAcNameID(), aaa.getAcName(), "Edit", aaa.getAcGroupID()));
-                            cit.addChild(ton);
-                        }
-                    }
+        // Drop down layout style - list view with radio button
+        dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+        // attaching data adapter to spinner
+        spinner.setAdapter(dataAdapter);
+
+        FloatingActionButton fab = findViewById(R.id.fab);
+        if (type.equals("Income")){
+            fab.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent intent = new Intent(EventCashBookActivity.this, CashCollectionActivity.class);
+                    intent.putExtra("BookingID", bookingID);
+                    intent.putExtra("Spinner", "Hide");
+                    intent.putExtra("Type", "New");
+                    intent.putExtra("CashBookID", "Id");
+                    startActivity(intent);
                 }
-            }
+            });
+        }else if (type.equals("Expense")){
+            fab.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent intent = new Intent(EventCashBookActivity.this, AddExpenseActivity.class);
+                    intent.putExtra("BookingID", bookingID);
+                    intent.putExtra("Spinner", "Hide");
+                    startActivity(intent);
+                }
+            });
         }
 
-        rv.setLayoutManager(new LinearLayoutManager(getContext()));
-        adapter = new TreeViewAdapter(nodes, Arrays.asList(new FileNodeBinder(getContext()), new DirectoryNodeBinder(getContext())));
-        // whether collapse child nodes when their parent node was close.
-//        adapter.ifCollapseChildWhileCollapseParent(true);
-        adapter.setOnTreeNodeListener(new TreeViewAdapter.OnTreeNodeListener() {
+        mList = new ArrayList<>();
+
+
+        List<CBSetting> list = CBSetting.listAll(CBSetting.class);
+        if (list.size() == 0){
+            CBSetting cbSetting = new CBSetting(true,true,true,true,true,true);
+            cbSetting.save();
+        }
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
-            public boolean onClick(TreeNode node, RecyclerView.ViewHolder holder) {
-                if (!node.isLeaf()) {
-                    //Update and toggle the node.
-                    onToggle(!node.isExpand(), holder);
-//                    if (!node.isExpand())
-//                        adapter.collapseBrotherNode(node);
-                }
+            public boolean onQueryTextSubmit(String s) {
                 return false;
             }
 
             @Override
-            public void onToggle(boolean isExpand, RecyclerView.ViewHolder holder) {
-                DirectoryNodeBinder.ViewHolder dirViewHolder = (DirectoryNodeBinder.ViewHolder) holder;
-                final ImageView ivArrow = dirViewHolder.getIvArrow();
-                int rotateDegree = isExpand ? 90 : -90;
-                ivArrow.animate().rotationBy(rotateDegree)
-                        .start();
+            public boolean onQueryTextChange(String s) {
+                filter(s);
+                return false;
             }
         });
-        rv.setAdapter(adapter);
+
     }
 
+
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.cb_menu,menu);
-        MenuItem print = menu.findItem(R.id.action_print);
-        print.setVisible(false);
-        MenuItem settings = menu.findItem(R.id.action_settings);
-        settings.setVisible(false);
-        super.onCreateOptionsMenu(menu,inflater);
+    public void onClick(View v) {
+        switch (v.getId()){
+            case R.id.tv_date:
+                orderBy = "CBDate";
+                orderBy(orderBy);
+                break;
+            case R.id.tv_id:
+                orderBy = "CashBookID";
+                orderBy(orderBy);
+                break;
+            case R.id.tv_debit:
+                orderBy = "DebitAccount";
+                orderBy(orderBy);
+                break;
+            case R.id.tv_credit:
+                orderBy = "CreditAccount";
+                orderBy(orderBy);
+                break;
+            case R.id.tv_remarks:
+                orderBy = "CBRemarks";
+                orderBy(orderBy);
+                break;
+            case R.id.tv_amount:
+                orderBy = "Amount";
+                orderBy(orderBy);
+                break;
+        }
+    }
+
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.cb_menu, menu);
+        return true;
+
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if(item.getItemId() == android.R.id.home){
-            getActivity().onBackPressed();
+            onBackPressed();
+        }else if (item.getItemId() == R.id.action_print){
+            try {
+
+                createPdf();
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (DocumentException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            return true;
+        }else if (item.getItemId() == R.id.action_settings){
+            startActivity(new Intent(EventCashBookActivity.this, CashBookSettingActivity.class));
+            return true;
         }else if (item.getItemId() == R.id.action_refresh){
             if (isConnected()){
-                refereshTables(getContext());
+                refereshTables(EventCashBookActivity.this);
             }else {
-                Toast.makeText(getContext(), "Please Check Your Internet Connection", Toast.LENGTH_SHORT).show();
+                Toast.makeText(EventCashBookActivity.this, "Please Check Your Internet Connection", Toast.LENGTH_SHORT).show();
             }
         }
         return super.onOptionsItemSelected(item);
     }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        getCashBook();
+
+        List<CBSetting> list = CBSetting.listAll(CBSetting.class);
+        for (CBSetting c : list){
+            if (!c.getDste()){
+                tv_date.setVisibility(View.GONE);
+            }else {
+                tv_date.setVisibility(View.VISIBLE);
+            }
+
+            if (!c.getCbId()){
+                tv_id.setVisibility(View.GONE);
+            }else {
+                tv_id.setVisibility(View.VISIBLE);
+            }
+
+            if (!c.getDebit()){
+                tv_debit.setVisibility(View.GONE);
+            }else {
+                tv_debit.setVisibility(View.VISIBLE);
+            }
+
+            if (!c.getCredit()){
+                tv_credit.setVisibility(View.GONE);
+            }else {
+                tv_credit.setVisibility(View.VISIBLE);
+            }
+
+            if (!c.getRemarks()){
+                tv_remarks.setVisibility(View.GONE);
+            }else {
+                tv_remarks.setVisibility(View.VISIBLE);
+            }
+
+            if (!c.getAmount()){
+                tv_amount.setVisibility(View.GONE);
+            }else {
+                tv_amount.setVisibility(View.VISIBLE);
+            }
+        }
+    }
+
+    private void getCashBook(){
+        mList.clear();
+        m = 0;
+        amount = 0;
+        gAmount = 0;
+        String query = "";
+
+        List<User> list = User.listAll(User.class);
+        for (User u : list){
+            if (type.equals("Income")){
+                query = "SELECT      CashBook.ID, CashBook.CashBookID, CashBook.CBDate, CashBook.DebitAccount, CashBook.CreditAccount, CashBook.CBRemarks, CashBook.Amount, CashBook.ClientID, CashBook.ClientUserID, CashBook.BookingID, \n" +
+                        "                         Account3Name.AcName AS DebitAccountName, Account3Name_1.AcName AS CreditAccountName, Account3Name_2.AcName AS UserName, CashBook.UpdatedDate\n" +
+                        "FROM            CashBook LEFT OUTER JOIN\n" +
+                        "                         Account3Name AS Account3Name_1 ON CashBook.CreditAccount = Account3Name_1.AcNameID LEFT OUTER JOIN\n" +
+                        "                         Account3Name AS Account3Name_2 ON CashBook.ClientUserID = Account3Name_2.AcNameID LEFT OUTER JOIN\n" +
+                        "                         Account3Name ON CashBook.DebitAccount = Account3Name.AcNameID\n" +
+                        "WHERE        (CashBook.ClientID = "+u.getClientID()+" AND CashBook.CreditAccount = "+creditAc+" AND CashBook.BookingID = "+bookingID+")" + orderby;
+                Log.e("CASHBOOK QUERY",query);
+            }else if (type.equals("Expense")){
+                query = "SELECT      CashBook.ID, CashBook.CashBookID, CashBook.CBDate, CashBook.DebitAccount, CashBook.CreditAccount, CashBook.CBRemarks, CashBook.Amount, CashBook.ClientID, CashBook.ClientUserID, CashBook.BookingID, \n" +
+                        "                         Account3Name.AcName AS DebitAccountName, Account3Name_1.AcName AS CreditAccountName, Account3Name_2.AcName AS UserName, CashBook.UpdatedDate\n" +
+                        "FROM            CashBook LEFT OUTER JOIN\n" +
+                        "                         Account3Name AS Account3Name_1 ON CashBook.CreditAccount = Account3Name_1.AcNameID LEFT OUTER JOIN\n" +
+                        "                         Account3Name AS Account3Name_2 ON CashBook.ClientUserID = Account3Name_2.AcNameID LEFT OUTER JOIN\n" +
+                        "                         Account3Name ON CashBook.DebitAccount = Account3Name.AcNameID\n" +
+                        "WHERE        (CashBook.ClientID = "+u.getClientID()+" AND CashBook.DebitAccount = "+creditAc+" AND CashBook.BookingID = "+bookingID+")" + orderby;
+                Log.e("CASHBOOK QUERY",query);
+            }
+            cashBooksList = databaseHelper.getCashBookEntry(query);
+        }
+        for (CashBook c : cashBooksList){
+
+            String[] separated = c.getCBDate().split("-");
+
+            if (m == 0) {
+                mList.add(CashEntry.createSection(separated[0]+"/"+separated[1]+"/"+separated[2]));
+                mList.add(CashEntry.createRow(c.getCashBookID(),c.getCBDate(),c.getDebitAccount(),c.getCreditAccount(),c.getCBRemarks(),c.getAmount(),c.getClientID(),c.getClientUserID(),c.getBookingID(),c.getDebitAccountName(),c.getCreditAccountName(),c.getUserName(), c.getUpdatedDate()));
+                m = Integer.valueOf(separated[2]);
+
+                amount = Integer.valueOf(c.getAmount()) + amount;
+                gAmount = Integer.valueOf(c.getAmount()) + gAmount;
+            }else if (m == Integer.valueOf(separated[2])){
+                amount = Integer.valueOf(c.getAmount()) + amount;
+                gAmount = Integer.valueOf(c.getAmount()) + gAmount;
+                mList.add(CashEntry.createRow(c.getCashBookID(),c.getCBDate(),c.getDebitAccount(),c.getCreditAccount(),c.getCBRemarks(),c.getAmount(),c.getClientID(),c.getClientUserID(),c.getBookingID(),c.getDebitAccountName(),c.getCreditAccountName(),c.getUserName(), c.getUpdatedDate()));
+            }else {
+                mList.add(CashEntry.createTotal(String.valueOf(amount)));
+                amount = 0;
+                amount = Integer.valueOf(c.getAmount()) + amount;
+                gAmount = Integer.valueOf(c.getAmount()) + gAmount;
+
+                mList.add(CashEntry.createSection(separated[0]+"/"+separated[1]+"/"+separated[2]));
+                mList.add(CashEntry.createRow(c.getCashBookID(),c.getCBDate(),c.getDebitAccount(),c.getCreditAccount(),c.getCBRemarks(),c.getAmount(),c.getClientID(),c.getClientUserID(),c.getBookingID(),c.getDebitAccountName(),c.getCreditAccountName(),c.getUserName(), c.getUpdatedDate()));
+                m = Integer.valueOf(separated[2]);
+            }
+        }
+//        }
+
+        mList.add(CashEntry.createTotal(String.valueOf(amount)));
+        mList.add(CashEntry.createSection("Grand Total"));
+        mList.add(CashEntry.createTotal(String.valueOf(gAmount)));
+        adapter = new CashBookAdapter(this,mList);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setAdapter(adapter);
+    }
+
+    private void filter(String text) {
+        Log.e("Search","SEARCH");
+        //new array list that will hold the filtered data
+        filterd = new ArrayList<>();
+
+        //looping through existing elements
+        if (!text.isEmpty()) {
+            for (CashEntry s : mList) {
+                Log.e("Search", String.valueOf(s.isRow()));
+                //if the existing elements contains the search input
+                if (s.isRow() == 1) {
+                    switch (filter){
+                        case 2:
+                            if (s.getCashBookID().contains(text.toLowerCase())) {
+                                //adding the element to filtered list
+                                filterd.add(s);
+                            }
+                            break;
+                        case 3:
+                            if (s.getDebitAccountName().toLowerCase().contains(text.toLowerCase())) {
+                                //adding the element to filtered list
+                                filterd.add(s);
+                            }
+                            break;
+                        case 4:
+                            if (s.getCreditAccountName().toLowerCase().contains(text.toLowerCase())) {
+                                //adding the element to filtered list
+                                filterd.add(s);
+                            }
+                            break;
+                        case 5:
+                            if (s.getCBRemarks().toLowerCase().contains(text.toLowerCase())) {
+                                //adding the element to filtered list
+                                filterd.add(s);
+                            }
+                            break;
+                        case 6:
+                            if (s.getAmount().contains(text.toLowerCase())) {
+                                //adding the element to filtered list
+                                filterd.add(s);
+                            }
+                            break;
+                    }
+                }
+            }
+        }else {
+            filterd = mList;
+        }
+
+        //calling a method of the adapter class and passing the filtered list
+        adapter.filterList(filterd);
+
+    }
+
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        if (position!=1 && position != 0){
+            getCashBook();
+        }
+        switch (position){
+            case 0:
+                filter = 0;
+                searchView.setQuery("",false);
+                searchView.clearFocus();
+                break;
+            case 1:
+                searchView.setQuery("",false);
+                searchView.clearFocus();
+                // custom dialog
+                final Dialog dialog = new Dialog(EventCashBookActivity.this);
+                dialog.setContentView(R.layout.date_filter_dialog);
+                dialog.setTitle("Select Date");
+
+                date1 = dialog.findViewById(R.id.date1);
+                date2 = dialog.findViewById(R.id.date2);
+                Button ok = dialog.findViewById(R.id.ok);
+                Button cancel = dialog.findViewById(R.id.cancel);
+
+                date1.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        AppController.fDate1 = "Date1";
+                        DialogFragment newFragment = new SelectDateFragment();
+                        newFragment.show(getSupportFragmentManager(), "DatePicker");
+                        fDate1 = date1.getText().toString();
+                    }
+                });
+
+                date2.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        AppController.fDate2 = "Date2";
+                        DialogFragment newFragment = new SelectDateFragment();
+                        newFragment.show(getSupportFragmentManager(), "DatePicker");
+                        fDate2 = date2.getText().toString();
+                    }
+                });
+                ok.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        fDate1 = date1.getText().toString();
+                        fDate2 = date2.getText().toString();
+                        dateFilter();
+                        dialog.dismiss();
+                        spinner.setSelection(0);
+                        f = "Date";
+
+                    }
+                });
+                cancel.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        dialog.dismiss();
+                        spinner.setSelection(0);
+                    }
+                });
+
+                dialog.show();
+
+                break;
+            case 2:
+                filter = 2;
+                searchView.setQuery("",false);
+                searchView.clearFocus();
+                break;
+            case 3:
+                filter = 3;
+                searchView.setQuery("",false);
+                searchView.clearFocus();
+                break;
+            case 4:
+                filter = 4;
+                searchView.setQuery("",false);
+                searchView.clearFocus();
+                break;
+            case 5:
+                filter = 5;
+                searchView.setQuery("",false);
+                searchView.clearFocus();
+                break;
+            case 6:
+                filter = 6;
+                searchView.setQuery("",false);
+                searchView.clearFocus();
+                break;
+        }
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
+
+    }
+
+    private void dateFilter(){
+        mList.clear();
+        m = 0;
+        amount = 0;
+        gAmount = 0;
+        String query = "";
+
+        List<User> list = User.listAll(User.class);
+        for (User u : list){
+
+            query = "SELECT        CashBook.CashBookID, CashBook.CBDate, CashBook.DebitAccount, CashBook.CreditAccount, CashBook.CBRemarks, CashBook.Amount, CashBook.ClientID, CashBook.ClientUserID, CashBook.BookingID, \n" +
+                    "                         Account3Name.AcName AS DebitAccountName, Account3Name_1.AcName AS CreditAccountName, Account3Name_2.AcName AS UserName, CashBook.UpdatedDate\n" +
+                    "FROM            CashBook LEFT OUTER JOIN\n" +
+                    "                         Account3Name AS Account3Name_1 ON CashBook.CreditAccount = Account3Name_1.AcNameID LEFT OUTER JOIN\n" +
+                    "                         Account3Name AS Account3Name_2 ON CashBook.ClientUserID = Account3Name_2.AcNameID LEFT OUTER JOIN\n" +
+                    "                         Account3Name ON CashBook.DebitAccount = Account3Name.AcNameID\n" +
+                    "WHERE        (CashBook.ClientID = "+u.getClientID()+" AND CashBook.CBDate >= Datetime('"+fDate1+"') AND CashBook.CBDate <= Datetime('"+fDate2+"'))";
+            cashBooksList = databaseHelper.getCashBookEntry(query);
+        }
+
+
+        if (listSorting){
+            for (int i = cashBooksList.size()-1; i >= 0; i--){
+                String[] separated = cashBooksList.get(i).getCBDate().split("-");
+                if (m == 0) {
+                    mList.add(CashEntry.createSection(separated[0]+"/"+separated[1]));
+                    mList.add(CashEntry.createRow(cashBooksList.get(i).getCashBookID(),cashBooksList.get(i).getCBDate(),cashBooksList.get(i).getDebitAccount(),cashBooksList.get(i).getCreditAccount(),cashBooksList.get(i).getCBRemarks(),cashBooksList.get(i).getAmount(),cashBooksList.get(i).getClientID(),cashBooksList.get(i).getClientUserID(),cashBooksList.get(i).getBookingID(),cashBooksList.get(i).getDebitAccountName(),cashBooksList.get(i).getCreditAccountName(),cashBooksList.get(i).getUserName(), cashBooksList.get(i).getUpdatedDate()));
+                    m = Integer.valueOf(separated[1]);
+
+                    amount = Integer.valueOf(cashBooksList.get(i).getAmount()) + amount;
+                    gAmount = Integer.valueOf(cashBooksList.get(i).getAmount()) + gAmount;
+                }else if (m == Integer.valueOf(separated[1])){
+                    amount = Integer.valueOf(cashBooksList.get(i).getAmount()) + amount;
+                    gAmount = Integer.valueOf(cashBooksList.get(i).getAmount()) + gAmount;
+                    mList.add(CashEntry.createRow(cashBooksList.get(i).getCashBookID(),cashBooksList.get(i).getCBDate(),cashBooksList.get(i).getDebitAccount(),cashBooksList.get(i).getCreditAccount(),cashBooksList.get(i).getCBRemarks(),cashBooksList.get(i).getAmount(),cashBooksList.get(i).getClientID(),cashBooksList.get(i).getClientUserID(),cashBooksList.get(i).getBookingID(),cashBooksList.get(i).getDebitAccountName(),cashBooksList.get(i).getCreditAccountName(),cashBooksList.get(i).getUserName(), cashBooksList.get(i).getUpdatedDate()));
+                }else {
+                    mList.add(CashEntry.createTotal(String.valueOf(amount)));
+                    amount = 0;
+                    amount = Integer.valueOf(cashBooksList.get(i).getAmount()) + amount;
+                    gAmount = Integer.valueOf(cashBooksList.get(i).getAmount()) + gAmount;
+
+                    mList.add(CashEntry.createSection(separated[0]+"/"+separated[1]));
+                    mList.add(CashEntry.createRow(cashBooksList.get(i).getCashBookID(),cashBooksList.get(i).getCBDate(),cashBooksList.get(i).getDebitAccount(),cashBooksList.get(i).getCreditAccount(),cashBooksList.get(i).getCBRemarks(),cashBooksList.get(i).getAmount(),cashBooksList.get(i).getClientID(),cashBooksList.get(i).getClientUserID(),cashBooksList.get(i).getBookingID(),cashBooksList.get(i).getDebitAccountName(),cashBooksList.get(i).getCreditAccountName(),cashBooksList.get(i).getUserName(), cashBooksList.get(i).getUpdatedDate()));
+                    m = Integer.valueOf(separated[1]);
+                }
+            }
+        }else {
+            for (CashBook c : cashBooksList){
+
+                String[] separated = c.getCBDate().split("-");
+
+                if (m == 0) {
+                    mList.add(CashEntry.createSection(separated[0]+"/"+separated[1]));
+                    mList.add(CashEntry.createRow(c.getCashBookID(),c.getCBDate(),c.getDebitAccount(),c.getCreditAccount(),c.getCBRemarks(),c.getAmount(),c.getClientID(),c.getClientUserID(),c.getBookingID(),c.getDebitAccountName(),c.getCreditAccountName(),c.getUserName(), c.getUpdatedDate()));
+                    m = Integer.valueOf(separated[1]);
+
+                    amount = Integer.valueOf(c.getAmount()) + amount;
+                    gAmount = Integer.valueOf(c.getAmount()) + gAmount;
+                }else if (m == Integer.valueOf(separated[1])){
+                    amount = Integer.valueOf(c.getAmount()) + amount;
+                    gAmount = Integer.valueOf(c.getAmount()) + gAmount;
+                    mList.add(CashEntry.createRow(c.getCashBookID(),c.getCBDate(),c.getDebitAccount(),c.getCreditAccount(),c.getCBRemarks(),c.getAmount(),c.getClientID(),c.getClientUserID(),c.getBookingID(),c.getDebitAccountName(),c.getCreditAccountName(),c.getUserName(), c.getUpdatedDate()));
+                }else {
+                    mList.add(CashEntry.createTotal(String.valueOf(amount)));
+                    amount = 0;
+                    amount = Integer.valueOf(c.getAmount()) + amount;
+                    gAmount = Integer.valueOf(c.getAmount()) + gAmount;
+
+                    mList.add(CashEntry.createSection(separated[0]+"/"+separated[1]));
+                    mList.add(CashEntry.createRow(c.getCashBookID(),c.getCBDate(),c.getDebitAccount(),c.getCreditAccount(),c.getCBRemarks(),c.getAmount(),c.getClientID(),c.getClientUserID(),c.getBookingID(),c.getDebitAccountName(),c.getCreditAccountName(),c.getUserName(), c.getUpdatedDate()));
+                    m = Integer.valueOf(separated[1]);
+                }
+            }
+        }
+
+        mList.add(CashEntry.createTotal(String.valueOf(amount)));
+        mList.add(CashEntry.createSection("Grand Total"));
+        mList.add(CashEntry.createTotal(String.valueOf(gAmount)));
+        adapter = new CashBookAdapter(EventCashBookActivity.this,mList);
+        recyclerView.setLayoutManager(new LinearLayoutManager(EventCashBookActivity.this));
+        recyclerView.setAdapter(adapter);
+    }
+
     //Check Internet Connection
     public boolean isConnected() {
         boolean connected = false;
         try {
-            ConnectivityManager cm = (ConnectivityManager)getContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+            ConnectivityManager cm = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
             NetworkInfo nInfo = cm.getActiveNetworkInfo();
             connected = nInfo != null && nInfo.isAvailable() && nInfo.isConnected();
             return connected;
@@ -215,6 +666,440 @@ public class ChartOfAccFragment extends Fragment {
             Log.e("Connectivity Exception", e.getMessage());
         }
         return connected;
+    }
+
+    public void orderBy(String order_by){
+        if (status == 0) {
+            status = 1;
+            orderby = " ORDER BY " + order_by + " DESC";
+        } else {
+            status = 0;
+            orderby = " ORDER BY " + order_by + " ASC";
+        }
+        getCashBook();
+    }
+
+    public void createPdf() throws IOException, DocumentException {
+
+        File docsFolder = new File(Environment.getExternalStorageDirectory() + "/Documents");
+        if (!docsFolder.exists()) {
+            docsFolder.mkdir();
+            Log.i(TAG, "Created a new directory for PDF");
+        }
+
+        String pdfname = "CashBook.pdf";
+        pdfFile = new File(docsFolder.getAbsolutePath(), pdfname);
+        OutputStream output = new FileOutputStream(pdfFile);
+
+        Document document = new Document(PageSize.A4);
+        PdfWriter writer = PdfWriter.getInstance(document, output);
+        writer.createXmpMetadata();
+        writer.setTagged();
+        writer.setPageEvent(new Footer());
+        document.open();
+        document.addLanguage("en-us");
+
+        PdfDictionary parameters = new PdfDictionary();Log.e("PDFDocument","Created2");
+        parameters.put(PdfName.MODDATE, new PdfDate());
+
+        Font chapterFont = FontFactory.getFont(FontFactory.HELVETICA, 16, Font.BOLD);
+        Font paragraphFont = FontFactory.getFont(FontFactory.HELVETICA, 10, Font.BOLD);
+        Chunk chunk = new Chunk("Client Name", chapterFont);
+        Paragraph name = new Paragraph("Address",paragraphFont);
+        name.setIndentationLeft(0);
+        Paragraph contact = new Paragraph("Contact",paragraphFont);
+        contact.setIndentationLeft(0);
+
+        PdfPTable title = new PdfPTable(new float[]{3, 3, 3});
+        title.getDefaultCell().setHorizontalAlignment(Element.ALIGN_CENTER);
+        title.getDefaultCell().setFixedHeight(30);
+        title.setTotalWidth(PageSize.A4.getWidth());
+        title.setWidthPercentage(100);
+        title.getDefaultCell().setVerticalAlignment(Element.ALIGN_MIDDLE);
+        title.setSpacingBefore(5);
+        title.addCell(footerCell("",PdfPCell.ALIGN_CENTER));
+        PdfPCell cell = new PdfPCell(new Phrase("Cash Book",chapterFont));
+        cell.setBorder(PdfPCell.NO_BORDER);
+        cell.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
+        cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+        title.addCell(cell);
+        title.addCell(footerCell("",PdfPCell.ALIGN_CENTER));
+
+//        PdfPTable param = new PdfPTable(new float[]{3, 3, 3});
+        title.addCell(footerCell("",PdfPCell.ALIGN_CENTER));
+        title.addCell(footerCell("",PdfPCell.ALIGN_CENTER));
+
+        PdfPCell pCell = null;
+        if (f.equals("Date")){
+            value = fDate1+" to "+fDate2;
+            pCell = new PdfPCell(new Phrase("Date"+": "+value,paragraphFont));
+        }else {
+            value = searchView.getQuery().toString().trim();
+            pCell = new PdfPCell(new Phrase(spinner.getSelectedItem().toString()+": "+value,paragraphFont));
+        }
+        pCell.setBorder(PdfPCell.NO_BORDER);
+        pCell.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
+        pCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+        title.addCell(pCell);
+
+        PdfPTable table = new PdfPTable(new float[]{3, 4, 4, 5, 3});
+        table.getDefaultCell().setHorizontalAlignment(Element.ALIGN_CENTER);
+        table.getDefaultCell().setFixedHeight(40);
+        table.setTotalWidth(PageSize.A4.getWidth());
+        table.setWidthPercentage(100);
+        table.getDefaultCell().setVerticalAlignment(Element.ALIGN_MIDDLE);
+        table.setSpacingBefore(20);
+        table.addCell("CB ID");
+        table.addCell("Debit Account");
+        table.addCell("Credit Account");
+        table.addCell("Remarks");
+        table.addCell("Amount");
+        table.setHeaderRows(1);
+        PdfPCell[] cells = table.getRow(0).getCells();
+        for (int j = 0; j < cells.length; j++) {
+            cells[j].setBackgroundColor(BaseColor.PINK);
+        }
+
+        tot = 0;
+        int mTotal = 0;
+
+        Font totalFont = FontFactory.getFont(FontFactory.HELVETICA, 13, Font.BOLD);
+        PdfPCell total = new PdfPCell(new Phrase("Total",totalFont));
+        total.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
+        total.setVerticalAlignment(Element.ALIGN_MIDDLE);
+        total.setFixedHeight(35);
+
+        if (filter > 1 && !searchView.getQuery().toString().equals("") && !f.equals("Date")){
+            d = "0";
+            for (CashEntry c : filterd){
+                if (d.equals("0")){
+                    PdfPCell section = new PdfPCell(new Phrase(c.getCBDate(),totalFont));
+                    section.setBorder(PdfPCell.NO_BORDER);
+                    section.setFixedHeight(30);
+                    section.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
+                    section.setVerticalAlignment(Element.ALIGN_MIDDLE);
+                    table.addCell(section);
+                    table.addCell(footerCell("",PdfPCell.ALIGN_RIGHT));
+                    table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
+                    table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
+                    table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
+//                    table.addCell(footerCell("",PdfPCell.ALIGN_RIGHT));
+
+
+//                    table.addCell(getCell(c.getCBDate(),PdfPCell.ALIGN_LEFT));
+                    table.addCell(getCell(c.getCashBookID(),PdfPCell.ALIGN_RIGHT));
+                    table.addCell(getCell(c.getDebitAccountName(),PdfPCell.ALIGN_LEFT));
+                    table.addCell(getCell(c.getCreditAccountName(),PdfPCell.ALIGN_LEFT));
+                    table.addCell(getCell(c.getCBRemarks(),PdfPCell.ALIGN_LEFT));
+                    table.addCell(getCell(c.getAmount(),PdfPCell.ALIGN_RIGHT));
+
+                    tot = tot + Integer.valueOf(c.getAmount());
+                    mTotal = mTotal + Integer.valueOf(c.getAmount());
+                    d = c.getCBDate();
+                }else if(d.equals(c.getCBDate())){
+//                    table.addCell(getCell(c.getCBDate(),PdfPCell.ALIGN_LEFT));
+                    table.addCell(getCell(c.getCashBookID(),PdfPCell.ALIGN_RIGHT));
+                    table.addCell(getCell(c.getDebitAccountName(),PdfPCell.ALIGN_LEFT));
+                    table.addCell(getCell(c.getCreditAccountName(),PdfPCell.ALIGN_LEFT));
+                    table.addCell(getCell(c.getCBRemarks(),PdfPCell.ALIGN_LEFT));
+                    table.addCell(getCell(c.getAmount(),PdfPCell.ALIGN_RIGHT));
+
+                    tot = tot + Integer.valueOf(c.getAmount());
+                    mTotal = mTotal + Integer.valueOf(c.getAmount());
+                    d = c.getCBDate();
+                }else if (!d.equals(c.getCBDate()) && !d.equals("0")){
+//                    table.addCell("");
+                    table.addCell("");
+                    table.addCell("");
+                    table.addCell("");
+                    table.addCell(total);
+                    table.addCell(getCell(String.valueOf(tot),PdfPCell.ALIGN_RIGHT));
+                    tot = 0;
+
+                    PdfPCell section = new PdfPCell(new Phrase(c.getCBDate(),totalFont));
+                    section.setBorder(PdfPCell.NO_BORDER);
+                    section.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
+                    section.setVerticalAlignment(Element.ALIGN_MIDDLE);
+                    section.setFixedHeight(30);
+                    table.addCell(section);
+                    table.addCell(footerCell("",PdfPCell.ALIGN_RIGHT));
+                    table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
+                    table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
+                    table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
+//                    table.addCell(footerCell("",PdfPCell.ALIGN_RIGHT));
+
+//                    table.addCell(getCell(c.getCBDate(),PdfPCell.ALIGN_LEFT));
+                    table.addCell(getCell(c.getCashBookID(),PdfPCell.ALIGN_RIGHT));
+                    table.addCell(getCell(c.getDebitAccountName(),PdfPCell.ALIGN_LEFT));
+                    table.addCell(getCell(c.getCreditAccountName(),PdfPCell.ALIGN_LEFT));
+                    table.addCell(getCell(c.getCBRemarks(),PdfPCell.ALIGN_LEFT));
+                    table.addCell(getCell(c.getAmount(),PdfPCell.ALIGN_RIGHT));
+
+                    tot = tot + Integer.valueOf(c.getAmount());
+                    mTotal = mTotal + Integer.valueOf(c.getAmount());
+                    d = c.getCBDate();
+                }
+            }
+        }else if (filter > 1 && searchView.getQuery().toString().equals("") && f.equals("Date")){
+            d = "0";
+            for (CashEntry c : filterd){
+                if (d.equals("0")){
+                    PdfPCell section = new PdfPCell(new Phrase(c.getCBDate(),totalFont));
+                    section.setBorder(PdfPCell.NO_BORDER);
+                    section.setFixedHeight(30);
+                    section.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
+                    section.setVerticalAlignment(Element.ALIGN_MIDDLE);
+                    table.addCell(section);
+                    table.addCell(footerCell("",PdfPCell.ALIGN_RIGHT));
+                    table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
+                    table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
+                    table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
+//                    table.addCell(footerCell("",PdfPCell.ALIGN_RIGHT));
+
+
+//                    table.addCell(getCell(c.getCBDate(),PdfPCell.ALIGN_LEFT));
+                    table.addCell(getCell(c.getCashBookID(),PdfPCell.ALIGN_RIGHT));
+                    table.addCell(getCell(c.getDebitAccountName(),PdfPCell.ALIGN_LEFT));
+                    table.addCell(getCell(c.getCreditAccountName(),PdfPCell.ALIGN_LEFT));
+                    table.addCell(getCell(c.getCBRemarks(),PdfPCell.ALIGN_LEFT));
+                    table.addCell(getCell(c.getAmount(),PdfPCell.ALIGN_RIGHT));
+
+                    tot = tot + Integer.valueOf(c.getAmount());
+                    mTotal = mTotal + Integer.valueOf(c.getAmount());
+                    d = c.getCBDate();
+                }else if(d.equals(c.getCBDate())){
+//                    table.addCell(getCell(c.getCBDate(),PdfPCell.ALIGN_LEFT));
+                    table.addCell(getCell(c.getCashBookID(),PdfPCell.ALIGN_RIGHT));
+                    table.addCell(getCell(c.getDebitAccountName(),PdfPCell.ALIGN_LEFT));
+                    table.addCell(getCell(c.getCreditAccountName(),PdfPCell.ALIGN_LEFT));
+                    table.addCell(getCell(c.getCBRemarks(),PdfPCell.ALIGN_LEFT));
+                    table.addCell(getCell(c.getAmount(),PdfPCell.ALIGN_RIGHT));
+
+                    tot = tot + Integer.valueOf(c.getAmount());
+                    mTotal = mTotal + Integer.valueOf(c.getAmount());
+                    d = c.getCBDate();
+                }else if (!d.equals(c.getCBDate()) && !d.equals("0")){
+//                    table.addCell("");
+                    table.addCell("");
+                    table.addCell("");
+                    table.addCell("");
+                    table.addCell(total);
+                    table.addCell(getCell(String.valueOf(tot),PdfPCell.ALIGN_RIGHT));
+                    tot = 0;
+
+                    PdfPCell section = new PdfPCell(new Phrase(c.getCBDate(),totalFont));
+                    section.setBorder(PdfPCell.NO_BORDER);
+                    section.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
+                    section.setVerticalAlignment(Element.ALIGN_MIDDLE);
+                    section.setFixedHeight(30);
+                    table.addCell(section);
+                    table.addCell(footerCell("",PdfPCell.ALIGN_RIGHT));
+                    table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
+                    table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
+                    table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
+//                    table.addCell(footerCell("",PdfPCell.ALIGN_RIGHT));
+
+//                    table.addCell(getCell(c.getCBDate(),PdfPCell.ALIGN_LEFT));
+                    table.addCell(getCell(c.getCashBookID(),PdfPCell.ALIGN_RIGHT));
+                    table.addCell(getCell(c.getDebitAccountName(),PdfPCell.ALIGN_LEFT));
+                    table.addCell(getCell(c.getCreditAccountName(),PdfPCell.ALIGN_LEFT));
+                    table.addCell(getCell(c.getCBRemarks(),PdfPCell.ALIGN_LEFT));
+                    table.addCell(getCell(c.getAmount(),PdfPCell.ALIGN_RIGHT));
+
+                    tot = tot + Integer.valueOf(c.getAmount());
+                    mTotal = mTotal + Integer.valueOf(c.getAmount());
+                    d = c.getCBDate();
+                }
+            }
+        } else {
+            d = "0";
+            for (CashBook c : cashBooksList){
+
+                if (d.equals("0")){
+
+                    PdfPCell section = new PdfPCell(new Phrase(c.getCBDate(),totalFont));
+                    section.setBorder(PdfPCell.NO_BORDER);
+                    section.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
+                    section.setVerticalAlignment(Element.ALIGN_MIDDLE);
+                    section.setFixedHeight(30);
+                    table.addCell(section);
+                    table.addCell(footerCell("",PdfPCell.ALIGN_RIGHT));
+                    table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
+                    table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
+                    table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
+//                    table.addCell(footerCell("",PdfPCell.ALIGN_RIGHT));
+
+//                    table.addCell(getCell(c.getCBDate(),PdfPCell.ALIGN_LEFT));
+                    table.addCell(getCell(c.getCashBookID(),PdfPCell.ALIGN_RIGHT));
+                    table.addCell(getCell(c.getDebitAccountName(),PdfPCell.ALIGN_LEFT));
+                    table.addCell(getCell(c.getCreditAccountName(),PdfPCell.ALIGN_LEFT));
+                    table.addCell(getCell(c.getCBRemarks(),PdfPCell.ALIGN_LEFT));
+                    table.addCell(getCell(c.getAmount(),PdfPCell.ALIGN_RIGHT));
+
+                    tot = tot + Integer.valueOf(c.getAmount());
+                    mTotal = mTotal + Integer.valueOf(c.getAmount());
+                    d = c.getCBDate();
+                }else if(d.equals(c.getCBDate())){
+//                    table.addCell(getCell(c.getCBDate(),PdfPCell.ALIGN_LEFT));
+                    table.addCell(getCell(c.getCashBookID(),PdfPCell.ALIGN_RIGHT));
+                    table.addCell(getCell(c.getDebitAccountName(),PdfPCell.ALIGN_LEFT));
+                    table.addCell(getCell(c.getCreditAccountName(),PdfPCell.ALIGN_LEFT));
+                    table.addCell(getCell(c.getCBRemarks(),PdfPCell.ALIGN_LEFT));
+                    table.addCell(getCell(c.getAmount(),PdfPCell.ALIGN_RIGHT));
+
+                    tot = tot + Integer.valueOf(c.getAmount());
+                    mTotal = mTotal + Integer.valueOf(c.getAmount());
+                    d = c.getCBDate();
+                }else if (!d.equals(c.getCBDate()) && !d.equals("0")){
+//                    table.addCell("");
+                    table.addCell("");
+                    table.addCell("");
+                    table.addCell("");
+                    table.addCell(total);
+                    table.addCell(getCell(String.valueOf(tot),PdfPCell.ALIGN_RIGHT));
+                    tot = 0;
+
+                    PdfPCell section = new PdfPCell(new Phrase(c.getCBDate(),totalFont));
+                    section.setBorder(PdfPCell.NO_BORDER);
+                    section.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
+                    section.setVerticalAlignment(Element.ALIGN_MIDDLE);
+                    section.setFixedHeight(30);
+                    table.addCell(section);
+                    table.addCell(footerCell("",PdfPCell.ALIGN_RIGHT));
+                    table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
+                    table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
+                    table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
+//                    table.addCell(footerCell("",PdfPCell.ALIGN_RIGHT));
+
+//                    table.addCell(getCell(c.getCBDate(),PdfPCell.ALIGN_LEFT));
+                    table.addCell(getCell(c.getCashBookID(),PdfPCell.ALIGN_RIGHT));
+                    table.addCell(getCell(c.getDebitAccountName(),PdfPCell.ALIGN_LEFT));
+                    table.addCell(getCell(c.getCreditAccountName(),PdfPCell.ALIGN_LEFT));
+                    table.addCell(getCell(c.getCBRemarks(),PdfPCell.ALIGN_LEFT));
+                    table.addCell(getCell(c.getAmount(),PdfPCell.ALIGN_RIGHT));
+
+                    tot = tot + Integer.valueOf(c.getAmount());
+                    mTotal = mTotal + Integer.valueOf(c.getAmount());
+                    d = c.getCBDate();
+                }
+            }
+        }
+
+//        table.addCell("");
+        table.addCell("");
+        table.addCell("");
+        table.addCell("");
+        table.addCell(total);
+        table.addCell(getCell(String.valueOf(tot),PdfPCell.ALIGN_RIGHT));
+
+//        table.addCell("");
+        table.addCell("");
+        table.addCell("");
+        table.addCell("");
+        table.addCell("Grand Total");
+        table.addCell(getCell(String.valueOf(mTotal),PdfPCell.ALIGN_RIGHT));
+
+//        Footer footer = new Footer();
+
+        document.open();
+
+        Font f = new Font(Font.FontFamily.TIMES_ROMAN, 30.0f, Font.UNDERLINE, BaseColor.BLACK);
+        Paragraph paragraph = new Paragraph("Cash Book \n\n", f);
+        paragraph.setAlignment(Element.ALIGN_CENTER);
+        document.add(chunk);
+        document.add(name);
+        document.add(contact);
+        document.add(title);
+//        document.add(param);
+        document.add(table);
+
+        document.close();
+        customPDFView();
+        Log.e("PDFDocument","Created");
+    }
+
+    public PdfPCell getCell(String text, int alignment) {
+        PdfPCell cell = new PdfPCell(new Phrase(text));
+        cell.setPadding(0);
+        cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+        cell.setHorizontalAlignment(alignment);
+        cell.setMinimumHeight(30);
+        cell.setPadding(3);
+        return cell;
+    }
+
+    public PdfPCell footerCell(String text, int alignment) {
+        PdfPCell cell = new PdfPCell(new Phrase(text));
+        cell.setPadding(0);
+        cell.setHorizontalAlignment(alignment);
+        cell.setBorder(PdfPCell.NO_BORDER);
+        return cell;
+    }
+
+    public void customPDFView(){
+        PackageManager packageManager = getPackageManager();
+        Intent testIntent = new Intent(Intent.ACTION_VIEW);
+        testIntent.setType("application/pdf");
+        List list = packageManager.queryIntentActivities(testIntent, PackageManager.MATCH_DEFAULT_ONLY);
+        if (list.size() > 0) {
+            Intent intent = new Intent();
+            intent.setAction(Intent.ACTION_VIEW);
+            Uri uri = Uri.fromFile(pdfFile);
+            intent.setDataAndType(uri, "application/pdf");
+            startActivity(intent);
+        } else {
+            Toast.makeText(EventCashBookActivity.this, "Download a PDF Viewer to see the generated PDF", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    class Footer extends PdfPageEventHelper {
+        Font font;
+        PdfTemplate t;
+        Image total;
+
+        @Override
+        public void onOpenDocument(PdfWriter writer, Document document) {
+            t = writer.getDirectContent().createTemplate(30, 16);
+            try {
+                total = Image.getInstance(t);
+                total.setRole(PdfName.ARTIFACT);
+                font =  new Font(Font.FontFamily.TIMES_ROMAN, 30.0f, Font.UNDERLINE, BaseColor.BLACK);
+            } catch (DocumentException de) {
+                throw new ExceptionConverter(de);
+            }
+        }
+
+        @Override
+        public void onEndPage(PdfWriter writer, Document document) {
+
+            PdfPTable table = new PdfPTable(new float[]{3, 4, 2});
+            table.getDefaultCell().setHorizontalAlignment(Element.ALIGN_CENTER);
+            table.getDefaultCell().setFixedHeight(20);
+            table.setTotalWidth(PageSize.A4.getWidth());
+            table.getDefaultCell().setBorder(Rectangle.BOTTOM);
+            Date dat = new Date();
+            SimpleDateFormat df = new SimpleDateFormat("EEE, d MMM yyyy");
+            table.addCell(footerCell(df.format(dat), PdfPCell.ALIGN_LEFT));
+            table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
+            Log.e("PAGE NUMBER",String.valueOf(writer.getPageNumber()));
+            table.addCell(footerCell(String.format("Page %s", writer.getPageNumber() - 1),PdfPCell.ALIGN_LEFT));
+            table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
+            table.addCell(footerCell("www.easysoft.com.pk",PdfPCell.ALIGN_LEFT));
+            table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
+
+            PdfContentByte canvas = writer.getDirectContent();
+            canvas.beginMarkedContentSequence(PdfName.ARTIFACT);
+            table.writeSelectedRows(0, -1, 36, 30, canvas);
+            canvas.endMarkedContentSequence();
+
+        }
+
+        @Override
+        public void onCloseDocument(PdfWriter writer, Document document) {
+            ColumnText.showTextAligned(t, Element.ALIGN_LEFT,
+                    new Phrase(String.valueOf(writer.getPageNumber()), font),
+                    2, 4, 0);
+        }
     }
 
     //FOR TESTING CASHBOOK
@@ -283,7 +1168,7 @@ public class ChartOfAccFragment extends Fragment {
                                         }
 
                                     }
-                                    initData();
+
                                 }
 
                             }else {
@@ -382,7 +1267,7 @@ public class ChartOfAccFragment extends Fragment {
                                             s.save();
                                         }
                                     }
-                                    initData();
+
                                 }
 
                             }else {
@@ -476,6 +1361,7 @@ public class ChartOfAccFragment extends Fragment {
                                             s.save();
                                         }
                                     }
+                                    getCashBook();
                                 }
                             }else {
                                 String message = jsonObj.getString("message");
@@ -572,6 +1458,7 @@ public class ChartOfAccFragment extends Fragment {
                                         }
                                     }
 
+                                    getCashBook();
                                 }
 
                             }else {
@@ -850,6 +1737,7 @@ public class ChartOfAccFragment extends Fragment {
                                         s.setInsertDate(UpdatedDate);
                                         s.save();
                                     }
+                                    getCashBook();
                                 }
 
                             } catch (JSONException e) {
@@ -919,6 +1807,7 @@ public class ChartOfAccFragment extends Fragment {
                                         s.setUpdateDate(UpdatedDate);
                                         s.save();
                                     }
+                                    getCashBook();
                                 }
                             } catch (JSONException e) {
                                 e.printStackTrace();
@@ -1151,11 +2040,10 @@ public class ChartOfAccFragment extends Fragment {
                                         s.setInsertDate(UpdatedDate);
                                         s.save();
                                     }
-                                    initData();
                                 }else {
                                     databaseHelper.deleteAccount3NameEntry("DELETE FROM Account3Name WHERE ID = "+c.getId());
                                     String message = jsonObject.getString("message");
-                                    Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(EventCashBookActivity.this, message, Toast.LENGTH_SHORT).show();
                                 }
                             } catch (JSONException e) {
                                 e.printStackTrace();
@@ -1227,7 +2115,6 @@ public class ChartOfAccFragment extends Fragment {
                                         s.setUpdateDate(UpdatedDate);
                                         s.save();
                                     }
-                                    initData();
                                 }
                             } catch (JSONException e) {
                                 e.printStackTrace();
@@ -1270,5 +2157,4 @@ public class ChartOfAccFragment extends Fragment {
         }
         mProgress.dismiss();
     }
-
 }

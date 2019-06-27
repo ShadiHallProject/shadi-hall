@@ -7,14 +7,16 @@ public class TableSession extends SugarRecord {
     String tableName;
     String maxID;
     String updateDate;
+    String insertDate;
 
     public TableSession() {
     }
 
-    public TableSession(String tableName, String maxID, String updateDate) {
+    public TableSession(String tableName, String maxID, String updateDate, String insertDate) {
         this.tableName = tableName;
         this.maxID = maxID;
         this.updateDate = updateDate;
+        this.insertDate = insertDate;
     }
 
     public String getTableName() {
@@ -39,5 +41,13 @@ public class TableSession extends SugarRecord {
 
     public void setUpdateDate(String updateDate) {
         this.updateDate = updateDate;
+    }
+
+    public String getInsertDate() {
+        return insertDate;
+    }
+
+    public void setInsertDate(String insertDate) {
+        this.insertDate = insertDate;
     }
 }

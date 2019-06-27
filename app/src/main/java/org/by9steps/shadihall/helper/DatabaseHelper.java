@@ -110,6 +110,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String KEY_SysCode3 = "SysCode";
     private static final String KEY_UpdatedDate3 = "UpdatedDate";
     private static final String KEY_Advance = "Advance";
+    private static final String KEY_Shift = "Shift";
 
     // Table Create Statements
     // Account3Name table create statement
@@ -167,7 +168,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             + KEY_NetCode3 + " TEXT,"
             + KEY_SysCode3 + " TEXT,"
             + KEY_UpdatedDate3 + " TEXT,"
-            + KEY_Advance + " TEXT"+ ")";
+            + KEY_Advance + " TEXT,"
+            + KEY_Shift + " TEXT"+ ")";
 
     // Account2Group table create statement
     private static final String CREATE_TABLE_Account2Group = "CREATE TABLE "
@@ -338,6 +340,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(KEY_SysCode3, bookings.getSysCode());
         values.put(KEY_UpdatedDate3, bookings.getUpdatedDate());
         values.put(KEY_Advance, bookings.getAmount());
+        values.put(KEY_Shift, bookings.getShift());
 
         // insert row
         String s = String.valueOf(db.insert(TABLE_Booking, null, values));
@@ -450,13 +453,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor c = db.rawQuery(query, null);
-        Log.e("SSSS",String.valueOf(c.moveToFirst()));
 
         // looping through all rows and adding to list
         if (c.moveToFirst()) {
             do {
                 Bookings generalLedger = new Bookings();
-                Log.e("SSSSS",c.getString(c.getColumnIndex("EventDate")));
                 generalLedger.setId(c.getString(c.getColumnIndex(KEY_ID)));
                 generalLedger.setBookingID(c.getString(c.getColumnIndex("BookingID")));
                 generalLedger.setClientName(c.getString(c.getColumnIndex("ClientName")));
@@ -466,12 +467,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 generalLedger.setEventName(c.getString(c.getColumnIndex("EventName")));
                 generalLedger.setBookingDate(c.getString(c.getColumnIndex("BookingDate")));
                 generalLedger.setEventDate(c.getString(c.getColumnIndex("EventDate")));
+                Log.e("EVENTDATE",c.getString(c.getColumnIndex("EventDate")));
                 generalLedger.setChargesTotal(c.getString(c.getColumnIndex("ChargesTotal")));
                 generalLedger.setDescription(c.getString(c.getColumnIndex("Description")));
                 generalLedger.setClientID(c.getString(c.getColumnIndex("ClientID")));
                 generalLedger.setClientUserID(c.getString(c.getColumnIndex("ClientUserID")));
                 generalLedger.setArrangePersons(c.getString(c.getColumnIndex(KEY_ArrangePersons)));
                 generalLedger.setAmount(c.getString(c.getColumnIndex(KEY_Advance)));
+                generalLedger.setShift(c.getString(c.getColumnIndex(KEY_Shift)));
 
                 // adding to todo list
                 mGeneralLedger.add(generalLedger);
@@ -999,5 +1002,18 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
 
         return vouchers;
+    }
+
+    //Get Voucher
+    public Boolean getBookingShift(String query) {
+
+        Log.e(LOG, query);
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor c = db.rawQuery(query, null);
+        Log.e("CashBook",String.valueOf(c.moveToFirst()));
+
+
+        return c.moveToFirst();
     }
 }

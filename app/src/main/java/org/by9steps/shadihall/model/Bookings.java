@@ -24,11 +24,12 @@ public class Bookings implements Serializable {
     String SysCode;
     String UpdatedDate;
     String Amount;
+    String Shift;
 
     public Bookings() {
     }
 
-    public Bookings(String bookingID, String clientName, String clientMobile, String clientAddress, String clientNic, String eventName, String bookingDate, String eventDate, String arrangePersons, String chargesTotal, String description, String clientID, String clientUserID, String netCode, String sysCode, String updatedDate) {
+    public Bookings(String bookingID, String clientName, String clientMobile, String clientAddress, String clientNic, String eventName, String bookingDate, String eventDate, String arrangePersons, String chargesTotal, String description, String clientID, String clientUserID, String netCode, String sysCode, String updatedDate, String shift) {
         BookingID = bookingID;
         ClientName = clientName;
         ClientMobile = clientMobile;
@@ -45,9 +46,10 @@ public class Bookings implements Serializable {
         NetCode = netCode;
         SysCode = sysCode;
         UpdatedDate = updatedDate;
+        Shift = shift;
     }
 
-    public Bookings(String bookingID, String clientName, String clientMobile, String clientAddress, String clientNic, String eventName, String bookingDate, String eventDate, String arrangePersons, String chargesTotal, String description, String clientID, String clientUserID, String netCode, String sysCode, String updatedDate, String amount) {
+    public Bookings(String bookingID, String clientName, String clientMobile, String clientAddress, String clientNic, String eventName, String bookingDate, String eventDate, String arrangePersons, String chargesTotal, String description, String clientID, String clientUserID, String netCode, String sysCode, String updatedDate, String amount, String shift) {
         BookingID = bookingID;
         ClientName = clientName;
         ClientMobile = clientMobile;
@@ -65,6 +67,7 @@ public class Bookings implements Serializable {
         SysCode = sysCode;
         UpdatedDate = updatedDate;
         Amount = amount;
+        Shift = shift;
     }
 
     public String getId() {
@@ -209,5 +212,13 @@ public class Bookings implements Serializable {
 
     public void setAmount(String amount) {
         Amount = amount;
+    }
+
+    public String getShift() {
+        return Shift;
+    }
+
+    public void setShift(String shift) {
+        Shift = shift;
     }
 }

@@ -3,10 +3,16 @@ package org.by9steps.shadihall.fragments;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -14,6 +20,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.Toast;
 
 import com.android.volley.DefaultRetryPolicy;
@@ -22,8 +29,6 @@ import com.android.volley.Response;
 import com.android.volley.RetryPolicy;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
-import com.applandeo.materialcalendarview.CalendarView;
-import com.applandeo.materialcalendarview.EventDay;
 import com.squareup.timessquare.CalendarCellDecorator;
 import com.squareup.timessquare.CalendarPickerView;
 import com.squareup.timessquare.DefaultDayViewAdapter;
@@ -31,8 +36,6 @@ import com.squareup.timessquare.DefaultDayViewAdapter;
 
 import org.by9steps.shadihall.AppController;
 import org.by9steps.shadihall.R;
-import org.by9steps.shadihall.activities.MainActivity;
-import org.by9steps.shadihall.activities.RegisterActivity;
 import org.by9steps.shadihall.helper.DatabaseHelper;
 import org.by9steps.shadihall.model.Account3Name;
 import org.by9steps.shadihall.model.Bookings;
@@ -43,6 +46,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.util.Collections;
@@ -59,7 +63,7 @@ import static com.squareup.timessquare.CalendarPickerView.SelectionMode.SINGLE;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class BookCalendarFragment extends Fragment {
+public class BookCalendarFragment extends Fragment implements View.OnClickListener {
 
     DatabaseHelper databaseHelper;
     CalendarPickerView calendar;
@@ -69,9 +73,15 @@ public class BookCalendarFragment extends Fragment {
 
     Date today;
     Calendar LastYear, nextYear;
+    Button dayBooking,nightBooking;
     String pattern="yyyy-MM-dd";
     ProgressDialog pDialog;
     int day, month, year;
+    String query, bookingType = "Morning";
+
+    //Print
+    private static final String TAG = "PdfCreatorActivity";
+    private File pdfFile;
 
     public BookCalendarFragment() {
         // Required empty public constructor
@@ -86,7 +96,12 @@ public class BookCalendarFragment extends Fragment {
         setHasOptionsMenu(true);
 
         calendar = view.findViewById(R.id.calendar);
+        dayBooking = view.findViewById(R.id.btn_day_booking);
+        nightBooking = view.findViewById(R.id.btn_night_booking);
         databaseHelper = new DatabaseHelper(getContext());
+
+        dayBooking.setOnClickListener(this);
+        nightBooking.setOnClickListener(this);
 
         LastYear = Calendar.getInstance();
         LastYear.add(Calendar.YEAR, -1);
@@ -121,44 +136,54 @@ public class BookCalendarFragment extends Fragment {
                         found = true;
                     }
                 }
+
                 if (found) {
                     day = calselected.get(Calendar.DAY_OF_MONTH);
                     month = calselected.get(Calendar.MONTH)+1;
                     year = calselected.get(Calendar.YEAR);
-                    String selectedDate = day + "-" + month + "-" + year;
-//                    Toast.makeText(getContext(), "Click is\n" + selectedDate, Toast.LENGTH_LONG).show();
+                    String selectedDate = null;
+                    if (month < 10 && day > 9){
+                        selectedDate = year + "-" + "0"+month + "-" + day;
+                    }else if (month > 9 && day < 10){
+                        selectedDate = year + "-" + month + "-" + "0"+day;
+                    }else if (month < 10 && day < 10){
+                        selectedDate = year + "-" + "0"+month + "-" + "0"+day;
+                    }else if (month > 9 && day > 9){
+                        selectedDate = year + "-" + month + "-" + day;
+                    }
 
-                    DateFormat df = new SimpleDateFormat(pattern);
-                    selectedDate= df.format(calendar.getSelectedDate());
                     getActivity().getSupportFragmentManager().beginTransaction()
-                            .replace(R.id.menu_container, BookingDetailFragment.newInstance(selectedDate))
+                            .replace(R.id.menu_container, SelectedDateBookingsFragment.newInstance(selectedDate,bookingType))
                             .addToBackStack(null)
                             .commit();
+//                    getActivity().getSupportFragmentManager().beginTransaction()
+//                            .replace(R.id.menu_container, BookingDetailFragment.newInstance(selectedDate,bookingType))
+//                            .addToBackStack(null)
+//                            .commit();
 
-                    Toast.makeText(getContext(), selectedDate+"\nEvent Already Booked \n" + calselected.get(Calendar.DAY_OF_MONTH), Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(getContext(), selectedDate+"\nEvent Already Booked \n" + calselected.get(Calendar.DAY_OF_MONTH), Toast.LENGTH_SHORT).show();
                 } else {
-                    String selectedDate;
+                    String selectedDate = null;
                     //new Activity
                     day = calselected.get(Calendar.DAY_OF_MONTH);
                     month = calselected.get(Calendar.MONTH)+1;
                     year = calselected.get(Calendar.YEAR);
-                    if (month < 10){
+
+                    if (month < 10 && day > 9){
                         selectedDate = year + "-" + "0"+month + "-" + day;
-//                        selectedDate = day + "-" + "0"+month + "-" + year;
-                    }else if (day < 10){
+                    }else if (month > 9 && day < 10){
                         selectedDate = year + "-" + month + "-" + "0"+day;
-                    }else {
+                    }else if (month < 10 && day < 10){
+                        selectedDate = year + "-" + "0"+month + "-" + "0"+day;
+                    }else if (month > 9 && day > 9){
                         selectedDate = year + "-" + month + "-" + day;
                     }
 
-//                    Toast.makeText(getContext(), "Click is\n" + selectedDate, Toast.LENGTH_LONG).show();
                     getActivity().getSupportFragmentManager().beginTransaction()
-                            .replace(R.id.menu_container, BookingFormFragment.newInstance(selectedDate,"id"))
+                            .replace(R.id.menu_container, BookingFormFragment.newInstance(selectedDate,"id",bookingType))
                             .addToBackStack(null)
                             .commit();
-//                    Intent intent = new Intent(BookCalender.this, BookingForm.class);
-//                    intent.putExtra("message", selectedDate);
-//                    startActivity(intent);
+
                 }
             }
 
@@ -168,11 +193,37 @@ public class BookCalendarFragment extends Fragment {
             }
         });
 
-        FetchFromDb();
+
+        if (bookingType.equals("Morning")){
+            dayBooking.setBackgroundResource(R.color.colorPrimaryDark);
+            nightBooking.setBackgroundResource(R.color.colorPrimary);
+            FetchFromDb();
+        }else {
+            nightBooking.setBackgroundResource(R.color.colorPrimaryDark);
+            dayBooking.setBackgroundResource(R.color.colorPrimary);
+            FetchFromDb();
+        }
 
         return  view;
     }
 
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()){
+            case R.id.btn_day_booking:
+                bookingType = "Morning";
+                dayBooking.setBackgroundResource(R.color.colorPrimaryDark);
+                nightBooking.setBackgroundResource(R.color.colorPrimary);
+                FetchFromDb();
+                break;
+            case R.id.btn_night_booking:
+                bookingType = "Evening";
+                nightBooking.setBackgroundResource(R.color.colorPrimaryDark);
+                dayBooking.setBackgroundResource(R.color.colorPrimary);
+                FetchFromDb();
+                break;
+        }
+    }
 
     public void FetchFromDb() {
 
@@ -180,7 +231,7 @@ public class BookCalendarFragment extends Fragment {
         List<User> list = User.listAll(User.class);
         for (User u: list) {
 //            query = "SELECT * FROM Booking";
-            query = "SELECT * FROM Booking WHERE ClientID =" + u.getClientID();
+            query = "SELECT * FROM Booking WHERE ClientID =" + u.getClientID()+ " AND Shift = '"+bookingType+"'";
         }
         bookingList = databaseHelper.getBookings(query);
 
@@ -193,7 +244,6 @@ public class BookCalendarFragment extends Fragment {
             Date date = null;
             try {
                 date = sdf.parse(book.getEventDate());
-                Log.e("Booking Size",String.valueOf(book.getEventDate()));
             } catch (ParseException e) {
                 e.printStackTrace();
             }
@@ -204,6 +254,7 @@ public class BookCalendarFragment extends Fragment {
             }
         }
         // mDatabase.close();
+        calendar.clearHighlightedDates();
         calendar.highlightDates(dateList);
 
     }
@@ -223,10 +274,10 @@ public class BookCalendarFragment extends Fragment {
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.cb_menu,menu);
-//        MenuItem print = menu.findItem(R.id.action_print);
-//        print.setVisible(false);
         MenuItem settings = menu.findItem(R.id.action_settings);
         settings.setVisible(false);
+        MenuItem print = menu.findItem(R.id.action_print);
+        print.setVisible(false);
         super.onCreateOptionsMenu(menu,inflater);
     }
 
@@ -284,7 +335,7 @@ public class BookCalendarFragment extends Fragment {
                         try {
                             jsonObj= new JSONObject(response);
                             String success = jsonObj.getString("success");
-                            Log.e("Sarem",jsonObj.toString());
+                            Log.e("Account3Name1",jsonObj.toString());
                             if (success.equals("1")){
                                 JSONArray jsonArray = jsonObj.getJSONArray("Account3Name");
                                 for (int i = 0; i < jsonArray.length(); i++) {
@@ -319,7 +370,7 @@ public class BookCalendarFragment extends Fragment {
                                         List<TableSession> se = TableSession.find(TableSession.class,"table_Name = ?","Account3Name");
                                         for (TableSession s : se){
                                             s.setMaxID(AcNameID);
-                                            s.setUpdateDate(SessionDate);
+                                            s.setInsertDate(SessionDate);
                                             s.save();
                                         }
 
@@ -330,7 +381,7 @@ public class BookCalendarFragment extends Fragment {
                             }else {
                                 String message = jsonObj.getString("message");
 //                                Toast.makeText(SplashActivity.this, message, Toast.LENGTH_SHORT).show();
-                            }Log.e("SSSSS","SAREMS1");
+                            }
                             updateAccount3Name();
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -380,6 +431,7 @@ public class BookCalendarFragment extends Fragment {
                         try {
                             jsonObj= new JSONObject(response);
                             String success = jsonObj.getString("success");
+                            Log.e("Account3Name2",jsonObj.toString());
                             if (success.equals("1")){
                                 JSONArray jsonArray = jsonObj.getJSONArray("Account3Name");
                                 for (int i = 0; i < jsonArray.length(); i++) {
@@ -479,11 +531,11 @@ public class BookCalendarFragment extends Fragment {
                         try {
                             jsonObj= new JSONObject(response);
                             String success = jsonObj.getString("success");
+                            Log.e("CashBook1",jsonObj.toString());
                             if (success.equals("1")){
                                 JSONArray jsonArray = jsonObj.getJSONArray("CashBook");
                                 for (int i = 0; i < jsonArray.length(); i++) {
                                     JSONObject jsonObject = jsonArray.getJSONObject(i);
-                                    Log.e("Account3Name",jsonObject.toString());
                                     String CashBookID = jsonObject.getString("CashBookID");
                                     String cb = jsonObject.getString("CBDate");
                                     JSONObject jbb = new JSONObject(cb);
@@ -512,7 +564,7 @@ public class BookCalendarFragment extends Fragment {
                                         List<TableSession> se = TableSession.find(TableSession.class,"table_Name = ?","CashBook");
                                         for (TableSession s : se){
                                             s.setMaxID(CashBookID);
-                                            s.setUpdateDate(SessionDate);
+                                            s.setInsertDate(SessionDate);
                                             s.save();
                                         }
                                     }
@@ -572,7 +624,7 @@ public class BookCalendarFragment extends Fragment {
 
                         try {
                             jsonObj= new JSONObject(response);
-                            Log.e("UPDATE CB",response);
+                            Log.e("CashBook2",response);
                             String success = jsonObj.getString("success");
                             if (success.equals("1")){
                                 JSONArray jsonArray = jsonObj.getJSONArray("CashBook");
@@ -668,17 +720,15 @@ public class BookCalendarFragment extends Fragment {
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-
+                        Log.e("Booking1",response);
                         String text = "", BookingID = "", ClientName = "", ClientMobile = "", ClientAddress = "", ClientNic = "", EventName = "", BookingDate = "", EventDate = "",
                                 ArrangePersons ="", ChargesTotal = "",Description = "", ClientID ="", ClientUserID = "", NetCode = "",SysCode = "", UpdatedDate = "";
                         try {
                             JSONObject json = new JSONObject(response);
                             String success = json.getString("success");
-                            Log.e("Response",success);
 
                             if (success.equals("1")) {
                                 JSONArray jsonArray = json.getJSONArray("Bookings");
-                                Log.e("SSSS", jsonArray.toString());
                                 for (int i = 0; i < jsonArray.length(); i++) {
                                     JSONObject jsonObject = jsonArray.getJSONObject(i);
 
@@ -707,14 +757,15 @@ public class BookCalendarFragment extends Fragment {
                                     JSONObject jbb = new JSONObject(up);
                                     UpdatedDate = jbb.getString("date");
                                     String SessionDate = jsonObject.getString("SessionDate");
+                                    String Shift = jsonObject.getString("Shift");
 
-                                    databaseHelper.createBooking(new Bookings(BookingID,ClientName,ClientMobile,ClientAddress,ClientNic,EventName,BookingDate,EventDate,ArrangePersons,ChargesTotal,Description,ClientID,ClientUserID,NetCode,SysCode,UpdatedDate));
+                                    databaseHelper.createBooking(new Bookings(BookingID,ClientName,ClientMobile,ClientAddress,ClientNic,EventName,BookingDate,EventDate,ArrangePersons,ChargesTotal,Description,ClientID,ClientUserID,NetCode,SysCode,UpdatedDate,Shift));
 
                                     if (i == jsonArray.length() - 1) {
                                         List<TableSession> se = TableSession.find(TableSession.class,"table_Name = ?","Bookings");
                                         for (TableSession s : se){
                                             s.setMaxID(BookingID);
-                                            s.setUpdateDate(SessionDate);
+                                            s.setInsertDate(SessionDate);
                                             s.save();
                                         }
                                     }
@@ -746,7 +797,7 @@ public class BookCalendarFragment extends Fragment {
                 for (User u : list) {
                     params.put("ClientID", u.getClientID());
                 }
-                List<TableSession> tableSessions = TableSession.find(TableSession.class,"table_Name = ?","CashBook");
+                List<TableSession> tableSessions = TableSession.find(TableSession.class,"table_Name = ?","Bookings");
                 for (TableSession t : tableSessions){
                     params.put("MaxID",t.getMaxID());
                 }
@@ -776,11 +827,10 @@ public class BookCalendarFragment extends Fragment {
                         try {
                             JSONObject json = new JSONObject(response);
                             String success = json.getString("success");
-                            Log.e("Response",success);
+                            Log.e("Booking2",json.toString());
 
                             if (success.equals("1")) {
                                 JSONArray jsonArray = json.getJSONArray("Bookings");
-                                Log.e("SSSS", jsonArray.toString());
                                 for (int i = 0; i < jsonArray.length(); i++) {
                                     JSONObject jsonObject = jsonArray.getJSONObject(i);
 
@@ -811,8 +861,8 @@ public class BookCalendarFragment extends Fragment {
                                     String SessionDate = jsonObject.getString("SessionDate");
 
                                     String query = "UPDATE Booking SET BookingID = '"+BookingID+"', ClientName = '"+ClientName+"', ClientMobile = '"+ClientMobile+"', ClientAddress = '"+ClientAddress+"', ClientNic = '"+ClientNic
-                                            +"', EventName = '"+EventName+"', BookingDate = '"+BookingDate+"', EventDate = '"+EventDate+"', ArrangePersons '"+ArrangePersons+"', ChargesTotal = '"+ChargesTotal+"', Description = '"+Description
-                                            +"', ClientID = '"+ClientID+"', ClientUserID '"+ClientUserID+"', NetCode = '"+NetCode+"', SysCode = '"+SysCode+"', UpdatedDate = '"+UpdatedDate+"' WHERE BookingID = "+ BookingID;
+                                            +"', EventName = '"+EventName+"', BookingDate = '"+BookingDate+"', EventDate = '"+EventDate+"', ArrangePersons ='"+ArrangePersons+"', ChargesTotal = '"+ChargesTotal+"', Description = '"+Description
+                                            +"', ClientID = '"+ClientID+"', ClientUserID = '"+ClientUserID+"', NetCode = '"+NetCode+"', SysCode = '"+SysCode+"', UpdatedDate = '"+UpdatedDate+"' WHERE BookingID = "+ BookingID;
                                     databaseHelper.updateBooking(query);
 
                                     if (i == jsonArray.length() - 1) {
@@ -852,7 +902,7 @@ public class BookCalendarFragment extends Fragment {
                 for (User u : list) {
                     params.put("ClientID", u.getClientID());
                 }
-                List<TableSession> tableSessions = TableSession.find(TableSession.class,"table_Name = ?","CashBook");
+                List<TableSession> tableSessions = TableSession.find(TableSession.class,"table_Name = ?","Bookings");
                 for (TableSession t : tableSessions){
                     params.put("MaxID",t.getMaxID());
                     params.put("SessionDate",t.getUpdateDate());
@@ -879,11 +929,10 @@ public class BookCalendarFragment extends Fragment {
                     new Response.Listener<String>() {
                         @Override
                         public void onResponse(String response) {
-                            Log.e("Response DD",response);
+                            Log.e("CashBook3",response);
                             try {
                                 JSONObject jsonObject = new JSONObject(response);
                                 String success = jsonObject.getString("success");
-                                Log.e("SuccessSS",success);
                                 if (success.equals("1")){
                                     String id = jsonObject.getString("CBID");
                                     String UpdatedDate = jsonObject.getString("UpdatedDate");
@@ -893,7 +942,7 @@ public class BookCalendarFragment extends Fragment {
                                     List<TableSession> se = TableSession.find(TableSession.class,"table_Name = ?","CashBook");
                                     for (TableSession s : se){
                                         s.setMaxID(id);
-                                        s.setUpdateDate(UpdatedDate);
+                                        s.setInsertDate(UpdatedDate);
                                         s.save();
                                     }
                                 }
@@ -950,7 +999,7 @@ public class BookCalendarFragment extends Fragment {
                     new Response.Listener<String>() {
                         @Override
                         public void onResponse(String response) {
-                            Log.e("Response CB",response);
+                            Log.e("CashBook4",response);
                             try {
                                 JSONObject jsonObject = new JSONObject(response);
                                 String success = jsonObject.getString("success");
@@ -1023,7 +1072,7 @@ public class BookCalendarFragment extends Fragment {
                     new Response.Listener<String>() {
                         @Override
                         public void onResponse(String response) {
-                            Log.e("Booking Boo",response);
+                            Log.e("Booking3",response);
                             try {
                                 JSONObject jsonObject = new JSONObject(response);
                                 String success = jsonObject.getString("success");
@@ -1034,10 +1083,10 @@ public class BookCalendarFragment extends Fragment {
                                     String message = jsonObject.getString("message");
                                     databaseHelper.updateCashBook("UPDATE Booking SET BookingID = '"+ id +"', UpdatedDate = '"+UpdatedDate+"' WHERE ID = "+c.getId());
 
-                                    List<TableSession> se = TableSession.find(TableSession.class,"table_Name = ?","Booking");
+                                    List<TableSession> se = TableSession.find(TableSession.class,"table_Name = ?","Bookings");
                                     for (TableSession s : se){
                                         s.setMaxID(id);
-                                        s.setUpdateDate(UpdatedDate);
+                                        s.setInsertDate(UpdatedDate);
                                         s.save();
                                     }
                                 }
@@ -1079,6 +1128,7 @@ public class BookCalendarFragment extends Fragment {
                         params.put("DebitAccount", u.getCashID());
                         params.put("CreditAccount", u.getBookingIncomeID());
                         params.put("Amount", c.getAmount());
+                        params.put("Shift", c.getShift());
                     }
                     return params;
                 }
@@ -1092,7 +1142,7 @@ public class BookCalendarFragment extends Fragment {
     }
 
     public void updateBooking(){
-        String query = "SELECT * FROM Booking WHERE UpdatedDate = 0";
+        String query = "SELECT * FROM Booking WHERE UpdatedDate = 0 AND BookingID != 'o'";
         final List<Bookings> addBooking = databaseHelper.getBookings(query);
         Log.e("BookingID UP", String.valueOf(addBooking.size()));
 
@@ -1104,7 +1154,7 @@ public class BookCalendarFragment extends Fragment {
                     new Response.Listener<String>() {
                         @Override
                         public void onResponse(String response) {
-                            Log.e("Response CB",response);
+                            Log.e("Booking4",response);
                             try {
                                 JSONObject jsonObject = new JSONObject(response);
                                 String success = jsonObject.getString("success");
@@ -1114,7 +1164,7 @@ public class BookCalendarFragment extends Fragment {
                                     String message = jsonObject.getString("message");
                                     databaseHelper.updateCashBook("UPDATE Booking SET UpdatedDate = '"+UpdatedDate+"' WHERE ID = "+c.getId());
 
-                                    List<TableSession> se = TableSession.find(TableSession.class,"table_Name = ?","Booking");
+                                    List<TableSession> se = TableSession.find(TableSession.class,"table_Name = ?","Bookings");
                                     for (TableSession s : se){
                                         s.setUpdateDate(UpdatedDate);
                                         s.save();
@@ -1181,7 +1231,7 @@ public class BookCalendarFragment extends Fragment {
                     new Response.Listener<String>() {
                         @Override
                         public void onResponse(String response) {
-                            Log.e("Response CB",response);
+                            Log.e("Account3Name3",response);
                             try {
                                 JSONObject jsonObject = new JSONObject(response);
                                 String success = jsonObject.getString("success");
@@ -1195,7 +1245,7 @@ public class BookCalendarFragment extends Fragment {
                                     List<TableSession> se = TableSession.find(TableSession.class,"table_Name = ?","Account3Name");
                                     for (TableSession s : se){
                                         s.setMaxID(id);
-                                        s.setUpdateDate(UpdatedDate);
+                                        s.setInsertDate(UpdatedDate);
                                         s.save();
                                     }
                                 }else {
@@ -1258,7 +1308,7 @@ public class BookCalendarFragment extends Fragment {
                     new Response.Listener<String>() {
                         @Override
                         public void onResponse(String response) {
-                            Log.e("Response CB",response);
+                            Log.e("Account3Name4",response);
                             try {
                                 JSONObject jsonObject = new JSONObject(response);
                                 String success = jsonObject.getString("success");

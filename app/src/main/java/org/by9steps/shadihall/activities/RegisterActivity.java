@@ -98,7 +98,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
     private final int GALLERY = 100;
     private final int CAMERA = 101;
     String encodedImage = "";
-    String ph,type;
+    String ph,type, latitude, longitude;
 
     //shared prefrences
     SharedPreferences sharedPreferences;
@@ -119,7 +119,13 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                 Context.MODE_PRIVATE);
 
         Intent intent = getIntent();
-        type = intent.getStringExtra("TYPE");
+        if (intent != null) {
+            type = intent.getStringExtra("TYPE");
+            if (type.equals("Register")){
+                latitude = intent.getStringExtra("Latitude");
+                longitude = intent.getStringExtra("Longitude");
+            }
+        }
 
 
         if (getSupportActionBar() != null) {
@@ -138,18 +144,12 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         c_address_layout = findViewById(R.id.c_address_layout);
         name_of_person = findViewById(R.id.name_of_person);
         name_of_person_layout = findViewById(R.id.name_of_person_layout);
-//        country = findViewById(R.id.country);
-//        country_layout = findViewById(R.id.country_layout);
         password = findViewById(R.id.password);
         password_layout = findViewById(R.id.password_layout);
         c_number = findViewById(R.id.c_number);
         c_number_layout = findViewById(R.id.c_number_layout);
         login_number = findViewById(R.id.login_number);
         login_number_layout = findViewById(R.id.login_number_layout);
-//        city = findViewById(R.id.city);
-//        city_layout = findViewById(R.id.city_layout);
-//        sub_city = findViewById(R.id.sub_city);
-//        sub_city_layout = findViewById(R.id.sub_city_layout);
         persons = findViewById(R.id.persons);
         persons_layout = findViewById(R.id.persons_layout);
         website = findViewById(R.id.website);
@@ -344,10 +344,12 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                                 params.put("CapacityOfPersons", persons.getText().toString());
                                 params.put("CompanyLogo", encodedImage);
                                 params.put("DisplayImage", encodedImage);
+                                params.put("Lat", latitude);
+                                params.put("Lng", longitude);
                                 return params;
                             }
                         };
-                        int socketTimeout = 30000;//30 seconds - change to what you want
+                        int socketTimeout = 30000;//30 seconds
                         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
                         jsonObjectRequest.setRetryPolicy(policy);
                         AppController.getInstance().addToRequestQueue(jsonObjectRequest, tag_json_obj);
@@ -548,15 +550,15 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-                        Log.e("Response",response);
+                        Log.e("Profile",response);
                         try {
                             JSONObject json = new JSONObject(response);
                             String success = json.getString("success");
-                            Log.e("Response",success);
+                            Log.e("Profile",success);
 
                             if (success.equals("1")) {
                                 JSONArray jsonArray = json.getJSONArray("UserProfile");
-                                Log.e("SSSS",jsonArray.toString());
+                                Log.e("Profile",jsonArray.toString());
                                 AreaName.deleteAll(AreaName.class);
                                 for (int i = 0; i < jsonArray.length(); i++) {
                                     JSONObject jsonObject = jsonArray.getJSONObject(i);
@@ -587,6 +589,8 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
 
                                     pDialog.dismiss();
                                 }
+                            }else {
+                                pDialog.dismiss();
                             }
 
                         } catch (JSONException e) {

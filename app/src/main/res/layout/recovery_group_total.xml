@@ -21,6 +21,16 @@
             android:layout_height="wrap_content">
 
             <TextView
+                android:id="@+id/id"
+                android:layout_gravity="left"
+                android:textStyle="bold"
+                android:textAlignment="center"
+                android:textSize="@dimen/textSize"
+                android:layout_margin="3dp"
+                android:layout_width="@dimen/hundred_dp"
+                android:layout_height="wrap_content"/>
+
+            <TextView
                 android:id="@+id/month"
                 android:layout_gravity="left"
                 android:textStyle="bold"
@@ -40,7 +50,7 @@
 
             <TextView
             android:textStyle="bold"
-            android:textAlignment="center"
+            android:textAlignment="textStart"
             android:textSize="@dimen/textSize"
             android:layout_margin="3dp"
             android:layout_width="@dimen/hundred_dp"
@@ -50,7 +60,7 @@
             <TextView
             android:textStyle="bold"
             android:id="@+id/g_total_charges"
-            android:textAlignment="center"
+            android:textAlignment="textEnd"
             android:textSize="@dimen/textSize"
             android:layout_margin="3dp"
             android:layout_width="@dimen/hundred_dp"
@@ -60,7 +70,7 @@
             <TextView
             android:textStyle="bold"
             android:id="@+id/total_recieved"
-            android:textAlignment="center"
+            android:textAlignment="textEnd"
             android:textSize="@dimen/textSize"
             android:layout_margin="3dp"
             android:layout_width="@dimen/hundred_dp"
@@ -75,7 +85,7 @@
             <TextView
             android:textStyle="bold"
             android:id="@+id/total_expensed"
-            android:textAlignment="center"
+            android:textAlignment="textEnd"
             android:textSize="@dimen/textSize"
             android:layout_margin="3dp"
             android:layout_width="@dimen/hundred_dp"
@@ -90,7 +100,7 @@
             <TextView
             android:textStyle="bold"
             android:id="@+id/total_balance"
-            android:textAlignment="center"
+            android:textAlignment="textEnd"
             android:textSize="@dimen/textSize"
             android:layout_margin="3dp"
             android:layout_width="@dimen/hundred_dp"
@@ -99,7 +109,7 @@
             <TextView
             android:textStyle="bold"
             android:id="@+id/total_profit"
-            android:textAlignment="center"
+            android:textAlignment="textEnd"
             android:textSize="@dimen/textSize"
             android:layout_margin="3dp"
             android:layout_width="@dimen/hundred_dp"
