@@ -9,24 +9,18 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationManager;
-import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.SearchView;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.location.places.GeoDataClient;
-import com.google.android.gms.location.places.Places;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -53,7 +47,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     boolean network_enabled = false;
     Button next;
 
-    private Float ZOOM = 15f;
+    private Float ZOOM = 18f;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,6 +75,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 intent.putExtra("Latitude", String.valueOf(marker.getPosition().latitude));
                 intent.putExtra("Longitude", String.valueOf(marker.getPosition().longitude));
                 startActivity(intent);
+                finish();
             }
         });
     }

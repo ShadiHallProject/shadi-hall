@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".activities.SelectImagesActivity">
+
+    <TextView
+        android:id="@+id/selectImages"
+        android:layout_weight=".6"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:text="Select Display Images"
+        android:gravity="center"
+        android:textSize="18sp"
+        android:textColor="@color/colorPrimaryDark"
+        android:textStyle="bold"
+        android:padding="@dimen/sp_10"/>
+
+    <GridView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:id="@+id/gv"
+        android:numColumns="3"
+        android:layout_weight="3">
+    </GridView>
+
+    <Button
+        android:layout_margin="5dp"
+        android:id="@+id/register"
+        android:text="@string/register"
+        android:textAllCaps="false"
+        android:background="@color/colorPrimaryDark"
+        android:textColor="@android:color/white"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight=".35"/>
+
+    <!--<com.glide.slider.library.SliderLayout-->
+        <!--android:id="@+id/slider"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="200dp" />-->
+
+
+</LinearLayout>

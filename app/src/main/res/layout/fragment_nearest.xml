@@ -3,10 +3,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".fragments.HomeFragment">
+    android:id="@+id/map_container"
+    tools:context=".fragments.NearestFragment">
 
-    <FrameLayout
-        android:id="@+id/container"
+    <android.support.v7.widget.RecyclerView
+        android:padding="@dimen/ten_dp"
+        tools:listitem="@layout/nearest_list_item"
+        android:id="@+id/recycler"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 

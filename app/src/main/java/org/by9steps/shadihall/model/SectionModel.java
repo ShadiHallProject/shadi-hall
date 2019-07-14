@@ -4,13 +4,13 @@ import java.util.List;
 
 public class SectionModel {
     String label;
-    List<Menu> list;
+    List<ProjectMenu> list;
 
 
     public SectionModel() {
     }
 
-    public SectionModel(String label, List<Menu> list) {
+    public SectionModel(String label, List<ProjectMenu> list) {
         this.label = label;
         this.list = list;
     }
@@ -23,11 +23,11 @@ public class SectionModel {
         this.label = label;
     }
 
-    public List<Menu> getList() {
+    public List<ProjectMenu> getList() {
         return list;
     }
 
-    public void setList(List<Menu> list) {
+    public void setList(List<ProjectMenu> list) {
         this.list = list;
     }
 }

@@ -63,6 +63,10 @@ dependencies {
     implementation "com.google.android.gms:play-services-places:16.1.0"
     implementation 'com.google.android.gms:play-services-maps:16.1.0'
 
-//    implementation files('libs/jxl.jar')
+    //Multiple Image Selected Limitation
+    implementation  'com.fxn769:pix:1.2.5'
+
+    //Slider
+//    implementation "com.github.firdausmaulan:GlideSlider:1.4.1"
 }
 apply plugin: 'com.google.gms.google-services'

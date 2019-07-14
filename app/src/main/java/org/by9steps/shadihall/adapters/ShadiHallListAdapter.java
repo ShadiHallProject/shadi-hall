@@ -1,31 +1,21 @@
-package org.by9steps.shadihall.fragments;
+package org.by9steps.shadihall.adapters;
 
-
-import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.SharedPreferences;
-import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.design.widget.TextInputEditText;
-import android.support.design.widget.TextInputLayout;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -35,173 +25,215 @@ import com.android.volley.Response;
 import com.android.volley.RetryPolicy;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
+import com.squareup.picasso.Picasso;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.by9steps.shadihall.AppController;
 import org.by9steps.shadihall.R;
-import org.by9steps.shadihall.activities.LoginActivity;
-import org.by9steps.shadihall.activities.MapsActivity;
-import org.by9steps.shadihall.adapters.ShadiHallListAdapter;
+import org.by9steps.shadihall.fragments.MenuItemsFragment;
 import org.by9steps.shadihall.helper.DatabaseHelper;
-import org.by9steps.shadihall.helper.InputValidation;
 import org.by9steps.shadihall.helper.Prefrence;
 import org.by9steps.shadihall.model.Account1Type;
 import org.by9steps.shadihall.model.Account2Group;
 import org.by9steps.shadihall.model.Account3Name;
 import org.by9steps.shadihall.model.ActiveClients;
 import org.by9steps.shadihall.model.Bookings;
+import org.by9steps.shadihall.model.CBUpdate;
 import org.by9steps.shadihall.model.CashBook;
+import org.by9steps.shadihall.model.Client;
+import org.by9steps.shadihall.model.ProjectMenu;
 import org.by9steps.shadihall.model.ShadiHallList;
 import org.by9steps.shadihall.model.TableSession;
 import org.by9steps.shadihall.model.UpdateDate;
+import org.by9steps.shadihall.model.User;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import de.hdodenhof.circleimageview.CircleImageView;
 
-/**
- * A simple {@link Fragment} subclass.
- */
-public class LoginFragment extends Fragment implements View.OnClickListener {
+public class ShadiHallListAdapter extends RecyclerView.Adapter{
 
-    TextInputEditText owner_numb, password;
-    TextView user_number;
-    TextInputLayout owner_layout, user_layout, password_layout;
-    Button login, create_account, logOut;
-    RecyclerView recyclerView;
+    Context mCtx;
+    List<ActiveClients> mList;
+    List<Client> clients;
 
     private ProgressDialog mProgress;
-    private InputValidation inputValidation;
-    List<ActiveClients> mList;
     Prefrence prefrence;
-
-    String oNumber, uNumber, mPassword, ph;
-    String cId;
 
     //shared prefrences
     SharedPreferences sharedPreferences;
     public static final String mypreference = "mypref";
     public static final String log_in = "loginKey";
     public static final String phone = "phoneKey";
-    public static final String resume = "resume";
 
     DatabaseHelper databaseHelper;
-    ShadiHallListAdapter adapter;
+    String cId, ph;
 
-    //GPS Enable
-    LocationManager lm;
-    boolean gps_enabled = false;
-    boolean network_enabled = false;
+    String clientID, clientUserID, userRights, projectID;
 
+    private OnItemClickListener listener;
 
-    public LoginFragment() {
-        // Required empty public constructor
+    public ShadiHallListAdapter(Context mCtx, List<ActiveClients> mList) {
+        this.mCtx = mCtx;
+        this.mList = mList;
+        prefrence = new Prefrence(mCtx);
+        databaseHelper = new DatabaseHelper(mCtx);
+        //shared prefrences
+        sharedPreferences = mCtx.getSharedPreferences(mypreference,
+                Context.MODE_PRIVATE);
     }
 
+    @NonNull
+    @Override
+    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
+        LayoutInflater inflater = LayoutInflater.from(mCtx);
+        View view = inflater.inflate(R.layout.shadihall_list_item, null);
+        return new ListViewHolder(view);
+    }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        View view =  inflater.inflate(R.layout.fragment_login, container, false);
-//        owner_layout = view.findViewById(R.id.owner_layout);
-//        owner_numb = view.findViewById(R.id.owner_mob);
-        user_layout = view.findViewById(R.id.user_layout);
-        user_number = view.findViewById(R.id.user_mob);
-        password_layout = view.findViewById(R.id.password_layout);
-        password = view.findViewById(R.id.password);
-        login = view.findViewById(R.id.login_btn);
-        create_account = view.findViewById(R.id.create_account);
-        logOut = view.findViewById(R.id.log_out);
-        recyclerView = view.findViewById(R.id.recycler);
+    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder viewHolder, int position) {
+        final ActiveClients shadiHallList = mList.get(position);
 
-        inputValidation = new InputValidation(getContext());
-        databaseHelper = new DatabaseHelper(getContext());
-        prefrence = new Prefrence(getContext());
-        mList = new ArrayList<>();
+        ((ListViewHolder)viewHolder).name.setText(shadiHallList.getCompanyName());
+        ((ListViewHolder)viewHolder).address.setText(shadiHallList.getCompanyAddress());
+        ((ListViewHolder)viewHolder).rights.setText(shadiHallList.getUserRights());
 
-//        login.setOnClickListener(this);
-        create_account.setOnClickListener(this);
-        logOut.setOnClickListener(this);
+        Picasso.get()
+                .load(AppController.imageUrl+shadiHallList.getClientID()+"/logo.png")
+                .placeholder(R.drawable.default_avatar)
+                .into(((ListViewHolder)viewHolder).image);
 
-        //shared prefrences
-        sharedPreferences = getActivity().getSharedPreferences(mypreference,
-                Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString(resume, "0");
-        editor.apply();
+        ((ListViewHolder)viewHolder).itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                String query = "SELECT * FROM Client WHERE ClientID = "+ shadiHallList.getClientID();
+                clients = databaseHelper.getClient(query);
+
+                if (clients.size() > 0){
+                    User.deleteAll(User.class);
+                    for (Client c : clients) {
+                        User user = new User(c.getClientID(), "0", "0", "0", "0", c.getClientUserID(), "ss");
+                        user.save();
+                    }
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    editor.putString(log_in, "Yes");
+                    editor.apply();
+
+                    if (isConnected()) {
+                        clientID = shadiHallList.getClientID();
+                        clientUserID = shadiHallList.getClientUserID();
+                        userRights = shadiHallList.getUserRights();
+                        projectID = shadiHallList.getProjectID();
+                        mProgress = new ProgressDialog(mCtx);
+                        mProgress.setTitle("Getting Details");
+                        mProgress.setMessage("Please wait...");
+                        mProgress.setCanceledOnTouchOutside(false);
+                        mProgress.show();
+                        getAccount3Name();
+                    }else {
+                        if (listener != null)
+                            listener.onItemClick(shadiHallList.getClientID(),shadiHallList.getClientUserID(), shadiHallList.getProjectID(), shadiHallList.getUserRights());
+                    }
+                }else {
+
+                    LayoutInflater layoutInflaterAndroid = LayoutInflater.from(mCtx);
+                    View mView = layoutInflaterAndroid.inflate(R.layout.password_input_dialog_box, null);
+                    AlertDialog.Builder alertDialogBuilderUserInput = new AlertDialog.Builder(mCtx);
+                    alertDialogBuilderUserInput.setView(mView);
+
+                    final EditText password = (EditText) mView.findViewById(R.id.userInputDialog);
+                    alertDialogBuilderUserInput
+                            .setCancelable(false)
+                            .setPositiveButton("Login", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialogBox, int id) {
+                                    Log.e("Password",password.getText().toString());
+                                    if (!password.getText().toString().equals("")) {
+                                        clientID = shadiHallList.getClientID();
+                                        clientUserID = shadiHallList.getClientUserID();
+                                        userRights = shadiHallList.getUserRights();
+                                        projectID = shadiHallList.getProjectID();
+
+                                        login(shadiHallList.getClientID(), shadiHallList.getClientUserID(), password.getText().toString());
+                                    }else {
+                                        Toast.makeText(mCtx, "Enter Password", Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+                            })
+
+                            .setNegativeButton("Cancel",
+                                    new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialogBox, int id) {
+                                            dialogBox.cancel();
+                                        }
+                                    });
+
+                    AlertDialog alertDialogAndroid = alertDialogBuilderUserInput.create();
+                    alertDialogAndroid.show();
+
+                }
+            }
+
+        });
+
+
+    }
+
+    @Override
+    public int getItemCount() {
+        return mList.size();
+    }
+
+    class ListViewHolder extends RecyclerView.ViewHolder {
+
+        CircleImageView image;
+        TextView name, address, rights;
+
+        public ListViewHolder(View itemView) {
+            super(itemView);
+
+            image = itemView.findViewById(R.id.image);
+            name = itemView.findViewById(R.id.name);
+            address = itemView.findViewById(R.id.address);
+            rights = itemView.findViewById(R.id.user_rights);
+
+        }
+    }
+
+    //load fragment on recyclerView OnClickListner
+    public  void setOnItemClickListener(OnItemClickListener listener) {
+        this.listener = listener;
+    }
+
+    public interface OnItemClickListener {
+        void onItemClick(String clientID, String clientUserId, String projectID, String userRights);
+    }
+
+    //Send Request To Server
+    private void login(final String mClientID, final String mClientUserID, final String mPassword){
 
         if(sharedPreferences.contains(phone)){
             ph = sharedPreferences.getString(phone,"");
-            Log.e("PHONE",ph);
-            user_number.setText(ph);
         }
 
-        lm = (LocationManager)getContext().getSystemService(Context.LOCATION_SERVICE);
-
-        if (isConnected()) {
-            getShadiHallList();
-        }else {
-            String query = "SELECT * FROM ActiveAccounts";
-            mList = databaseHelper.getActiveAccounts(query);
-            adapter = new ShadiHallListAdapter(getContext(),mList);
-            recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-            recyclerView.setHasFixedSize(true);
-            recyclerView.setAdapter(adapter);
-            adapter.setOnItemClickListener(new ShadiHallListAdapter.OnItemClickListener() {
-                @Override
-                public void onItemClick(String clientID, String clientUserID, String projectID, String userRights) {
-Log.e("IDDD",projectID);
-                    prefrence.setClientIDSession(clientID);
-                    prefrence.setClientUserIDSession(clientUserID);
-                    prefrence.setProjectIDSession(projectID);
-                    prefrence.setUserRighhtsSession(userRights);
-
-                    FragmentManager manager = getFragmentManager();
-                    assert manager != null;
-                    FragmentTransaction transaction = manager.beginTransaction();
-                    transaction.replace(R.id.mContainer, new MenuItemsFragment());
-                    transaction.commit();
-                }
-            });
-        }
-
-        Log.e("CREATVIEW","OK");
-
-        return view;
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        if(sharedPreferences.contains(resume)){
-            String res = sharedPreferences.getString(resume,"");
-            assert res != null;
-            if (res.equals("1")){
-                getShadiHallList();
-            }
-        }
-
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString(resume, "0");
-        editor.apply();
-    }
-
-    private void getShadiHallList(){
-        mProgress = new ProgressDialog(getContext());
-        mProgress.setTitle("Please wait...");
-        mProgress.setMessage("Getting Your Number Details");
+        mProgress = new ProgressDialog(mCtx);
+        mProgress.setTitle("Checking credentials");
+        mProgress.setMessage("Please wait...");
         mProgress.setCanceledOnTouchOutside(false);
         mProgress.show();
 
+//        CBUpdate.deleteAll(CBUpdate.class);
+
         String tag_json_obj = "json_obj_req";
-        String u = "http://69.167.137.121/plesk-site-preview/sky.com.pk/shadiHall/GetShadiHallList.php";
+        String u = "http://69.167.137.121/plesk-site-preview/sky.com.pk/shadiHall/Login.php";
 
         StringRequest jsonObjectRequest = new StringRequest(com.android.volley.Request.Method.POST, u,
                 new Response.Listener<String>() {
@@ -215,58 +247,60 @@ Log.e("IDDD",projectID);
                             String success = jsonObj.getString("success");
                             String message = jsonObj.getString("message");
                             if (success.equals("1")){
-                                JSONArray jsonArray = jsonObj.getJSONArray("ShadiHall");
-                                databaseHelper.deleteActiveAccounts();
-                                mList.clear();
+                                JSONArray jsonArray = jsonObj.getJSONArray("UserInfo");
+                                Log.e("UserInfo",jsonArray.toString());
+                                User.deleteAll(User.class);
                                 for (int i = 0; i < jsonArray.length(); i++) {
                                     JSONObject jsonObject = jsonArray.getJSONObject(i);
-                                    String AcMobileNo = jsonObject.getString("AcMobileNo");
-                                    String UserRights = jsonObject.getString("UserRights");
-                                    String AcName = jsonObject.getString("AcName");
-                                    String ClientID = jsonObject.getString("ClientID");
+                                    String cashID = jsonObject.getString("CashID");
+                                    String bookingIncomeID = jsonObject.getString("BookingIncomeID");
+                                    String bookingExpenseID = jsonObject.getString("BookingExpenseID");
+                                    String acNameID = "0";
+                                    String acName = "ss";
+                                    cId = jsonObject.getString("ClientID");
+                                    String ClientParentID = jsonObject.getString("ClientParentID");
+                                    String EntryType = jsonObject.getString("EntryType");
+                                    String LoginMobileNo = jsonObject.getString("LoginMobileNo");
                                     String CompanyName = jsonObject.getString("CompanyName");
                                     String CompanyAddress = jsonObject.getString("CompanyAddress");
-                                    String ProjectID = jsonObject.getString("ProjectID");
-                                    String ProjectName = jsonObject.getString("ProjectName");
+                                    String CompanyNumber = jsonObject.getString("CompanyNumber");
+                                    String NameOfPerson = jsonObject.getString("NameOfPerson");
+                                    String Email = jsonObject.getString("Email");
+                                    String WebSite = jsonObject.getString("WebSite");
+                                    String Password = jsonObject.getString("Password");
+                                    String ActiveClient = jsonObject.getString("ActiveClient");
+                                    String Country = jsonObject.getString("Country");
+                                    String City = jsonObject.getString("City");
+                                    String SubCity = jsonObject.getString("SubCity");
+                                    String CapacityOfPersons = jsonObject.getString("CapacityOfPersons");
                                     String ClientUserID = jsonObject.getString("ClientUserID");
-                                    databaseHelper.createActiveAccounts(new ActiveClients(AcMobileNo, UserRights,
-                                            AcName,
-                                            ClientID,
-                                            CompanyName,
-                                            CompanyAddress,
-                                            ProjectID,
-                                            ProjectName,
-                                            ClientUserID));
-//                                    mList.add(new ShadiHallList(AcMobileNo,UserRights,AcName,ClientID,CompanyName,CompanyAddress,ProjectID,ProjectName));
+                                    String SysCode = jsonObject.getString("SysCode");
+                                    String NetCode = jsonObject.getString("NetCode");
+                                    String up = jsonObject.getString("UpdatedDate");
+                                    JSONObject jb = new JSONObject(up);
+                                    String UpdatedDate = jb.getString("date");
+                                    String Lat = jsonObject.getString("Lat");
+                                    String Lng = jsonObject.getString("Lng");
+                                    String ProjectID = jsonObject.getString("ProjectID");
+
+                                    databaseHelper.createClient(new Client(cId, ClientParentID, EntryType, LoginMobileNo, CompanyName,
+                                            CompanyAddress, CompanyNumber, NameOfPerson, Email, WebSite, Password, ActiveClient,
+                                            Country, City, SubCity, CapacityOfPersons, ClientUserID, SysCode, NetCode, UpdatedDate,
+                                            Lat, Lng, ProjectID));
+
+                                    User user = new User(cId,cashID,bookingIncomeID,bookingExpenseID,acNameID,ClientUserID,acName);
+                                    user.save();
                                 }
-                                String query = "SELECT * FROM ActiveAccounts";
-                                mList = databaseHelper.getActiveAccounts(query);
-                                adapter = new ShadiHallListAdapter(getContext(),mList);
-                                recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-                                recyclerView.setHasFixedSize(true);
-                                recyclerView.setAdapter(adapter);
-                                adapter.setOnItemClickListener(new ShadiHallListAdapter.OnItemClickListener() {
-                                    @Override
-                                    public void onItemClick(String clientID, String clientUserID, String projectID, String userRights) {
 
-                                        prefrence.setClientIDSession(clientID);
-                                        prefrence.setClientUserIDSession(clientUserID);
-                                        prefrence.setProjectIDSession(projectID);
-                                        prefrence.setUserRighhtsSession(userRights);
-
-                                        FragmentManager manager = getFragmentManager();
-                                        assert manager != null;
-                                        FragmentTransaction transaction = manager.beginTransaction();
-                                        transaction.replace(R.id.mContainer, new MenuItemsFragment());
-                                        transaction.commit();
-                                    }
-                                });
-                                mProgress.dismiss();
-
+                                if (isConnected()) {
+                                    getAccount3Name();
+                                }else {
+                                    Toast.makeText(mCtx, "Please Check Your Internet Connection", Toast.LENGTH_SHORT).show();
+                                }
 
                             }else {
-                                Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
                                 mProgress.dismiss();
+                                Toast.makeText(mCtx, message, Toast.LENGTH_SHORT).show();
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -277,13 +311,15 @@ Log.e("IDDD",projectID);
             public void onErrorResponse(VolleyError error) {
                 mProgress.dismiss();
                 Log.e("Error",error.toString());
-                Toast.makeText(getContext(), error.toString(), Toast.LENGTH_LONG).show();
+                Toast.makeText(mCtx, error.toString(), Toast.LENGTH_LONG).show();
             }
         }){
             @Override
             protected Map<String, String> getParams() {
                 Map<String, String> params = new HashMap<String, String>();
-                params.put("LoginMobileNo", user_number.getText().toString());
+                params.put("ClientID", mClientID);
+                params.put("ClientUserID", mClientUserID);
+                params.put("Password", mPassword);
                 return params;
             }
         };
@@ -291,155 +327,6 @@ Log.e("IDDD",projectID);
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         jsonObjectRequest.setRetryPolicy(policy);
         AppController.getInstance().addToRequestQueue(jsonObjectRequest, tag_json_obj);
-    }
-
-    @Override
-    public void onClick(View view) {
-        switch (view.getId()) {
-//            case R.id.login_btn:
-
-//                oNumber = owner_numb.getText().toString();
-//                uNumber = user_number.getText().toString();
-//                mPassword = password.getText().toString();
-//
-//                if (!inputValidation.isInputEditTextFilled(owner_numb, owner_layout, getString(R.string.enter_owner_number))) {
-//                    return;
-//                }
-//                if (!inputValidation.isInputEditTextFilled(user_number, user_layout, getString(R.string.enter_user_number))) {
-//                    return;
-//                }
-//                if (!inputValidation.isInputEditTextFilled(password, password_layout, getString(R.string.enter_password))) {
-//                    return;
-//                }
-//                else {
-//                    mProgress = new ProgressDialog(getContext());
-//                    mProgress.setTitle("Checking credentials");
-//                    mProgress.setMessage("Please wait...");
-//                    mProgress.setCanceledOnTouchOutside(false);
-//                    mProgress.show();
-//
-//                    CBUpdate.deleteAll(CBUpdate.class);
-//
-//                    String tag_json_obj = "json_obj_req";
-//                    String u = "http://69.167.137.121/plesk-site-preview/sky.com.pk/shadiHall/Login.php";
-//
-//                    StringRequest jsonObjectRequest = new StringRequest(com.android.volley.Request.Method.POST, u,
-//                            new Response.Listener<String>() {
-//                                @Override
-//                                public void onResponse(String response) {
-//                                    Log.e("RES",response);
-//                                    JSONObject jsonObj = null;
-//
-//                                    try {
-//                                        jsonObj= new JSONObject(response);
-//                                        JSONArray jsonArray = jsonObj.getJSONArray("UserInfo");
-//                                        String success = jsonObj.getString("success");
-//                                        String message = jsonObj.getString("message");
-//                                        if (success.equals("1")){
-//
-//                                            User.deleteAll(User.class);
-//                                            for (int i = 0; i < jsonArray.length(); i++) {
-//                                                JSONObject jsonObject = jsonArray.getJSONObject(i);
-//                                                cId = jsonObject.getString("ClientID");
-//                                                String cashID = jsonObject.getString("CashID");
-//                                                String bookingIncomeID = jsonObject.getString("BookingIncomeID");
-//                                                String bookingExpenseID = jsonObject.getString("BookingExpenseID");
-//                                                String acNameID = jsonObject.getString("AcNameID");
-//                                                String clientUserID = jsonObject.getString("ClientUserID");
-//                                                String acName = jsonObject.getString("AcName");
-//                                                String acAddress = jsonObject.getString("AcAddress");
-//                                                String acContactNo = jsonObject.getString("AcContactNo");
-//
-//                                                User user = new User(cId,cashID,bookingIncomeID,bookingExpenseID,acNameID,clientUserID,acName);
-//                                                user.save();
-//                                            }
-//
-//                                            databaseHelper = new DatabaseHelper(getContext());
-//
-//                                            if (isConnected()) {
-//                                                getAccount3Name();
-//                                            }else {
-//                                                Toast.makeText(getContext(), "Please Check Your Internet Connection", Toast.LENGTH_SHORT).show();
-//                                            }
-//
-//                                        }else {
-//                                            Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
-//                                        }
-//                                    } catch (JSONException e) {
-//                                        e.printStackTrace();
-//                                    }
-//                                }
-//                            }, new Response.ErrorListener() {
-//                        @Override
-//                        public void onErrorResponse(VolleyError error) {
-//                            mProgress.dismiss();
-//                            Log.e("Error",error.toString());
-//                            Toast.makeText(getContext(), error.toString(), Toast.LENGTH_LONG).show();
-//                        }
-//                    }){
-//                        @Override
-//                        protected Map<String, String> getParams() {
-//                            Map<String, String> params = new HashMap<String, String>();
-//                            Log.e("NUMBER",oNumber);
-//                            params.put("logMobNum", uNumber);
-//                            params.put("AcMobNum", oNumber);
-//                            params.put("password", mPassword);
-//                            return params;
-//                        }
-//                    };
-//                    int socketTimeout = 10000;//10 seconds - change to what you want
-//                    RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
-//                    jsonObjectRequest.setRetryPolicy(policy);
-//                    AppController.getInstance().addToRequestQueue(jsonObjectRequest, tag_json_obj);
-//                }
-
-//                break;
-            case R.id.create_account:
-                if (isGpsEnabled()) {
-                    Intent intent = new Intent(getContext(), MapsActivity.class);
-                    startActivity(intent);
-                }
-                break;
-            case R.id.log_out:
-                startActivity(new Intent(getContext(), LoginActivity.class));
-                getActivity().finish();
-                break;
-        }
-    }
-
-    private Boolean isGpsEnabled(){
-        try {
-            gps_enabled = lm.isProviderEnabled(LocationManager.GPS_PROVIDER);
-        } catch(Exception ex) {}
-
-        try {
-            network_enabled = lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
-        } catch(Exception ex) {}
-
-        if(!gps_enabled && !network_enabled) {
-            // notify user
-
-            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getContext());
-            alertDialogBuilder.setMessage(R.string.gps_network_not_enabled);
-            alertDialogBuilder.setPositiveButton(R.string.open_location_settings,
-                    new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface arg0, int arg1) {
-                            startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
-                        }
-                    });
-
-            alertDialogBuilder.setNegativeButton(R.string.Cancel,new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    dialog.dismiss();
-                }
-            });
-
-            AlertDialog alertDialog = alertDialogBuilder.create();
-            alertDialog.show();
-        }
-        return gps_enabled;
     }
 
     public void getAccount3Name(){
@@ -515,7 +402,7 @@ Log.e("IDDD",projectID);
             @Override
             protected Map<String, String> getParams() {
                 Map<String, String> params = new HashMap<String, String>();
-                params.put("ClientID", cId);
+                params.put("ClientID", clientID);
                 return params;
             }
         };
@@ -609,7 +496,7 @@ Log.e("IDDD",projectID);
             @Override
             protected Map<String, String> getParams() {
                 Map<String, String> params = new HashMap<String, String>();
-                params.put("ClientID", cId);
+                params.put("ClientID", clientID);
                 return params;
             }
         };
@@ -759,7 +646,7 @@ Log.e("IDDD",projectID);
             @Override
             protected Map<String, String> getParams() {
                 Map<String, String> params = new HashMap<String, String>();
-                params.put("ClientID", cId);
+                params.put("ClientID", clientID);
                 return params;
             }
         };
@@ -779,7 +666,7 @@ Log.e("IDDD",projectID);
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-                        Log.e("RES",response);
+                        Log.e("Account1Type",response);
 //                        mProgress.dismiss();
                         JSONObject jsonObj = null;
 
@@ -798,12 +685,11 @@ Log.e("IDDD",projectID);
 
                                     databaseHelper.createAccount1Type(new Account1Type(AcTypeID,AcTypeName));
                                 }
-
+                                getItem1Type();
                             }else {
                                 String message = jsonObj.getString("message");
 //                                Toast.makeText(SplashActivity.this, message, Toast.LENGTH_SHORT).show();
                             }
-                            getItem1Type();
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -840,7 +726,6 @@ Log.e("IDDD",projectID);
                             Log.e("Success",success);
                             if (success.equals("1")){
                                 JSONArray jsonArray = jsonObj.getJSONArray("Item1Type");
-                                databaseHelper.deleteAccount1Type();
                                 for (int i = 0; i < jsonArray.length(); i++) {
                                     JSONObject jsonObject = jsonArray.getJSONObject(i);
                                     Log.e("GetItem1Type",jsonObject.toString());
@@ -849,7 +734,7 @@ Log.e("IDDD",projectID);
 
 //                                    databaseHelper.createAccount1Type(new Account1Type(AcTypeID,AcTypeName));
                                 }
-                                getProject();
+                                getProjectMenu();
                             }else {
                                 String message = jsonObj.getString("message");
 //                                Toast.makeText(SplashActivity.this, message, Toast.LENGTH_SHORT).show();
@@ -872,58 +757,6 @@ Log.e("IDDD",projectID);
         AppController.getInstance().addToRequestQueue(jsonObjectRequest, tag_json_obj);
     }
 
-    public void getProject(){
-        Log.e("GetProject","Ok");
-        String tag_json_obj = "json_obj_req";
-        String u = "http://69.167.137.121/plesk-site-preview/sky.com.pk/shadiHall/GetProject.php";
-
-        StringRequest jsonObjectRequest = new StringRequest(Request.Method.GET, u,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        Log.e("GetProject",response);
-//                        mProgress.dismiss();
-                        JSONObject jsonObj = null;
-
-                        try {
-                            jsonObj= new JSONObject(response);
-                            String success = jsonObj.getString("success");
-                            Log.e("Success",success);
-                            if (success.equals("1")){
-                                JSONArray jsonArray = jsonObj.getJSONArray("Project");
-                                databaseHelper.deleteAccount1Type();
-                                for (int i = 0; i < jsonArray.length(); i++) {
-                                    JSONObject jsonObject = jsonArray.getJSONObject(i);
-                                    Log.e("Project",jsonObject.toString());
-                                    String ProjectID = jsonObject.getString("ProjectID");
-                                    String ProjectName = jsonObject.getString("ProjectName");
-//                                    String ProjectDescription = jsonObject.getString("ProjectDescription");
-                                    String ProjectType = jsonObject.getString("ProjectType");
-
-//                                    databaseHelper.createAccount1Type(new Account1Type(AcTypeID,AcTypeName));
-                                }
-
-                            }else {
-                                String message = jsonObj.getString("message");
-//                                Toast.makeText(SplashActivity.this, message, Toast.LENGTH_SHORT).show();
-                            }
-                            getProjectMenu();
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.e("Error",error.toString());
-//                Toast.makeText(SplashActivity.this, error.toString(), Toast.LENGTH_LONG).show();
-            }
-        });
-        int socketTimeout = 10000;//10 seconds - change to what you want
-        RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
-        jsonObjectRequest.setRetryPolicy(policy);
-        AppController.getInstance().addToRequestQueue(jsonObjectRequest, tag_json_obj);
-    }
 
     public void getProjectMenu(){
         Log.e("GetProjectMenu","OK");
@@ -944,7 +777,7 @@ Log.e("IDDD",projectID);
                             Log.e("ProjectMenu",success);
                             if (success.equals("1")){
                                 JSONArray jsonArray = jsonObj.getJSONArray("ProjectMenu");
-                                databaseHelper.deleteAccount1Type();
+                                databaseHelper.deleteProjectMenu();
                                 for (int i = 0; i < jsonArray.length(); i++) {
                                     JSONObject jsonObject = jsonArray.getJSONObject(i);
                                     Log.e("ProjectMenu",jsonObject.toString());
@@ -955,9 +788,10 @@ Log.e("IDDD",projectID);
                                     String PageOpen = jsonObject.getString("PageOpen");
                                     String ValuePass = jsonObject.getString("ValuePass");
                                     String ImageName = jsonObject.getString("ImageName");
+                                    String GroupSortBy = jsonObject.getString("GroupSortBy");
                                     String SortBy = jsonObject.getString("SortBy");
 
-//                                    databaseHelper.createAccount1Type(new Account1Type(AcTypeID,AcTypeName));
+                                    databaseHelper.createProjectMenu(new ProjectMenu(MenuID, ProjectID, MenuGroup, MenuName, PageOpen, ValuePass, ImageName, GroupSortBy,SortBy));
                                 }
 
                             }else {
@@ -1026,11 +860,9 @@ Log.e("IDDD",projectID);
                                     editor.putString(log_in, "Yes");
                                     editor.apply();
 
-                                    FragmentManager manager = getFragmentManager();
-                                    assert manager != null;
-                                    FragmentTransaction transaction = manager.beginTransaction();
-                                    transaction.replace(R.id.mContainer, new MenuItemsFragment());
-                                    transaction.commit();
+                                    if (listener != null)
+                                        listener.onItemClick(clientID,clientUserID, projectID, userRights);
+
                                     mProgress.dismiss();
 
                                 }
@@ -1039,13 +871,10 @@ Log.e("IDDD",projectID);
                                 editor.putString(log_in, "Yes");
                                 editor.apply();
 
-                                FragmentManager manager = getFragmentManager();
-                                assert manager != null;
-                                FragmentTransaction transaction = manager.beginTransaction();
-                                transaction.replace(R.id.mContainer, new MenuItemsFragment());
-                                transaction.commit();
+                                if (listener != null)
+                                    listener.onItemClick(clientID,clientUserID, projectID, userRights);
+
                                 mProgress.dismiss();
-//                                pDialog.dismiss();
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -1078,7 +907,7 @@ Log.e("IDDD",projectID);
     public boolean isConnected() {
         boolean connected = false;
         try {
-            ConnectivityManager cm = (ConnectivityManager)getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+            ConnectivityManager cm = (ConnectivityManager)mCtx.getSystemService(Context.CONNECTIVITY_SERVICE);
             NetworkInfo nInfo = cm.getActiveNetworkInfo();
             connected = nInfo != null && nInfo.isAvailable() && nInfo.isConnected();
             return connected;

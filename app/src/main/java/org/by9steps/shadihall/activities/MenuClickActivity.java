@@ -1,5 +1,6 @@
 package org.by9steps.shadihall.activities;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -19,11 +20,17 @@ import org.by9steps.shadihall.fragments.BalSheetFragment;
 import org.by9steps.shadihall.fragments.BookCalendarFragment;
 import org.by9steps.shadihall.fragments.CashBookFragment;
 import org.by9steps.shadihall.fragments.ChartOfAccFragment;
+import org.by9steps.shadihall.fragments.DateBalSheetFragment;
+import org.by9steps.shadihall.fragments.DateProfitLossFragment;
 import org.by9steps.shadihall.fragments.ListFragment;
+import org.by9steps.shadihall.fragments.MonthBalSheetFragment;
+import org.by9steps.shadihall.fragments.MonthTrialBalance;
 import org.by9steps.shadihall.fragments.ProfitLossFragment;
 import org.by9steps.shadihall.fragments.RecoveryFragment;
 import org.by9steps.shadihall.fragments.ReportsFragment;
+import org.by9steps.shadihall.fragments.SummerizeTrailBalFragment;
 import org.by9steps.shadihall.fragments.TrailBalanceFragment;
+import org.by9steps.shadihall.fragments.YearProfitLossFragment;
 import org.by9steps.shadihall.helper.DatabaseHelper;
 import org.by9steps.shadihall.model.Account1Type;
 import org.by9steps.shadihall.model.Account2Group;
@@ -58,11 +65,12 @@ public class MenuClickActivity extends AppCompatActivity {
         SimpleDateFormat curFormater = new SimpleDateFormat("yyyy-MM-dd");
         currentDate = curFormater.format(date);
 
-        String message = "",position = "";
+        String title = "", message = "",ValuePass = "";
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
+            title = extras.getString("title");
             message = extras.getString("message");
-            position = extras.getString("position");
+            ValuePass = extras.getString("position");
         }
 
 //        if (AppController.internet.equals("Yes")){
@@ -71,18 +79,13 @@ public class MenuClickActivity extends AppCompatActivity {
 
 
         if (savedInstanceState == null) {
-            Log.e("MESSAGE",message);
-            if (message.equals("Cash Book") && position.equals("0")) {
-                Log.e("Position", position);
-                Log.e("Message", message);
-            }
 
             if (getSupportActionBar() != null) {
                 getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-                getSupportActionBar().setTitle(message);
+                getSupportActionBar().setTitle(title);
             }
 
-            if (message.equals("Booking") && position.equals("0")) {
+            if (message.equals("Booking")) {
                 getSupportFragmentManager().beginTransaction()
                         .add(R.id.menu_container, new BookCalendarFragment())
                         .commit();
@@ -90,79 +93,55 @@ public class MenuClickActivity extends AppCompatActivity {
                 getSupportFragmentManager().beginTransaction()
                         .add(R.id.menu_container, new RecoveryFragment())
                         .commit();
-            } else if (message.equals("Web Editing")) {
-                getSupportFragmentManager().beginTransaction()
-                        .add(R.id.menu_container, new ListFragment())
-                        .commit();
-            } else if (message.equals("Cash Book") && position.equals("0")) {
-                getSupportFragmentManager().beginTransaction()
-                        .add(R.id.menu_container, new ListFragment())
-                        .commit();
             } else if (message.equals("ChartOfAcc")) {
                 getSupportFragmentManager().beginTransaction()
                         .add(R.id.menu_container, new ChartOfAccFragment())
                         .commit();
             }
             //Reports
-            else if (message.equals("Cash Book")) {
+            else if (message.equals("CashBook")) {
                 getSupportFragmentManager().beginTransaction()
                         .add(R.id.menu_container, new CashBookFragment())
                         .commit();
-            } else if (message.equals("Booking")) {
+            } else if (message.equals("AccountEntry")) {
                 getSupportFragmentManager().beginTransaction()
-                        .add(R.id.menu_container, new ListFragment())
+                        .add(R.id.menu_container, ReportsFragment.newInstance(ValuePass))
                         .commit();
-            } else if (message.equals("Incom")) {
+            } else if (message.equals("TreeView")) {
                 getSupportFragmentManager().beginTransaction()
-                        .add(R.id.menu_container, ReportsFragment.newInstance("6"))
+                        .add(R.id.menu_container, new ChartOfAccFragment())
                         .commit();
-            }else if (message.equals("Cash And Bank")) {
+            } else if (message.equals("CompletTrailBalance")) {
                 getSupportFragmentManager().beginTransaction()
-                        .add(R.id.menu_container, ReportsFragment.newInstance("0"))
+                        .add(R.id.menu_container, new ChartOfAccFragment())
                         .commit();
-            } else if (message.equals("Employee")) {
+            } else if (message.equals("MonthWiseTrailBalance")) {
                 getSupportFragmentManager().beginTransaction()
-                        .add(R.id.menu_container, ReportsFragment.newInstance("1"))
+                        .add(R.id.menu_container, new SummerizeTrailBalFragment())
                         .commit();
-            } else if (message.equals("General Expense")) {
+            } else if (message.equals("YearlyTrailBalance")) {
                 getSupportFragmentManager().beginTransaction()
-                        .add(R.id.menu_container, ReportsFragment.newInstance("2"))
+                        .add(R.id.menu_container, new MonthTrialBalance())
                         .commit();
-            } else if (message.equals("Fixed Asset")) {
+            } else if (message.equals("P/LStatmentBooking")) {
                 getSupportFragmentManager().beginTransaction()
-                        .add(R.id.menu_container, ReportsFragment.newInstance("3"))
+                        .add(R.id.menu_container, new RecoveryFragment())
                         .commit();
-            } else if (message.equals("Supplier")) {
+            } else if (message.equals("P/LStatmentDateWise")) {
                 getSupportFragmentManager().beginTransaction()
-                        .add(R.id.menu_container, ReportsFragment.newInstance("5"))
+                        .add(R.id.menu_container, new DateProfitLossFragment())
                         .commit();
-            } else if (message.equals("Client")) {
+            } else if (message.equals("P/LStatmentyearly")) {
                 getSupportFragmentManager().beginTransaction()
-                        .add(R.id.menu_container, ReportsFragment.newInstance("4"))
+                        .add(R.id.menu_container, new YearProfitLossFragment())
                         .commit();
-            } else if (message.equals("Revenue")) {
+            } else if (message.equals("BalanceSheetDate")) {
                 getSupportFragmentManager().beginTransaction()
-                        .add(R.id.menu_container, ReportsFragment.newInstance("6"))
+                        .add(R.id.menu_container, new DateBalSheetFragment())
                         .commit();
-            } else if (message.equals("Capital")) {
+            } else if (message.equals("BalanceSheetMonth")) {
                 getSupportFragmentManager().beginTransaction()
-                        .add(R.id.menu_container, ReportsFragment.newInstance("7"))
-                        .commit();
-            } else if (message.equals("Website")) {
-                getSupportFragmentManager().beginTransaction()
-                        .add(R.id.menu_container, new ListFragment())
-                        .commit();
-            } else if (message.equals("Trail Balance")) {
-                getSupportFragmentManager().beginTransaction()
-                        .add(R.id.menu_container, new TrailBalanceFragment())
-                        .commit();
-            } else if (message.equals("Profit/Loss")) {
-                getSupportFragmentManager().beginTransaction()
-                        .add(R.id.menu_container, new ProfitLossFragment())
-                        .commit();
-            } else if (message.equals("Bal Sheet")) {
-                getSupportFragmentManager().beginTransaction()
-                        .add(R.id.menu_container, new BalSheetFragment())
+                        .add(R.id.menu_container, new MonthBalSheetFragment())
                         .commit();
             }
 

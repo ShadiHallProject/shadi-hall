@@ -10,13 +10,17 @@ import android.util.Log;
 import org.by9steps.shadihall.model.Account1Type;
 import org.by9steps.shadihall.model.Account2Group;
 import org.by9steps.shadihall.model.Account3Name;
+import org.by9steps.shadihall.model.ActiveClients;
 import org.by9steps.shadihall.model.BalSheet;
 import org.by9steps.shadihall.model.Bookings;
 import org.by9steps.shadihall.model.CashBook;
 import org.by9steps.shadihall.model.ChartOfAcc;
+import org.by9steps.shadihall.model.Client;
 import org.by9steps.shadihall.model.GeneralLedger;
 import org.by9steps.shadihall.model.MonthTb;
 import org.by9steps.shadihall.model.ProfitLoss;
+import org.by9steps.shadihall.model.ProjectMenu;
+import org.by9steps.shadihall.model.Projects;
 import org.by9steps.shadihall.model.Recovery;
 import org.by9steps.shadihall.model.Reports;
 import org.by9steps.shadihall.model.Spinner;
@@ -46,6 +50,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String TABLE_CashBook = "CashBook";
     private static final String TABLE_Booking = "Booking";
     private static final String TABLE_Client = "Client";
+    private static final String TABLE_Project = "Project";
+    private static final String TABLE_ProjectMenu = "ProjectMenu";
+    private static final String TABLE_Account4UserRights = "Account4UserRights";
+    private static final String TABLE_Item1Type = "Item1Type";
+    private static final String TABLE_Item2Group = "Item2Group";
+    private static final String TABLE_Item3Name = "Item3Name";
+    private static final String TABLE_SalePur1 = "SalePur1";
+    private static final String TABLE_SalePur2 = "SalePur2";
+    private static final String TABLE_SalePurLocation = "SalePurLocation";
+    private static final String TABLE_ActiveAccounts = "ActiveAccounts";
 
     // Account3Name Table - column names
     private static final String KEY_AcNameID = "AcNameID";
@@ -111,6 +125,147 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String KEY_UpdatedDate3 = "UpdatedDate";
     private static final String KEY_Advance = "Advance";
     private static final String KEY_Shift = "Shift";
+
+    //New Tables
+
+    //Client Table - column names
+    private static final String KEY_ClientID4 = "ClientID";
+    private static final String KEY_ClientParentID = "ClientParentID";
+    private static final String KEY_EntryType = "EntryType";
+    private static final String KEY_LoginMobileNo = "LoginMobileNo";
+    private static final String KEY_CompanyName = "CompanyName";
+    private static final String KEY_CompanyAddress = "CompanyAddress";
+    private static final String KEY_CompanyNumber = "CompanyNumber";
+    private static final String KEY_NameOfPerson = "NameOfPerson";
+    private static final String KEY_Email = "Email";
+    private static final String KEY_WebSite = "WebSite";
+    private static final String KEY_Password = "Password";
+    private static final String KEY_ActiveClient = "ActiveClient";
+    private static final String KEY_Country = "Country";
+    private static final String KEY_City = "City";
+    private static final String KEY_SubCity = "SubCity";
+    private static final String KEY_CapacityOfPersons = "CapacityOfPersons";
+    private static final String KEY_ClientUserID4 = "ClientUserID";
+    private static final String KEY_SysCode4 = "SysCode";
+    private static final String KEY_NetCode4 = "NetCode";
+    private static final String KEY_UpdatedDate4 = "UpdatedDate";
+    private static final String KEY_Lat = "Lat";
+    private static final String KEY_Lng = "Lng";
+    private static final String KEY_BookingTermsAndCondition = "BookingTermsAndCondition";
+    private static final String KEY_ProjectID = "ProjectID";
+    private static final String KEY_UserRights4 = "UserRights";
+
+    //Project Table - column names
+    private static final String KEY_ProjectID5 = "ProjectID";
+    private static final String KEY_ProjectName = "ProjectName";
+    private static final String KEY_ProjectDescription = "ProjectDescription";
+    private static final String KEY_ProjectType = "ProjectType";
+
+    //ProjectMenu Table - column names
+    private static final String KEY_MenuID = "MenuID";
+    private static final String KEY_ProjectID6 = "ProjectID";
+    private static final String KEY_MenuGroup = "MenuGroup";
+    private static final String KEY_MenuName = "MenuName";
+    private static final String KEY_PageOpen = "PageOpen";
+    private static final String KEY_ValuePass = "ValuePass";
+    private static final String KEY_ImageName = "ImageName";
+    private static final String KEY_GroupSortBy = "GroupSortBy";
+    private static final String KEY_SortBy = "SortBy";
+
+    //Account4UserRights Table - column names
+    private static final String KEY_AcRightsID = "AcRightsID";
+    private static final String KEY_Account3ID = "Account3ID";
+    private static final String KEY_MenuName11 = "MenuName";
+    private static final String KEY_PageOpen11 = "PageOpen";
+    private static final String KEY_ValuePass11 = "ValuePass";
+    private static final String KEY_ImageName11 = "ImageName";
+    private static final String KEY_Inserting = "Inserting";
+    private static final String KEY_Edting = "Edting";
+    private static final String KEY_Deleting = "Deleting";
+    private static final String KEY_Reporting = "Reporting";
+    private static final String KEY_ClientID11 = "ClientID";
+    private static final String KEY_ClientUserID11 = "ClientUserID";
+    private static final String KEY_NetCode11 = "NetCode";
+    private static final String KEY_SysCode11 = "SysCode";
+    private static final String KEY_UpdatedDate11 = "UpdateDate";
+    private static final String KEY_SortBy11 = "SortBy";
+
+    //Item1Type Table - column names
+    private static final String KEY_Item1TypeID = "Item1TypeID";
+    private static final String KEY_ItemType = "ItemType";
+
+    //Item2Group Table - column names
+    private static final String KEY_Item2GroupID = "Item2GroupID";
+    private static final String KEY_Item1ID = "Item1ID";
+    private static final String KEY_Item2GroupName = "Item2GroupName";
+    private static final String KEY_ClientID6 = "ClientID";
+    private static final String KEY_ClientUserID6 = "ClientUserID";
+    private static final String KEY_NetCode6 = "NetCode";
+    private static final String KEY_SysCode6 = "SysCode";
+    private static final String KEY_UpdatedDate6 = "UpdatedDate";
+
+    //Item3Name Table - column names
+    private static final String KEY_Item3NameID = "Item3NameID";
+    private static final String KEY_Item2GroupID7 = "Item2GroupID";
+    private static final String KEY_ItemName = "ItemName";
+    private static final String KEY_ClientID7 = "ClientID";
+    private static final String KEY_ClientUserID7 = "ClientUserID";
+    private static final String KEY_NetCode7 = "NetCode";
+    private static final String KEY_SysCode7 = "SysCode";
+    private static final String KEY_UpdatedDate7 = "UpdatedDate";
+
+    //SalePur1 Table - column names
+    private static final String KEY_SalePur1ID = "SalePur1ID";
+    private static final String KEY_SerialNo8 = "SerialNo";
+    private static final String KEY_EntryType8 = "EntryType";
+    private static final String KEY_SPDate = "SPDate";
+    private static final String KEY_AccountID = "AccountID";
+    private static final String KEY_Remarks = "Remarks";
+    private static final String KEY_ClientID8 = "ClientID";
+    private static final String KEY_ClientUserID8= "ClientUserID";
+    private static final String KEY_NetCode8 = "NetCode";
+    private static final String KEY_SysCode8 = "SysCode";
+    private static final String KEY_UpdatedDate8 = "UpdatedDate";
+    private static final String KEY_Name = "Name";
+    private static final String KEY_DueDate = "DueDate";
+
+    //SalePur2 Table - column names
+    private static final String KEY_SalePur2ID = "SalePur2ID";
+    private static final String KEY_SalePur1ID9 = "SalePur1ID";
+    private static final String KEY_EntryType9 = "EntryType";
+    private static final String KEY_ItemCode = "ItemCode";
+    private static final String KEY_ItemDescription = "ItemDescription";
+    private static final String KEY_QtyAdd = "QtyAdd";
+    private static final String KEY_QtyLess = "QtyLess";
+    private static final String KEY_Qty= "Qty";
+    private static final String KEY_Price = "Price";
+    private static final String KEY_Total = "Total";
+    private static final String KEY_Location = "Location";
+    private static final String KEY_ClientID9= "ClientID";
+    private static final String KEY_ClientUserID9= "ClientUserID";
+    private static final String KEY_NetCode9 = "NetCode";
+    private static final String KEY_SysCode9 = "SysCode";
+    private static final String KEY_UpdatedDate9 = "UpdatedDate";
+
+    //SalePurLocation Table - column names
+    private static final String KEY_LocationID = "LocationID";
+    private static final String KEY_LocationName = "LocationName";
+    private static final String KEY_ClientID10 = "ClientID";
+    private static final String KEY_ClientUserID10 = "ClientUserID";
+    private static final String KEY_NetCode10 = "NetCode";
+    private static final String KEY_SysCode10 = "SysCode";
+    private static final String KEY_UpdatedDate10 = "UpdatedDate";
+
+    //ActiveAccounts Table - column names
+    private static final String KEY_AcMobileNo12 = "AcMobileNo";
+    private static final String KEY_UserRights12 = "UserRights";
+    private static final String KEY_AcName12 = "AcName";
+    private static final String KEY_ClientID12 = "ClientID";
+    private static final String KEY_CompanyName12 = "CompanyName";
+    private static final String KEY_CompanyAddress12 = "CompanyAddress";
+    private static final String KEY_ProjectID12 = "ProjectID";
+    private static final String KEY_ProjectName12 = "ProjectName";
+    private static final String KEY_ClientUserID12 = "ClientUserID";
 
     // Table Create Statements
     // Account3Name table create statement
@@ -182,6 +337,157 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             + TABLE_Account1Type + "(" + KEY_AcTypeID + " TEXT,"
             + KEY_AcTypeName + " TEXT" + ")";
 
+    // Client table create statement
+    private static final String CREATE_TABLE_Client = "CREATE TABLE "
+            + TABLE_Client + "(" + KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +KEY_ClientID4 + " TEXT,"
+            + KEY_ClientParentID + " TEXT,"
+            + KEY_EntryType + " TEXT,"
+            + KEY_LoginMobileNo + " TEXT,"
+            + KEY_CompanyName + " TEXT,"
+            + KEY_CompanyAddress + " TEXT,"
+            + KEY_CompanyNumber + " TEXT,"
+            + KEY_NameOfPerson + " TEXT,"
+            + KEY_Email + " TEXT,"
+            + KEY_WebSite + " TEXT,"
+            + KEY_Password + " TEXT,"
+            + KEY_ActiveClient + " TEXT,"
+            + KEY_Country + " TEXT,"
+            + KEY_City + " TEXT,"
+            + KEY_SubCity + " TEXT,"
+            + KEY_CapacityOfPersons + " TEXT,"
+            + KEY_ClientUserID4 + " TEXT,"
+            + KEY_SysCode4 + " TEXT,"
+            + KEY_NetCode4 + " TEXT,"
+            + KEY_UpdatedDate4 + " TEXT,"
+            + KEY_Lat + " TEXT,"
+            + KEY_Lng + " TEXT,"
+            + KEY_BookingTermsAndCondition + " TEXT,"
+            + KEY_ProjectID + " TEXT,"
+            + KEY_UserRights4 + " TEXT"+ ")";
+
+    // Project table create statement
+    private static final String CREATE_TABLE_Project = "CREATE TABLE "
+            + TABLE_Project + "(" + KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +KEY_ProjectID + " TEXT,"
+            + KEY_ProjectName + " TEXT,"
+            + KEY_ProjectDescription + " TEXT,"
+            + KEY_ProjectType + " TEXT"+ ")";
+
+    // ProjectMenu table create statement
+    private static final String CREATE_TABLE_ProjectMenu = "CREATE TABLE "
+            + TABLE_ProjectMenu + "(" + KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +KEY_MenuID + " TEXT,"
+            + KEY_ProjectID6 + " TEXT,"
+            + KEY_MenuGroup + " TEXT,"
+            + KEY_MenuName + " TEXT,"
+            + KEY_PageOpen + " TEXT,"
+            + KEY_ValuePass + " TEXT,"
+            + KEY_ImageName + " TEXT,"
+            + KEY_GroupSortBy + " TEXT,"
+            + KEY_SortBy + " TEXT"+ ")";
+
+    // Account4UserRights table create statement
+    private static final String CREATE_TABLE_Account4UserRights = "CREATE TABLE "
+            + TABLE_Account4UserRights + "(" + KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +KEY_AcRightsID + " TEXT,"
+            + KEY_Account3ID + " TEXT,"
+            + KEY_MenuName11 + " TEXT,"
+            + KEY_PageOpen11 + " TEXT,"
+            + KEY_ValuePass11 + " TEXT,"
+            + KEY_ImageName11 + " TEXT,"
+            + KEY_Inserting + " TEXT,"
+            + KEY_Edting + " TEXT,"
+            + KEY_Deleting + " TEXT,"
+            + KEY_Reporting + " TEXT,"
+            + KEY_ClientID11 + " TEXT,"
+            + KEY_ClientUserID11 + " TEXT,"
+            + KEY_NetCode11 + " TEXT,"
+            + KEY_SysCode11 + " TEXT,"
+            + KEY_UpdatedDate11 + " TEXT,"
+            + KEY_SortBy11 + " TEXT"+ ")";
+
+    // Item1Type table create statement
+    private static final String CREATE_TABLE_Item1Type = "CREATE TABLE "
+            + TABLE_Item1Type + "(" + KEY_Item1TypeID + " TEXT,"
+            + KEY_ItemType + " TEXT" + ")";
+
+    // Item2Group table create statement
+    private static final String CREATE_TABLE_Item2Group = "CREATE TABLE "
+            + TABLE_Item2Group + "(" + KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +KEY_Item2GroupID + " TEXT,"
+            + KEY_Item1ID + " TEXT,"
+            + KEY_Item2GroupName + " TEXT,"
+            + KEY_ClientID6 + " TEXT,"
+            + KEY_ClientUserID6 + " TEXT,"
+            + KEY_NetCode6 + " TEXT,"
+            + KEY_SysCode6 + " TEXT,"
+            + KEY_UpdatedDate6 + " TEXT"+ ")";
+
+    // Item3Name table create statement
+    private static final String CREATE_TABLE_Item3Name = "CREATE TABLE "
+            + TABLE_Item3Name + "(" + KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +KEY_Item3NameID + " TEXT,"
+            + KEY_Item2GroupID7 + " TEXT,"
+            + KEY_ItemName + " TEXT,"
+            + KEY_ClientID7 + " TEXT,"
+            + KEY_ClientUserID7 + " TEXT,"
+            + KEY_NetCode7 + " TEXT,"
+            + KEY_SysCode7 + " TEXT,"
+            + KEY_UpdatedDate7 + " TEXT"+ ")";
+
+    // SalePur1 table create statement
+    private static final String CREATE_TABLE_SalePur1 = "CREATE TABLE "
+            + TABLE_SalePur1 + "(" + KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +KEY_SalePur1ID + " TEXT,"
+            + KEY_SerialNo8 + " TEXT,"
+            + KEY_EntryType8 + " TEXT,"
+            + KEY_SPDate + " TEXT,"
+            + KEY_AccountID + " TEXT,"
+            + KEY_Remarks+ " TEXT,"
+            + KEY_ClientID8 + " TEXT,"
+            + KEY_ClientUserID8 + " TEXT,"
+            + KEY_NetCode8 + " TEXT,"
+            + KEY_SysCode8 + " TEXT,"
+            + KEY_UpdatedDate8 + " TEXT,"
+            + KEY_Name + " TEXT,"
+            + KEY_DueDate + " TEXT"+ ")";
+
+    // SalePur2 table create statement
+    private static final String CREATE_TABLE_SalePur2 = "CREATE TABLE "
+            + TABLE_SalePur2 + "(" + KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +KEY_SalePur2ID + " TEXT,"
+            + KEY_SalePur1ID9 + " TEXT,"
+            + KEY_EntryType9 + " TEXT,"
+            + KEY_ItemCode + " TEXT,"
+            + KEY_ItemDescription + " TEXT,"
+            + KEY_QtyAdd+ " TEXT,"
+            + KEY_QtyLess + " TEXT,"
+            + KEY_Qty + " TEXT,"
+            + KEY_Price + " TEXT,"
+            + KEY_Total + " TEXT,"
+            + KEY_Location + " TEXT,"
+            + KEY_ClientID9 + " TEXT,"
+            + KEY_ClientUserID9 + " TEXT,"
+            + KEY_NetCode9 + " TEXT,"
+            + KEY_SysCode9 + " TEXT,"
+            + KEY_UpdatedDate9 + " TEXT"+ ")";
+
+    // SalePurLocation table create statement
+    private static final String CREATE_TABLE_SalePurLocation = "CREATE TABLE "
+            + TABLE_SalePurLocation + "(" + KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +KEY_LocationID + " TEXT,"
+            + KEY_LocationName + " TEXT,"
+            + KEY_ClientID10 + " TEXT,"
+            + KEY_ClientUserID10 + " TEXT,"
+            + KEY_NetCode10 + " TEXT,"
+            + KEY_SysCode10 + " TEXT,"
+            + KEY_UpdatedDate10 + " TEXT"+ ")";
+
+    // ActiveAccounts table create statement
+    private static final String CREATE_TABLE_ActiveAccounts = "CREATE TABLE "
+            + TABLE_ActiveAccounts + "(" + KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +KEY_AcMobileNo12 + " TEXT,"
+            + KEY_UserRights12 + " TEXT,"
+            + KEY_AcName12 + " TEXT,"
+            + KEY_ClientID12 + " TEXT,"
+            + KEY_CompanyName12 + " TEXT,"
+            + KEY_CompanyAddress12 + " TEXT,"
+            + KEY_ProjectID12 + " TEXT,"
+            + KEY_ProjectName12 + " TEXT,"
+            + KEY_ClientUserID12 + " TEXT"+ ")";
+
+
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
@@ -195,6 +501,18 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(CREATE_TABLE_Booking);
         db.execSQL(CREATE_TABLE_Account2Group);
         db.execSQL(CREATE_TABLE_Account1Type);
+
+        db.execSQL(CREATE_TABLE_Client);
+        db.execSQL(CREATE_TABLE_Project);
+        db.execSQL(CREATE_TABLE_ProjectMenu);
+        db.execSQL(CREATE_TABLE_Account4UserRights);
+        db.execSQL(CREATE_TABLE_Item1Type);
+        db.execSQL(CREATE_TABLE_Item2Group);
+        db.execSQL(CREATE_TABLE_Item3Name);
+        db.execSQL(CREATE_TABLE_SalePur1);
+        db.execSQL(CREATE_TABLE_SalePur2);
+        db.execSQL(CREATE_TABLE_SalePurLocation);
+        db.execSQL(CREATE_TABLE_ActiveAccounts);
     }
 
     @Override
@@ -205,6 +523,18 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_Booking);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_Account2Group);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_Account1Type);
+
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_Client);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_Project);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_ProjectMenu);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_Account4UserRights);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_Item1Type);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_Item2Group);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_Item3Name);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_SalePur1);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_SalePur2);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_SalePurLocation);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_ActiveAccounts);
 
         if (newVersion > oldVersion) {
             db.execSQL("ALTER TABLE "+TABLE_CashBook +" ADD COLUMN ID PRIMARY KEY AUTOINCREMENT");
@@ -1013,7 +1343,271 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         Cursor c = db.rawQuery(query, null);
         Log.e("CashBook",String.valueOf(c.moveToFirst()));
 
-
         return c.moveToFirst();
+    }
+
+    /**
+     * Creating a Project
+     */
+    public void createProjects(Projects projects) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(KEY_ProjectID, projects.getProjectID());
+        values.put(KEY_ProjectName, projects.getProjectName());
+        values.put(KEY_ProjectType, projects.getProjectType());
+        Log.e("Values",values.toString());
+        db.insert(TABLE_Project, null, values);
+        // insert row
+//        String cid = String.valueOf(db.insert(TABLE_CashBook, null, values));
+//        Log.e("OKK",String.valueOf(db.insert(TABLE_CashBook, null, values)));
+    }
+
+    //Get Voucher
+    public List<Projects> getProjects(String query) {
+        List<Projects> projects = new ArrayList<>();
+
+
+        Log.e(LOG, query);
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor c = db.rawQuery(query, null);
+        Log.e("Projects",String.valueOf(c.moveToFirst()));
+
+        // looping through all rows and adding to list
+        if (c.moveToFirst()) {
+            do {
+                Projects project = new Projects();
+                Log.e("ProjectIDDD",c.getString(c.getColumnIndex(KEY_ProjectID)));
+
+                project.setProjectID(c.getString(c.getColumnIndex(KEY_ProjectID)));
+                project.setProjectName(c.getString(c.getColumnIndex(KEY_ProjectName)));
+                project.setProjectType(c.getString(c.getColumnIndex(KEY_ProjectType)));
+
+
+                // adding to todo list
+                projects.add(project);
+            } while (c.moveToNext());
+        }
+
+        return projects;
+    }
+
+    /**
+     * Deleting a Project
+     */
+    public void deleteProject() {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.execSQL("DELETE FROM "+ TABLE_Project);
+    }
+
+    /**
+     * Creating a ActiveAccounts
+     */
+    public void createActiveAccounts(ActiveClients client) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(KEY_AcMobileNo12, client.getAcMobileNo());
+        values.put(KEY_UserRights12, client.getUserRights());
+        values.put(KEY_AcName12, client.getAcName());
+        values.put(KEY_ClientID12, client.getClientID());
+        values.put(KEY_CompanyName12, client.getCompanyName());
+        values.put(KEY_CompanyAddress12, client.getCompanyAddress());
+        values.put(KEY_ProjectID12, client.getProjectID());
+        values.put(KEY_ProjectName, client.getProjectName());
+        values.put(KEY_ClientUserID12, client.getClientUserID());
+
+        // insert row
+        db.insert(TABLE_ActiveAccounts, null, values);
+
+    }
+
+    //Get ActiveAccounts
+    public List<ActiveClients> getActiveAccounts(String query) {
+        List<ActiveClients> clients = new ArrayList<>();
+
+
+        Log.e(LOG, query);
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor c = db.rawQuery(query, null);
+        Log.e("CashBook",String.valueOf(c.moveToFirst()));
+
+        // looping through all rows and adding to list
+        if (c.moveToFirst()) {
+            do {
+                ActiveClients client = new ActiveClients();
+
+                client.setAcMobileNo(c.getString(c.getColumnIndex(KEY_AcMobileNo12)));
+                client.setUserRights(c.getString(c.getColumnIndex(KEY_UserRights12)));
+                client.setAcName(c.getString(c.getColumnIndex(KEY_AcName12)));
+                client.setClientID(c.getString(c.getColumnIndex(KEY_ClientID12)));
+                client.setCompanyName(c.getString(c.getColumnIndex(KEY_CompanyName12)));
+                client.setCompanyAddress(c.getString(c.getColumnIndex(KEY_CompanyAddress12)));
+                client.setProjectID(c.getString(c.getColumnIndex(KEY_ProjectID12)));
+                client.setProjectName(c.getString(c.getColumnIndex(KEY_ProjectName)));
+                client.setClientUserID(c.getString(c.getColumnIndex(KEY_ClientUserID12)));
+
+
+                // adding to todo list
+                clients.add(client);
+            } while (c.moveToNext());
+        }
+
+        return clients;
+    }
+
+    /**
+     * Deleting a Project
+     */
+    public void deleteActiveAccounts() {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.execSQL("DELETE FROM "+ TABLE_ActiveAccounts + " WHERE EXISTS (SELECT * FROM ActiveAccounts)");
+    }
+
+    /**
+     * Creating a Client
+     */
+    public void createClient(Client client) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(KEY_ClientID4, client.getClientID());
+        values.put(KEY_ClientParentID, client.getClientParentID());
+        values.put(KEY_EntryType, client.getEntryType());
+        values.put(KEY_LoginMobileNo, client.getLoginMobileNo());
+        values.put(KEY_CompanyName, client.getCompanyName());
+        values.put(KEY_CompanyAddress, client.getCompanyAddress());
+        values.put(KEY_CompanyNumber, client.getCompanyNumber());
+        values.put(KEY_NameOfPerson, client.getNameOfPerson());
+        values.put(KEY_Email, client.getEmail());
+        values.put(KEY_WebSite, client.getWebSite());
+        values.put(KEY_Password, client.getPassword());
+        values.put(KEY_ActiveClient, client.getActiveClient());
+        values.put(KEY_Country, client.getCountry());
+        values.put(KEY_City, client.getCity());
+        values.put(KEY_SubCity, client.getSubCity());
+        values.put(KEY_CapacityOfPersons, client.getCapacityOfPersons());
+        values.put(KEY_ClientUserID, client.getClientUserID());
+        values.put(KEY_SysCode4, client.getSysCode());
+        values.put(KEY_NetCode4, client.getNetCode());
+        values.put(KEY_UpdatedDate4, client.getUpdatedDate());
+        values.put(KEY_Lat, client.getLat());
+        values.put(KEY_Lng, client.getLng());
+        values.put(KEY_ProjectID, client.getProjectID());
+
+        // insert row
+        db.insert(TABLE_Client, null, values);
+    }
+
+    //Get Client
+    public List<Client> getClient(String query) {
+        List<Client> clients = new ArrayList<>();
+
+        Log.e(LOG, query);
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor c = db.rawQuery(query, null);
+        Log.e("CashBook",String.valueOf(c.moveToFirst()));
+
+        // looping through all rows and adding to list
+        if (c.moveToFirst()) {
+            do {
+                Client client = new Client();
+
+                client.setClientID(c.getString(c.getColumnIndex(KEY_ClientID4)));
+                client.setClientParentID(c.getString(c.getColumnIndex(KEY_ClientParentID)));
+                client.setEntryType(c.getString(c.getColumnIndex(KEY_EntryType)));
+                client.setLoginMobileNo(c.getString(c.getColumnIndex(KEY_LoginMobileNo)));
+                client.setCompanyName(c.getString(c.getColumnIndex(KEY_CompanyName)));
+                client.setCompanyAddress(c.getString(c.getColumnIndex(KEY_CompanyAddress)));
+                client.setCompanyNumber(c.getString(c.getColumnIndex(KEY_CompanyNumber)));
+                client.setNameOfPerson(c.getString(c.getColumnIndex(KEY_NameOfPerson)));
+                client.setEmail(c.getString(c.getColumnIndex(KEY_Email)));
+                client.setWebSite(c.getString(c.getColumnIndex(KEY_WebSite)));
+                client.setPassword(c.getString(c.getColumnIndex(KEY_Password)));
+                client.setActiveClient(c.getString(c.getColumnIndex(KEY_ActiveClient)));
+                client.setCountry(c.getString(c.getColumnIndex(KEY_Country)));
+                client.setCity(c.getString(c.getColumnIndex(KEY_City)));
+                client.setSubCity(c.getString(c.getColumnIndex(KEY_SubCity)));
+                client.setCapacityOfPersons(c.getString(c.getColumnIndex(KEY_CapacityOfPersons)));
+                client.setClientUserID(c.getString(c.getColumnIndex(KEY_ClientUserID)));
+                client.setSysCode(c.getString(c.getColumnIndex(KEY_SysCode4)));
+                client.setNetCode(c.getString(c.getColumnIndex(KEY_NetCode4)));
+                client.setUpdatedDate(c.getString(c.getColumnIndex(KEY_UpdatedDate4)));
+                client.setLat(c.getString(c.getColumnIndex(KEY_Lat)));
+                client.setLng(c.getString(c.getColumnIndex(KEY_Lng)));
+                client.setProjectID(c.getString(c.getColumnIndex(KEY_ProjectID)));
+
+
+                // adding to todo list
+                clients.add(client);
+            } while (c.moveToNext());
+        }
+
+        return clients;
+    }
+
+    /**
+     * Creating a ProjectMenu
+     */
+    public void createProjectMenu(ProjectMenu projectMenu) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(KEY_MenuID, projectMenu.getMenuID());
+        values.put(KEY_ProjectID6, projectMenu.getProjectID());
+        values.put(KEY_MenuGroup, projectMenu.getMenuGroup());
+        values.put(KEY_MenuName, projectMenu.getMenuName());
+        values.put(KEY_PageOpen, projectMenu.getPageOpen());
+        values.put(KEY_ValuePass, projectMenu.getValuePass());
+        values.put(KEY_ImageName, projectMenu.getImageName());
+        values.put(KEY_GroupSortBy, projectMenu.getGroupSortBy());
+        values.put(KEY_SortBy, projectMenu.getSortBy());
+
+        // insert row
+        db.insert(TABLE_ProjectMenu, null, values);
+    }
+
+    //Get ProjectMenu
+    public List<ProjectMenu> getProjectMenu(String query) {
+        List<ProjectMenu> projectMenus = new ArrayList<>();
+
+        Log.e(LOG, query);
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor c = db.rawQuery(query, null);
+        Log.e("CashBook",String.valueOf(c.moveToFirst()));
+
+        // looping through all rows and adding to list
+        if (c.moveToFirst()) {
+            do {
+                ProjectMenu projectMenu = new ProjectMenu();
+
+                projectMenu.setMenuID(c.getString(c.getColumnIndex(KEY_MenuID)));
+                projectMenu.setProjectID(c.getString(c.getColumnIndex(KEY_ProjectID6)));
+                projectMenu.setMenuGroup(c.getString(c.getColumnIndex(KEY_MenuGroup)));
+                projectMenu.setMenuName(c.getString(c.getColumnIndex(KEY_MenuName)));
+                projectMenu.setPageOpen(c.getString(c.getColumnIndex(KEY_PageOpen)));
+                projectMenu.setValuePass(c.getString(c.getColumnIndex(KEY_ValuePass)));
+                projectMenu.setImageName(c.getString(c.getColumnIndex(KEY_ImageName)));
+                projectMenu.setGroupSortBy(c.getString(c.getColumnIndex(KEY_GroupSortBy)));
+                projectMenu.setSortBy(c.getString(c.getColumnIndex(KEY_SortBy)));
+
+                // adding to todo list
+                projectMenus.add(projectMenu);
+            } while (c.moveToNext());
+        }
+
+        return projectMenus;
+    }
+
+    /**
+     * Deleting ProjectMenu
+     */
+    public void deleteProjectMenu() {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.execSQL("DELETE FROM "+ TABLE_ProjectMenu + " WHERE EXISTS (SELECT * FROM ActiveAccounts)");
     }
 }

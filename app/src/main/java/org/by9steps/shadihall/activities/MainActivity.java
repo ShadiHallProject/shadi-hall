@@ -33,6 +33,7 @@ import org.by9steps.shadihall.fragments.ListFragment;
 import org.by9steps.shadihall.fragments.LoginFragment;
 import org.by9steps.shadihall.fragments.MenuFragment;
 import org.by9steps.shadihall.fragments.TreeFragment;
+import org.by9steps.shadihall.helper.Prefrence;
 import org.by9steps.shadihall.model.AreaName;
 import org.by9steps.shadihall.model.Bookings;
 import org.by9steps.shadihall.model.Tree;
@@ -56,6 +57,8 @@ public class MainActivity extends AppCompatActivity {
     public static final String mypreference = "mypref";
     public static final String login = "loginKey";
 
+    Prefrence prefrence;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -68,6 +71,7 @@ public class MainActivity extends AppCompatActivity {
         //shared prefrences
         sharedPreferences = getSharedPreferences(mypreference,
                 Context.MODE_PRIVATE);
+        prefrence = new Prefrence(this);
 
 
         viewPager = (ViewPager) findViewById(R.id.viewpager);
@@ -203,6 +207,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void LogOut(){
+        prefrence.setUserRighhtsSession("0");
+        prefrence.setClientUserIDSession("0");
+        prefrence.setClientIDSession("0");
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString(login, "No");
         editor.apply();

@@ -54,7 +54,7 @@ public class AppController extends Application {
     public static String fDate1 = "";
     public static String fDate2 = "";
 
-    public static String imageUrl = "http://69.167.137.121/plesk-site-preview/sky.com.pk/shadiHall/ClientImages";
+    public static String imageUrl = "http://69.167.137.121/plesk-site-preview/sky.com.pk/shadiHall/ClientImages/";
 
     DatabaseHelper databaseHelper;
     ProgressDialog mProgress;

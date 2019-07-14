@@ -13,6 +13,7 @@ import android.widget.Button;
 
 import org.by9steps.shadihall.R;
 import org.by9steps.shadihall.helper.InputValidation;
+import org.by9steps.shadihall.helper.Prefrence;
 
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -21,6 +22,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     TextInputEditText phoneNum;
 
     private InputValidation inputValidation;
+    Prefrence prefrence;
 
     String ph;
 
@@ -36,6 +38,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         setContentView(R.layout.activity_login);
 
         inputValidation = new InputValidation(this);
+        prefrence = new Prefrence(this);
 
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(false);
@@ -64,6 +67,11 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 if (!inputValidation.isInputEditTextFilled(phoneNum, phoneLayout, getString(R.string.error_message_phone))) {
                     return;
                 } else {
+
+                    prefrence.setClientIDSession("0");
+                    prefrence.setClientUserIDSession("0");
+                    prefrence.setProjectIDSession("0");
+                    prefrence.setUserRighhtsSession("0");
 
                     SharedPreferences.Editor editor = sharedPreferences.edit();
                         editor.putString(phone, ph);

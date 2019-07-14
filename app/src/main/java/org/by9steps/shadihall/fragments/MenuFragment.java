@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import org.by9steps.shadihall.R;
+import org.by9steps.shadihall.helper.Prefrence;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -25,6 +26,8 @@ public class MenuFragment extends Fragment {
     SharedPreferences sharedPreferences;
     public static final String mypreference = "mypref";
     public static final String login = "loginKey";
+
+    Prefrence prefrence;
 
     // TODO: Rename and change types of parameters
     private String men;
@@ -62,19 +65,37 @@ public class MenuFragment extends Fragment {
         sharedPreferences = getActivity().getSharedPreferences(mypreference,
                 Context.MODE_PRIVATE);
 
+        prefrence = new Prefrence(getContext());
+
         String s = "No";
         if(sharedPreferences.contains(login)){
             s = sharedPreferences.getString(login,"");
         }
 
-        if (s.equals("Yes")) {
-            getChildFragmentManager().beginTransaction()
-                    .add(R.id.mContainer, new MenuItemsFragment())
-                    .addToBackStack(null)
-                    .commit();
-        }else{
+//        if (s.equals("Yes")) {
+//            getChildFragmentManager().beginTransaction()
+//                    .add(R.id.mContainer, new MenuItemsFragment())
+//                    .addToBackStack(null)
+//                    .commit();
+//        }else{
+//            getChildFragmentManager().beginTransaction()
+//                    .add(R.id.mContainer, new LoginFragment())
+//                    .addToBackStack(null)
+//                    .commit();
+//        }
+
+        if (prefrence.getClientIDSession().equals("0")
+                && prefrence.getClientUserIDSession().equals("0")
+                && prefrence.getUserRighhtsSession().equals("0")){
+
             getChildFragmentManager().beginTransaction()
                     .add(R.id.mContainer, new LoginFragment())
+                    .addToBackStack(null)
+                    .commit();
+        }else {
+
+            getChildFragmentManager().beginTransaction()
+                    .add(R.id.mContainer, new MenuItemsFragment())
                     .addToBackStack(null)
                     .commit();
         }

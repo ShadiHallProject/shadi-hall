@@ -15,6 +15,8 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import org.by9steps.shadihall.R;
+import org.by9steps.shadihall.helper.DatabaseHelper;
+import org.by9steps.shadihall.model.ProjectMenu;
 import org.by9steps.shadihall.model.SectionModel;
 
 import java.util.List;
@@ -24,10 +26,14 @@ public class SectionViewAdapter extends RecyclerView.Adapter {
 
     private Context mCtx;
     List<SectionModel> mList;
+    List<ProjectMenu> mList1;
+
+    DatabaseHelper databaseHelper;
 
     public SectionViewAdapter(Context mCtx, List<SectionModel> mList) {
         this.mCtx = mCtx;
         this.mList = mList;
+        databaseHelper = new DatabaseHelper(mCtx);
     }
 
     @NonNull
@@ -44,7 +50,9 @@ public class SectionViewAdapter extends RecyclerView.Adapter {
         final SectionModel sectionModel = mList.get(i);
         ((SectionViewHolder)viewHolder).sectionname.setText(sectionModel.getLabel());
 
-        ((SectionViewHolder)viewHolder).adapter = new RecyclerViewAdapter(((SectionViewHolder)viewHolder).itemView.getContext(),sectionModel.getList());
+        mList1 = databaseHelper.getProjectMenu("SELECT * FROM ProjectMenu WHERE MenuGroup = '"+ sectionModel.getLabel()+"' ORDER BY SortBy");
+
+        ((SectionViewHolder)viewHolder).adapter = new RecyclerViewAdapter(((SectionViewHolder)viewHolder).itemView.getContext(),mList1);
         ((SectionViewHolder)viewHolder).recyclerView.setLayoutManager(new GridLayoutManager(((SectionViewHolder)viewHolder).itemView.getContext(),2));
         ((SectionViewHolder)viewHolder).recyclerView.addItemDecoration(new GridSpacingItemDecoration(2, dpToPx(((SectionViewHolder)viewHolder).itemView.getContext(),10), true));
         ((SectionViewHolder)viewHolder).recyclerView.setItemAnimator(new DefaultItemAnimator());

@@ -260,7 +260,7 @@ public class OtpActivity extends AppCompatActivity implements View.OnClickListen
         random = new Random().nextInt((max - min) + 1) + min;
         StringBuilder builder = new StringBuilder(mob);
         String number;
-        Log.e("BUILD",String.valueOf(builder.charAt(0)));
+        Log.e("BUILD",String.valueOf(random));
         if (String.valueOf(builder.charAt(0)).equals("0")) {
             number = "92" + builder.deleteCharAt(0);
             Log.e("NUMBER",number);
