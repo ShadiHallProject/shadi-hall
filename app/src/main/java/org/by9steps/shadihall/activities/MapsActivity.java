@@ -17,6 +17,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.SearchView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -49,6 +50,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private Float ZOOM = 18f;
 
+    TextView country;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,6 +59,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         searchView = findViewById(R.id.input_search);
         next = findViewById(R.id.next);
+        country = findViewById(R.id.country);
+
+        if (getActionBar() != null) {
+            getActionBar().setDisplayHomeAsUpEnabled(true);
+        }
 
         lm = (LocationManager)this.getSystemService(Context.LOCATION_SERVICE);
 
@@ -118,13 +126,25 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     if (addresses != null) {
                         obj = addresses.get(0);
                         title = obj.getSubLocality()+obj.getFeatureName();
+
+                        String subCity = addresses.get(0).getSubLocality();
+                        String countryName = addresses.get(0).getCountryName();
+                        String cityName = addresses.get(0).getLocality();
+
+                        country.setText(countryName+" "+cityName+" "+subCity);
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
                 moveCamera(latLng, ZOOM, title);
+
             }
         });
+
+        if (getActionBar() != null) {
+            getActionBar().setDisplayHomeAsUpEnabled(true);
+        }
+
     }
 
     private void init(){
@@ -181,6 +201,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             // Logic to handle location object
                             moveCamera(new LatLng(location.getLatitude(), location.getLongitude()), ZOOM, "My Location");
                             Log.e("Location", "Location");
+                            Geocoder geocoder = new Geocoder(MapsActivity.this, Locale.getDefault());
+                            List<Address> addresses = null;
+                            try {
+                                addresses = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
+                                String subCity = addresses.get(0).getSubLocality();
+                                String countryName = addresses.get(0).getCountryName();
+                                String cityName = addresses.get(0).getLocality();
+
+                                country.setText(countryName+" "+cityName+" "+subCity);
+
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
                         }
                     }
                 });

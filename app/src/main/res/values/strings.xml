@@ -41,6 +41,7 @@
     <string name="error_message_persons">Enter Persons</string>
     <string name="error_message_website">Enter Website</string>
     <string name="error_message_email">Enter Email</string>
+    <string name="error_message_description">Enter Email</string>
     <string name="error_message_salary">Enter Salary</string>
     <string name="sp_country">Select Country</string>
     <string name="enter_phone_number">Enter Phone Number</string>
@@ -211,4 +212,5 @@
     <string name="select_booking_shift">Select Booking Shift</string>
     <string name="event_shift">Event Shift</string>
     <string name="bookingid">BookingID</string>
+    <string name="financial_year">Financial Year</string>
 </resources>

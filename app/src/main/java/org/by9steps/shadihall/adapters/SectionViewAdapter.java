@@ -16,6 +16,7 @@ import android.widget.TextView;
 
 import org.by9steps.shadihall.R;
 import org.by9steps.shadihall.helper.DatabaseHelper;
+import org.by9steps.shadihall.helper.Prefrence;
 import org.by9steps.shadihall.model.ProjectMenu;
 import org.by9steps.shadihall.model.SectionModel;
 
@@ -28,12 +29,15 @@ public class SectionViewAdapter extends RecyclerView.Adapter {
     List<SectionModel> mList;
     List<ProjectMenu> mList1;
 
+    Prefrence prefrence;
+
     DatabaseHelper databaseHelper;
 
     public SectionViewAdapter(Context mCtx, List<SectionModel> mList) {
         this.mCtx = mCtx;
         this.mList = mList;
         databaseHelper = new DatabaseHelper(mCtx);
+        prefrence = new Prefrence(mCtx);
     }
 
     @NonNull
@@ -50,7 +54,7 @@ public class SectionViewAdapter extends RecyclerView.Adapter {
         final SectionModel sectionModel = mList.get(i);
         ((SectionViewHolder)viewHolder).sectionname.setText(sectionModel.getLabel());
 
-        mList1 = databaseHelper.getProjectMenu("SELECT * FROM ProjectMenu WHERE MenuGroup = '"+ sectionModel.getLabel()+"' ORDER BY SortBy");
+        mList1 = databaseHelper.getProjectMenu("SELECT * FROM ProjectMenu WHERE MenuGroup = '"+ sectionModel.getLabel()+"' AND ProjectID = "+prefrence.getProjectIDSession()+" ORDER BY SortBy");
 
         ((SectionViewHolder)viewHolder).adapter = new RecyclerViewAdapter(((SectionViewHolder)viewHolder).itemView.getContext(),mList1);
         ((SectionViewHolder)viewHolder).recyclerView.setLayoutManager(new GridLayoutManager(((SectionViewHolder)viewHolder).itemView.getContext(),2));

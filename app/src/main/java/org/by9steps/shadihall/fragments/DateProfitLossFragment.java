@@ -60,10 +60,10 @@ import org.by9steps.shadihall.AppController;
 import org.by9steps.shadihall.R;
 import org.by9steps.shadihall.adapters.ProfitLossDateAdapter;
 import org.by9steps.shadihall.helper.DatabaseHelper;
+import org.by9steps.shadihall.helper.Prefrence;
 import org.by9steps.shadihall.model.BalSheet;
 import org.by9steps.shadihall.model.ProfitLoss;
 import org.by9steps.shadihall.model.Recovery;
-import org.by9steps.shadihall.model.User;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -101,6 +101,7 @@ public class DateProfitLossFragment extends Fragment implements View.OnClickList
     int gIncome, gExpense, gProfit;
 
     DatabaseHelper databaseHelper;
+    Prefrence prefrence;
     List<ProfitLoss> profitLossList;
 
     List<ProfitLoss> filterdList;
@@ -143,6 +144,7 @@ public class DateProfitLossFragment extends Fragment implements View.OnClickList
         dpl_profit.setOnClickListener(this);
 
         databaseHelper = new DatabaseHelper(getContext());
+        prefrence = new Prefrence(getContext());
 
         getProfitloss();
 
@@ -223,8 +225,7 @@ public class DateProfitLossFragment extends Fragment implements View.OnClickList
         gIncome = 0; gExpense = 0; gProfit = 0;
         m=0;
 
-        List<User> list = User.listAll(User.class);
-        for (User u : list){
+
             String query = "SELECT        ClientID, CBDate, SUM(Income) AS Income, SUM(Expense) AS Expense, IFNULL(SUM(Income), 0) - IFNULL(SUM(Expense), 0) AS Profit\n" +
                     "FROM            (SELECT        CashBook.ClientID, Account1Type.AcTypeName, CashBook.CBDate, 0 AS Income, SUM(CashBook.Amount) AS Expense\n" +
                     "                          FROM            CashBook INNER JOIN\n" +
@@ -242,11 +243,11 @@ public class DateProfitLossFragment extends Fragment implements View.OnClickList
                     "                          GROUP BY Account1Type_1.AcTypeName, CashBook_1.CBDate, CashBook_1.ClientID\n" +
                     "                          HAVING        (Account1Type_1.AcTypeName = 'Revenue')) AS derivedtbl_1\n" +
                     "GROUP BY ClientID, CBDate\n" +
-                    "HAVING        (ClientID = "+u.getClientID()+")"+ orderby;
+                    "HAVING        (ClientID = "+prefrence.getClientIDSession()+")"+ orderby;
 
 //            Log.e("PROFIT-LOSS QUERY",query);
             profitLossList = databaseHelper.getProfitLoss(query);
-        }
+
 
         for (ProfitLoss p : profitLossList){
             String[] separated = p.getCBDate().split("-");
@@ -399,11 +400,10 @@ public class DateProfitLossFragment extends Fragment implements View.OnClickList
             @Override
             protected Map<String, String> getParams() {
                 Map<String, String> params = new HashMap<String, String>();
-                List<User> list = User.listAll(User.class);
-                for (User u: list) {
-                    params.put("ClientID", u.getClientID());
+
+                    params.put("ClientID", prefrence.getClientIDSession());
                     params.put("Date", "1");
-                }
+
                 return params;
             }
         };

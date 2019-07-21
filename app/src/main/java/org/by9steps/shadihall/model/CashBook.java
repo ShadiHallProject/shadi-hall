@@ -16,7 +16,9 @@ public class CashBook implements Serializable {
     String NetCode;
     String SysCode;
     String UpdatedDate;
-    String BookingID;
+    String TableID;
+    String SerialNo;
+    String TableName;
 
     String DebitAccountName;
     String CreditAccountName;
@@ -25,7 +27,7 @@ public class CashBook implements Serializable {
     public CashBook() {
     }
 
-    public CashBook(String cashBookID, String CBDate, String debitAccount, String creditAccount, String CBRemarks, String amount, String clientID, String clientUserID, String netCode, String sysCode, String updatedDate, String bookingID) {
+    public CashBook(String cashBookID, String CBDate, String debitAccount, String creditAccount, String CBRemarks, String amount, String clientID, String clientUserID, String netCode, String sysCode, String updatedDate, String tableID, String serialNo, String tableName) {
         CashBookID = cashBookID;
         this.CBDate = CBDate;
         DebitAccount = debitAccount;
@@ -37,7 +39,9 @@ public class CashBook implements Serializable {
         NetCode = netCode;
         SysCode = sysCode;
         UpdatedDate = updatedDate;
-        BookingID = bookingID;
+        TableID = tableID;
+        SerialNo = serialNo;
+        TableName = tableName;
     }
 
     public String getCashBookID() {
@@ -128,12 +132,12 @@ public class CashBook implements Serializable {
         UpdatedDate = updatedDate;
     }
 
-    public String getBookingID() {
-        return BookingID;
+    public String getTableID() {
+        return TableID;
     }
 
-    public void setBookingID(String bookingID) {
-        BookingID = bookingID;
+    public void setTableID(String tableID) {
+        TableID = tableID;
     }
 
     public String getDebitAccountName() {
@@ -166,5 +170,21 @@ public class CashBook implements Serializable {
 
     public void setcId(String cId) {
         this.cId = cId;
+    }
+
+    public String getSerialNo() {
+        return SerialNo;
+    }
+
+    public void setSerialNo(String serialNo) {
+        SerialNo = serialNo;
+    }
+
+    public String getTableName() {
+        return TableName;
+    }
+
+    public void setTableName(String tableName) {
+        TableName = tableName;
     }
 }

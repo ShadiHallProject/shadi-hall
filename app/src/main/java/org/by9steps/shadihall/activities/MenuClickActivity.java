@@ -32,15 +32,6 @@ import org.by9steps.shadihall.fragments.SummerizeTrailBalFragment;
 import org.by9steps.shadihall.fragments.TrailBalanceFragment;
 import org.by9steps.shadihall.fragments.YearProfitLossFragment;
 import org.by9steps.shadihall.helper.DatabaseHelper;
-import org.by9steps.shadihall.model.Account1Type;
-import org.by9steps.shadihall.model.Account2Group;
-import org.by9steps.shadihall.model.Account3Name;
-import org.by9steps.shadihall.model.Bookings;
-import org.by9steps.shadihall.model.CashBook;
-import org.by9steps.shadihall.model.User;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;

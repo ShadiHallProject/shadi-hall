@@ -57,12 +57,8 @@ import org.by9steps.shadihall.AppController;
 import org.by9steps.shadihall.R;
 import org.by9steps.shadihall.adapters.ProfitLossDateAdapter;
 import org.by9steps.shadihall.helper.DatabaseHelper;
+import org.by9steps.shadihall.helper.Prefrence;
 import org.by9steps.shadihall.model.ProfitLoss;
-import org.by9steps.shadihall.model.Summerize;
-import org.by9steps.shadihall.model.User;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -95,6 +91,7 @@ public class YearProfitLossFragment extends Fragment implements View.OnClickList
     String m = "First";
 
     DatabaseHelper databaseHelper;
+    Prefrence prefrence;
     List<ProfitLoss> profitLossList;
 
     List<ProfitLoss> filterdList;
@@ -136,6 +133,7 @@ public class YearProfitLossFragment extends Fragment implements View.OnClickList
         ypl_profit.setOnClickListener(this);
 
         databaseHelper = new DatabaseHelper(getContext());
+        prefrence = new Prefrence(getContext());
 
         getProfitLoss();
 
@@ -212,8 +210,6 @@ public class YearProfitLossFragment extends Fragment implements View.OnClickList
         mList.clear();
         income = 0; expense = 0; profit = 0; gIncome = 0; gExpense = 0; gProfit = 0; m = "First";
 
-        List<User> list = User.listAll(User.class);
-        for (User u : list){
             String quuery = "SELECT        ClientID, SUM(Income) AS Income, SUM(Expense) AS Expense,IFNULL(SUM(Income), 0) - IFNULL(SUM(Expense), 0) AS Profit, CBDate\n" +
                     "FROM            (SELECT        CashBook.ClientID, Account1Type.AcTypeName, CashBook.CBDate, 0 AS Income, SUM(CashBook.Amount) AS Expense\n" +
                     "                          FROM            CashBook INNER JOIN\n" +
@@ -231,9 +227,9 @@ public class YearProfitLossFragment extends Fragment implements View.OnClickList
                     "                          GROUP BY Account1Type_1.AcTypeName, CashBook_1.CBDate, CashBook_1.ClientID\n" +
                     "                          HAVING        (Account1Type_1.AcTypeName = 'Revenue')) AS derivedtbl_1\n" +
                     "GROUP BY ClientID, strftime(\"%m-%Y\",CBDate)\n" +
-                    "HAVING        (ClientID = "+u.getClientID()+")" + orderby;
+                    "HAVING        (ClientID = "+prefrence.getClientIDSession()+")" + orderby;
             profitLossList = databaseHelper.getProfitLoss(quuery);
-        }
+
 
         for (ProfitLoss p : profitLossList){
 

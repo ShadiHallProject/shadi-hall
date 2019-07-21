@@ -11,32 +11,18 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.android.volley.DefaultRetryPolicy;
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.RetryPolicy;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-
-import org.by9steps.shadihall.AppController;
 import org.by9steps.shadihall.R;
 import org.by9steps.shadihall.helper.DatabaseHelper;
 import org.by9steps.shadihall.helper.InputValidation;
+import org.by9steps.shadihall.helper.Prefrence;
 import org.by9steps.shadihall.model.CashBook;
-import org.by9steps.shadihall.model.User;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import in.galaxyofandroid.spinerdialog.OnSpinerItemClick;
-import in.galaxyofandroid.spinerdialog.SpinnerDialog;
 
 public class AddExpenseActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -51,8 +37,9 @@ public class AddExpenseActivity extends AppCompatActivity implements View.OnClic
     Button add;
 
     InputValidation inputValidation;
+    Prefrence prefrence;
 
-    String bookingID, spinnerType;
+    String tableID, spinnerType;
     ProgressDialog pDialog;
     DatabaseHelper databaseHelper;
 
@@ -68,12 +55,13 @@ public class AddExpenseActivity extends AppCompatActivity implements View.OnClic
 
         Intent intent = getIntent();
         if (intent != null) {
-            bookingID = intent.getStringExtra("BookingID");
+            tableID = intent.getStringExtra("BookingID");
             spinnerType = intent.getStringExtra("Spinner");
         }
 
         inputValidation = new InputValidation(this);
         databaseHelper = new DatabaseHelper(this);
+        prefrence = new Prefrence(this);
 
         date_layout = findViewById(R.id.date_layout);
         date = findViewById(R.id.date);
@@ -104,11 +92,8 @@ public class AddExpenseActivity extends AppCompatActivity implements View.OnClic
         }else {
 //            credit_account_layout.setVisibility(View.GONE);
 //            debit_account_layout.setVisibility(View.GONE);
-            List<User> list = User.listAll(User.class);
-//            for (User u : list) {
             credit_account.setText("Expense");
             debit_account.setText("Cash");
-//            }
         }
 
         add.setOnClickListener(this);
@@ -135,12 +120,14 @@ public class AddExpenseActivity extends AppCompatActivity implements View.OnClic
                     return;
                 }else{
 
-                    final List<User> list = User.listAll(User.class);
+                    int seriolNo = databaseHelper.getMaxValue("SELECT max(SerialNo) FROM CashBook") + 1;
+                    String cashID = databaseHelper.getID("SELECT AcNameID FROM Account3Name WHERE ClientID = "+prefrence.getClientIDSession()+" and AcName = 'Cash'");
+                    String expenseID = databaseHelper.getID("SELECT AcNameID FROM Account3Name WHERE ClientID = "+prefrence.getClientIDSession()+" and AcName = 'Booking Expense'");
 
-                    for (User u : list) {
-                        databaseHelper.createCashBook(new CashBook("0", date.getText().toString(), u.getBookingExpenseID(), u.getCashID(), description.getText().toString(), amount.getText().toString(), u.getClientID(),u.getClientUserID(),"0","0","0",bookingID));
-                        cleraCashe();
-                    }
+                    Log.e("IDSS EXPEN", String.valueOf(seriolNo)+" / "+cashID+" / "+expenseID);
+
+                    databaseHelper.createCashBook(new CashBook("0", date.getText().toString(), expenseID, cashID, description.getText().toString(), amount.getText().toString(), prefrence.getClientIDSession(),prefrence.getClientUserIDSession(),"0","0","0",tableID,String.valueOf(seriolNo),"Booking"));
+                    cleraCashe();
 
                 }
                 break;

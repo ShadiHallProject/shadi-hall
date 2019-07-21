@@ -60,9 +60,9 @@ import org.by9steps.shadihall.AppController;
 import org.by9steps.shadihall.R;
 import org.by9steps.shadihall.adapters.BalSheetDateAdapter;
 import org.by9steps.shadihall.helper.DatabaseHelper;
+import org.by9steps.shadihall.helper.Prefrence;
 import org.by9steps.shadihall.model.BalSheet;
 import org.by9steps.shadihall.model.ProfitLoss;
-import org.by9steps.shadihall.model.User;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -99,6 +99,7 @@ public class DateBalSheetFragment extends Fragment implements View.OnClickListen
     int gCapital, gProfitLoss, gLiabilities, gCpl, gAssets;
 
     DatabaseHelper databaseHelper;
+    Prefrence prefrence;
     List<BalSheet> balSheetList;
 
 
@@ -148,6 +149,7 @@ public class DateBalSheetFragment extends Fragment implements View.OnClickListen
         dbs_assets.setOnClickListener(this);
 
         databaseHelper = new DatabaseHelper(getContext());
+        prefrence = new Prefrence(getContext());
 
         getBalsheet();
 
@@ -241,8 +243,7 @@ public class DateBalSheetFragment extends Fragment implements View.OnClickListen
         gCapital = 0; gProfitLoss = 0; gLiabilities = 0; gCpl = 0; gAssets = 0;
         m = 0;
 
-        List<User> list = User.listAll(User.class);
-        for (User u : list) {
+
             String query = "SELECT        CBDate, SUM(Capital) AS Capital, SUM(Expense) + SUM(Revenue) AS ProfitLoss, SUM(Liabilities) AS Liabilities, SUM(Expense) + SUM(Revenue) + SUM(Capital) + SUM(Liabilities) AS [C + P + L], SUM(Assets) AS Assets,\n" +
                     "                         ClientID\n" +
                     "FROM            (SELECT        derivedtbl_1.ClientID, derivedtbl_1.CBDate, Account1Type.AcTypeName, CAST(CASE WHEN AcTypeName = 'Expense' THEN (SUM(derivedtbl_1.Debit) - SUM(derivedtbl_1.Credit)) ELSE 0 END AS INT) AS Expense,\n" +
@@ -252,11 +253,11 @@ public class DateBalSheetFragment extends Fragment implements View.OnClickListen
                     "                                                    AS Liabilities\n" +
                     "                          FROM            (SELECT        CreditAccount AS AccountID, 0 AS Debit, Amount AS Credit, ClientID, CBDate\n" +
                     "                                                    FROM            CashBook AS CashBook\n" +
-                    "                                                    WHERE        (ClientID = " + u.getClientID() + ")\n" +
+                    "                                                    WHERE        (ClientID = " + prefrence.getClientIDSession() + ")\n" +
                     "                                                    UNION ALL\n" +
                     "                                                    SELECT        DebitAccount AS AccountID, Amount AS Debit, 0 AS Credit, ClientID, CBDate\n" +
                     "                                                    FROM            CashBook AS CashBook_1\n" +
-                    "                                                    WHERE        (ClientID = " + u.getClientID() + ")) AS derivedtbl_1 INNER JOIN\n" +
+                    "                                                    WHERE        (ClientID = " + prefrence.getClientIDSession() + ")) AS derivedtbl_1 INNER JOIN\n" +
                     "                                                    Account3Name ON derivedtbl_1.AccountID = Account3Name.AcNameID INNER JOIN\n" +
                     "                                                    Account2Group ON Account3Name.AcGroupID = Account2Group.AcGroupID INNER JOIN\n" +
                     "                                                    Account1Type ON Account2Group.AcTypeID = Account1Type.AcTypeID\n" +
@@ -264,7 +265,7 @@ public class DateBalSheetFragment extends Fragment implements View.OnClickListen
                     "GROUP BY ClientID, CBDate"+
                     orderby;
             balSheetList = databaseHelper.getBalSheet(query);
-        }
+
 
         for (BalSheet b : balSheetList) {
             String[] separated = b.getCBDate().split("-");
@@ -448,11 +449,10 @@ public class DateBalSheetFragment extends Fragment implements View.OnClickListen
             @Override
             protected Map<String, String> getParams() {
                 Map<String, String> params = new HashMap<String, String>();
-                List<User> list = User.listAll(User.class);
-                for (User u : list) {
-                    params.put("ClientID", u.getClientID());
+
+                    params.put("ClientID", prefrence.getClientIDSession());
                     params.put("Date", "1");
-                }
+
                 return params;
             }
         };

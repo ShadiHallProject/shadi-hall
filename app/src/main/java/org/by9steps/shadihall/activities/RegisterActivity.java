@@ -44,11 +44,13 @@ import com.android.volley.toolbox.StringRequest;
 import com.orm.SugarContext;
 import com.orm.util.NamingHelper;
 import com.squareup.picasso.Picasso;
+import com.whiteelephant.monthpicker.MonthPickerDialog;
 
 import org.by9steps.shadihall.AppController;
 import org.by9steps.shadihall.R;
 import org.by9steps.shadihall.adapters.SpinnerAdapter;
 import org.by9steps.shadihall.helper.InputValidation;
+import org.by9steps.shadihall.helper.Prefrence;
 import org.by9steps.shadihall.model.AreaName;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -56,9 +58,11 @@ import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Date;
 import java.util.Locale;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -79,14 +83,14 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
     TextInputEditText c_number;
     TextInputLayout login_number_layout;
     TextView login_number;
-    TextInputLayout country_layout;
-    TextView country;
-    TextInputLayout city_layout;
-    TextView city;
-    TextInputLayout sub_city_layout;
-    TextView sub_city;
-    TextInputLayout persons_layout;
-    TextInputEditText persons;
+//    TextInputLayout country_layout;
+//    TextView country;
+    TextInputLayout financial_year_layout;
+    Button financial_year;
+    TextInputLayout description_layout;
+    TextInputEditText description;
+//    TextInputLayout persons_layout;
+//    TextInputEditText persons;
     TextInputLayout website_layout;
     TextInputEditText website;
     TextInputLayout email_layout;
@@ -103,12 +107,15 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
     private final int CAMERA = 101;
     String encodedImage = "";
     String ph,type, latitude, longitude;
+    String country, city, subCity;
+    int choosenYear = 2019;
 
     //shared prefrences
     SharedPreferences sharedPreferences;
     public static final String mypreference = "mypref";
     public static final String phone = "phoneKey";
     public static final String resume = "resume";
+    Prefrence prefrence;
 
 
     @Override
@@ -129,8 +136,8 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         c_number_layout = findViewById(R.id.c_number_layout);
         login_number = findViewById(R.id.login_number);
         login_number_layout = findViewById(R.id.login_number_layout);
-        persons = findViewById(R.id.persons);
-        persons_layout = findViewById(R.id.persons_layout);
+//        persons = findViewById(R.id.persons);
+//        persons_layout = findViewById(R.id.persons_layout);
         website = findViewById(R.id.website);
         website_layout = findViewById(R.id.website_layout);
         email = findViewById(R.id.email);
@@ -138,12 +145,12 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         image = findViewById(R.id.image);
         register = findViewById(R.id.register);
         contact_list = findViewById(R.id.contactList);
-        country_layout = findViewById(R.id.country_name_layout);
-        country = findViewById(R.id.country_name);
-        city_layout = findViewById(R.id.city_name_layout);
-        city = findViewById(R.id.city_name);
-        sub_city_layout = findViewById(R.id.sub_city_name_layout);
-        sub_city = findViewById(R.id.sub_city_name);
+        financial_year_layout = findViewById(R.id.financial_year_layout);
+        financial_year = findViewById(R.id.financial_year);
+        description_layout = findViewById(R.id.description_layout);
+        description = findViewById(R.id.description);
+//        sub_city_layout = findViewById(R.id.sub_city_name_layout);
+//        sub_city = findViewById(R.id.sub_city_name);
 //        sp_country = findViewById(R.id.sp_country);
 //        sp_city = findViewById(R.id.sp_city);
 //        sp_sub_city = findViewById(R.id.sp_sub_city);
@@ -153,6 +160,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         //shared prefrences
         sharedPreferences = getSharedPreferences(mypreference,
                 Context.MODE_PRIVATE);
+        prefrence = new Prefrence(this);
 
         Intent intent = getIntent();
         if (intent != null) {
@@ -164,13 +172,13 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                 List<Address> addresses = null;
                 try {
                     addresses = geocoder.getFromLocation(Double.valueOf(latitude), Double.valueOf(longitude), 1);
-                    String subCity = addresses.get(0).getSubLocality();
-                    String countryName = addresses.get(0).getCountryName();
-                    String cityName = addresses.get(0).getLocality();
+                    city = addresses.get(0).getSubLocality();
+                    country = addresses.get(0).getCountryName();
+                    subCity = addresses.get(0).getLocality();
 
-                    country.setText("Country:  "+countryName);
-                    city.setText("City:  "+cityName);
-                    sub_city.setText("Sub City:  "+subCity);
+//                    country.setText("Country:  "+countryName);
+//                    city.setText("City:  "+cityName);
+//                    sub_city.setText("Sub City:  "+subCity);
 
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -189,9 +197,15 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
 
         }
 
+        Date date = new Date();
+        SimpleDateFormat df = new SimpleDateFormat("yyyy");
+        choosenYear = Integer.valueOf(df.format(date));
+        financial_year.setText(String.valueOf(choosenYear));
+
         register.setOnClickListener(this);
         image.setOnClickListener(this);
         contact_list.setOnClickListener(this);
+        financial_year.setOnClickListener(this);
 
         // Spinner click listener
 //        sp_country.setOnItemSelectedListener(this);
@@ -259,9 +273,9 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.register:
-                final String contry = country.getText().toString();
-                final String cty = city.getText().toString();
-                final String subCty = sub_city.getText().toString();
+//                final String contry = country.getText().toString();
+//                final String cty = city.getText().toString();
+//                final String subCty = sub_city.getText().toString();
 
                 if (!inputValidation.isInputEditTextFilled(c_name, c_name_layout, getString(R.string.error_message_c_name))) {
                     return;
@@ -291,13 +305,16 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
 //                if (!inputValidation.isInputEditTextFilled(sub_city, sub_city_layout, getString(R.string.error_message_sub_city))) {
 //                    return;
 //                }
-                if (!inputValidation.isInputEditTextFilled(persons, persons_layout, getString(R.string.error_message_persons))) {
-                    return;
-                }
+//                if (!inputValidation.isInputEditTextFilled(persons, persons_layout, getString(R.string.error_message_persons))) {
+//                    return;
+//                }
                 if (!inputValidation.isInputEditTextFilled(website, website_layout, getString(R.string.error_message_website))) {
                     return;
                 }
                 if (!inputValidation.isInputEditTextFilled(email, email_layout, getString(R.string.error_message_email))) {
+                    return;
+                }
+                if (!inputValidation.isInputEditTextFilled(description, description_layout, getString(R.string.error_message_description))) {
                     return;
                 }
                 if (encodedImage.isEmpty() || encodedImage.equals("")){
@@ -341,6 +358,9 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                                                 pDialog.dismiss();
                                                 String message = jsonObj.getString("message");
                                                 Toast.makeText(RegisterActivity.this, message, Toast.LENGTH_SHORT).show();
+                                            }else {
+                                                pDialog.dismiss();
+                                                Toast.makeText(RegisterActivity.this, response, Toast.LENGTH_SHORT).show();
                                             }
 
                                         } catch (JSONException e) {
@@ -367,17 +387,19 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                                 params.put("NameOfPerson", name_of_person.getText().toString());
                                 params.put("LoginMobileNo", login_number.getText().toString());
                                 params.put("Email", email.getText().toString());
-                                params.put("Country", contry);
+                                params.put("Country", country);
                                 params.put("Password", password.getText().toString());
-                                params.put("City", cty);
-                                params.put("SubCity", subCty);
+                                params.put("City", city);
+                                params.put("SubCity", subCity);
                                 params.put("Website", website.getText().toString());
-                                params.put("CapacityOfPersons", persons.getText().toString());
+                                params.put("CapacityOfPersons", "0");
                                 params.put("CompanyLogo", encodedImage);
                                 params.put("DisplayImage", encodedImage);
                                 params.put("Lat", latitude);
                                 params.put("Lng", longitude);
-                                params.put("ProjectID", "2");
+                                params.put("ProjectID", prefrence.getProjectIDSession());
+                                params.put("BusinessDescriptions", description.getText().toString());
+                                params.put("FinancialYear", financial_year.getText().toString());
                                 return params;
                             }
                         };
@@ -419,6 +441,20 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
             case R.id.contactList:
                 Intent intent = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);
                 startActivityForResult(intent, 1);
+                break;
+            case R.id.financial_year:
+                MonthPickerDialog.Builder builde = new MonthPickerDialog.Builder(RegisterActivity.this, new MonthPickerDialog.OnDateSetListener() {
+                    @Override
+                    public void onDateSet(int selectedMonth, int selectedYear) {
+                        financial_year.setText(Integer.toString(selectedYear));
+                        choosenYear = selectedYear;
+                    }
+                }, choosenYear, 0);
+
+                builde.showYearOnly()
+                        .setYearRange(1990, 2050)
+                        .build()
+                        .show();
                 break;
 
         }
@@ -566,7 +602,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                                     name_of_person.setText(pName);
                                     email.setText(cMail);
                                     website.setText(cWebsite);
-                                    persons.setText(cPersons);
+//                                    persons.setText(cPersons);
 
                                     pDialog.dismiss();
                                 }

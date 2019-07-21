@@ -1,52 +1,26 @@
 package org.by9steps.shadihall.activities;
 
 import android.Manifest;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
-import android.widget.Toast;
 
-import com.android.volley.DefaultRetryPolicy;
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.RetryPolicy;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
+import com.crashlytics.android.Crashlytics;
 import com.nabinbhandari.android.permissions.PermissionHandler;
 import com.nabinbhandari.android.permissions.Permissions;
 import com.orm.SugarContext;
 
-import org.by9steps.shadihall.AppController;
 import org.by9steps.shadihall.R;
-import org.by9steps.shadihall.helper.DatabaseHelper;
-import org.by9steps.shadihall.model.Account1Type;
-import org.by9steps.shadihall.model.Account2Group;
-import org.by9steps.shadihall.model.Account3Name;
-import org.by9steps.shadihall.model.Bookings;
-import org.by9steps.shadihall.model.CashBook;
-import org.by9steps.shadihall.model.UpdateDate;
-import org.by9steps.shadihall.model.User;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+
+import io.fabric.sdk.android.Fabric;
 
 
 public class SplashActivity extends AppCompatActivity {
@@ -76,6 +50,7 @@ public class SplashActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
         SugarContext.init(this);
+        Fabric.with(this, new Crashlytics());
 
         //shared prefrences
         sharedPreferences = getSharedPreferences(mypreference,
@@ -113,6 +88,7 @@ public class SplashActivity extends AppCompatActivity {
                 finish();
             }
         });
+//        Crashlytics.getInstance().crash();
     }
 
 }

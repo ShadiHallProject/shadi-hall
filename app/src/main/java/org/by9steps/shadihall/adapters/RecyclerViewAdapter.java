@@ -14,12 +14,10 @@ import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 
-import org.by9steps.shadihall.AppController;
 import org.by9steps.shadihall.R;
 import org.by9steps.shadihall.activities.GeneralLedgerActivity;
 import org.by9steps.shadihall.activities.MenuClickActivity;
 import org.by9steps.shadihall.helper.Prefrence;
-import org.by9steps.shadihall.model.Menu;
 import org.by9steps.shadihall.model.ProjectMenu;
 
 import java.util.List;

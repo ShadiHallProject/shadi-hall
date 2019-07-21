@@ -56,10 +56,6 @@ import org.by9steps.shadihall.activities.CashCollectionActivity;
 import org.by9steps.shadihall.helper.DatabaseHelper;
 import org.by9steps.shadihall.model.Bookings;
 import org.by9steps.shadihall.model.CashBook;
-import org.by9steps.shadihall.model.User;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -161,10 +157,9 @@ public class BookingDetailFragment extends Fragment implements View.OnClickListe
         databaseHelper = new DatabaseHelper(getContext());
 
         String query = "";
-        List<User> list = User.listAll(User.class);
-        for (User u: list) {
-            query = "SELECT * FROM Booking WHERE BookingID = '" + eventID+"'";
-        }
+
+        query = "SELECT * FROM Booking WHERE BookingID = '" + eventID+"'";
+
         bookingList = databaseHelper.getBookings(query);
         Log.e("Booking",String.valueOf(bookingList.size()));
 

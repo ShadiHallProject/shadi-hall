@@ -49,11 +49,10 @@ import org.by9steps.shadihall.activities.CashCollectionActivity;
 import org.by9steps.shadihall.activities.EventCashBookActivity;
 import org.by9steps.shadihall.fragments.BookingDetailFragment;
 import org.by9steps.shadihall.helper.DatabaseHelper;
+import org.by9steps.shadihall.helper.Prefrence;
 import org.by9steps.shadihall.model.Bookings;
 import org.by9steps.shadihall.model.CashBook;
 import org.by9steps.shadihall.model.Recovery;
-import org.by9steps.shadihall.model.Reports;
-import org.by9steps.shadihall.model.User;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -71,9 +70,14 @@ public class RecoveryAdapter extends RecyclerView.Adapter {
     private Context mCtx;
     List<Recovery> mList;
 
+    Prefrence prefrence;
+    DatabaseHelper databaseHelper;
+
     public RecoveryAdapter(Context mCtx, List<Recovery> mList) {
         this.mCtx = mCtx;
         this.mList = mList;
+        prefrence = new Prefrence(mCtx);
+        databaseHelper = new DatabaseHelper(mCtx);
     }
 
     @NonNull
@@ -148,32 +152,32 @@ public class RecoveryAdapter extends RecyclerView.Adapter {
                 }
             });
 
-            List<User> list = User.listAll(User.class);
-            for (final User u : list) {
+            ((ItemViewHolder) viewHolder).add.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(mCtx, EventCashBookActivity.class);
+                    String incomeID = databaseHelper.getID("SELECT AcNameID FROM Account3Name WHERE ClientID = "+prefrence.getClientIDSession()+" and AcName = 'Booking Income'");
+                    intent.putExtra("CreditAc", incomeID);
+                    intent.putExtra("BookingId", recovery.getBookingID());
+                    intent.putExtra("Type", "Income");
+                    mCtx.startActivity(intent);
 
-                ((ItemViewHolder) viewHolder).add.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Intent intent = new Intent(mCtx, EventCashBookActivity.class);
-                        intent.putExtra("CreditAc", u.getBookingIncomeID());
-                        intent.putExtra("BookingId", recovery.getBookingID());
-                        intent.putExtra("Type", "Income");
-                        mCtx.startActivity(intent);
+                }
+            });
 
-                    }
-                });
+            ((ItemViewHolder) viewHolder).add_expense.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(mCtx, EventCashBookActivity.class);
+                    String expenseID = databaseHelper.getID("SELECT AcNameID FROM Account3Name WHERE ClientID = "+prefrence.getClientIDSession()+" and AcName = 'Booking Expense'");
+                    intent.putExtra("CreditAc", expenseID);
+                    intent.putExtra("BookingId", recovery.getBookingID());
+                    intent.putExtra("Type", "Expense");
+                    mCtx.startActivity(intent);
+                }
+            });
 
-                ((ItemViewHolder) viewHolder).add_expense.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Intent intent = new Intent(mCtx, EventCashBookActivity.class);
-                        intent.putExtra("CreditAc", u.getBookingExpenseID());
-                        intent.putExtra("BookingId", recovery.getBookingID());
-                        intent.putExtra("Type", "Expense");
-                        mCtx.startActivity(intent);
-                    }
-                });
-            }
+
         }else if (recovery.isRow() == 2){
             ((TotalViewHolder) viewHolder).recieved.setText(recovery.getRecieved());
             ((TotalViewHolder) viewHolder).expensed.setText(recovery.getExpensed());
@@ -276,7 +280,6 @@ public class RecoveryAdapter extends RecyclerView.Adapter {
     private File pdfFile;
     List<Bookings> bookingList;
     List<CashBook> cashBookList;
-    DatabaseHelper databaseHelper;
 
     public void createPdf(String id) throws IOException, DocumentException {
 

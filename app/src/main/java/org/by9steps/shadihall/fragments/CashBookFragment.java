@@ -75,6 +75,7 @@ import com.itextpdf.text.pdf.PdfName;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfPageEventHelper;
+import com.itextpdf.text.pdf.PdfReader;
 import com.itextpdf.text.pdf.PdfTemplate;
 import com.itextpdf.text.pdf.PdfWriter;
 
@@ -85,6 +86,7 @@ import org.by9steps.shadihall.activities.CashCollectionActivity;
 import org.by9steps.shadihall.activities.SplashActivity;
 import org.by9steps.shadihall.adapters.CashBookAdapter;
 import org.by9steps.shadihall.helper.DatabaseHelper;
+import org.by9steps.shadihall.helper.Prefrence;
 import org.by9steps.shadihall.model.Account3Name;
 import org.by9steps.shadihall.model.Bookings;
 import org.by9steps.shadihall.model.CBSetting;
@@ -93,7 +95,6 @@ import org.by9steps.shadihall.model.CashBook;
 import org.by9steps.shadihall.model.CashEntry;
 import org.by9steps.shadihall.model.TableSession;
 import org.by9steps.shadihall.model.UpdateDate;
-import org.by9steps.shadihall.model.User;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -132,6 +133,7 @@ public class CashBookFragment extends Fragment implements OnItemSelectedListener
     List<CashEntry> filterd;
     CashBookAdapter adapter;
     DatabaseHelper databaseHelper;
+    Prefrence prefrence;
 
     int m = 0, amount, gAmount , filter;
     Boolean listSorting = false;
@@ -148,6 +150,8 @@ public class CashBookFragment extends Fragment implements OnItemSelectedListener
     String d = "0";
     int tot = 0;
     String value = "Complete CashBook", f = "No";
+    String updatedDate;
+    String cashID, incomeID, expenseID;
 
     public CashBookFragment() {
         // Required empty public constructor
@@ -180,6 +184,7 @@ public class CashBookFragment extends Fragment implements OnItemSelectedListener
         tv_amount = view.findViewById(R.id.tv_amount);
 
         databaseHelper = new DatabaseHelper(getContext());
+        prefrence = new Prefrence(getContext());
 
         spinner.setOnItemSelectedListener(this);
         tv_date.setOnClickListener(this);
@@ -198,12 +203,6 @@ public class CashBookFragment extends Fragment implements OnItemSelectedListener
         categories.add("Cre Account");
         categories.add("Remarks");
         categories.add("Amount");
-
-        List<TableSession> tableSessions = TableSession.find(TableSession.class,"table_Name = ?","CashBook");
-        for (TableSession t : tableSessions){
-            Log.e("MAX ID", t.getMaxID());
-            Log.e("DATE",t.getUpdateDate());
-        }
 
         // Creating adapter for spinner
         ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_spinner_item, categories);
@@ -372,25 +371,22 @@ public class CashBookFragment extends Fragment implements OnItemSelectedListener
         gAmount = 0;
         String query = "";
 
-        List<User> list = User.listAll(User.class);
-        for (User u : list){
-            query = "SELECT      CashBook.ID, CashBook.CashBookID, CashBook.CBDate, CashBook.DebitAccount, CashBook.CreditAccount, CashBook.CBRemarks, CashBook.Amount, CashBook.ClientID, CashBook.ClientUserID, CashBook.BookingID, \n" +
-                    "                         Account3Name.AcName AS DebitAccountName, Account3Name_1.AcName AS CreditAccountName, Account3Name_2.AcName AS UserName, CashBook.UpdatedDate\n" +
+            query = "SELECT      CashBook.ID, CashBook.CashBookID, CashBook.CBDate, CashBook.DebitAccount, CashBook.CreditAccount, CashBook.CBRemarks, CashBook.Amount, CashBook.ClientID, CashBook.ClientUserID, CashBook.TableID, \n" +
+                    "                         Account3Name.AcName AS DebitAccountName, Account3Name_1.AcName AS CreditAccountName, Account3Name_2.AcName AS UserName, CashBook.UpdatedDate, CashBook.SerialNo\n" +
                     "FROM            CashBook LEFT OUTER JOIN\n" +
                     "                         Account3Name AS Account3Name_1 ON CashBook.CreditAccount = Account3Name_1.AcNameID LEFT OUTER JOIN\n" +
                     "                         Account3Name AS Account3Name_2 ON CashBook.ClientUserID = Account3Name_2.AcNameID LEFT OUTER JOIN\n" +
                     "                         Account3Name ON CashBook.DebitAccount = Account3Name.AcNameID\n" +
-                    "WHERE        (CashBook.ClientID = "+u.getClientID()+")" + orderby;
-            Log.e("CASHBOOK QUERY",query);
+                    "WHERE        (CashBook.ClientID = "+prefrence.getClientIDSession()+")" + orderby;
             cashBooksList = databaseHelper.getCashBookEntry(query);
-        }
+
             for (CashBook c : cashBooksList){
 
                 String[] separated = c.getCBDate().split("-");
 
                 if (m == 0) {
                     mList.add(CashEntry.createSection(separated[0]+"/"+separated[1]+"/"+separated[2]));
-                    mList.add(CashEntry.createRow(c.getCashBookID(),c.getCBDate(),c.getDebitAccount(),c.getCreditAccount(),c.getCBRemarks(),c.getAmount(),c.getClientID(),c.getClientUserID(),c.getBookingID(),c.getDebitAccountName(),c.getCreditAccountName(),c.getUserName(), c.getUpdatedDate()));
+                    mList.add(CashEntry.createRow(c.getCashBookID(),c.getCBDate(),c.getDebitAccount(),c.getCreditAccount(),c.getCBRemarks(),c.getAmount(),c.getClientID(),c.getClientUserID(),c.getTableID(),c.getDebitAccountName(),c.getCreditAccountName(),c.getUserName(), c.getUpdatedDate()));
                     m = Integer.valueOf(separated[2]);
 
                     amount = Integer.valueOf(c.getAmount()) + amount;
@@ -398,7 +394,7 @@ public class CashBookFragment extends Fragment implements OnItemSelectedListener
                 }else if (m == Integer.valueOf(separated[2])){
                     amount = Integer.valueOf(c.getAmount()) + amount;
                     gAmount = Integer.valueOf(c.getAmount()) + gAmount;
-                    mList.add(CashEntry.createRow(c.getCashBookID(),c.getCBDate(),c.getDebitAccount(),c.getCreditAccount(),c.getCBRemarks(),c.getAmount(),c.getClientID(),c.getClientUserID(),c.getBookingID(),c.getDebitAccountName(),c.getCreditAccountName(),c.getUserName(), c.getUpdatedDate()));
+                    mList.add(CashEntry.createRow(c.getCashBookID(),c.getCBDate(),c.getDebitAccount(),c.getCreditAccount(),c.getCBRemarks(),c.getAmount(),c.getClientID(),c.getClientUserID(),c.getTableID(),c.getDebitAccountName(),c.getCreditAccountName(),c.getUserName(), c.getUpdatedDate()));
                 }else {
                     mList.add(CashEntry.createTotal(String.valueOf(amount)));
                     amount = 0;
@@ -406,7 +402,7 @@ public class CashBookFragment extends Fragment implements OnItemSelectedListener
                     gAmount = Integer.valueOf(c.getAmount()) + gAmount;
 
                     mList.add(CashEntry.createSection(separated[0]+"/"+separated[1]+"/"+separated[2]));
-                    mList.add(CashEntry.createRow(c.getCashBookID(),c.getCBDate(),c.getDebitAccount(),c.getCreditAccount(),c.getCBRemarks(),c.getAmount(),c.getClientID(),c.getClientUserID(),c.getBookingID(),c.getDebitAccountName(),c.getCreditAccountName(),c.getUserName(), c.getUpdatedDate()));
+                    mList.add(CashEntry.createRow(c.getCashBookID(),c.getCBDate(),c.getDebitAccount(),c.getCreditAccount(),c.getCBRemarks(),c.getAmount(),c.getClientID(),c.getClientUserID(),c.getTableID(),c.getDebitAccountName(),c.getCreditAccountName(),c.getUserName(), c.getUpdatedDate()));
                     m = Integer.valueOf(separated[2]);
                 }
             }
@@ -580,8 +576,6 @@ public class CashBookFragment extends Fragment implements OnItemSelectedListener
         gAmount = 0;
         String query = "";
 
-        List<User> list = User.listAll(User.class);
-        for (User u : list){
 
             query = "SELECT        CashBook.CashBookID, CashBook.CBDate, CashBook.DebitAccount, CashBook.CreditAccount, CashBook.CBRemarks, CashBook.Amount, CashBook.ClientID, CashBook.ClientUserID, CashBook.BookingID, \n" +
                     "                         Account3Name.AcName AS DebitAccountName, Account3Name_1.AcName AS CreditAccountName, Account3Name_2.AcName AS UserName, CashBook.UpdatedDate\n" +
@@ -589,9 +583,8 @@ public class CashBookFragment extends Fragment implements OnItemSelectedListener
                     "                         Account3Name AS Account3Name_1 ON CashBook.CreditAccount = Account3Name_1.AcNameID LEFT OUTER JOIN\n" +
                     "                         Account3Name AS Account3Name_2 ON CashBook.ClientUserID = Account3Name_2.AcNameID LEFT OUTER JOIN\n" +
                     "                         Account3Name ON CashBook.DebitAccount = Account3Name.AcNameID\n" +
-                    "WHERE        (CashBook.ClientID = "+u.getClientID()+" AND CashBook.CBDate >= Datetime('"+fDate1+"') AND CashBook.CBDate <= Datetime('"+fDate2+"'))";
+                    "WHERE        (CashBook.ClientID = "+prefrence.getClientIDSession()+" AND CashBook.CBDate >= Datetime('"+fDate1+"') AND CashBook.CBDate <= Datetime('"+fDate2+"'))";
             cashBooksList = databaseHelper.getCashBookEntry(query);
-        }
 
 
         if (listSorting){
@@ -599,7 +592,7 @@ public class CashBookFragment extends Fragment implements OnItemSelectedListener
                 String[] separated = cashBooksList.get(i).getCBDate().split("-");
                 if (m == 0) {
                     mList.add(CashEntry.createSection(separated[0]+"/"+separated[1]));
-                    mList.add(CashEntry.createRow(cashBooksList.get(i).getCashBookID(),cashBooksList.get(i).getCBDate(),cashBooksList.get(i).getDebitAccount(),cashBooksList.get(i).getCreditAccount(),cashBooksList.get(i).getCBRemarks(),cashBooksList.get(i).getAmount(),cashBooksList.get(i).getClientID(),cashBooksList.get(i).getClientUserID(),cashBooksList.get(i).getBookingID(),cashBooksList.get(i).getDebitAccountName(),cashBooksList.get(i).getCreditAccountName(),cashBooksList.get(i).getUserName(), cashBooksList.get(i).getUpdatedDate()));
+                    mList.add(CashEntry.createRow(cashBooksList.get(i).getCashBookID(),cashBooksList.get(i).getCBDate(),cashBooksList.get(i).getDebitAccount(),cashBooksList.get(i).getCreditAccount(),cashBooksList.get(i).getCBRemarks(),cashBooksList.get(i).getAmount(),cashBooksList.get(i).getClientID(),cashBooksList.get(i).getClientUserID(),cashBooksList.get(i).getTableID(),cashBooksList.get(i).getDebitAccountName(),cashBooksList.get(i).getCreditAccountName(),cashBooksList.get(i).getUserName(), cashBooksList.get(i).getUpdatedDate()));
                     m = Integer.valueOf(separated[1]);
 
                     amount = Integer.valueOf(cashBooksList.get(i).getAmount()) + amount;
@@ -607,7 +600,7 @@ public class CashBookFragment extends Fragment implements OnItemSelectedListener
                 }else if (m == Integer.valueOf(separated[1])){
                     amount = Integer.valueOf(cashBooksList.get(i).getAmount()) + amount;
                     gAmount = Integer.valueOf(cashBooksList.get(i).getAmount()) + gAmount;
-                    mList.add(CashEntry.createRow(cashBooksList.get(i).getCashBookID(),cashBooksList.get(i).getCBDate(),cashBooksList.get(i).getDebitAccount(),cashBooksList.get(i).getCreditAccount(),cashBooksList.get(i).getCBRemarks(),cashBooksList.get(i).getAmount(),cashBooksList.get(i).getClientID(),cashBooksList.get(i).getClientUserID(),cashBooksList.get(i).getBookingID(),cashBooksList.get(i).getDebitAccountName(),cashBooksList.get(i).getCreditAccountName(),cashBooksList.get(i).getUserName(), cashBooksList.get(i).getUpdatedDate()));
+                    mList.add(CashEntry.createRow(cashBooksList.get(i).getCashBookID(),cashBooksList.get(i).getCBDate(),cashBooksList.get(i).getDebitAccount(),cashBooksList.get(i).getCreditAccount(),cashBooksList.get(i).getCBRemarks(),cashBooksList.get(i).getAmount(),cashBooksList.get(i).getClientID(),cashBooksList.get(i).getClientUserID(),cashBooksList.get(i).getTableID(),cashBooksList.get(i).getDebitAccountName(),cashBooksList.get(i).getCreditAccountName(),cashBooksList.get(i).getUserName(), cashBooksList.get(i).getUpdatedDate()));
                 }else {
                     mList.add(CashEntry.createTotal(String.valueOf(amount)));
                     amount = 0;
@@ -615,7 +608,7 @@ public class CashBookFragment extends Fragment implements OnItemSelectedListener
                     gAmount = Integer.valueOf(cashBooksList.get(i).getAmount()) + gAmount;
 
                     mList.add(CashEntry.createSection(separated[0]+"/"+separated[1]));
-                    mList.add(CashEntry.createRow(cashBooksList.get(i).getCashBookID(),cashBooksList.get(i).getCBDate(),cashBooksList.get(i).getDebitAccount(),cashBooksList.get(i).getCreditAccount(),cashBooksList.get(i).getCBRemarks(),cashBooksList.get(i).getAmount(),cashBooksList.get(i).getClientID(),cashBooksList.get(i).getClientUserID(),cashBooksList.get(i).getBookingID(),cashBooksList.get(i).getDebitAccountName(),cashBooksList.get(i).getCreditAccountName(),cashBooksList.get(i).getUserName(), cashBooksList.get(i).getUpdatedDate()));
+                    mList.add(CashEntry.createRow(cashBooksList.get(i).getCashBookID(),cashBooksList.get(i).getCBDate(),cashBooksList.get(i).getDebitAccount(),cashBooksList.get(i).getCreditAccount(),cashBooksList.get(i).getCBRemarks(),cashBooksList.get(i).getAmount(),cashBooksList.get(i).getClientID(),cashBooksList.get(i).getClientUserID(),cashBooksList.get(i).getTableID(),cashBooksList.get(i).getDebitAccountName(),cashBooksList.get(i).getCreditAccountName(),cashBooksList.get(i).getUserName(), cashBooksList.get(i).getUpdatedDate()));
                     m = Integer.valueOf(separated[1]);
                 }
             }
@@ -626,7 +619,7 @@ public class CashBookFragment extends Fragment implements OnItemSelectedListener
 
                 if (m == 0) {
                     mList.add(CashEntry.createSection(separated[0]+"/"+separated[1]));
-                    mList.add(CashEntry.createRow(c.getCashBookID(),c.getCBDate(),c.getDebitAccount(),c.getCreditAccount(),c.getCBRemarks(),c.getAmount(),c.getClientID(),c.getClientUserID(),c.getBookingID(),c.getDebitAccountName(),c.getCreditAccountName(),c.getUserName(), c.getUpdatedDate()));
+                    mList.add(CashEntry.createRow(c.getCashBookID(),c.getCBDate(),c.getDebitAccount(),c.getCreditAccount(),c.getCBRemarks(),c.getAmount(),c.getClientID(),c.getClientUserID(),c.getTableID(),c.getDebitAccountName(),c.getCreditAccountName(),c.getUserName(), c.getUpdatedDate()));
                     m = Integer.valueOf(separated[1]);
 
                     amount = Integer.valueOf(c.getAmount()) + amount;
@@ -634,7 +627,7 @@ public class CashBookFragment extends Fragment implements OnItemSelectedListener
                 }else if (m == Integer.valueOf(separated[1])){
                     amount = Integer.valueOf(c.getAmount()) + amount;
                     gAmount = Integer.valueOf(c.getAmount()) + gAmount;
-                    mList.add(CashEntry.createRow(c.getCashBookID(),c.getCBDate(),c.getDebitAccount(),c.getCreditAccount(),c.getCBRemarks(),c.getAmount(),c.getClientID(),c.getClientUserID(),c.getBookingID(),c.getDebitAccountName(),c.getCreditAccountName(),c.getUserName(), c.getUpdatedDate()));
+                    mList.add(CashEntry.createRow(c.getCashBookID(),c.getCBDate(),c.getDebitAccount(),c.getCreditAccount(),c.getCBRemarks(),c.getAmount(),c.getClientID(),c.getClientUserID(),c.getTableID(),c.getDebitAccountName(),c.getCreditAccountName(),c.getUserName(), c.getUpdatedDate()));
                 }else {
                     mList.add(CashEntry.createTotal(String.valueOf(amount)));
                     amount = 0;
@@ -642,7 +635,7 @@ public class CashBookFragment extends Fragment implements OnItemSelectedListener
                     gAmount = Integer.valueOf(c.getAmount()) + gAmount;
 
                     mList.add(CashEntry.createSection(separated[0]+"/"+separated[1]));
-                    mList.add(CashEntry.createRow(c.getCashBookID(),c.getCBDate(),c.getDebitAccount(),c.getCreditAccount(),c.getCBRemarks(),c.getAmount(),c.getClientID(),c.getClientUserID(),c.getBookingID(),c.getDebitAccountName(),c.getCreditAccountName(),c.getUserName(), c.getUpdatedDate()));
+                    mList.add(CashEntry.createRow(c.getCashBookID(),c.getCBDate(),c.getDebitAccount(),c.getCreditAccount(),c.getCBRemarks(),c.getAmount(),c.getClientID(),c.getClientUserID(),c.getTableID(),c.getDebitAccountName(),c.getCreditAccountName(),c.getUserName(), c.getUpdatedDate()));
                     m = Integer.valueOf(separated[1]);
                 }
             }
@@ -1107,6 +1100,11 @@ public class CashBookFragment extends Fragment implements OnItemSelectedListener
     //FOR TESTING CASHBOOK
 
     public void refereshTables(Context context){
+
+        cashID = databaseHelper.getID("SELECT AcNameID FROM Account3Name WHERE ClientID = "+prefrence.getClientIDSession()+" and AcName = 'Cash'");
+        incomeID = databaseHelper.getID("SELECT AcNameID FROM Account3Name WHERE ClientID = "+prefrence.getClientIDSession()+" and AcName = 'Booking Income'");
+        expenseID = databaseHelper.getID("SELECT AcNameID FROM Account3Name WHERE ClientID = "+prefrence.getClientIDSession()+" and AcName = 'Booking Expense'");
+
         databaseHelper = new DatabaseHelper(context);
         mProgress = new ProgressDialog(context);
         mProgress.setMessage("Loading...");
@@ -1160,16 +1158,16 @@ public class CashBookFragment extends Fragment implements OnItemSelectedListener
                                     String SessionDate = jsonObject.getString("SessionDate");
 
                                     databaseHelper.createAccount3Name(new Account3Name(AcNameID,AcName,AcGroupID,AcAddress,AcMobileNo,AcContactNo,AcEmailAddress,AcDebitBal,AcCreditBal,AcPassward,ClientID,ClientUserID,SysCode,NetCode,UpdatedDate,SerialNo,UserRights,SecurityRights,Salary));
-
-                                    if (i == jsonArray.length() - 1) {
-                                        List<TableSession> se = TableSession.find(TableSession.class,"table_Name = ?","Account3Name");
-                                        for (TableSession s : se){
-                                            s.setMaxID(AcNameID);
-                                            s.setInsertDate(SessionDate);
-                                            s.save();
-                                        }
-
-                                    }
+                                    updatedDate = SessionDate;
+//                                    if (i == jsonArray.length() - 1) {
+//                                        List<TableSession> se = TableSession.find(TableSession.class,"table_Name = ?","Account3Name");
+//                                        for (TableSession s : se){
+//                                            s.setMaxID(AcNameID);
+//                                            s.setInsertDate(SessionDate);
+//                                            s.save();
+//                                        }
+//
+//                                    }
 
                                 }
 
@@ -1193,16 +1191,10 @@ public class CashBookFragment extends Fragment implements OnItemSelectedListener
             @Override
             protected Map<String, String> getParams() {
                 Map<String, String> params = new HashMap<String, String>();
-                List<User> list = User.listAll(User.class);
-                for (User u : list) {
-                    params.put("ClientID", u.getClientID());
-                    Log.e("SAREM",u.getClientID());
-                }
-                List<TableSession> tableSessions = TableSession.find(TableSession.class,"table_Name = ?","Account3Name");
-                for (TableSession t : tableSessions){
-                    params.put("MaxID",t.getMaxID());
-                    Log.e("SAREM",t.getMaxID());
-                }
+
+                params.put("ClientID", prefrence.getClientIDSession());
+                int maxID = databaseHelper.getMaxValue("SELECT max(CAST(AcNameID AS Int)) FROM Account3Name");
+                params.put("MaxID", String.valueOf(maxID));
                 return params;
             }
         };
@@ -1260,15 +1252,15 @@ public class CashBookFragment extends Fragment implements OnItemSelectedListener
                                             + "', ClientID = '"+ClientID+"', ClientUserID = '"+ClientUserID+"', SysCode = '"+SysCode+"', NetCode = '"+NetCode+"', UpdatedDate = '"+UpdatedDate+"', SerialNo = '"+SerialNo
                                             +"', UserRights = '"+UserRights+"', SecurityRights = '"+SecurityRights+"', Salary '"+Salary+"' WHERE AcNameID = "+AcNameID;
                                     databaseHelper.updateAccount3Name(query);
-
-                                    if (i == jsonArray.length() - 1) {
-                                        List<TableSession> se = TableSession.find(TableSession.class,"table_Name = ?","Account3Name");
-                                        for (TableSession s : se){
-//                                            s.setMaxID(AcNameID);
-                                            s.setUpdateDate(SessionDate);
-                                            s.save();
-                                        }
-                                    }
+                                    updatedDate = SessionDate;
+//                                    if (i == jsonArray.length() - 1) {
+//                                        List<TableSession> se = TableSession.find(TableSession.class,"table_Name = ?","Account3Name");
+//                                        for (TableSession s : se){
+////                                            s.setMaxID(AcNameID);
+//                                            s.setUpdateDate(SessionDate);
+//                                            s.save();
+//                                        }
+//                                    }
 
                                 }
 
@@ -1292,16 +1284,13 @@ public class CashBookFragment extends Fragment implements OnItemSelectedListener
             @Override
             protected Map<String, String> getParams() {
                 Map<String, String> params = new HashMap<String, String>();
-                List<User> list = User.listAll(User.class);
-                for (User u : list) {
-                    params.put("ClientID", u.getClientID());
-                }
-                List<TableSession> tableSessions = TableSession.find(TableSession.class,"table_Name = ?","Account3Name");
-                for (TableSession t : tableSessions){
-                    params.put("MaxID",t.getMaxID());
-                    params.put("SessionDate",t.getUpdateDate());
-                    Log.e("SAREM",t.getUpdateDate());
-                }
+
+                params.put("ClientID", prefrence.getClientIDSession());
+                int maxID = databaseHelper.getMaxValue("SELECT max(CAST(AcNameID AS Int)) FROM Account3Name");
+                params.put("MaxID",String.valueOf(maxID));
+                String date = databaseHelper.getClientUpdatedDate(prefrence.getClientIDSession());
+                params.put("SessionDate",date);
+
                 return params;
             }
         };
@@ -1350,21 +1339,25 @@ public class CashBookFragment extends Fragment implements OnItemSelectedListener
                                     String UpdatedDate = jsonObject.getString("UpdatedDate");
 //                                    JSONObject jb = new JSONObject(ed);
 //                                    String UpdatedDate = jb.getString("date");
-                                    String BookingID = jsonObject.getString("BookingID");
+                                    String TableID = jsonObject.getString("TableID");
                                     String SessionDate = jsonObject.getString("SessionDate");
+                                    String SerialNo = jsonObject.getString("SerialNo");
+                                    String TableName = jsonObject.getString("TableName");
 
-                                    databaseHelper.createCashBook(new CashBook(CashBookID,CBDate1,DebitAccount,CreditAccount,CBRemark,Amount,ClientID,ClientUserID,NetCode,SysCode,UpdatedDate,BookingID));
-
-                                    if (i == jsonArray.length() - 1) {
-                                        List<TableSession> se = TableSession.find(TableSession.class,"table_Name = ?","CashBook");
-                                        for (TableSession s : se){
-                                            s.setMaxID(CashBookID);
-                                            s.setInsertDate(SessionDate);
-                                            s.save();
-                                        }
-                                    }
+                                    databaseHelper.createCashBook(new CashBook(CashBookID,CBDate1,DebitAccount,CreditAccount,CBRemark,Amount,ClientID,ClientUserID,NetCode,SysCode,UpdatedDate,TableID, SerialNo, TableName));
+                                    updatedDate = SessionDate;
+//                                    if (i == jsonArray.length() - 1) {
+//                                        List<TableSession> se = TableSession.find(TableSession.class,"table_Name = ?","CashBook");
+//                                        for (TableSession s : se){
+//                                            s.setMaxID(CashBookID);
+//                                            s.setInsertDate(SessionDate);
+//                                            s.save();
+//                                        }
+//                                    }
                                     getCashBook();
+
                                 }
+
                             }else {
                                 String message = jsonObj.getString("message");
 //                                Toast.makeText(SplashActivity.this, message, Toast.LENGTH_SHORT).show();
@@ -1387,14 +1380,14 @@ public class CashBookFragment extends Fragment implements OnItemSelectedListener
             @Override
             protected Map<String, String> getParams() {
                 Map<String, String> params = new HashMap<String, String>();
-                List<User> list = User.listAll(User.class);
-                for (User u : list) {
-                    params.put("ClientID", u.getClientID());
-                }
-                List<TableSession> tableSessions = TableSession.find(TableSession.class,"table_Name = ?","CashBook");
-                for (TableSession t : tableSessions){
-                    params.put("MaxID",t.getMaxID());
-                }
+
+                params.put("ClientID", prefrence.getClientIDSession());
+                int maxID = databaseHelper.getMaxValue("SELECT max(CAST(CashBookID AS Int)) FROM CashBook");
+                Log.e("MAXIDCASH", String.valueOf(maxID));
+                params.put("MaxID",String.valueOf(maxID));
+
+                Log.e("MAXID",String.valueOf(maxID));
+
                 return params;
             }
         };
@@ -1444,23 +1437,24 @@ public class CashBookFragment extends Fragment implements OnItemSelectedListener
                                     String UpdatedDate = jsonObject.getString("UpdatedDate");
 //                                    JSONObject jb = new JSONObject(ed);
 //                                    String UpdatedDate = jb.getString("date");
-                                    String BookingID = jsonObject.getString("BookingID");
+                                    String TableID = jsonObject.getString("TableID");
                                     String SessionDate = jsonObject.getString("SessionDate");
 
-                                    String query = "UPDATE CashBook SET CBDate = '"+CBDate1+"', DebitAccount = '"+DebitAccount+"', CreditAccount = '"+CreditAccount+"', CBRemarks = '"+CBRemark+"', Amount = '"+Amount+"', ClientID = '"+ClientID+"', ClientUserID = '"+ClientUserID+"', NetCode = '"+NetCode+"', SysCode = '"+SysCode+"', UpdatedDate = '"+UpdatedDate+"', BookingID = '"+BookingID+
+                                    String query = "UPDATE CashBook SET CBDate = '"+CBDate1+"', DebitAccount = '"+DebitAccount+"', CreditAccount = '"+CreditAccount+"', CBRemarks = '"+CBRemark+"', Amount = '"+Amount+"', ClientID = '"+ClientID+"', ClientUserID = '"+ClientUserID+"', NetCode = '"+NetCode+"', SysCode = '"+SysCode+"', UpdatedDate = '"+UpdatedDate+"', TableID = '"+TableID+
                                             "' WHERE CashBookID = "+CashBookID;
                                     databaseHelper.updateCashBook(query);
-
-                                    if (i == jsonArray.length() - 1) {
-                                        List<TableSession> se = TableSession.find(TableSession.class,"table_Name = ?","CashBook");
-                                        for (TableSession s : se){
-//                                            s.setMaxID(CashBookID);
-                                            s.setUpdateDate(SessionDate);
-                                            s.save();
-                                        }
-                                    }
-
+                                    updatedDate = SessionDate;
                                     getCashBook();
+//                                    if (i == jsonArray.length() - 1) {
+//                                        List<TableSession> se = TableSession.find(TableSession.class,"table_Name = ?","CashBook");
+//                                        for (TableSession s : se){
+////                                            s.setMaxID(CashBookID);
+//                                            s.setUpdateDate(SessionDate);
+//                                            s.save();
+//                                        }
+//                                    }
+
+
                                 }
 
                             }else {
@@ -1485,16 +1479,14 @@ public class CashBookFragment extends Fragment implements OnItemSelectedListener
             @Override
             protected Map<String, String> getParams() {
                 Map<String, String> params = new HashMap<String, String>();
-                List<User> list = User.listAll(User.class);
-                for (User u : list) {
-                    params.put("ClientID", u.getClientID());
-                }
-                List<TableSession> tableSessions = TableSession.find(TableSession.class,"table_Name = ?","CashBook");
-                for (TableSession t : tableSessions){
-                    params.put("MaxID",t.getMaxID());
-                    Log.e("UPDATE DATE",t.getUpdateDate());
-                    params.put("SessionDate",t.getUpdateDate());
-                }
+
+                params.put("ClientID", prefrence.getClientIDSession());
+                int maxID = databaseHelper.getMaxValue("SELECT max(CAST(CashBookID AS Int)) FROM CashBook");
+                Log.e("MAXIDCASH", String.valueOf(maxID));
+                params.put("MaxID",String.valueOf(maxID));
+                String date = databaseHelper.getClientUpdatedDate(prefrence.getClientIDSession());
+                params.put("SessionDate",date);
+
                 return params;
             }
         };
@@ -1552,17 +1544,18 @@ public class CashBookFragment extends Fragment implements OnItemSelectedListener
                                     UpdatedDate = jbb.getString("date");
                                     String SessionDate = jsonObject.getString("SessionDate");
                                     String Shift = jsonObject.getString("Shift");
+                                    String SerialNo = jsonObject.getString("SerialNo");
 
-                                    databaseHelper.createBooking(new Bookings(BookingID,ClientName,ClientMobile,ClientAddress,ClientNic,EventName,BookingDate,EventDate,ArrangePersons,ChargesTotal,Description,ClientID,ClientUserID,NetCode,SysCode,UpdatedDate,Shift));
-
-                                    if (i == jsonArray.length() - 1) {
-                                        List<TableSession> se = TableSession.find(TableSession.class,"table_Name = ?","Bookings");
-                                        for (TableSession s : se){
-                                            s.setMaxID(BookingID);
-                                            s.setInsertDate(SessionDate);
-                                            s.save();
-                                        }
-                                    }
+                                    databaseHelper.createBooking(new Bookings(BookingID,ClientName,ClientMobile,ClientAddress,ClientNic,EventName,BookingDate,EventDate,ArrangePersons,ChargesTotal,Description,ClientID,ClientUserID,NetCode,SysCode,UpdatedDate,Shift, SerialNo));
+                                    updatedDate = SessionDate;
+//                                    if (i == jsonArray.length() - 1) {
+//                                        List<TableSession> se = TableSession.find(TableSession.class,"table_Name = ?","Bookings");
+//                                        for (TableSession s : se){
+//                                            s.setMaxID(BookingID);
+//                                            s.setInsertDate(SessionDate);
+//                                            s.save();
+//                                        }
+//                                    }
                                 }
 
 //                                FetchFromDb();
@@ -1587,14 +1580,11 @@ public class CashBookFragment extends Fragment implements OnItemSelectedListener
             @Override
             protected Map<String, String> getParams() {
                 Map<String, String> params = new HashMap<String, String>();
-                List<User> list = User.listAll(User.class);
-                for (User u : list) {
-                    params.put("ClientID", u.getClientID());
-                }
-                List<TableSession> tableSessions = TableSession.find(TableSession.class,"table_Name = ?","Bookings");
-                for (TableSession t : tableSessions){
-                    params.put("MaxID",t.getMaxID());
-                }
+
+                params.put("ClientID", prefrence.getClientIDSession());
+                int maxID = databaseHelper.getMaxValue("SELECT max(CAST(BookingID AS Int)) FROM Booking");
+                params.put("MaxID",String.valueOf(maxID));
+
                 return params;
             }
         };
@@ -1658,15 +1648,16 @@ public class CashBookFragment extends Fragment implements OnItemSelectedListener
                                             +"', EventName = '"+EventName+"', BookingDate = '"+BookingDate+"', EventDate = '"+EventDate+"', ArrangePersons ='"+ArrangePersons+"', ChargesTotal = '"+ChargesTotal+"', Description = '"+Description
                                             +"', ClientID = '"+ClientID+"', ClientUserID = '"+ClientUserID+"', NetCode = '"+NetCode+"', SysCode = '"+SysCode+"', UpdatedDate = '"+UpdatedDate+"' WHERE BookingID = "+ BookingID;
                                     databaseHelper.updateBooking(query);
+                                    updatedDate = SessionDate;
 
-                                    if (i == jsonArray.length() - 1) {
-                                        List<TableSession> se = TableSession.find(TableSession.class,"table_Name = ?","Bookings");
-                                        for (TableSession s : se){
-//                                            s.setMaxID(BookingID);
-                                            s.setUpdateDate(SessionDate);
-                                            s.save();
-                                        }
-                                    }
+//                                    if (i == jsonArray.length() - 1) {
+//                                        List<TableSession> se = TableSession.find(TableSession.class,"table_Name = ?","Bookings");
+//                                        for (TableSession s : se){
+////                                            s.setMaxID(BookingID);
+//                                            s.setUpdateDate(SessionDate);
+//                                            s.save();
+//                                        }
+//                                    }
                                 }
 
 
@@ -1692,15 +1683,13 @@ public class CashBookFragment extends Fragment implements OnItemSelectedListener
             @Override
             protected Map<String, String> getParams() {
                 Map<String, String> params = new HashMap<String, String>();
-                List<User> list = User.listAll(User.class);
-                for (User u : list) {
-                    params.put("ClientID", u.getClientID());
-                }
-                List<TableSession> tableSessions = TableSession.find(TableSession.class,"table_Name = ?","Bookings");
-                for (TableSession t : tableSessions){
-                    params.put("MaxID",t.getMaxID());
-                    params.put("SessionDate",t.getUpdateDate());
-                }
+
+                params.put("ClientID", prefrence.getClientIDSession());
+                int maxID = databaseHelper.getMaxValue("SELECT max(CAST(BookingID AS Int)) FROM Booking");
+                params.put("MaxID",String.valueOf(maxID));
+                String date = databaseHelper.getClientUpdatedDate(prefrence.getClientIDSession());
+                params.put("SessionDate",date);
+
                 return params;
             }
         };
@@ -1732,13 +1721,14 @@ public class CashBookFragment extends Fragment implements OnItemSelectedListener
                                     String UpdatedDate = jsonObject.getString("UpdatedDate");
                                     String message = jsonObject.getString("message");
                                     databaseHelper.updateCashBook("UPDATE CashBook SET CashBookID = '"+id+"', UpdatedDate = '"+UpdatedDate+"' WHERE ID = "+c.getcId());
-
-                                    List<TableSession> se = TableSession.find(TableSession.class,"table_Name = ?","CashBook");
-                                    for (TableSession s : se){
-                                        s.setMaxID(id);
-                                        s.setInsertDate(UpdatedDate);
-                                        s.save();
-                                    }
+                                    updatedDate = UpdatedDate;
+//                                    getCashBook();
+//                                    List<TableSession> se = TableSession.find(TableSession.class,"table_Name = ?","CashBook");
+//                                    for (TableSession s : se){
+//                                        s.setMaxID(id);
+//                                        s.setInsertDate(UpdatedDate);
+//                                        s.save();
+//                                    }
                                     getCashBook();
                                 }
 
@@ -1757,19 +1747,20 @@ public class CashBookFragment extends Fragment implements OnItemSelectedListener
                 protected Map<String, String> getParams() {
 
                     Map<String, String> params = new HashMap<String, String>();
-                    List<User> list = User.listAll(User.class);
-                    for (User u : list) {
+
                         params.put("CBDate", c.getCBDate());
                         params.put("DebitAccount", c.getDebitAccount());
                         params.put("CreditAccount", c.getCreditAccount());
                         params.put("CBRemarks", c.getCBRemarks());
                         params.put("Amount", c.getAmount());
-                        params.put("ClientID", u.getClientID());
-                        params.put("ClientUserID", u.getClientUserID());
+                        params.put("ClientID", prefrence.getClientIDSession());
+                        params.put("ClientUserID", prefrence.getClientUserIDSession());
                         params.put("NetCode", "0");
                         params.put("SysCode", "0");
-                        params.put("BookingID", c.getBookingID());
-                    }
+                        params.put("TableID", c.getTableID());
+                        params.put("SerialNo", c.getSerialNo());
+                        params.put("TableName", c.getTableName());
+
                     return params;
                 }
             };
@@ -1804,11 +1795,13 @@ public class CashBookFragment extends Fragment implements OnItemSelectedListener
                                     String message = jsonObject.getString("message");
                                     databaseHelper.updateCashBook("UPDATE CashBook SET UpdatedDate = '"+UpdatedDate+"' WHERE ID = "+c.getcId());
 
-                                    List<TableSession> se = TableSession.find(TableSession.class,"table_Name = ?","CashBook");
-                                    for (TableSession s : se){
-                                        s.setUpdateDate(UpdatedDate);
-                                        s.save();
-                                    }
+                                    updatedDate = UpdatedDate;
+//                                    getCashBook();
+//                                    List<TableSession> se = TableSession.find(TableSession.class,"table_Name = ?","CashBook");
+//                                    for (TableSession s : se){
+//                                        s.setUpdateDate(UpdatedDate);
+//                                        s.save();
+//                                    }
                                     getCashBook();
                                 }
                             } catch (JSONException e) {
@@ -1827,20 +1820,19 @@ public class CashBookFragment extends Fragment implements OnItemSelectedListener
                 protected Map<String, String> getParams() {
 
                     Map<String, String> params = new HashMap<String, String>();
-                    List<User> list = User.listAll(User.class);
-                    for (User u : list) {
                         params.put("CashBookID", c.getCashBookID());
                         params.put("CBDate", c.getCBDate());
                         params.put("DebitAccount", c.getDebitAccount());
                         params.put("CreditAccount", c.getCreditAccount());
                         params.put("CBRemarks", c.getCBRemarks());
                         params.put("Amount", c.getAmount());
-                        params.put("ClientID", u.getClientID());
-                        params.put("ClientUserID", u.getClientUserID());
+                        params.put("ClientID", prefrence.getClientIDSession());
+                        params.put("ClientUserID", prefrence.getClientUserIDSession());
                         params.put("NetCode", "0");
                         params.put("SysCode", "0");
-                        params.put("BookingID", c.getBookingID());
-                    }
+                        params.put("TableID", c.getTableID());
+                        params.put("SerialNo", c.getSerialNo());
+
                     return params;
                 }
             };
@@ -1878,13 +1870,13 @@ public class CashBookFragment extends Fragment implements OnItemSelectedListener
                                     String UpdatedDate = jsonObject.getString("UpdatedDate");
                                     String message = jsonObject.getString("message");
                                     databaseHelper.updateCashBook("UPDATE Booking SET BookingID = '"+ id +"', UpdatedDate = '"+UpdatedDate+"' WHERE ID = "+c.getId());
-
-                                    List<TableSession> se = TableSession.find(TableSession.class,"table_Name = ?","Bookings");
-                                    for (TableSession s : se){
-                                        s.setMaxID(id);
-                                        s.setInsertDate(UpdatedDate);
-                                        s.save();
-                                    }
+                                    updatedDate = UpdatedDate;
+//                                    List<TableSession> se = TableSession.find(TableSession.class,"table_Name = ?","Bookings");
+//                                    for (TableSession s : se){
+//                                        s.setMaxID(id);
+//                                        s.setInsertDate(UpdatedDate);
+//                                        s.save();
+//                                    }
                                 }
                             } catch (JSONException e) {
                                 e.printStackTrace();
@@ -1904,8 +1896,6 @@ public class CashBookFragment extends Fragment implements OnItemSelectedListener
                 protected Map<String, String> getParams() {
 
                     Map<String, String> params = new HashMap<String, String>();
-                    List<User> list = User.listAll(User.class);
-                    for (User u : list) {
                         params.put("ClientName", c.getClientName());
                         params.put("ClientMobile", c.getClientMobile());
                         params.put("ClientAddress", c.getClientAddress());
@@ -1916,15 +1906,16 @@ public class CashBookFragment extends Fragment implements OnItemSelectedListener
                         params.put("ArrangePersons", c.getArrangePersons());
                         params.put("ChargesTotal", c.getChargesTotal());
                         params.put("Description", c.getDescription());
-                        params.put("ClientID", u.getClientID());
-                        params.put("ClientUserID", u.getClientUserID());
+                        params.put("ClientID", prefrence.getClientIDSession());
+                        params.put("ClientUserID", prefrence.getClientUserIDSession());
                         params.put("NetCode", "0");
                         params.put("SysCode", "0");
-                        params.put("DebitAccount", u.getCashID());
-                        params.put("CreditAccount", u.getBookingIncomeID());
+                        params.put("DebitAccount", cashID);
+                        params.put("CreditAccount", incomeID);
                         params.put("Amount", c.getAmount());
                         params.put("Shift", c.getShift());
-                    }
+                        params.put("SerialNo", c.getSerialNo());
+
                     return params;
                 }
             };
@@ -1958,12 +1949,12 @@ public class CashBookFragment extends Fragment implements OnItemSelectedListener
                                     String UpdatedDate = jsonObject.getString("UpdatedDate");
                                     String message = jsonObject.getString("message");
                                     databaseHelper.updateCashBook("UPDATE Booking SET UpdatedDate = '"+UpdatedDate+"' WHERE ID = "+c.getId());
-
-                                    List<TableSession> se = TableSession.find(TableSession.class,"table_Name = ?","Bookings");
-                                    for (TableSession s : se){
-                                        s.setUpdateDate(UpdatedDate);
-                                        s.save();
-                                    }
+                                    updatedDate = UpdatedDate;
+//                                    List<TableSession> se = TableSession.find(TableSession.class,"table_Name = ?","Bookings");
+//                                    for (TableSession s : se){
+//                                        s.setUpdateDate(UpdatedDate);
+//                                        s.save();
+//                                    }
                                 }
                             } catch (JSONException e) {
                                 e.printStackTrace();
@@ -1981,8 +1972,6 @@ public class CashBookFragment extends Fragment implements OnItemSelectedListener
                 protected Map<String, String> getParams() {
 
                     Map<String, String> params = new HashMap<String, String>();
-                    List<User> list = User.listAll(User.class);
-                    for (User u : list) {
                         params.put("BookingID", c.getBookingID());
                         params.put("ClientName", c.getClientName());
                         params.put("ClientMobile", c.getClientMobile());
@@ -1994,13 +1983,14 @@ public class CashBookFragment extends Fragment implements OnItemSelectedListener
                         params.put("ArrangePersons", c.getArrangePersons());
                         params.put("ChargesTotal", c.getChargesTotal());
                         params.put("Description", c.getDescription());
-                        params.put("ClientID", u.getClientID());
-                        params.put("ClientUserID", u.getClientUserID());
+                        params.put("ClientID", prefrence.getClientIDSession());
+                        params.put("ClientUserID", prefrence.getClientUserIDSession());
                         params.put("NetCode", "0");
                         params.put("SysCode", "0");
-                        params.put("DebitAccount", u.getCashID());
-                        params.put("CreditAccount", u.getBookingIncomeID());
-                    }
+
+                        params.put("DebitAccount", cashID);
+                        params.put("CreditAccount", incomeID);
+
                     return params;
                 }
             };
@@ -2035,13 +2025,13 @@ public class CashBookFragment extends Fragment implements OnItemSelectedListener
                                     String UpdatedDate = jsonObject.getString("UpdatedDate");
                                     String message = jsonObject.getString("message");
                                     databaseHelper.updateCashBook("UPDATE Account3Name SET AcNameID = '"+ id +"', UpdatedDate = '"+UpdatedDate+"' WHERE ID = "+c.getId());
-
-                                    List<TableSession> se = TableSession.find(TableSession.class,"table_Name = ?","Account3Name");
-                                    for (TableSession s : se){
-                                        s.setMaxID(id);
-                                        s.setInsertDate(UpdatedDate);
-                                        s.save();
-                                    }
+                                    updatedDate = UpdatedDate;
+//                                    List<TableSession> se = TableSession.find(TableSession.class,"table_Name = ?","Account3Name");
+//                                    for (TableSession s : se){
+//                                        s.setMaxID(id);
+//                                        s.setInsertDate(UpdatedDate);
+//                                        s.save();
+//                                    }
                                 }else {
                                     databaseHelper.deleteAccount3NameEntry("DELETE FROM Account3Name WHERE ID = "+c.getId());
                                     String message = jsonObject.getString("message");
@@ -2064,8 +2054,7 @@ public class CashBookFragment extends Fragment implements OnItemSelectedListener
                 protected Map<String, String> getParams() {
 
                     Map<String, String> params = new HashMap<String, String>();
-                    List<User> list = User.listAll(User.class);
-                    for (User u : list) {
+
                         params.put("AcName", c.getAcName());
                         params.put("AcAddress", c.getAcAddress());
                         params.put("AcContactNo", c.getAcContactNo());
@@ -2074,9 +2063,10 @@ public class CashBookFragment extends Fragment implements OnItemSelectedListener
                         params.put("AcMobileNo", c.getAcMobileNo());
                         params.put("AcPassward", c.getAcPassward());
                         params.put("SecurityRights", c.getSecurityRights());
-                        params.put("ClientID", u.getClientID());
+                        params.put("ClientID", prefrence.getClientIDSession());
                         params.put("AcGroupID", c.getAcGroupID());
-                    }
+                        params.put("SerialNo", c.getSerialNo());
+
                     return params;
                 }
             };
@@ -2111,12 +2101,13 @@ public class CashBookFragment extends Fragment implements OnItemSelectedListener
                                     String UpdatedDate = jsonObject.getString("UpdatedDate");
                                     String message = jsonObject.getString("message");
                                     databaseHelper.updateCashBook("UPDATE Account3Name SET UpdatedDate = '"+UpdatedDate+"' WHERE ID = "+c.getId());
-
-                                    List<TableSession> se = TableSession.find(TableSession.class,"table_Name = ?","Account3Name");
-                                    for (TableSession s : se){
-                                        s.setUpdateDate(UpdatedDate);
-                                        s.save();
-                                    }
+                                    updatedDate = UpdatedDate;
+//                                    List<TableSession> se = TableSession.find(TableSession.class,"table_Name = ?","Account3Name");
+//                                    for (TableSession s : se){
+//                                        s.setUpdateDate(UpdatedDate);
+//                                        s.save();
+//                                    }
+                                    databaseHelper.updateClient("UPDATE Client SET UpdatedDate = '"+updatedDate+"' WHERE ClientID = "+prefrence.getClientIDSession());
                                 }
                             } catch (JSONException e) {
                                 e.printStackTrace();
@@ -2135,8 +2126,7 @@ public class CashBookFragment extends Fragment implements OnItemSelectedListener
                 protected Map<String, String> getParams() {
 
                     Map<String, String> params = new HashMap<String, String>();
-                    List<User> list = User.listAll(User.class);
-                    for (User u : list) {
+
                         params.put("AcNameID", c.getAcNameID());
                         params.put("AcName", c.getAcName());
                         params.put("AcAddress", c.getAcAddress());
@@ -2146,9 +2136,9 @@ public class CashBookFragment extends Fragment implements OnItemSelectedListener
                         params.put("AcMobileNo", c.getAcMobileNo());
                         params.put("AcPassward", c.getAcPassward());
                         params.put("SecurityRights", c.getSecurityRights());
-                        params.put("ClientID", u.getClientID());
+                        params.put("ClientID", prefrence.getClientIDSession());
                         params.put("AcGroupID", c.getAcGroupID());
-                    }
+
                     return params;
                 }
             };
@@ -2156,6 +2146,10 @@ public class CashBookFragment extends Fragment implements OnItemSelectedListener
             RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
             jsonObjectRequest.setRetryPolicy(policy);
             AppController.getInstance().addToRequestQueue(jsonObjectRequest, tag_json_obj);
+        }
+        getCashBook();
+        if (addBooking.size() == 0){
+            databaseHelper.updateClient("UPDATE Client SET UpdatedDate = '"+updatedDate+"' WHERE ClientID = "+prefrence.getClientIDSession());
         }
         mProgress.dismiss();
     }

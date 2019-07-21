@@ -51,7 +51,6 @@ import org.by9steps.shadihall.model.ProjectMenu;
 import org.by9steps.shadihall.model.ShadiHallList;
 import org.by9steps.shadihall.model.TableSession;
 import org.by9steps.shadihall.model.UpdateDate;
-import org.by9steps.shadihall.model.User;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -74,6 +73,7 @@ public class ShadiHallListAdapter extends RecyclerView.Adapter{
     public static final String phone = "phoneKey";
 
     DatabaseHelper databaseHelper;
+
     String cId, ph;
 
     String clientID, clientUserID, userRights, projectID;
@@ -119,11 +119,11 @@ public class ShadiHallListAdapter extends RecyclerView.Adapter{
                 clients = databaseHelper.getClient(query);
 
                 if (clients.size() > 0){
-                    User.deleteAll(User.class);
-                    for (Client c : clients) {
-                        User user = new User(c.getClientID(), "0", "0", "0", "0", c.getClientUserID(), "ss");
-                        user.save();
-                    }
+//                    User.deleteAll(User.class);
+//                    for (Client c : clients) {
+//                        User user = new User(c.getClientID(), "0", "0", "0", "0", c.getClientUserID(), "ss");
+//                        user.save();
+//                    }
                     SharedPreferences.Editor editor = sharedPreferences.edit();
                     editor.putString(log_in, "Yes");
                     editor.apply();
@@ -138,7 +138,7 @@ public class ShadiHallListAdapter extends RecyclerView.Adapter{
                         mProgress.setMessage("Please wait...");
                         mProgress.setCanceledOnTouchOutside(false);
                         mProgress.show();
-                        getAccount3Name();
+                        getCashBook();
                     }else {
                         if (listener != null)
                             listener.onItemClick(shadiHallList.getClientID(),shadiHallList.getClientUserID(), shadiHallList.getProjectID(), shadiHallList.getUserRights());
@@ -249,7 +249,6 @@ public class ShadiHallListAdapter extends RecyclerView.Adapter{
                             if (success.equals("1")){
                                 JSONArray jsonArray = jsonObj.getJSONArray("UserInfo");
                                 Log.e("UserInfo",jsonArray.toString());
-                                User.deleteAll(User.class);
                                 for (int i = 0; i < jsonArray.length(); i++) {
                                     JSONObject jsonObject = jsonArray.getJSONObject(i);
                                     String cashID = jsonObject.getString("CashID");
@@ -288,12 +287,12 @@ public class ShadiHallListAdapter extends RecyclerView.Adapter{
                                             Country, City, SubCity, CapacityOfPersons, ClientUserID, SysCode, NetCode, UpdatedDate,
                                             Lat, Lng, ProjectID));
 
-                                    User user = new User(cId,cashID,bookingIncomeID,bookingExpenseID,acNameID,ClientUserID,acName);
-                                    user.save();
+//                                    User user = new User(cId,cashID,bookingIncomeID,bookingExpenseID,acNameID,ClientUserID,acName);
+//                                    user.save();
                                 }
 
                                 if (isConnected()) {
-                                    getAccount3Name();
+                                    getCashBook();
                                 }else {
                                     Toast.makeText(mCtx, "Please Check Your Internet Connection", Toast.LENGTH_SHORT).show();
                                 }
@@ -324,6 +323,88 @@ public class ShadiHallListAdapter extends RecyclerView.Adapter{
             }
         };
         int socketTimeout = 10000;//10 seconds - change to what you want
+        RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
+        jsonObjectRequest.setRetryPolicy(policy);
+        AppController.getInstance().addToRequestQueue(jsonObjectRequest, tag_json_obj);
+    }
+
+    public void getCashBook(){
+
+        String tag_json_obj = "json_obj_req";
+        String u = "http://69.167.137.121/plesk-site-preview/sky.com.pk/shadiHall/Test2.php";
+
+        StringRequest jsonObjectRequest = new StringRequest(com.android.volley.Request.Method.POST, u,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+//                        mProgress.dismiss();
+                        JSONObject jsonObj = null;
+
+                        try {
+                            jsonObj= new JSONObject(response);
+                            JSONArray jsonArray = jsonObj.getJSONArray("CashBook");
+                            String success = jsonObj.getString("success");
+                            if (success.equals("1")){
+                                databaseHelper.deleteCashBook();
+                                for (int i = 0; i < jsonArray.length(); i++) {
+                                    JSONObject jsonObject = jsonArray.getJSONObject(i);
+                                    Log.e("CashBook",jsonObject.toString());
+                                    String CashBookID = jsonObject.getString("CashBookID");
+                                    String cb = jsonObject.getString("CBDate");
+                                    JSONObject jbb = new JSONObject(cb);
+                                    String CBDate = jbb.getString("date");
+                                    SimpleDateFormat ss = new SimpleDateFormat("yyyy-MM-dd");
+                                    Date date = ss.parse(CBDate);
+                                    SimpleDateFormat sf = new SimpleDateFormat("yyyy-MM-dd");
+                                    String CBDate1 = sf.format(date);
+                                    String DebitAccount = jsonObject.getString("DebitAccount");
+                                    String CreditAccount = jsonObject.getString("CreditAccount");
+                                    String CBRemark = jsonObject.getString("CBRemarks");
+                                    String Amount = jsonObject.getString("Amount");
+                                    String ClientID = jsonObject.getString("ClientID");
+                                    String ClientUserID = jsonObject.getString("ClientUserID");
+                                    String NetCode = jsonObject.getString("NetCode");
+                                    String SysCode = jsonObject.getString("SysCode");
+                                    String UpdatedDate = jsonObject.getString("UpdatedDate");
+//                                    JSONObject jb = new JSONObject(ed);
+//                                    String UpdatedDate = jb.getString("date");
+                                    String TableID = jsonObject.getString("TableID");
+                                    String SessionDate = jsonObject.getString("SessionDate");
+                                    String SerialNo = jsonObject.getString("SerialNo");
+                                    String TableName = jsonObject.getString("TableName");
+
+                                    databaseHelper.createCashBook(new CashBook(CashBookID,CBDate1,DebitAccount,CreditAccount,CBRemark,Amount,ClientID,ClientUserID,NetCode,SysCode,UpdatedDate,TableID, SerialNo, TableName));
+
+                                }
+//                                mProgress.dismiss();
+
+                            }else {
+                                String message = jsonObj.getString("message");
+//                                Toast.makeText(SplashActivity.this, message, Toast.LENGTH_SHORT).show();
+                            }
+                            getAccount3Name();
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        } catch (ParseException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+//                mProgress.dismiss();
+                Log.e("Error",error.toString());
+//                Toast.makeText(SplashActivity.this, error.toString(), Toast.LENGTH_LONG).show();
+            }
+        }){
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("ClientID", clientID);
+                return params;
+            }
+        };
+        int socketTimeout = 10000;//10 seconds
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         jsonObjectRequest.setRetryPolicy(policy);
         AppController.getInstance().addToRequestQueue(jsonObjectRequest, tag_json_obj);
@@ -375,113 +456,19 @@ public class ShadiHallListAdapter extends RecyclerView.Adapter{
 
                                     databaseHelper.createAccount3Name(new Account3Name(AcNameID,AcName,AcGroupID,AcAddress,AcMobileNo,AcContactNo,AcEmailAddress,AcDebitBal,AcCreditBal,AcPassward,ClientID,ClientUserID,SysCode,NetCode,UpdatedDate,SerialNo,UserRights,SecurityRights,Salary));
 
-                                    if (i == jsonArray.length() - 1) {
-                                        TableSession.deleteAll(TableSession.class);
-                                        TableSession session = new TableSession("Account3Name", AcNameID, SessionDate, SessionDate);
-                                        session.save();
-                                    }
+//                                    if (i == jsonArray.length() - 1) {
+//                                        TableSession.deleteAll(TableSession.class);
+//                                        TableSession session = new TableSession("Account3Name", AcNameID, SessionDate, SessionDate);
+//                                        session.save();
+//                                    }
                                 }
-                                getCashBook();
+                                getAccountGroups();
 
                             }else {
                                 String message = jsonObj.getString("message");
 //                                Toast.makeText(SplashActivity.this, message, Toast.LENGTH_SHORT).show();
                             }
                         } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-//                mProgress.dismiss();
-                Log.e("Error",error.toString());
-//                Toast.makeText(SplashActivity.this, error.toString(), Toast.LENGTH_LONG).show();
-            }
-        }){
-            @Override
-            protected Map<String, String> getParams() {
-                Map<String, String> params = new HashMap<String, String>();
-                params.put("ClientID", clientID);
-                return params;
-            }
-        };
-        int socketTimeout = 10000;//10 seconds
-        RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
-        jsonObjectRequest.setRetryPolicy(policy);
-        AppController.getInstance().addToRequestQueue(jsonObjectRequest, tag_json_obj);
-    }
-
-    public void getCashBook(){
-
-        String tag_json_obj = "json_obj_req";
-        String u = "http://69.167.137.121/plesk-site-preview/sky.com.pk/shadiHall/Test2.php";
-
-        StringRequest jsonObjectRequest = new StringRequest(com.android.volley.Request.Method.POST, u,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-//                        mProgress.dismiss();
-                        JSONObject jsonObj = null;
-
-                        try {
-                            jsonObj= new JSONObject(response);
-                            JSONArray jsonArray = jsonObj.getJSONArray("CashBook");
-                            String success = jsonObj.getString("success");
-                            if (success.equals("1")){
-                                databaseHelper.deleteCashBook();
-                                for (int i = 0; i < jsonArray.length(); i++) {
-                                    JSONObject jsonObject = jsonArray.getJSONObject(i);
-                                    Log.e("Account3Name",jsonObject.toString());
-                                    String CashBookID = jsonObject.getString("CashBookID");
-                                    String cb = jsonObject.getString("CBDate");
-                                    JSONObject jbb = new JSONObject(cb);
-                                    String CBDate = jbb.getString("date");
-                                    SimpleDateFormat ss = new SimpleDateFormat("yyyy-MM-dd");
-                                    Date date = ss.parse(CBDate);
-                                    SimpleDateFormat sf = new SimpleDateFormat("yyyy-MM-dd");
-                                    String CBDate1 = sf.format(date);
-                                    String DebitAccount = jsonObject.getString("DebitAccount");
-                                    String CreditAccount = jsonObject.getString("CreditAccount");
-                                    String CBRemark = jsonObject.getString("CBRemarks");
-                                    String Amount = jsonObject.getString("Amount");
-                                    String ClientID = jsonObject.getString("ClientID");
-                                    String ClientUserID = jsonObject.getString("ClientUserID");
-                                    String NetCode = jsonObject.getString("NetCode");
-                                    String SysCode = jsonObject.getString("SysCode");
-                                    String UpdatedDate = jsonObject.getString("UpdatedDate");
-//                                    JSONObject jb = new JSONObject(ed);
-//                                    String UpdatedDate = jb.getString("date");
-                                    String BookingID = jsonObject.getString("BookingID");
-                                    String SessionDate = jsonObject.getString("SessionDate");
-
-                                    databaseHelper.createCashBook(new CashBook(CashBookID,CBDate1,DebitAccount,CreditAccount,CBRemark,Amount,ClientID,ClientUserID,NetCode,SysCode,UpdatedDate,BookingID));
-
-                                    if (i == jsonArray.length() - 1) {
-                                        TableSession session = new TableSession("CashBook", CashBookID, SessionDate, SessionDate);
-                                        session.save();
-                                    }
-
-                                    Date da = new Date();
-                                    SimpleDateFormat sff = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                                    String d = sff.format(da);
-                                    if (i == jsonArray.length()-1) {
-
-                                        UpdateDate.deleteAll(UpdateDate.class);
-                                        UpdateDate updateDate = new UpdateDate(d, CashBookID);
-                                        updateDate.save();
-                                    }
-                                }
-//                                mProgress.dismiss();
-
-                            }else {
-                                String message = jsonObj.getString("message");
-//                                Toast.makeText(SplashActivity.this, message, Toast.LENGTH_SHORT).show();
-                            }
-                            getAccountGroups();
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        } catch (ParseException e) {
                             e.printStackTrace();
                         }
                     }
@@ -535,7 +522,7 @@ public class ShadiHallListAdapter extends RecyclerView.Adapter{
                                     databaseHelper.createAccount2Group(new Account2Group(AcGroupID,AcTypeID,AcGruopName));
                                 }
 
-                                getBookings();
+                                getAccountTypes();
 //
 //                                mProgress.dismiss();
 //                                getCashBook();
@@ -556,101 +543,6 @@ public class ShadiHallListAdapter extends RecyclerView.Adapter{
 //                Toast.makeText(getContext(), error.toString(), Toast.LENGTH_LONG).show();
             }
         });
-        int socketTimeout = 10000;//10 seconds - change to what you want
-        RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
-        jsonObjectRequest.setRetryPolicy(policy);
-        AppController.getInstance().addToRequestQueue(jsonObjectRequest, tag_json_obj);
-    }
-
-    public void getBookings(){
-        // Tag used to cancel the request
-        String tag_json_obj = "json_obj_req";
-        String url = "http://69.167.137.121/plesk-site-preview/sky.com.pk/shadiHall/GetBookings.php";
-
-
-        StringRequest jsonObjectRequest = new StringRequest(Request.Method.POST, url,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-
-                        String text = "", BookingID = "", ClientName = "", ClientMobile = "", ClientAddress = "", ClientNic = "", EventName = "", BookingDate = "", EventDate = "",
-                                ArrangePersons ="", ChargesTotal = "",Description = "", ClientID ="", ClientUserID = "", NetCode = "",SysCode = "", UpdatedDate = "";
-                        try {
-                            JSONObject json = new JSONObject(response);
-                            String success = json.getString("success");
-                            Log.e("Response",success);
-
-                            if (success.equals("1")) {
-                                JSONArray jsonArray = json.getJSONArray("Bookings");
-                                Log.e("SSSS", jsonArray.toString());
-                                databaseHelper.deleteBooking();
-                                for (int i = 0; i < jsonArray.length(); i++) {
-                                    JSONObject jsonObject = jsonArray.getJSONObject(i);
-
-                                    BookingID = jsonObject.getString("BookingID");
-                                    ClientName = jsonObject.getString("ClientName");
-                                    ClientMobile = jsonObject.getString("ClientMobile");
-                                    ClientAddress = jsonObject.getString("ClientAddress");
-                                    ClientNic = jsonObject.getString("ClientNic");
-                                    EventName = jsonObject.getString("EventName");
-                                    String bd = jsonObject.getString("BookingDate");
-                                    JSONObject jbbb = new JSONObject(bd);
-                                    BookingDate = jbbb.getString("date");
-                                    String ed = jsonObject.getString("EventDate");
-                                    JSONObject jb = new JSONObject(ed);
-                                    EventDate = jb.getString("date");
-                                    Log.e("TEST",EventDate);
-                                    ArrangePersons = jsonObject.getString("ArrangePersons");
-                                    ChargesTotal = jsonObject.getString("ChargesTotal");
-                                    Description = jsonObject.getString("Description");
-                                    ClientID = jsonObject.getString("ClientID");
-                                    ClientUserID = jsonObject.getString("ClientUserID");
-                                    NetCode = jsonObject.getString("NetCode");
-                                    SysCode = jsonObject.getString("SysCode");
-                                    Log.e("TEST","TEST");
-                                    String up = jsonObject.getString("UpdatedDate");
-                                    JSONObject jbb = new JSONObject(up);
-                                    UpdatedDate = jbb.getString("date");
-                                    String SessionDate = jsonObject.getString("SessionDate");
-                                    String Shift = jsonObject.getString("Shift");
-
-                                    Log.e("TEST","SSSS");
-
-                                    databaseHelper.createBooking(new Bookings(BookingID,ClientName,ClientMobile,ClientAddress,ClientNic,EventName,BookingDate,EventDate,ArrangePersons,ChargesTotal,Description,ClientID,ClientUserID,NetCode,SysCode,UpdatedDate,Shift));
-
-                                    if (i == jsonArray.length() - 1) {
-                                        TableSession session = new TableSession("Bookings", BookingID, SessionDate, SessionDate);
-                                        session.save();
-                                    }
-                                }
-
-//                                FetchFromDb();
-//                                pDialog.dismiss();
-                            }else {
-//                                pDialog.dismiss();
-                            }
-                            getAccountTypes();
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.e("Error", error.toString());
-//                pDialog.dismiss();
-//                Toast.makeText(SplashActivity.this, error.toString(), Toast.LENGTH_LONG).show();
-            }
-        }){
-            @Override
-            protected Map<String, String> getParams() {
-                Map<String, String> params = new HashMap<String, String>();
-                params.put("ClientID", clientID);
-                return params;
-            }
-        };
-
         int socketTimeout = 10000;//10 seconds - change to what you want
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         jsonObjectRequest.setRetryPolicy(policy);
@@ -757,7 +649,6 @@ public class ShadiHallListAdapter extends RecyclerView.Adapter{
         AppController.getInstance().addToRequestQueue(jsonObjectRequest, tag_json_obj);
     }
 
-
     public void getProjectMenu(){
         Log.e("GetProjectMenu","OK");
         String tag_json_obj = "json_obj_req";
@@ -794,11 +685,12 @@ public class ShadiHallListAdapter extends RecyclerView.Adapter{
                                     databaseHelper.createProjectMenu(new ProjectMenu(MenuID, ProjectID, MenuGroup, MenuName, PageOpen, ValuePass, ImageName, GroupSortBy,SortBy));
                                 }
 
+                                getBookings();
+
                             }else {
                                 String message = jsonObj.getString("message");
 //                                Toast.makeText(SplashActivity.this, message, Toast.LENGTH_SHORT).show();
                             }
-                            getAccount4UserRights();
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -810,6 +702,102 @@ public class ShadiHallListAdapter extends RecyclerView.Adapter{
 //                Toast.makeText(SplashActivity.this, error.toString(), Toast.LENGTH_LONG).show();
             }
         });
+        int socketTimeout = 10000;//10 seconds - change to what you want
+        RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
+        jsonObjectRequest.setRetryPolicy(policy);
+        AppController.getInstance().addToRequestQueue(jsonObjectRequest, tag_json_obj);
+    }
+
+    public void getBookings(){
+        // Tag used to cancel the request
+        String tag_json_obj = "json_obj_req";
+        String url = "http://69.167.137.121/plesk-site-preview/sky.com.pk/shadiHall/GetBookings.php";
+
+
+        StringRequest jsonObjectRequest = new StringRequest(Request.Method.POST, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+
+                        String text = "", BookingID = "", ClientName = "", ClientMobile = "", ClientAddress = "", ClientNic = "", EventName = "", BookingDate = "", EventDate = "",
+                                ArrangePersons ="", ChargesTotal = "",Description = "", ClientID ="", ClientUserID = "", NetCode = "",SysCode = "", UpdatedDate = "";
+                        try {
+                            JSONObject json = new JSONObject(response);
+                            String success = json.getString("success");
+                            Log.e("Response",success);
+
+                            if (success.equals("1")) {
+                                JSONArray jsonArray = json.getJSONArray("Bookings");
+                                Log.e("SSSS", jsonArray.toString());
+                                databaseHelper.deleteBooking();
+                                for (int i = 0; i < jsonArray.length(); i++) {
+                                    JSONObject jsonObject = jsonArray.getJSONObject(i);
+
+                                    BookingID = jsonObject.getString("BookingID");
+                                    ClientName = jsonObject.getString("ClientName");
+                                    ClientMobile = jsonObject.getString("ClientMobile");
+                                    ClientAddress = jsonObject.getString("ClientAddress");
+                                    ClientNic = jsonObject.getString("ClientNic");
+                                    EventName = jsonObject.getString("EventName");
+                                    String bd = jsonObject.getString("BookingDate");
+                                    JSONObject jbbb = new JSONObject(bd);
+                                    BookingDate = jbbb.getString("date");
+                                    String ed = jsonObject.getString("EventDate");
+                                    JSONObject jb = new JSONObject(ed);
+                                    EventDate = jb.getString("date");
+                                    Log.e("TEST",EventDate);
+                                    ArrangePersons = jsonObject.getString("ArrangePersons");
+                                    ChargesTotal = jsonObject.getString("ChargesTotal");
+                                    Description = jsonObject.getString("Description");
+                                    ClientID = jsonObject.getString("ClientID");
+                                    ClientUserID = jsonObject.getString("ClientUserID");
+                                    NetCode = jsonObject.getString("NetCode");
+                                    SysCode = jsonObject.getString("SysCode");
+                                    Log.e("TEST","TEST");
+                                    String up = jsonObject.getString("UpdatedDate");
+                                    JSONObject jbb = new JSONObject(up);
+                                    UpdatedDate = jbb.getString("date");
+                                    String SessionDate = jsonObject.getString("SessionDate");
+                                    String Shift = jsonObject.getString("Shift");
+                                    String SerialNo = jsonObject.getString("SerialNo");
+
+                                    Log.e("TEST","SSSS");
+
+                                    databaseHelper.createBooking(new Bookings(BookingID,ClientName,ClientMobile,ClientAddress,ClientNic,EventName,BookingDate,EventDate,ArrangePersons,ChargesTotal,Description,ClientID,ClientUserID,NetCode,SysCode,UpdatedDate,Shift, SerialNo));
+
+//                                    if (i == jsonArray.length() - 1) {
+//                                        TableSession session = new TableSession("Bookings", BookingID, SessionDate, SessionDate);
+//                                        session.save();
+//                                    }
+                                }
+                                getAccount4UserRights();
+
+//                                FetchFromDb();
+//                                pDialog.dismiss();
+                            }else {
+//                                pDialog.dismiss();
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.e("Error", error.toString());
+//                pDialog.dismiss();
+//                Toast.makeText(SplashActivity.this, error.toString(), Toast.LENGTH_LONG).show();
+            }
+        }){
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("ClientID", clientID);
+                return params;
+            }
+        };
+
         int socketTimeout = 10000;//10 seconds - change to what you want
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         jsonObjectRequest.setRetryPolicy(policy);

@@ -53,9 +53,9 @@ import org.by9steps.shadihall.AppController;
 import org.by9steps.shadihall.R;
 import org.by9steps.shadihall.adapters.MonthTrialBalanceAdapter;
 import org.by9steps.shadihall.helper.DatabaseHelper;
+import org.by9steps.shadihall.helper.Prefrence;
 import org.by9steps.shadihall.model.MonthTb;
 import org.by9steps.shadihall.model.Summerize;
-import org.by9steps.shadihall.model.User;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -73,6 +73,7 @@ import java.util.List;
 public class MonthTrialBalance extends Fragment implements View.OnClickListener {
 
     DatabaseHelper databaseHelper;
+    Prefrence prefrence;
     Boolean section = true;
 
     static Button date_picker1, date_picker2;
@@ -113,6 +114,7 @@ public class MonthTrialBalance extends Fragment implements View.OnClickListener 
 
         setHasOptionsMenu(true);
         databaseHelper = new DatabaseHelper(getContext());
+        prefrence = new Prefrence(getContext());
 
         date_picker1 = view.findViewById(R.id.date_picker1);
         date_picker2 = view.findViewById(R.id.date_picker2);
@@ -204,8 +206,6 @@ public class MonthTrialBalance extends Fragment implements View.OnClickListener 
         mPreDebit = 0; mPreCredit = 0; mTraDebit = 0; mTraCredit = 0; mCloDebit = 0; mCloCredit = 0;
         mList.clear();
 
-        List<User> list = User.listAll(User.class);
-        for (User u : list) {
             String query = "SELECT        SixColumnTB.ClientID, SixColumnTB.AccountID, SUM(SixColumnTB.Debit) AS Debit, SUM(SixColumnTB.Credit) AS Credit, SUM(SixColumnTB.PrvBal) AS PrvBal, SUM(SixColumnTB.PrvDebit) AS PrvDebit, \n" +
                     "                         SUM(SixColumnTB.PrvCredit) AS PrvCredit, SUM(SixColumnTB.TraDebit) AS TraDebit, SUM(SixColumnTB.TraCredit) AS TraCredit, SUM(SixColumnTB.TraBalance) AS TraBalance, \n" +
                     "                         SUM(SixColumnTB.PrvBal + SixColumnTB.TraBalance) AS ClosingBalnce, CASE WHEN (SUM(PrvBal + TraBalance) > 0) THEN SUM(PrvBal + TraBalance) ELSE 0 END AS ClosingDebit, CASE WHEN (SUM(PrvBal + TraBalance) \n" +
@@ -214,21 +214,21 @@ public class MonthTrialBalance extends Fragment implements View.OnClickListener 
                     "                                                    CASE WHEN (SUM(Debit) - SUM(Credit)) < 0 THEN (SUM(Debit) - SUM(Credit)) ELSE 0 END AS PrvCredit, 0 AS TraDebit, 0 AS TraCredit, 0 AS TraBalance\n" +
                     "                          FROM            (SELECT        CreditAccount AS AccountID, 0 AS Debit, Amount AS Credit, ClientID, CBDate\n" +
                     "                                                    FROM            CashBook AS CashBook\n" +
-                    "                                                    WHERE        (ClientID = " + u.getClientID() + ") AND (CBDate < '" + date_picker1.getText().toString() + "')\n" +
+                    "                                                    WHERE        (ClientID = " + prefrence.getClientIDSession() + ") AND (CBDate < '" + date_picker1.getText().toString() + "')\n" +
                     "                                                    UNION ALL\n" +
                     "                                                    SELECT        DebitAccount AS AccountID, Amount AS Debit, 0 AS Credit, ClientID, CBDate\n" +
                     "                                                    FROM            CashBook AS CashBook_1\n" +
-                    "                                                    WHERE        (ClientID = " + u.getClientID() + ") AND (CBDate < '" + date_picker1.getText().toString() + "')) AS derivedtbl_1\n" +
+                    "                                                    WHERE        (ClientID = " + prefrence.getClientIDSession() + ") AND (CBDate < '" + date_picker1.getText().toString() + "')) AS derivedtbl_1\n" +
                     "                          GROUP BY ClientID, AccountID\n" +
                     "                          UNION ALL\n" +
                     "                          SELECT        ClientID, AccountID, 0 AS Debit, 0 AS Credit, 0 AS PrvBalance, 0 AS PrvDebit, 0 AS PrvCredit, SUM(Debit) AS TraDebit, SUM(Credit) AS TraCredit, SUM(Debit) - SUM(Credit) AS TraBal\n" +
                     "                          FROM            (SELECT        CreditAccount AS AccountID, 0 AS Debit, Amount AS Credit, ClientID, CBDate\n" +
                     "                                                    FROM            CashBook AS CashBook\n" +
-                    "                                                    WHERE        (ClientID = " + u.getClientID() + ") AND (CBDate >= '" + date_picker1.getText().toString() + "') AND (CBDate <= '" + date_picker2.getText().toString() + "')\n" +
+                    "                                                    WHERE        (ClientID = " + prefrence.getClientIDSession() + ") AND (CBDate >= '" + date_picker1.getText().toString() + "') AND (CBDate <= '" + date_picker2.getText().toString() + "')\n" +
                     "                                                    UNION ALL\n" +
                     "                                                    SELECT        DebitAccount AS AccountID, Amount AS Debit, 0 AS Credit, ClientID, CBDate\n" +
                     "                                                    FROM            CashBook AS CashBook_1\n" +
-                    "                                                    WHERE        (ClientID = " + u.getClientID() + ") AND (CBDate >= '" + date_picker1.getText().toString() + "') AND (CBDate <= '" + date_picker2.getText().toString() + "')) AS derivedtbl_1_1\n" +
+                    "                                                    WHERE        (ClientID = " + prefrence.getClientIDSession() + ") AND (CBDate >= '" + date_picker1.getText().toString() + "') AND (CBDate <= '" + date_picker2.getText().toString() + "')) AS derivedtbl_1_1\n" +
                     "                          GROUP BY ClientID, AccountID) AS SixColumnTB INNER JOIN\n" +
                     "                         Account3Name ON SixColumnTB.AccountID = Account3Name.AcNameID INNER JOIN\n" +
                     "                         Account2Group ON Account3Name.AcGroupID = Account2Group.AcGroupID INNER JOIN\n" +
@@ -236,7 +236,7 @@ public class MonthTrialBalance extends Fragment implements View.OnClickListener 
                     "GROUP BY SixColumnTB.ClientID, SixColumnTB.AccountID, Account3Name.AcName, Account2Group.AcGroupID, Account2Group.AcGruopName, Account1Type.AcTypeID, Account1Type.AcTypeName "+ orderby;
 
             monthTbList = databaseHelper.getMonthTB(query);
-        }
+
 
         gPreDebit = 0; gPreCredit = 0; gTraDebit = 0; gTraCredit = 0; gCloDebit = 0; gCloCredit = 0;
         mList.add(MonthTb.createSection("Assets And Liability"));

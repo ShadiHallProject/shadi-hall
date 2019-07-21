@@ -10,7 +10,7 @@ public class CashEntry {
     String Amount;
     String ClientID;
     String ClientUserID;
-    String BookingID;
+    String TableID;
     String DebitAccountName;
     String CreditAccountName;
     String UserName;
@@ -19,7 +19,7 @@ public class CashEntry {
 
     private int isRow;
 
-    public static CashEntry createRow(String cashBookID, String CBDate, String debitAccount, String creditAccount, String CBRemarks, String amount, String clientID, String clientUserID, String bookingID, String debitAccountName, String creditAccountName, String userName, String updatedDate) {
+    public static CashEntry createRow(String cashBookID, String CBDate, String debitAccount, String creditAccount, String CBRemarks, String amount, String clientID, String clientUserID, String tableID, String debitAccountName, String creditAccountName, String userName, String updatedDate) {
         CashEntry cashEntry = new CashEntry();
         cashEntry.isRow = 1;
         cashEntry.CashBookID = cashBookID;
@@ -30,7 +30,7 @@ public class CashEntry {
         cashEntry.Amount = amount;
         cashEntry.ClientID = clientID;
         cashEntry.ClientUserID = clientUserID;
-        cashEntry.BookingID = bookingID;
+        cashEntry.TableID = tableID;
         cashEntry.DebitAccountName = debitAccountName;
         cashEntry.CreditAccountName = creditAccountName;
         cashEntry.UserName = userName;
@@ -85,8 +85,8 @@ public class CashEntry {
         return ClientUserID;
     }
 
-    public String getBookingID() {
-        return BookingID;
+    public String getTableID() {
+        return TableID;
     }
 
     public String getDebitAccountName() {

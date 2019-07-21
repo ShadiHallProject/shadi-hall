@@ -104,7 +104,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String KEY_NetCode2 = "NetCode";
     private static final String KEY_SysCode2 = "SysCode";
     private static final String KEY_UpdatedDate2 = "UpdatedDate";
-    private static final String KEY_BookingID = "BookingID";
+    private static final String KEY_TableID = "TableID";
+    private static final String KEY_SerialNo2 = "SerialNo";
+    private static final String KEY_TableName = "TableName";
 
     // Booking Table - column names
     private static final String KEY_BookingID3 = "BookingID";
@@ -125,6 +127,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String KEY_UpdatedDate3 = "UpdatedDate";
     private static final String KEY_Advance = "Advance";
     private static final String KEY_Shift = "Shift";
+    private static final String KEY_SerialNo3 = "SerialNo";
 
     //New Tables
 
@@ -285,7 +288,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             + KEY_SysCode + " TEXT,"
             + KEY_NetCode + " TEXT,"
             + KEY_UpdatedDate + " TEXT,"
-            + KEY_SerialNo + " TEXT,"
+            + KEY_SerialNo + " INTEGER,"
             + KEY_UserRights + " TEXT,"
             + KEY_SecurityRights + " TEXT,"
             + KEY_Salary + " TEXT" + ")";
@@ -303,7 +306,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             + KEY_NetCode2 + " TEXT,"
             + KEY_SysCode2 + " TEXT,"
             + KEY_UpdatedDate2 + " TEXT,"
-            + KEY_BookingID + " TEXT" + ")";
+            + KEY_TableID + " TEXT,"
+            + KEY_SerialNo2 + " TEXT,"
+            + KEY_TableName + " INTEGER" + ")";
 
     // Booking table create statement
     private static final String CREATE_TABLE_Booking = "CREATE TABLE "
@@ -324,7 +329,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             + KEY_SysCode3 + " TEXT,"
             + KEY_UpdatedDate3 + " TEXT,"
             + KEY_Advance + " TEXT,"
-            + KEY_Shift + " TEXT"+ ")";
+            + KEY_Shift + " TEXT,"
+            + KEY_SerialNo3 + " INTEGER"+ ")";
 
     // Account2Group table create statement
     private static final String CREATE_TABLE_Account2Group = "CREATE TABLE "
@@ -619,9 +625,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(KEY_NetCode2, cashBook.getNetCode());
         values.put(KEY_SysCode2, cashBook.getSysCode());
         values.put(KEY_UpdatedDate2, cashBook.getUpdatedDate());
-        values.put(KEY_BookingID, cashBook.getBookingID());
-
-        Log.e("Values",values.toString());
+        values.put(KEY_TableID, cashBook.getTableID());
+        values.put(KEY_SerialNo2, cashBook.getSerialNo());
+        values.put(KEY_TableName, cashBook.getTableName());
 
         // insert row
         String cid = String.valueOf(db.insert(TABLE_CashBook, null, values));
@@ -653,7 +659,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
-        values.put(KEY_BookingID, bookings.getBookingID());
+        values.put(KEY_BookingID3, bookings.getBookingID());
         values.put(KEY_ClientName, bookings.getClientName());
         values.put(KEY_ClientMobile, bookings.getClientMobile());
         values.put(KEY_ClientAddress, bookings.getClientAddress());
@@ -671,6 +677,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(KEY_UpdatedDate3, bookings.getUpdatedDate());
         values.put(KEY_Advance, bookings.getAmount());
         values.put(KEY_Shift, bookings.getShift());
+        values.put(KEY_SerialNo3, bookings.getSerialNo());
 
         // insert row
         String s = String.valueOf(db.insert(TABLE_Booking, null, values));
@@ -805,6 +812,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 generalLedger.setArrangePersons(c.getString(c.getColumnIndex(KEY_ArrangePersons)));
                 generalLedger.setAmount(c.getString(c.getColumnIndex(KEY_Advance)));
                 generalLedger.setShift(c.getString(c.getColumnIndex(KEY_Shift)));
+                generalLedger.setSerialNo(c.getString(c.getColumnIndex(KEY_SerialNo3)));
 
                 // adding to todo list
                 mGeneralLedger.add(generalLedger);
@@ -874,7 +882,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 cashBook.setAmount(c.getString(c.getColumnIndex("Amount")));
                 cashBook.setClientID(c.getString(c.getColumnIndex("ClientID")));
                 cashBook.setClientUserID(c.getString(c.getColumnIndex("ClientUserID")));
-                cashBook.setBookingID(c.getString(c.getColumnIndex("BookingID")));
+                cashBook.setTableID(c.getString(c.getColumnIndex("TableID")));
                 cashBook.setDebitAccountName(c.getString(c.getColumnIndex("DebitAccountName")));
                 cashBook.setCreditAccountName(c.getString(c.getColumnIndex("CreditAccountName")));
                 cashBook.setUserName(c.getString(c.getColumnIndex("UserName")));
@@ -1061,6 +1069,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 account3Name.setSalary(c.getString(c.getColumnIndex(KEY_Salary)));
                 account3Name.setAcPassward(c.getString(c.getColumnIndex(KEY_AcPassward)));
                 account3Name.setSecurityRights(c.getString(c.getColumnIndex(KEY_SecurityRights)));
+                account3Name.setSerialNo(c.getString(c.getColumnIndex(KEY_SerialNo)));
 
                 // adding to todo list
                 mAccount3Name.add(account3Name);
@@ -1247,7 +1256,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 cashBook.setNetCode(c.getString(c.getColumnIndex(KEY_NetCode2)));
                 cashBook.setSysCode(c.getString(c.getColumnIndex(KEY_SysCode2)));
                 cashBook.setUpdatedDate(c.getString(c.getColumnIndex(KEY_UpdatedDate2)));
-                cashBook.setBookingID(c.getString(c.getColumnIndex(KEY_BookingID)));
+                cashBook.setTableID(c.getString(c.getColumnIndex(KEY_TableID)));
+                cashBook.setSerialNo(c.getString(c.getColumnIndex(KEY_SerialNo2)));
+                cashBook.setTableName(c.getString(c.getColumnIndex(KEY_TableName)));
 
                 // adding to todo list
                 cashBooks.add(cashBook);
@@ -1550,6 +1561,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     /**
+     * Update a Client
+     */
+    public void updateClient(String query) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.execSQL(query);
+    }
+
+    /**
      * Creating a ProjectMenu
      */
     public void createProjectMenu(ProjectMenu projectMenu) {
@@ -1609,5 +1628,65 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public void deleteProjectMenu() {
         SQLiteDatabase db = this.getWritableDatabase();
         db.execSQL("DELETE FROM "+ TABLE_ProjectMenu + " WHERE EXISTS (SELECT * FROM ActiveAccounts)");
+    }
+
+    //Get MaxValue
+    public int getMaxValue(String query) {
+        int maxID = 0;
+
+        Log.e(LOG, query);
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor c = db.rawQuery(query, null);
+
+        // looping through all rows and adding to list
+        if (c.moveToFirst()) {
+            do {
+
+                maxID = c.getInt(0);
+                Log.e("MAXIDDD", String.valueOf(maxID));
+
+            } while (c.moveToNext());
+        }
+
+        return maxID;
+    }
+
+    public String getID(String query){
+        String id = "0";
+
+        Log.e(LOG, query);
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor c = db.rawQuery(query, null);
+
+        // looping through all rows and adding to list
+        if (c.moveToFirst()) {
+            do {
+
+                id = c.getString(0);
+
+            } while (c.moveToNext());
+        }
+
+        return id;
+    }
+
+    public String getClientUpdatedDate(String id){
+        String date = "0";
+        String query = "SELECT UpdatedDate FROM Client WHERE ClientID = "+id;
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor c = db.rawQuery(query, null);
+
+        // looping through all rows and adding to list
+        if (c.moveToFirst()) {
+            do {
+
+                date = c.getString(0);
+
+            } while (c.moveToNext());
+        }
+
+        return date;
     }
 }

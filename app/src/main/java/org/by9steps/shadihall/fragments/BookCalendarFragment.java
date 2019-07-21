@@ -37,11 +37,11 @@ import com.squareup.timessquare.DefaultDayViewAdapter;
 import org.by9steps.shadihall.AppController;
 import org.by9steps.shadihall.R;
 import org.by9steps.shadihall.helper.DatabaseHelper;
+import org.by9steps.shadihall.helper.Prefrence;
 import org.by9steps.shadihall.model.Account3Name;
 import org.by9steps.shadihall.model.Bookings;
 import org.by9steps.shadihall.model.CashBook;
 import org.by9steps.shadihall.model.TableSession;
-import org.by9steps.shadihall.model.User;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -66,6 +66,8 @@ import static com.squareup.timessquare.CalendarPickerView.SelectionMode.SINGLE;
 public class BookCalendarFragment extends Fragment implements View.OnClickListener {
 
     DatabaseHelper databaseHelper;
+    Prefrence prefrence;
+
     CalendarPickerView calendar;
     List<Date> dateList = new ArrayList<>();
     List<Bookings> bookingList;
@@ -78,6 +80,7 @@ public class BookCalendarFragment extends Fragment implements View.OnClickListen
     ProgressDialog pDialog;
     int day, month, year;
     String query, bookingType = "Morning";
+    String updatedDate;
 
     //Print
     private static final String TAG = "PdfCreatorActivity";
@@ -98,7 +101,9 @@ public class BookCalendarFragment extends Fragment implements View.OnClickListen
         calendar = view.findViewById(R.id.calendar);
         dayBooking = view.findViewById(R.id.btn_day_booking);
         nightBooking = view.findViewById(R.id.btn_night_booking);
+
         databaseHelper = new DatabaseHelper(getContext());
+        prefrence = new Prefrence(getContext());
 
         dayBooking.setOnClickListener(this);
         nightBooking.setOnClickListener(this);
@@ -159,7 +164,7 @@ public class BookCalendarFragment extends Fragment implements View.OnClickListen
 //                    getActivity().getSupportFragmentManager().beginTransaction()
 //                            .replace(R.id.menu_container, BookingDetailFragment.newInstance(selectedDate,bookingType))
 //                            .addToBackStack(null)
-//                            .commit();
+//                            .commit();z
 
 //                    Toast.makeText(getContext(), selectedDate+"\nEvent Already Booked \n" + calselected.get(Calendar.DAY_OF_MONTH), Toast.LENGTH_SHORT).show();
                 } else {
@@ -228,11 +233,9 @@ public class BookCalendarFragment extends Fragment implements View.OnClickListen
     public void FetchFromDb() {
 
         String query = "";
-        List<User> list = User.listAll(User.class);
-        for (User u: list) {
 //            query = "SELECT * FROM Booking";
-            query = "SELECT * FROM Booking WHERE ClientID =" + u.getClientID()+ " AND Shift = '"+bookingType+"'";
-        }
+        query = "SELECT * FROM Booking WHERE ClientID =" + prefrence.getClientIDSession()+ " AND Shift = '"+bookingType+"'";
+
         bookingList = databaseHelper.getBookings(query);
 
         dateList = new ArrayList<>();
@@ -310,8 +313,14 @@ public class BookCalendarFragment extends Fragment implements View.OnClickListen
     }
 
     //FOR TESTING CASHBOOK
+    String cashID, incomeID, expenseID;
 
     public void refereshTables(Context context){
+
+        cashID = databaseHelper.getID("SELECT AcNameID FROM Account3Name WHERE ClientID = "+prefrence.getClientIDSession()+" and AcName = 'Cash'");
+        incomeID = databaseHelper.getID("SELECT AcNameID FROM Account3Name WHERE ClientID = "+prefrence.getClientIDSession()+" and AcName = 'Booking Income'");
+        expenseID = databaseHelper.getID("SELECT AcNameID FROM Account3Name WHERE ClientID = "+prefrence.getClientIDSession()+" and AcName = 'Booking Expense'");
+
         databaseHelper = new DatabaseHelper(context);
         mProgress = new ProgressDialog(context);
         mProgress.setMessage("Loading...");
@@ -365,16 +374,16 @@ public class BookCalendarFragment extends Fragment implements View.OnClickListen
                                     String SessionDate = jsonObject.getString("SessionDate");
 
                                     databaseHelper.createAccount3Name(new Account3Name(AcNameID,AcName,AcGroupID,AcAddress,AcMobileNo,AcContactNo,AcEmailAddress,AcDebitBal,AcCreditBal,AcPassward,ClientID,ClientUserID,SysCode,NetCode,UpdatedDate,SerialNo,UserRights,SecurityRights,Salary));
-
-                                    if (i == jsonArray.length() - 1) {
-                                        List<TableSession> se = TableSession.find(TableSession.class,"table_Name = ?","Account3Name");
-                                        for (TableSession s : se){
-                                            s.setMaxID(AcNameID);
-                                            s.setInsertDate(SessionDate);
-                                            s.save();
-                                        }
-
-                                    }
+                                    updatedDate = SessionDate;
+//                                    if (i == jsonArray.length() - 1) {
+//                                        List<TableSession> se = TableSession.find(TableSession.class,"table_Name = ?","Account3Name");
+//                                        for (TableSession s : se){
+//                                            s.setMaxID(AcNameID);
+//                                            s.setInsertDate(SessionDate);
+//                                            s.save();
+//                                        }
+//
+//                                    }
 
                                 }
 
@@ -398,16 +407,10 @@ public class BookCalendarFragment extends Fragment implements View.OnClickListen
             @Override
             protected Map<String, String> getParams() {
                 Map<String, String> params = new HashMap<String, String>();
-                List<User> list = User.listAll(User.class);
-                for (User u : list) {
-                    params.put("ClientID", u.getClientID());
-                    Log.e("SAREM",u.getClientID());
-                }
-                List<TableSession> tableSessions = TableSession.find(TableSession.class,"table_Name = ?","Account3Name");
-                for (TableSession t : tableSessions){
-                    params.put("MaxID",t.getMaxID());
-                    Log.e("SAREM",t.getMaxID());
-                }
+
+                params.put("ClientID", prefrence.getClientIDSession());
+                int maxID = databaseHelper.getMaxValue("SELECT max(CAST(AcNameID AS Int)) FROM Account3Name");
+                params.put("MaxID", String.valueOf(maxID));
                 return params;
             }
         };
@@ -465,15 +468,15 @@ public class BookCalendarFragment extends Fragment implements View.OnClickListen
                                             + "', ClientID = '"+ClientID+"', ClientUserID = '"+ClientUserID+"', SysCode = '"+SysCode+"', NetCode = '"+NetCode+"', UpdatedDate = '"+UpdatedDate+"', SerialNo = '"+SerialNo
                                             +"', UserRights = '"+UserRights+"', SecurityRights = '"+SecurityRights+"', Salary '"+Salary+"' WHERE AcNameID = "+AcNameID;
                                     databaseHelper.updateAccount3Name(query);
-
-                                    if (i == jsonArray.length() - 1) {
-                                        List<TableSession> se = TableSession.find(TableSession.class,"table_Name = ?","Account3Name");
-                                        for (TableSession s : se){
-//                                            s.setMaxID(AcNameID);
-                                            s.setUpdateDate(SessionDate);
-                                            s.save();
-                                        }
-                                    }
+                                    updatedDate = SessionDate;
+//                                    if (i == jsonArray.length() - 1) {
+//                                        List<TableSession> se = TableSession.find(TableSession.class,"table_Name = ?","Account3Name");
+//                                        for (TableSession s : se){
+////                                            s.setMaxID(AcNameID);
+//                                            s.setUpdateDate(SessionDate);
+//                                            s.save();
+//                                        }
+//                                    }
 
                                 }
 
@@ -497,16 +500,13 @@ public class BookCalendarFragment extends Fragment implements View.OnClickListen
             @Override
             protected Map<String, String> getParams() {
                 Map<String, String> params = new HashMap<String, String>();
-                List<User> list = User.listAll(User.class);
-                for (User u : list) {
-                    params.put("ClientID", u.getClientID());
-                }
-                List<TableSession> tableSessions = TableSession.find(TableSession.class,"table_Name = ?","Account3Name");
-                for (TableSession t : tableSessions){
-                    params.put("MaxID",t.getMaxID());
-                    params.put("SessionDate",t.getUpdateDate());
-                    Log.e("SAREM",t.getUpdateDate());
-                }
+
+                params.put("ClientID", prefrence.getClientIDSession());
+                int maxID = databaseHelper.getMaxValue("SELECT max(CAST(AcNameID AS Int)) FROM Account3Name");
+                params.put("MaxID",String.valueOf(maxID));
+                String date = databaseHelper.getClientUpdatedDate(prefrence.getClientIDSession());
+                params.put("SessionDate",date);
+
                 return params;
             }
         };
@@ -555,19 +555,21 @@ public class BookCalendarFragment extends Fragment implements View.OnClickListen
                                     String UpdatedDate = jsonObject.getString("UpdatedDate");
 //                                    JSONObject jb = new JSONObject(ed);
 //                                    String UpdatedDate = jb.getString("date");
-                                    String BookingID = jsonObject.getString("BookingID");
+                                    String TableID = jsonObject.getString("TableID");
                                     String SessionDate = jsonObject.getString("SessionDate");
+                                    String SerialNo = jsonObject.getString("SerialNo");
+                                    String TableName = jsonObject.getString("TableName");
 
-                                    databaseHelper.createCashBook(new CashBook(CashBookID,CBDate1,DebitAccount,CreditAccount,CBRemark,Amount,ClientID,ClientUserID,NetCode,SysCode,UpdatedDate,BookingID));
-
-                                    if (i == jsonArray.length() - 1) {
-                                        List<TableSession> se = TableSession.find(TableSession.class,"table_Name = ?","CashBook");
-                                        for (TableSession s : se){
-                                            s.setMaxID(CashBookID);
-                                            s.setInsertDate(SessionDate);
-                                            s.save();
-                                        }
-                                    }
+                                    databaseHelper.createCashBook(new CashBook(CashBookID,CBDate1,DebitAccount,CreditAccount,CBRemark,Amount,ClientID,ClientUserID,NetCode,SysCode,UpdatedDate,TableID, SerialNo, TableName));
+                                    updatedDate = SessionDate;
+//                                    if (i == jsonArray.length() - 1) {
+//                                        List<TableSession> se = TableSession.find(TableSession.class,"table_Name = ?","CashBook");
+//                                        for (TableSession s : se){
+//                                            s.setMaxID(CashBookID);
+//                                            s.setInsertDate(SessionDate);
+//                                            s.save();
+//                                        }
+//                                    }
 
                                 }
 
@@ -593,14 +595,14 @@ public class BookCalendarFragment extends Fragment implements View.OnClickListen
             @Override
             protected Map<String, String> getParams() {
                 Map<String, String> params = new HashMap<String, String>();
-                List<User> list = User.listAll(User.class);
-                for (User u : list) {
-                    params.put("ClientID", u.getClientID());
-                }
-                List<TableSession> tableSessions = TableSession.find(TableSession.class,"table_Name = ?","CashBook");
-                for (TableSession t : tableSessions){
-                    params.put("MaxID",t.getMaxID());
-                }
+
+                params.put("ClientID", prefrence.getClientIDSession());
+                int maxID = databaseHelper.getMaxValue("SELECT max(CAST(CashBookID AS Int)) FROM CashBook");
+                Log.e("MAXIDCASH", String.valueOf(maxID));
+                params.put("MaxID",String.valueOf(maxID));
+
+                Log.e("MAXID",String.valueOf(maxID));
+
                 return params;
             }
         };
@@ -650,21 +652,13 @@ public class BookCalendarFragment extends Fragment implements View.OnClickListen
                                     String UpdatedDate = jsonObject.getString("UpdatedDate");
 //                                    JSONObject jb = new JSONObject(ed);
 //                                    String UpdatedDate = jb.getString("date");
-                                    String BookingID = jsonObject.getString("BookingID");
+                                    String TableID = jsonObject.getString("TableID");
                                     String SessionDate = jsonObject.getString("SessionDate");
 
-                                    String query = "UPDATE CashBook SET CBDate = '"+CBDate1+"', DebitAccount = '"+DebitAccount+"', CreditAccount = '"+CreditAccount+"', CBRemarks = '"+CBRemark+"', Amount = '"+Amount+"', ClientID = '"+ClientID+"', ClientUserID = '"+ClientUserID+"', NetCode = '"+NetCode+"', SysCode = '"+SysCode+"', UpdatedDate = '"+UpdatedDate+"', BookingID = '"+BookingID+
+                                    String query = "UPDATE CashBook SET CBDate = '"+CBDate1+"', DebitAccount = '"+DebitAccount+"', CreditAccount = '"+CreditAccount+"', CBRemarks = '"+CBRemark+"', Amount = '"+Amount+"', ClientID = '"+ClientID+"', ClientUserID = '"+ClientUserID+"', NetCode = '"+NetCode+"', SysCode = '"+SysCode+"', UpdatedDate = '"+UpdatedDate+"', TableID = '"+TableID+
                                             "' WHERE CashBookID = "+CashBookID;
                                     databaseHelper.updateCashBook(query);
-
-                                    if (i == jsonArray.length() - 1) {
-                                        List<TableSession> se = TableSession.find(TableSession.class,"table_Name = ?","CashBook");
-                                        for (TableSession s : se){
-//                                            s.setMaxID(CashBookID);
-                                            s.setUpdateDate(SessionDate);
-                                            s.save();
-                                        }
-                                    }
+                                    updatedDate = SessionDate;
 
 
                                 }
@@ -691,16 +685,14 @@ public class BookCalendarFragment extends Fragment implements View.OnClickListen
             @Override
             protected Map<String, String> getParams() {
                 Map<String, String> params = new HashMap<String, String>();
-                List<User> list = User.listAll(User.class);
-                for (User u : list) {
-                    params.put("ClientID", u.getClientID());
-                }
-                List<TableSession> tableSessions = TableSession.find(TableSession.class,"table_Name = ?","CashBook");
-                for (TableSession t : tableSessions){
-                    params.put("MaxID",t.getMaxID());
-                    Log.e("UPDATE DATE",t.getUpdateDate());
-                    params.put("SessionDate",t.getUpdateDate());
-                }
+
+                params.put("ClientID", prefrence.getClientIDSession());
+                int maxID = databaseHelper.getMaxValue("SELECT max(CAST(CashBookID AS Int)) FROM CashBook");
+                Log.e("MAXIDCASH", String.valueOf(maxID));
+                params.put("MaxID",String.valueOf(maxID));
+                String date = databaseHelper.getClientUpdatedDate(prefrence.getClientIDSession());
+                params.put("SessionDate",date);
+
                 return params;
             }
         };
@@ -758,17 +750,19 @@ public class BookCalendarFragment extends Fragment implements View.OnClickListen
                                     UpdatedDate = jbb.getString("date");
                                     String SessionDate = jsonObject.getString("SessionDate");
                                     String Shift = jsonObject.getString("Shift");
+                                    String SerialNo = jsonObject.getString("SerialNo");
 
-                                    databaseHelper.createBooking(new Bookings(BookingID,ClientName,ClientMobile,ClientAddress,ClientNic,EventName,BookingDate,EventDate,ArrangePersons,ChargesTotal,Description,ClientID,ClientUserID,NetCode,SysCode,UpdatedDate,Shift));
-
-                                    if (i == jsonArray.length() - 1) {
-                                        List<TableSession> se = TableSession.find(TableSession.class,"table_Name = ?","Bookings");
-                                        for (TableSession s : se){
-                                            s.setMaxID(BookingID);
-                                            s.setInsertDate(SessionDate);
-                                            s.save();
-                                        }
-                                    }
+                                    databaseHelper.createBooking(new Bookings(BookingID,ClientName,ClientMobile,ClientAddress,ClientNic,EventName,BookingDate,EventDate,ArrangePersons,ChargesTotal,Description,ClientID,ClientUserID,NetCode,SysCode,UpdatedDate,Shift, SerialNo));
+                                    updatedDate = SessionDate;
+//                                    if (i == jsonArray.length() - 1) {
+//                                        List<TableSession> se = TableSession.find(TableSession.class,"table_Name = ?","Bookings");
+//                                        for (TableSession s : se){
+//                                            s.setMaxID(BookingID);
+//                                            s.setInsertDate(SessionDate);
+//                                            s.save();
+//                                        }
+//                                    }
+                                    FetchFromDb();
                                 }
 
 //                                FetchFromDb();
@@ -793,14 +787,11 @@ public class BookCalendarFragment extends Fragment implements View.OnClickListen
             @Override
             protected Map<String, String> getParams() {
                 Map<String, String> params = new HashMap<String, String>();
-                List<User> list = User.listAll(User.class);
-                for (User u : list) {
-                    params.put("ClientID", u.getClientID());
-                }
-                List<TableSession> tableSessions = TableSession.find(TableSession.class,"table_Name = ?","Bookings");
-                for (TableSession t : tableSessions){
-                    params.put("MaxID",t.getMaxID());
-                }
+
+                params.put("ClientID", prefrence.getClientIDSession());
+                int maxID = databaseHelper.getMaxValue("SELECT max(CAST(BookingID AS Int)) FROM Booking");
+                params.put("MaxID",String.valueOf(maxID));
+
                 return params;
             }
         };
@@ -864,15 +855,16 @@ public class BookCalendarFragment extends Fragment implements View.OnClickListen
                                             +"', EventName = '"+EventName+"', BookingDate = '"+BookingDate+"', EventDate = '"+EventDate+"', ArrangePersons ='"+ArrangePersons+"', ChargesTotal = '"+ChargesTotal+"', Description = '"+Description
                                             +"', ClientID = '"+ClientID+"', ClientUserID = '"+ClientUserID+"', NetCode = '"+NetCode+"', SysCode = '"+SysCode+"', UpdatedDate = '"+UpdatedDate+"' WHERE BookingID = "+ BookingID;
                                     databaseHelper.updateBooking(query);
-
-                                    if (i == jsonArray.length() - 1) {
-                                        List<TableSession> se = TableSession.find(TableSession.class,"table_Name = ?","Bookings");
-                                        for (TableSession s : se){
-//                                            s.setMaxID(BookingID);
-                                            s.setUpdateDate(SessionDate);
-                                            s.save();
-                                        }
-                                    }
+                                    updatedDate = SessionDate;
+                                    FetchFromDb();
+//                                    if (i == jsonArray.length() - 1) {
+//                                        List<TableSession> se = TableSession.find(TableSession.class,"table_Name = ?","Bookings");
+//                                        for (TableSession s : se){
+////                                            s.setMaxID(BookingID);
+//                                            s.setUpdateDate(SessionDate);
+//                                            s.save();
+//                                        }
+//                                    }
                                 }
 
 
@@ -898,15 +890,13 @@ public class BookCalendarFragment extends Fragment implements View.OnClickListen
             @Override
             protected Map<String, String> getParams() {
                 Map<String, String> params = new HashMap<String, String>();
-                List<User> list = User.listAll(User.class);
-                for (User u : list) {
-                    params.put("ClientID", u.getClientID());
-                }
-                List<TableSession> tableSessions = TableSession.find(TableSession.class,"table_Name = ?","Bookings");
-                for (TableSession t : tableSessions){
-                    params.put("MaxID",t.getMaxID());
-                    params.put("SessionDate",t.getUpdateDate());
-                }
+
+                params.put("ClientID", prefrence.getClientIDSession());
+                int maxID = databaseHelper.getMaxValue("SELECT max(CAST(BookingID AS Int)) FROM Booking");
+                params.put("MaxID",String.valueOf(maxID));
+                String date = databaseHelper.getClientUpdatedDate(prefrence.getClientIDSession());
+                params.put("SessionDate",date);
+
                 return params;
             }
         };
@@ -938,13 +928,7 @@ public class BookCalendarFragment extends Fragment implements View.OnClickListen
                                     String UpdatedDate = jsonObject.getString("UpdatedDate");
                                     String message = jsonObject.getString("message");
                                     databaseHelper.updateCashBook("UPDATE CashBook SET CashBookID = '"+id+"', UpdatedDate = '"+UpdatedDate+"' WHERE ID = "+c.getcId());
-
-                                    List<TableSession> se = TableSession.find(TableSession.class,"table_Name = ?","CashBook");
-                                    for (TableSession s : se){
-                                        s.setMaxID(id);
-                                        s.setInsertDate(UpdatedDate);
-                                        s.save();
-                                    }
+                                    updatedDate = UpdatedDate;
                                 }
 
                             } catch (JSONException e) {
@@ -962,19 +946,20 @@ public class BookCalendarFragment extends Fragment implements View.OnClickListen
                 protected Map<String, String> getParams() {
 
                     Map<String, String> params = new HashMap<String, String>();
-                    List<User> list = User.listAll(User.class);
-                    for (User u : list) {
-                        params.put("CBDate", c.getCBDate());
-                        params.put("DebitAccount", c.getDebitAccount());
-                        params.put("CreditAccount", c.getCreditAccount());
-                        params.put("CBRemarks", c.getCBRemarks());
-                        params.put("Amount", c.getAmount());
-                        params.put("ClientID", u.getClientID());
-                        params.put("ClientUserID", u.getClientUserID());
-                        params.put("NetCode", "0");
-                        params.put("SysCode", "0");
-                        params.put("BookingID", c.getBookingID());
-                    }
+
+                    params.put("CBDate", c.getCBDate());
+                    params.put("DebitAccount", c.getDebitAccount());
+                    params.put("CreditAccount", c.getCreditAccount());
+                    params.put("CBRemarks", c.getCBRemarks());
+                    params.put("Amount", c.getAmount());
+                    params.put("ClientID", prefrence.getClientIDSession());
+                    params.put("ClientUserID", prefrence.getClientUserIDSession());
+                    params.put("NetCode", "0");
+                    params.put("SysCode", "0");
+                    params.put("TableID", c.getTableID());
+                    params.put("SerialNo", c.getSerialNo());
+                    params.put("TableName", c.getTableName());
+
                     return params;
                 }
             };
@@ -1009,11 +994,7 @@ public class BookCalendarFragment extends Fragment implements View.OnClickListen
                                     String message = jsonObject.getString("message");
                                     databaseHelper.updateCashBook("UPDATE CashBook SET UpdatedDate = '"+UpdatedDate+"' WHERE ID = "+c.getcId());
 
-                                    List<TableSession> se = TableSession.find(TableSession.class,"table_Name = ?","CashBook");
-                                    for (TableSession s : se){
-                                        s.setUpdateDate(UpdatedDate);
-                                        s.save();
-                                    }
+                                    updatedDate = UpdatedDate;
                                 }
                             } catch (JSONException e) {
                                 e.printStackTrace();
@@ -1031,20 +1012,19 @@ public class BookCalendarFragment extends Fragment implements View.OnClickListen
                 protected Map<String, String> getParams() {
 
                     Map<String, String> params = new HashMap<String, String>();
-                    List<User> list = User.listAll(User.class);
-                    for (User u : list) {
-                        params.put("CashBookID", c.getCashBookID());
-                        params.put("CBDate", c.getCBDate());
-                        params.put("DebitAccount", c.getDebitAccount());
-                        params.put("CreditAccount", c.getCreditAccount());
-                        params.put("CBRemarks", c.getCBRemarks());
-                        params.put("Amount", c.getAmount());
-                        params.put("ClientID", u.getClientID());
-                        params.put("ClientUserID", u.getClientUserID());
-                        params.put("NetCode", "0");
-                        params.put("SysCode", "0");
-                        params.put("BookingID", c.getBookingID());
-                    }
+                    params.put("CashBookID", c.getCashBookID());
+                    params.put("CBDate", c.getCBDate());
+                    params.put("DebitAccount", c.getDebitAccount());
+                    params.put("CreditAccount", c.getCreditAccount());
+                    params.put("CBRemarks", c.getCBRemarks());
+                    params.put("Amount", c.getAmount());
+                    params.put("ClientID", prefrence.getClientIDSession());
+                    params.put("ClientUserID", prefrence.getClientUserIDSession());
+                    params.put("NetCode", "0");
+                    params.put("SysCode", "0");
+                    params.put("TableID", c.getTableID());
+                    params.put("SerialNo", c.getSerialNo());
+
                     return params;
                 }
             };
@@ -1082,19 +1062,19 @@ public class BookCalendarFragment extends Fragment implements View.OnClickListen
                                     String UpdatedDate = jsonObject.getString("UpdatedDate");
                                     String message = jsonObject.getString("message");
                                     databaseHelper.updateCashBook("UPDATE Booking SET BookingID = '"+ id +"', UpdatedDate = '"+UpdatedDate+"' WHERE ID = "+c.getId());
-
-                                    List<TableSession> se = TableSession.find(TableSession.class,"table_Name = ?","Bookings");
-                                    for (TableSession s : se){
-                                        s.setMaxID(id);
-                                        s.setInsertDate(UpdatedDate);
-                                        s.save();
-                                    }
+                                    updatedDate = UpdatedDate;
+                                    FetchFromDb();
+//                                    List<TableSession> se = TableSession.find(TableSession.class,"table_Name = ?","Bookings");
+//                                    for (TableSession s : se){
+//                                        s.setMaxID(id);
+//                                        s.setInsertDate(UpdatedDate);
+//                                        s.save();
+//                                    }
                                 }
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }Log.e("Sarem","CashBook7");
 //                            addAccount3Name();
-                            FetchFromDb();
                             mProgress.dismiss();
                         }
                     }, new Response.ErrorListener() {
@@ -1109,8 +1089,7 @@ public class BookCalendarFragment extends Fragment implements View.OnClickListen
                 protected Map<String, String> getParams() {
 
                     Map<String, String> params = new HashMap<String, String>();
-                    List<User> list = User.listAll(User.class);
-                    for (User u : list) {
+
                         params.put("ClientName", c.getClientName());
                         params.put("ClientMobile", c.getClientMobile());
                         params.put("ClientAddress", c.getClientAddress());
@@ -1121,15 +1100,16 @@ public class BookCalendarFragment extends Fragment implements View.OnClickListen
                         params.put("ArrangePersons", c.getArrangePersons());
                         params.put("ChargesTotal", c.getChargesTotal());
                         params.put("Description", c.getDescription());
-                        params.put("ClientID", u.getClientID());
-                        params.put("ClientUserID", u.getClientUserID());
+                        params.put("ClientID", prefrence.getClientIDSession());
+                        params.put("ClientUserID", prefrence.getClientUserIDSession());
                         params.put("NetCode", "0");
                         params.put("SysCode", "0");
-                        params.put("DebitAccount", u.getCashID());
-                        params.put("CreditAccount", u.getBookingIncomeID());
+                        params.put("DebitAccount", cashID);
+                        params.put("CreditAccount", incomeID);
                         params.put("Amount", c.getAmount());
                         params.put("Shift", c.getShift());
-                    }
+                        params.put("SerialNo", c.getSerialNo());
+
                     return params;
                 }
             };
@@ -1163,12 +1143,13 @@ public class BookCalendarFragment extends Fragment implements View.OnClickListen
                                     String UpdatedDate = jsonObject.getString("UpdatedDate");
                                     String message = jsonObject.getString("message");
                                     databaseHelper.updateCashBook("UPDATE Booking SET UpdatedDate = '"+UpdatedDate+"' WHERE ID = "+c.getId());
-
-                                    List<TableSession> se = TableSession.find(TableSession.class,"table_Name = ?","Bookings");
-                                    for (TableSession s : se){
-                                        s.setUpdateDate(UpdatedDate);
-                                        s.save();
-                                    }
+                                    updatedDate = UpdatedDate;
+                                    FetchFromDb();
+//                                    List<TableSession> se = TableSession.find(TableSession.class,"table_Name = ?","Bookings");
+//                                    for (TableSession s : se){
+//                                        s.setUpdateDate(UpdatedDate);
+//                                        s.save();
+//                                    }
                                 }
                             } catch (JSONException e) {
                                 e.printStackTrace();
@@ -1186,8 +1167,7 @@ public class BookCalendarFragment extends Fragment implements View.OnClickListen
                 protected Map<String, String> getParams() {
 
                     Map<String, String> params = new HashMap<String, String>();
-                    List<User> list = User.listAll(User.class);
-                    for (User u : list) {
+
                         params.put("BookingID", c.getBookingID());
                         params.put("ClientName", c.getClientName());
                         params.put("ClientMobile", c.getClientMobile());
@@ -1199,13 +1179,13 @@ public class BookCalendarFragment extends Fragment implements View.OnClickListen
                         params.put("ArrangePersons", c.getArrangePersons());
                         params.put("ChargesTotal", c.getChargesTotal());
                         params.put("Description", c.getDescription());
-                        params.put("ClientID", u.getClientID());
-                        params.put("ClientUserID", u.getClientUserID());
+                        params.put("ClientID", prefrence.getClientIDSession());
+                        params.put("ClientUserID", prefrence.getClientUserIDSession());
                         params.put("NetCode", "0");
                         params.put("SysCode", "0");
-                        params.put("DebitAccount", u.getCashID());
-                        params.put("CreditAccount", u.getBookingIncomeID());
-                    }
+                        params.put("DebitAccount", cashID);
+                        params.put("CreditAccount", incomeID);
+
                     return params;
                 }
             };
@@ -1214,7 +1194,6 @@ public class BookCalendarFragment extends Fragment implements View.OnClickListen
             jsonObjectRequest.setRetryPolicy(policy);
             AppController.getInstance().addToRequestQueue(jsonObjectRequest, tag_json_obj);
         }
-        FetchFromDb();
         addAccount3Name();
     }
 
@@ -1241,13 +1220,13 @@ public class BookCalendarFragment extends Fragment implements View.OnClickListen
                                     String UpdatedDate = jsonObject.getString("UpdatedDate");
                                     String message = jsonObject.getString("message");
                                     databaseHelper.updateCashBook("UPDATE Account3Name SET AcNameID = '"+ id +"', UpdatedDate = '"+UpdatedDate+"' WHERE ID = "+c.getId());
-
-                                    List<TableSession> se = TableSession.find(TableSession.class,"table_Name = ?","Account3Name");
-                                    for (TableSession s : se){
-                                        s.setMaxID(id);
-                                        s.setInsertDate(UpdatedDate);
-                                        s.save();
-                                    }
+                                    updatedDate = UpdatedDate;
+//                                    List<TableSession> se = TableSession.find(TableSession.class,"table_Name = ?","Account3Name");
+//                                    for (TableSession s : se){
+//                                        s.setMaxID(id);
+//                                        s.setInsertDate(UpdatedDate);
+//                                        s.save();
+//                                    }
                                 }else {
                                     databaseHelper.deleteAccount3NameEntry("DELETE FROM Account3Name WHERE ID = "+c.getId());
                                     String message = jsonObject.getString("message");
@@ -1270,8 +1249,7 @@ public class BookCalendarFragment extends Fragment implements View.OnClickListen
                 protected Map<String, String> getParams() {
 
                     Map<String, String> params = new HashMap<String, String>();
-                    List<User> list = User.listAll(User.class);
-                    for (User u : list) {
+
                         params.put("AcName", c.getAcName());
                         params.put("AcAddress", c.getAcAddress());
                         params.put("AcContactNo", c.getAcContactNo());
@@ -1280,9 +1258,10 @@ public class BookCalendarFragment extends Fragment implements View.OnClickListen
                         params.put("AcMobileNo", c.getAcMobileNo());
                         params.put("AcPassward", c.getAcPassward());
                         params.put("SecurityRights", c.getSecurityRights());
-                        params.put("ClientID", u.getClientID());
+                        params.put("ClientID", prefrence.getClientIDSession());
                         params.put("AcGroupID", c.getAcGroupID());
-                    }
+                        params.put("SerialNo", c.getSerialNo());
+
                     return params;
                 }
             };
@@ -1317,12 +1296,13 @@ public class BookCalendarFragment extends Fragment implements View.OnClickListen
                                     String UpdatedDate = jsonObject.getString("UpdatedDate");
                                     String message = jsonObject.getString("message");
                                     databaseHelper.updateCashBook("UPDATE Account3Name SET UpdatedDate = '"+UpdatedDate+"' WHERE ID = "+c.getId());
-
-                                    List<TableSession> se = TableSession.find(TableSession.class,"table_Name = ?","Account3Name");
-                                    for (TableSession s : se){
-                                        s.setUpdateDate(UpdatedDate);
-                                        s.save();
-                                    }
+                                    updatedDate = UpdatedDate;
+//                                    List<TableSession> se = TableSession.find(TableSession.class,"table_Name = ?","Account3Name");
+//                                    for (TableSession s : se){
+//                                        s.setUpdateDate(UpdatedDate);
+//                                        s.save();
+//                                    }
+                                    databaseHelper.updateClient("UPDATE Client SET UpdatedDate = '"+updatedDate+"' WHERE ClientID = "+prefrence.getClientIDSession());
                                 }
                             } catch (JSONException e) {
                                 e.printStackTrace();
@@ -1341,8 +1321,7 @@ public class BookCalendarFragment extends Fragment implements View.OnClickListen
                 protected Map<String, String> getParams() {
 
                     Map<String, String> params = new HashMap<String, String>();
-                    List<User> list = User.listAll(User.class);
-                    for (User u : list) {
+
                         params.put("AcNameID", c.getAcNameID());
                         params.put("AcName", c.getAcName());
                         params.put("AcAddress", c.getAcAddress());
@@ -1352,9 +1331,9 @@ public class BookCalendarFragment extends Fragment implements View.OnClickListen
                         params.put("AcMobileNo", c.getAcMobileNo());
                         params.put("AcPassward", c.getAcPassward());
                         params.put("SecurityRights", c.getSecurityRights());
-                        params.put("ClientID", u.getClientID());
+                        params.put("ClientID", prefrence.getClientIDSession());
                         params.put("AcGroupID", c.getAcGroupID());
-                    }
+
                     return params;
                 }
             };
@@ -1364,6 +1343,9 @@ public class BookCalendarFragment extends Fragment implements View.OnClickListen
             AppController.getInstance().addToRequestQueue(jsonObjectRequest, tag_json_obj);
         }
         FetchFromDb();
+        if (addBooking.size() == 0){
+            databaseHelper.updateClient("UPDATE Client SET UpdatedDate = '"+updatedDate+"' WHERE ClientID = "+prefrence.getClientIDSession());
+        }
         mProgress.dismiss();
     }
 

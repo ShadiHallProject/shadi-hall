@@ -38,10 +38,10 @@ import org.by9steps.shadihall.AppController;
 import org.by9steps.shadihall.R;
 import org.by9steps.shadihall.activities.CashCollectionActivity;
 import org.by9steps.shadihall.helper.DatabaseHelper;
+import org.by9steps.shadihall.helper.Prefrence;
 import org.by9steps.shadihall.model.CBSetting;
 import org.by9steps.shadihall.model.CashBook;
 import org.by9steps.shadihall.model.CashEntry;
-import org.by9steps.shadihall.model.User;
 import org.by9steps.shadihall.model.Voucher;
 
 import java.io.ByteArrayOutputStream;
@@ -67,6 +67,7 @@ public class CashBookAdapter extends RecyclerView.Adapter {
 
     File pdfFile;
     DatabaseHelper databaseHelper;
+    Prefrence prefrence;
 
     DecimalFormat formatter = new DecimalFormat("#,###,###");
 
@@ -75,7 +76,7 @@ public class CashBookAdapter extends RecyclerView.Adapter {
         this.mList = mList;
         this.mFilterList = mList;
         databaseHelper = new DatabaseHelper(mCtx);
-        Log.e("LIST","sss");
+        prefrence = new Prefrence(mCtx);
     }
 
     @NonNull
@@ -272,8 +273,7 @@ public class CashBookAdapter extends RecyclerView.Adapter {
     public void createPDF (String id){
         List<Voucher> mVoucher = null;
 
-        List<User> list = User.listAll(User.class);
-        for (User u : list){
+
             String query = "SELECT        CashBook.CashBookID, CashBook.CBDate, CashBook.CBRemarks, CashBook.DebitAccount, CashBook.CreditAccount, CashBook.ClientUserID, CashBook.Amount, \n" +
                     "                         CashBook.ClientID, Account3Name_1.AcName AS DebiterName, Account3Name_1.AcAddress AS DebiterAddress, Account3Name_1.AcContactNo AS DebiterContactNo,\n" +
                     "                          Account3Name_2.AcName AS CrediterName, Account3Name_2.AcAddress AS CrediterAddress, Account3Name_2.AcContactNo AS CrediterContactNo, \n" +
@@ -282,9 +282,9 @@ public class CashBookAdapter extends RecyclerView.Adapter {
                     "                         Account3Name ON CashBook.ClientUserID = Account3Name.AcNameID LEFT OUTER JOIN\n" +
                     "                         Account3Name AS Account3Name_2 ON CashBook.CreditAccount = Account3Name_2.AcNameID LEFT OUTER JOIN\n" +
                     "                         Account3Name AS Account3Name_1 ON CashBook.DebitAccount = Account3Name_1.AcNameID\n" +
-                    "WHERE        (CashBook.CashBookID = "+id+") AND (CashBook.ClientID = "+u.getClientID()+")";
+                    "WHERE        (CashBook.CashBookID = "+id+") AND (CashBook.ClientID = "+prefrence.getClientIDSession()+")";
             mVoucher = databaseHelper.getPrintValues(query);
-        }
+
 
         for (Voucher v : mVoucher){
             try {

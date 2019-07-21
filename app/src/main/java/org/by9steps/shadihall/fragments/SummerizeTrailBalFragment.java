@@ -60,11 +60,11 @@ import org.by9steps.shadihall.AppController;
 import org.by9steps.shadihall.R;
 import org.by9steps.shadihall.adapters.SummerizeTrialBalanceAdapter;
 import org.by9steps.shadihall.helper.DatabaseHelper;
+import org.by9steps.shadihall.helper.Prefrence;
 import org.by9steps.shadihall.model.CashBook;
 import org.by9steps.shadihall.model.CashEntry;
 import org.by9steps.shadihall.model.Recovery;
 import org.by9steps.shadihall.model.Summerize;
-import org.by9steps.shadihall.model.User;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -90,6 +90,8 @@ public class SummerizeTrailBalFragment extends Fragment implements View.OnClickL
     String currentDate;
 
     DatabaseHelper databaseHelper;
+    Prefrence prefrence;
+
     List<Summerize> summerizeList;
     List<Summerize> filterdList;
 
@@ -149,6 +151,7 @@ public class SummerizeTrailBalFragment extends Fragment implements View.OnClickL
         date_picker.setOnClickListener(this);
 
         databaseHelper = new DatabaseHelper(getContext());
+        prefrence = new Prefrence(getContext());
 
         Date date = new Date();
         SimpleDateFormat curFormater = new SimpleDateFormat("yyyy-MM-dd");
@@ -279,24 +282,23 @@ public class SummerizeTrailBalFragment extends Fragment implements View.OnClickL
 
         currentDate = date_picker.getText().toString();
 
-        List<User> list = User.listAll(User.class);
-        for (User u : list){
+
             String query = "SELECT        Account1Type.AcTypeID, Account1Type.AcTypeName, Account2Group.AcGroupID, Account2Group.AcGruopName, SUM(derivedtbl_1.Debit) AS Debit, SUM(derivedtbl_1.Credit) AS Credit, derivedtbl_1.ClientID,\n" +
                     "                         SUM(derivedtbl_1.Debit) - SUM(derivedtbl_1.Credit) AS Bal, CASE WHEN (SUM(Debit) - SUM(Credit)) > 0 THEN (SUM(Debit) - SUM(Credit)) ELSE 0 END AS DebitBL, CASE WHEN (SUM(Debit) - SUM(Credit)) < 0 THEN (SUM(Debit)\n" +
                     "                         - SUM(Credit)) ELSE 0 END AS CreditBL\n" +
                     "FROM            (SELECT        CreditAccount AS AccountID, 0 AS Debit, Amount AS Credit, ClientID, CBDate\n" +
                     "                          FROM            CashBook AS CashBook\n" +
-                    "                          WHERE        (ClientID = "+u.getClientID()+") AND (CBDate <= '"+currentDate+"')\n" +
+                    "                          WHERE        (ClientID = "+prefrence.getClientIDSession()+") AND (CBDate <= '"+currentDate+"')\n" +
                     "                          UNION ALL\n" +
                     "                          SELECT        DebitAccount AS AccountID, Amount AS Debit, 0 AS Credit, ClientID, CBDate\n" +
                     "                          FROM            CashBook AS CashBook_1\n" +
-                    "                          WHERE        (ClientID = "+u.getClientID()+") AND (CBDate <= '"+currentDate+"')) AS derivedtbl_1 INNER JOIN\n" +
+                    "                          WHERE        (ClientID = "+prefrence.getClientIDSession()+") AND (CBDate <= '"+currentDate+"')) AS derivedtbl_1 INNER JOIN\n" +
                     "                         Account3Name ON derivedtbl_1.AccountID = Account3Name.AcNameID INNER JOIN\n" +
                     "                         Account2Group ON Account3Name.AcGroupID = Account2Group.AcGroupID INNER JOIN\n" +
                     "                         Account1Type ON Account2Group.AcTypeID = Account1Type.AcTypeID\n" +
                     "GROUP BY derivedtbl_1.ClientID, Account2Group.AcGroupID, Account2Group.AcGruopName, Account1Type.AcTypeName, Account1Type.AcTypeID" + orderby;
             summerizeList = databaseHelper.getSummerizeTB(query);
-        }
+
 //        int a = 0;
 //        List<Summerize> list1 = new ArrayList<>();
 //        List<Summerize> list2 = new ArrayList<>();

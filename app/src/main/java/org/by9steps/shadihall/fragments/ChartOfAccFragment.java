@@ -32,6 +32,7 @@ import org.by9steps.shadihall.AppController;
 import org.by9steps.shadihall.R;
 import org.by9steps.shadihall.bean.Dir;
 import org.by9steps.shadihall.helper.DatabaseHelper;
+import org.by9steps.shadihall.helper.Prefrence;
 import org.by9steps.shadihall.model.Account1Type;
 import org.by9steps.shadihall.model.Account2Group;
 import org.by9steps.shadihall.model.Account3Name;
@@ -39,7 +40,6 @@ import org.by9steps.shadihall.model.Bookings;
 import org.by9steps.shadihall.model.CashBook;
 import org.by9steps.shadihall.model.ChartOfAcc;
 import org.by9steps.shadihall.model.TableSession;
-import org.by9steps.shadihall.model.User;
 import org.by9steps.shadihall.viewbinder.DirectoryNodeBinder;
 import org.by9steps.shadihall.viewbinder.FileNodeBinder;
 import org.json.JSONArray;
@@ -75,8 +75,11 @@ public class ChartOfAccFragment extends Fragment {
     List<String> town = new ArrayList<>();
 
     DatabaseHelper databaseHelper;
+    Prefrence prefrence;
+
     List<ChartOfAcc> chartOfAccList;
     String query = "";
+    String updatedDate;
 
 
     public ChartOfAccFragment() {
@@ -91,7 +94,9 @@ public class ChartOfAccFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_chart_of_acc, container, false);
 
         rv = view.findViewById(R.id.rv);
+
         databaseHelper = new DatabaseHelper(getContext());
+        prefrence = new Prefrence(getContext());
         mProgress = new ProgressDialog(getContext());
         setHasOptionsMenu(true);
 
@@ -100,23 +105,22 @@ public class ChartOfAccFragment extends Fragment {
         SimpleDateFormat curFormater = new SimpleDateFormat("yyyy-MM-dd");
         currentDate = curFormater.format(date);
 
-        List<User> list = User.listAll(User.class);
-        for (User u : list){
+
             query = "SELECT        Account1Type.AcTypeID, Account1Type.AcTypeName, Account2Group.AcGroupID, Account2Group.AcGruopName, derivedtbl_1.AccountID, Account3Name.AcName, SUM(derivedtbl_1.Debit) AS Debit, SUM(derivedtbl_1.Credit) \n" +
                     "                         AS Credit, derivedtbl_1.ClientID, SUM(derivedtbl_1.Debit) - SUM(derivedtbl_1.Credit) AS Bal, CASE WHEN (SUM(Debit) - SUM(Credit)) > 0 THEN (SUM(Debit) - SUM(Credit)) ELSE 0 END AS DebitBL, CASE WHEN (SUM(Debit) \n" +
                     "                         - SUM(Credit)) < 0 THEN (SUM(Debit) - SUM(Credit)) ELSE 0 END AS CreditBL, MAX(derivedtbl_1.CBDate) AS MaxDate\n" +
                     "FROM            (SELECT        CreditAccount AS AccountID, 0 AS Debit, Amount AS Credit, ClientID, CBDate\n" +
                     "                          FROM            CashBook AS CashBook\n" +
-                    "                          WHERE        (ClientID = "+u.getClientID()+") AND (CBDate <= '"+currentDate+"')\n" +
+                    "                          WHERE        (ClientID = "+prefrence.getClientIDSession()+") AND (CBDate <= '"+currentDate+"')\n" +
                     "                          UNION ALL\n" +
                     "                          SELECT        DebitAccount AS AccountID, Amount AS Debit, 0 AS Credit, ClientID, CBDate\n" +
                     "                          FROM            CashBook AS CashBook_1\n" +
-                    "                          WHERE        (ClientID = "+u.getClientID()+") AND (CBDate <= '"+currentDate+"')) AS derivedtbl_1 INNER JOIN\n" +
+                    "                          WHERE        (ClientID = "+prefrence.getClientIDSession()+") AND (CBDate <= '"+currentDate+"')) AS derivedtbl_1 INNER JOIN\n" +
                     "                         Account3Name ON derivedtbl_1.AccountID = Account3Name.AcNameID INNER JOIN\n" +
                     "                         Account2Group ON Account3Name.AcGroupID = Account2Group.AcGroupID INNER JOIN\n" +
                     "                         Account1Type ON Account2Group.AcTypeID = Account1Type.AcTypeID\n" +
                     "GROUP BY derivedtbl_1.ClientID, derivedtbl_1.AccountID, Account3Name.AcName, Account2Group.AcGroupID, Account2Group.AcGruopName, Account1Type.AcTypeName, Account1Type.AcTypeID";
-        }
+
         initData();
 
         return view;
@@ -218,8 +222,15 @@ public class ChartOfAccFragment extends Fragment {
     }
 
     //FOR TESTING CASHBOOK
+    String cashID, incomeID, expenseID;
 
     public void refereshTables(Context context){
+
+        cashID = databaseHelper.getID("SELECT AcNameID FROM Account3Name WHERE ClientID = "+prefrence.getClientIDSession()+" and AcName = 'Cash'");
+        incomeID = databaseHelper.getID("SELECT AcNameID FROM Account3Name WHERE ClientID = "+prefrence.getClientIDSession()+" and AcName = 'Booking Income'");
+        expenseID = databaseHelper.getID("SELECT AcNameID FROM Account3Name WHERE ClientID = "+prefrence.getClientIDSession()+" and AcName = 'Booking Expense'");
+
+
         databaseHelper = new DatabaseHelper(context);
         mProgress = new ProgressDialog(context);
         mProgress.setMessage("Loading...");
@@ -273,17 +284,18 @@ public class ChartOfAccFragment extends Fragment {
                                     String SessionDate = jsonObject.getString("SessionDate");
 
                                     databaseHelper.createAccount3Name(new Account3Name(AcNameID,AcName,AcGroupID,AcAddress,AcMobileNo,AcContactNo,AcEmailAddress,AcDebitBal,AcCreditBal,AcPassward,ClientID,ClientUserID,SysCode,NetCode,UpdatedDate,SerialNo,UserRights,SecurityRights,Salary));
-
-                                    if (i == jsonArray.length() - 1) {
-                                        List<TableSession> se = TableSession.find(TableSession.class,"table_Name = ?","Account3Name");
-                                        for (TableSession s : se){
-                                            s.setMaxID(AcNameID);
-                                            s.setInsertDate(SessionDate);
-                                            s.save();
-                                        }
-
-                                    }
+                                    updatedDate = SessionDate;
                                     initData();
+//                                    if (i == jsonArray.length() - 1) {
+//                                        List<TableSession> se = TableSession.find(TableSession.class,"table_Name = ?","Account3Name");
+//                                        for (TableSession s : se){
+//                                            s.setMaxID(AcNameID);
+//                                            s.setInsertDate(SessionDate);
+//                                            s.save();
+//                                        }
+//
+//                                    }
+
                                 }
 
                             }else {
@@ -306,16 +318,10 @@ public class ChartOfAccFragment extends Fragment {
             @Override
             protected Map<String, String> getParams() {
                 Map<String, String> params = new HashMap<String, String>();
-                List<User> list = User.listAll(User.class);
-                for (User u : list) {
-                    params.put("ClientID", u.getClientID());
-                    Log.e("SAREM",u.getClientID());
-                }
-                List<TableSession> tableSessions = TableSession.find(TableSession.class,"table_Name = ?","Account3Name");
-                for (TableSession t : tableSessions){
-                    params.put("MaxID",t.getMaxID());
-                    Log.e("SAREM",t.getMaxID());
-                }
+
+                params.put("ClientID", prefrence.getClientIDSession());
+                int maxID = databaseHelper.getMaxValue("SELECT max(CAST(AcNameID AS Int)) FROM Account3Name");
+                params.put("MaxID", String.valueOf(maxID));
                 return params;
             }
         };
@@ -373,16 +379,17 @@ public class ChartOfAccFragment extends Fragment {
                                             + "', ClientID = '"+ClientID+"', ClientUserID = '"+ClientUserID+"', SysCode = '"+SysCode+"', NetCode = '"+NetCode+"', UpdatedDate = '"+UpdatedDate+"', SerialNo = '"+SerialNo
                                             +"', UserRights = '"+UserRights+"', SecurityRights = '"+SecurityRights+"', Salary '"+Salary+"' WHERE AcNameID = "+AcNameID;
                                     databaseHelper.updateAccount3Name(query);
-
-                                    if (i == jsonArray.length() - 1) {
-                                        List<TableSession> se = TableSession.find(TableSession.class,"table_Name = ?","Account3Name");
-                                        for (TableSession s : se){
-//                                            s.setMaxID(AcNameID);
-                                            s.setUpdateDate(SessionDate);
-                                            s.save();
-                                        }
-                                    }
+                                    updatedDate = SessionDate;
                                     initData();
+//                                    if (i == jsonArray.length() - 1) {
+//                                        List<TableSession> se = TableSession.find(TableSession.class,"table_Name = ?","Account3Name");
+//                                        for (TableSession s : se){
+////                                            s.setMaxID(AcNameID);
+//                                            s.setUpdateDate(SessionDate);
+//                                            s.save();
+//                                        }
+//                                    }
+
                                 }
 
                             }else {
@@ -405,16 +412,13 @@ public class ChartOfAccFragment extends Fragment {
             @Override
             protected Map<String, String> getParams() {
                 Map<String, String> params = new HashMap<String, String>();
-                List<User> list = User.listAll(User.class);
-                for (User u : list) {
-                    params.put("ClientID", u.getClientID());
-                }
-                List<TableSession> tableSessions = TableSession.find(TableSession.class,"table_Name = ?","Account3Name");
-                for (TableSession t : tableSessions){
-                    params.put("MaxID",t.getMaxID());
-                    params.put("SessionDate",t.getUpdateDate());
-                    Log.e("SAREM",t.getUpdateDate());
-                }
+
+                params.put("ClientID", prefrence.getClientIDSession());
+                int maxID = databaseHelper.getMaxValue("SELECT max(CAST(AcNameID AS Int)) FROM Account3Name");
+                params.put("MaxID",String.valueOf(maxID));
+                String date = databaseHelper.getClientUpdatedDate(prefrence.getClientIDSession());
+                params.put("SessionDate",date);
+
                 return params;
             }
         };
@@ -463,20 +467,24 @@ public class ChartOfAccFragment extends Fragment {
                                     String UpdatedDate = jsonObject.getString("UpdatedDate");
 //                                    JSONObject jb = new JSONObject(ed);
 //                                    String UpdatedDate = jb.getString("date");
-                                    String BookingID = jsonObject.getString("BookingID");
+                                    String TableID = jsonObject.getString("TableID");
                                     String SessionDate = jsonObject.getString("SessionDate");
+                                    String SerialNo = jsonObject.getString("SerialNo");
+                                    String TableName = jsonObject.getString("TableName");
 
-                                    databaseHelper.createCashBook(new CashBook(CashBookID,CBDate1,DebitAccount,CreditAccount,CBRemark,Amount,ClientID,ClientUserID,NetCode,SysCode,UpdatedDate,BookingID));
+                                    databaseHelper.createCashBook(new CashBook(CashBookID,CBDate1,DebitAccount,CreditAccount,CBRemark,Amount,ClientID,ClientUserID,NetCode,SysCode,UpdatedDate,TableID, SerialNo, TableName));
+                                    updatedDate = SessionDate;
+//                                    if (i == jsonArray.length() - 1) {
+//                                        List<TableSession> se = TableSession.find(TableSession.class,"table_Name = ?","CashBook");
+//                                        for (TableSession s : se){
+//                                            s.setMaxID(CashBookID);
+//                                            s.setInsertDate(SessionDate);
+//                                            s.save();
+//                                        }
+//                                    }
 
-                                    if (i == jsonArray.length() - 1) {
-                                        List<TableSession> se = TableSession.find(TableSession.class,"table_Name = ?","CashBook");
-                                        for (TableSession s : se){
-                                            s.setMaxID(CashBookID);
-                                            s.setInsertDate(SessionDate);
-                                            s.save();
-                                        }
-                                    }
                                 }
+
                             }else {
                                 String message = jsonObj.getString("message");
 //                                Toast.makeText(SplashActivity.this, message, Toast.LENGTH_SHORT).show();
@@ -499,14 +507,14 @@ public class ChartOfAccFragment extends Fragment {
             @Override
             protected Map<String, String> getParams() {
                 Map<String, String> params = new HashMap<String, String>();
-                List<User> list = User.listAll(User.class);
-                for (User u : list) {
-                    params.put("ClientID", u.getClientID());
-                }
-                List<TableSession> tableSessions = TableSession.find(TableSession.class,"table_Name = ?","CashBook");
-                for (TableSession t : tableSessions){
-                    params.put("MaxID",t.getMaxID());
-                }
+
+                params.put("ClientID", prefrence.getClientIDSession());
+                int maxID = databaseHelper.getMaxValue("SELECT max(CAST(CashBookID AS Int)) FROM CashBook");
+                Log.e("MAXIDCASH", String.valueOf(maxID));
+                params.put("MaxID",String.valueOf(maxID));
+
+                Log.e("MAXID",String.valueOf(maxID));
+
                 return params;
             }
         };
@@ -556,21 +564,14 @@ public class ChartOfAccFragment extends Fragment {
                                     String UpdatedDate = jsonObject.getString("UpdatedDate");
 //                                    JSONObject jb = new JSONObject(ed);
 //                                    String UpdatedDate = jb.getString("date");
-                                    String BookingID = jsonObject.getString("BookingID");
+                                    String TableID = jsonObject.getString("TableID");
                                     String SessionDate = jsonObject.getString("SessionDate");
 
-                                    String query = "UPDATE CashBook SET CBDate = '"+CBDate1+"', DebitAccount = '"+DebitAccount+"', CreditAccount = '"+CreditAccount+"', CBRemarks = '"+CBRemark+"', Amount = '"+Amount+"', ClientID = '"+ClientID+"', ClientUserID = '"+ClientUserID+"', NetCode = '"+NetCode+"', SysCode = '"+SysCode+"', UpdatedDate = '"+UpdatedDate+"', BookingID = '"+BookingID+
+                                    String query = "UPDATE CashBook SET CBDate = '"+CBDate1+"', DebitAccount = '"+DebitAccount+"', CreditAccount = '"+CreditAccount+"', CBRemarks = '"+CBRemark+"', Amount = '"+Amount+"', ClientID = '"+ClientID+"', ClientUserID = '"+ClientUserID+"', NetCode = '"+NetCode+"', SysCode = '"+SysCode+"', UpdatedDate = '"+UpdatedDate+"', TableID = '"+TableID+
                                             "' WHERE CashBookID = "+CashBookID;
                                     databaseHelper.updateCashBook(query);
+                                    updatedDate = SessionDate;
 
-                                    if (i == jsonArray.length() - 1) {
-                                        List<TableSession> se = TableSession.find(TableSession.class,"table_Name = ?","CashBook");
-                                        for (TableSession s : se){
-//                                            s.setMaxID(CashBookID);
-                                            s.setUpdateDate(SessionDate);
-                                            s.save();
-                                        }
-                                    }
 
                                 }
 
@@ -596,16 +597,14 @@ public class ChartOfAccFragment extends Fragment {
             @Override
             protected Map<String, String> getParams() {
                 Map<String, String> params = new HashMap<String, String>();
-                List<User> list = User.listAll(User.class);
-                for (User u : list) {
-                    params.put("ClientID", u.getClientID());
-                }
-                List<TableSession> tableSessions = TableSession.find(TableSession.class,"table_Name = ?","CashBook");
-                for (TableSession t : tableSessions){
-                    params.put("MaxID",t.getMaxID());
-                    Log.e("UPDATE DATE",t.getUpdateDate());
-                    params.put("SessionDate",t.getUpdateDate());
-                }
+
+                params.put("ClientID", prefrence.getClientIDSession());
+                int maxID = databaseHelper.getMaxValue("SELECT max(CAST(CashBookID AS Int)) FROM CashBook");
+                Log.e("MAXIDCASH", String.valueOf(maxID));
+                params.put("MaxID",String.valueOf(maxID));
+                String date = databaseHelper.getClientUpdatedDate(prefrence.getClientIDSession());
+                params.put("SessionDate",date);
+
                 return params;
             }
         };
@@ -663,17 +662,18 @@ public class ChartOfAccFragment extends Fragment {
                                     UpdatedDate = jbb.getString("date");
                                     String SessionDate = jsonObject.getString("SessionDate");
                                     String Shift = jsonObject.getString("Shift");
+                                    String SerialNo = jsonObject.getString("SerialNo");
 
-                                    databaseHelper.createBooking(new Bookings(BookingID,ClientName,ClientMobile,ClientAddress,ClientNic,EventName,BookingDate,EventDate,ArrangePersons,ChargesTotal,Description,ClientID,ClientUserID,NetCode,SysCode,UpdatedDate,Shift));
-
-                                    if (i == jsonArray.length() - 1) {
-                                        List<TableSession> se = TableSession.find(TableSession.class,"table_Name = ?","Bookings");
-                                        for (TableSession s : se){
-                                            s.setMaxID(BookingID);
-                                            s.setInsertDate(SessionDate);
-                                            s.save();
-                                        }
-                                    }
+                                    databaseHelper.createBooking(new Bookings(BookingID,ClientName,ClientMobile,ClientAddress,ClientNic,EventName,BookingDate,EventDate,ArrangePersons,ChargesTotal,Description,ClientID,ClientUserID,NetCode,SysCode,UpdatedDate,Shift, SerialNo));
+                                    updatedDate = SessionDate;
+//                                    if (i == jsonArray.length() - 1) {
+//                                        List<TableSession> se = TableSession.find(TableSession.class,"table_Name = ?","Bookings");
+//                                        for (TableSession s : se){
+//                                            s.setMaxID(BookingID);
+//                                            s.setInsertDate(SessionDate);
+//                                            s.save();
+//                                        }
+//                                    }
                                 }
 
 //                                FetchFromDb();
@@ -698,14 +698,11 @@ public class ChartOfAccFragment extends Fragment {
             @Override
             protected Map<String, String> getParams() {
                 Map<String, String> params = new HashMap<String, String>();
-                List<User> list = User.listAll(User.class);
-                for (User u : list) {
-                    params.put("ClientID", u.getClientID());
-                }
-                List<TableSession> tableSessions = TableSession.find(TableSession.class,"table_Name = ?","Bookings");
-                for (TableSession t : tableSessions){
-                    params.put("MaxID",t.getMaxID());
-                }
+
+                params.put("ClientID", prefrence.getClientIDSession());
+                int maxID = databaseHelper.getMaxValue("SELECT max(CAST(BookingID AS Int)) FROM Booking");
+                params.put("MaxID",String.valueOf(maxID));
+
                 return params;
             }
         };
@@ -769,15 +766,16 @@ public class ChartOfAccFragment extends Fragment {
                                             +"', EventName = '"+EventName+"', BookingDate = '"+BookingDate+"', EventDate = '"+EventDate+"', ArrangePersons ='"+ArrangePersons+"', ChargesTotal = '"+ChargesTotal+"', Description = '"+Description
                                             +"', ClientID = '"+ClientID+"', ClientUserID = '"+ClientUserID+"', NetCode = '"+NetCode+"', SysCode = '"+SysCode+"', UpdatedDate = '"+UpdatedDate+"' WHERE BookingID = "+ BookingID;
                                     databaseHelper.updateBooking(query);
+                                    updatedDate = SessionDate;
 
-                                    if (i == jsonArray.length() - 1) {
-                                        List<TableSession> se = TableSession.find(TableSession.class,"table_Name = ?","Bookings");
-                                        for (TableSession s : se){
-//                                            s.setMaxID(BookingID);
-                                            s.setUpdateDate(SessionDate);
-                                            s.save();
-                                        }
-                                    }
+//                                    if (i == jsonArray.length() - 1) {
+//                                        List<TableSession> se = TableSession.find(TableSession.class,"table_Name = ?","Bookings");
+//                                        for (TableSession s : se){
+////                                            s.setMaxID(BookingID);
+//                                            s.setUpdateDate(SessionDate);
+//                                            s.save();
+//                                        }
+//                                    }
                                 }
 
 
@@ -803,15 +801,13 @@ public class ChartOfAccFragment extends Fragment {
             @Override
             protected Map<String, String> getParams() {
                 Map<String, String> params = new HashMap<String, String>();
-                List<User> list = User.listAll(User.class);
-                for (User u : list) {
-                    params.put("ClientID", u.getClientID());
-                }
-                List<TableSession> tableSessions = TableSession.find(TableSession.class,"table_Name = ?","Bookings");
-                for (TableSession t : tableSessions){
-                    params.put("MaxID",t.getMaxID());
-                    params.put("SessionDate",t.getUpdateDate());
-                }
+
+                params.put("ClientID", prefrence.getClientIDSession());
+                int maxID = databaseHelper.getMaxValue("SELECT max(CAST(BookingID AS Int)) FROM Booking");
+                params.put("MaxID",String.valueOf(maxID));
+                String date = databaseHelper.getClientUpdatedDate(prefrence.getClientIDSession());
+                params.put("SessionDate",date);
+
                 return params;
             }
         };
@@ -843,13 +839,7 @@ public class ChartOfAccFragment extends Fragment {
                                     String UpdatedDate = jsonObject.getString("UpdatedDate");
                                     String message = jsonObject.getString("message");
                                     databaseHelper.updateCashBook("UPDATE CashBook SET CashBookID = '"+id+"', UpdatedDate = '"+UpdatedDate+"' WHERE ID = "+c.getcId());
-
-                                    List<TableSession> se = TableSession.find(TableSession.class,"table_Name = ?","CashBook");
-                                    for (TableSession s : se){
-                                        s.setMaxID(id);
-                                        s.setInsertDate(UpdatedDate);
-                                        s.save();
-                                    }
+                                    updatedDate = UpdatedDate;
                                 }
 
                             } catch (JSONException e) {
@@ -867,19 +857,20 @@ public class ChartOfAccFragment extends Fragment {
                 protected Map<String, String> getParams() {
 
                     Map<String, String> params = new HashMap<String, String>();
-                    List<User> list = User.listAll(User.class);
-                    for (User u : list) {
-                        params.put("CBDate", c.getCBDate());
-                        params.put("DebitAccount", c.getDebitAccount());
-                        params.put("CreditAccount", c.getCreditAccount());
-                        params.put("CBRemarks", c.getCBRemarks());
-                        params.put("Amount", c.getAmount());
-                        params.put("ClientID", u.getClientID());
-                        params.put("ClientUserID", u.getClientUserID());
-                        params.put("NetCode", "0");
-                        params.put("SysCode", "0");
-                        params.put("BookingID", c.getBookingID());
-                    }
+
+                    params.put("CBDate", c.getCBDate());
+                    params.put("DebitAccount", c.getDebitAccount());
+                    params.put("CreditAccount", c.getCreditAccount());
+                    params.put("CBRemarks", c.getCBRemarks());
+                    params.put("Amount", c.getAmount());
+                    params.put("ClientID", prefrence.getClientIDSession());
+                    params.put("ClientUserID", prefrence.getClientUserIDSession());
+                    params.put("NetCode", "0");
+                    params.put("SysCode", "0");
+                    params.put("TableID", c.getTableID());
+                    params.put("SerialNo", c.getSerialNo());
+                    params.put("TableName", c.getTableName());
+
                     return params;
                 }
             };
@@ -914,11 +905,7 @@ public class ChartOfAccFragment extends Fragment {
                                     String message = jsonObject.getString("message");
                                     databaseHelper.updateCashBook("UPDATE CashBook SET UpdatedDate = '"+UpdatedDate+"' WHERE ID = "+c.getcId());
 
-                                    List<TableSession> se = TableSession.find(TableSession.class,"table_Name = ?","CashBook");
-                                    for (TableSession s : se){
-                                        s.setUpdateDate(UpdatedDate);
-                                        s.save();
-                                    }
+                                    updatedDate = UpdatedDate;
                                 }
                             } catch (JSONException e) {
                                 e.printStackTrace();
@@ -936,20 +923,19 @@ public class ChartOfAccFragment extends Fragment {
                 protected Map<String, String> getParams() {
 
                     Map<String, String> params = new HashMap<String, String>();
-                    List<User> list = User.listAll(User.class);
-                    for (User u : list) {
-                        params.put("CashBookID", c.getCashBookID());
-                        params.put("CBDate", c.getCBDate());
-                        params.put("DebitAccount", c.getDebitAccount());
-                        params.put("CreditAccount", c.getCreditAccount());
-                        params.put("CBRemarks", c.getCBRemarks());
-                        params.put("Amount", c.getAmount());
-                        params.put("ClientID", u.getClientID());
-                        params.put("ClientUserID", u.getClientUserID());
-                        params.put("NetCode", "0");
-                        params.put("SysCode", "0");
-                        params.put("BookingID", c.getBookingID());
-                    }
+                    params.put("CashBookID", c.getCashBookID());
+                    params.put("CBDate", c.getCBDate());
+                    params.put("DebitAccount", c.getDebitAccount());
+                    params.put("CreditAccount", c.getCreditAccount());
+                    params.put("CBRemarks", c.getCBRemarks());
+                    params.put("Amount", c.getAmount());
+                    params.put("ClientID", prefrence.getClientIDSession());
+                    params.put("ClientUserID", prefrence.getClientUserIDSession());
+                    params.put("NetCode", "0");
+                    params.put("SysCode", "0");
+                    params.put("TableID", c.getTableID());
+                    params.put("SerialNo", c.getSerialNo());
+
                     return params;
                 }
             };
@@ -987,13 +973,13 @@ public class ChartOfAccFragment extends Fragment {
                                     String UpdatedDate = jsonObject.getString("UpdatedDate");
                                     String message = jsonObject.getString("message");
                                     databaseHelper.updateCashBook("UPDATE Booking SET BookingID = '"+ id +"', UpdatedDate = '"+UpdatedDate+"' WHERE ID = "+c.getId());
-
-                                    List<TableSession> se = TableSession.find(TableSession.class,"table_Name = ?","Bookings");
-                                    for (TableSession s : se){
-                                        s.setMaxID(id);
-                                        s.setInsertDate(UpdatedDate);
-                                        s.save();
-                                    }
+                                    updatedDate = UpdatedDate;
+//                                    List<TableSession> se = TableSession.find(TableSession.class,"table_Name = ?","Bookings");
+//                                    for (TableSession s : se){
+//                                        s.setMaxID(id);
+//                                        s.setInsertDate(UpdatedDate);
+//                                        s.save();
+//                                    }
                                 }
                             } catch (JSONException e) {
                                 e.printStackTrace();
@@ -1013,8 +999,7 @@ public class ChartOfAccFragment extends Fragment {
                 protected Map<String, String> getParams() {
 
                     Map<String, String> params = new HashMap<String, String>();
-                    List<User> list = User.listAll(User.class);
-                    for (User u : list) {
+
                         params.put("ClientName", c.getClientName());
                         params.put("ClientMobile", c.getClientMobile());
                         params.put("ClientAddress", c.getClientAddress());
@@ -1025,15 +1010,16 @@ public class ChartOfAccFragment extends Fragment {
                         params.put("ArrangePersons", c.getArrangePersons());
                         params.put("ChargesTotal", c.getChargesTotal());
                         params.put("Description", c.getDescription());
-                        params.put("ClientID", u.getClientID());
-                        params.put("ClientUserID", u.getClientUserID());
+                        params.put("ClientID", prefrence.getClientIDSession());
+                        params.put("ClientUserID", prefrence.getClientUserIDSession());
                         params.put("NetCode", "0");
                         params.put("SysCode", "0");
-                        params.put("DebitAccount", u.getCashID());
-                        params.put("CreditAccount", u.getBookingIncomeID());
+                        params.put("DebitAccount", cashID);
+                        params.put("CreditAccount", incomeID);
                         params.put("Amount", c.getAmount());
                         params.put("Shift", c.getShift());
-                    }
+                        params.put("SerialNo", c.getSerialNo());
+
                     return params;
                 }
             };
@@ -1067,12 +1053,12 @@ public class ChartOfAccFragment extends Fragment {
                                     String UpdatedDate = jsonObject.getString("UpdatedDate");
                                     String message = jsonObject.getString("message");
                                     databaseHelper.updateCashBook("UPDATE Booking SET UpdatedDate = '"+UpdatedDate+"' WHERE ID = "+c.getId());
-
-                                    List<TableSession> se = TableSession.find(TableSession.class,"table_Name = ?","Bookings");
-                                    for (TableSession s : se){
-                                        s.setUpdateDate(UpdatedDate);
-                                        s.save();
-                                    }
+                                    updatedDate = UpdatedDate;
+//                                    List<TableSession> se = TableSession.find(TableSession.class,"table_Name = ?","Bookings");
+//                                    for (TableSession s : se){
+//                                        s.setUpdateDate(UpdatedDate);
+//                                        s.save();
+//                                    }
                                 }
                             } catch (JSONException e) {
                                 e.printStackTrace();
@@ -1090,8 +1076,7 @@ public class ChartOfAccFragment extends Fragment {
                 protected Map<String, String> getParams() {
 
                     Map<String, String> params = new HashMap<String, String>();
-                    List<User> list = User.listAll(User.class);
-                    for (User u : list) {
+
                         params.put("BookingID", c.getBookingID());
                         params.put("ClientName", c.getClientName());
                         params.put("ClientMobile", c.getClientMobile());
@@ -1103,13 +1088,13 @@ public class ChartOfAccFragment extends Fragment {
                         params.put("ArrangePersons", c.getArrangePersons());
                         params.put("ChargesTotal", c.getChargesTotal());
                         params.put("Description", c.getDescription());
-                        params.put("ClientID", u.getClientID());
-                        params.put("ClientUserID", u.getClientUserID());
+                        params.put("ClientID", prefrence.getClientIDSession());
+                        params.put("ClientUserID", prefrence.getClientUserIDSession());
                         params.put("NetCode", "0");
                         params.put("SysCode", "0");
-                        params.put("DebitAccount", u.getCashID());
-                        params.put("CreditAccount", u.getBookingIncomeID());
-                    }
+                        params.put("DebitAccount", cashID);
+                        params.put("CreditAccount", incomeID);
+
                     return params;
                 }
             };
@@ -1144,14 +1129,14 @@ public class ChartOfAccFragment extends Fragment {
                                     String UpdatedDate = jsonObject.getString("UpdatedDate");
                                     String message = jsonObject.getString("message");
                                     databaseHelper.updateCashBook("UPDATE Account3Name SET AcNameID = '"+ id +"', UpdatedDate = '"+UpdatedDate+"' WHERE ID = "+c.getId());
-
-                                    List<TableSession> se = TableSession.find(TableSession.class,"table_Name = ?","Account3Name");
-                                    for (TableSession s : se){
-                                        s.setMaxID(id);
-                                        s.setInsertDate(UpdatedDate);
-                                        s.save();
-                                    }
+                                    updatedDate = UpdatedDate;
                                     initData();
+//                                    List<TableSession> se = TableSession.find(TableSession.class,"table_Name = ?","Account3Name");
+//                                    for (TableSession s : se){
+//                                        s.setMaxID(id);
+//                                        s.setInsertDate(UpdatedDate);
+//                                        s.save();
+//                                    }
                                 }else {
                                     databaseHelper.deleteAccount3NameEntry("DELETE FROM Account3Name WHERE ID = "+c.getId());
                                     String message = jsonObject.getString("message");
@@ -1174,8 +1159,7 @@ public class ChartOfAccFragment extends Fragment {
                 protected Map<String, String> getParams() {
 
                     Map<String, String> params = new HashMap<String, String>();
-                    List<User> list = User.listAll(User.class);
-                    for (User u : list) {
+
                         params.put("AcName", c.getAcName());
                         params.put("AcAddress", c.getAcAddress());
                         params.put("AcContactNo", c.getAcContactNo());
@@ -1184,9 +1168,10 @@ public class ChartOfAccFragment extends Fragment {
                         params.put("AcMobileNo", c.getAcMobileNo());
                         params.put("AcPassward", c.getAcPassward());
                         params.put("SecurityRights", c.getSecurityRights());
-                        params.put("ClientID", u.getClientID());
+                        params.put("ClientID", prefrence.getClientUserIDSession());
                         params.put("AcGroupID", c.getAcGroupID());
-                    }
+                        params.put("SerialNo", c.getSerialNo());
+
                     return params;
                 }
             };
@@ -1221,13 +1206,14 @@ public class ChartOfAccFragment extends Fragment {
                                     String UpdatedDate = jsonObject.getString("UpdatedDate");
                                     String message = jsonObject.getString("message");
                                     databaseHelper.updateCashBook("UPDATE Account3Name SET UpdatedDate = '"+UpdatedDate+"' WHERE ID = "+c.getId());
-
-                                    List<TableSession> se = TableSession.find(TableSession.class,"table_Name = ?","Account3Name");
-                                    for (TableSession s : se){
-                                        s.setUpdateDate(UpdatedDate);
-                                        s.save();
-                                    }
+                                    updatedDate = UpdatedDate;
                                     initData();
+//                                    List<TableSession> se = TableSession.find(TableSession.class,"table_Name = ?","Account3Name");
+//                                    for (TableSession s : se){
+//                                        s.setUpdateDate(UpdatedDate);
+//                                        s.save();
+//                                    }
+                                    databaseHelper.updateClient("UPDATE Client SET UpdatedDate = '"+updatedDate+"' WHERE ClientID = "+prefrence.getClientIDSession());
                                 }
                             } catch (JSONException e) {
                                 e.printStackTrace();
@@ -1246,8 +1232,7 @@ public class ChartOfAccFragment extends Fragment {
                 protected Map<String, String> getParams() {
 
                     Map<String, String> params = new HashMap<String, String>();
-                    List<User> list = User.listAll(User.class);
-                    for (User u : list) {
+
                         params.put("AcNameID", c.getAcNameID());
                         params.put("AcName", c.getAcName());
                         params.put("AcAddress", c.getAcAddress());
@@ -1257,9 +1242,9 @@ public class ChartOfAccFragment extends Fragment {
                         params.put("AcMobileNo", c.getAcMobileNo());
                         params.put("AcPassward", c.getAcPassward());
                         params.put("SecurityRights", c.getSecurityRights());
-                        params.put("ClientID", u.getClientID());
+                        params.put("ClientID", prefrence.getClientIDSession());
                         params.put("AcGroupID", c.getAcGroupID());
-                    }
+
                     return params;
                 }
             };
@@ -1267,6 +1252,10 @@ public class ChartOfAccFragment extends Fragment {
             RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
             jsonObjectRequest.setRetryPolicy(policy);
             AppController.getInstance().addToRequestQueue(jsonObjectRequest, tag_json_obj);
+        }
+        initData();
+        if (addBooking.size() == 0){
+            databaseHelper.updateClient("UPDATE Client SET UpdatedDate = '"+updatedDate+"' WHERE ClientID = "+prefrence.getClientIDSession());
         }
         mProgress.dismiss();
     }

@@ -1,7 +1,6 @@
 package org.by9steps.shadihall.fragments;
 
 
-import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.support.design.widget.TextInputEditText;
@@ -9,41 +8,24 @@ import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.DatePicker;
-import android.widget.RadioButton;
-import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.volley.DefaultRetryPolicy;
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.RetryPolicy;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-import com.itextpdf.text.DocumentException;
 import com.orm.SugarContext;
-import com.squareup.timessquare.CalendarPickerView;
 
 import org.by9steps.shadihall.AppController;
 import org.by9steps.shadihall.R;
-import org.by9steps.shadihall.activities.RegisterActivity;
 import org.by9steps.shadihall.helper.DatabaseHelper;
 import org.by9steps.shadihall.helper.InputValidation;
+import org.by9steps.shadihall.helper.Prefrence;
 import org.by9steps.shadihall.model.Bookings;
-import org.by9steps.shadihall.model.CashBook;
-import org.by9steps.shadihall.model.User;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.text.DateFormat;
-import java.text.ParseException;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -64,6 +46,7 @@ public class BookingFormFragment extends Fragment implements View.OnClickListene
 
     InputValidation inputValidation;
     DatabaseHelper databaseHelper;
+    Prefrence prefrence;
 
     TextInputLayout date_layout;
     TextView date;
@@ -137,6 +120,7 @@ public class BookingFormFragment extends Fragment implements View.OnClickListene
 
         inputValidation = new InputValidation(getContext());
         databaseHelper = new DatabaseHelper(getContext());
+        prefrence = new Prefrence(getContext());
 
         date = view.findViewById(R.id.date);
         date_layout = view.findViewById(R.id.date_layout);
@@ -169,10 +153,9 @@ public class BookingFormFragment extends Fragment implements View.OnClickListene
 
         if (!bookingID.equals("id")){
             String query = "";
-            List<User> list = User.listAll(User.class);
-            for (User u: list) {
-                query = "SELECT * FROM Booking WHERE BookingID = '" + bookingID+"'";
-            }
+
+            query = "SELECT * FROM Booking WHERE BookingID = '" + bookingID+"'";
+
             bookingList = databaseHelper.getBookings(query);
             for (Bookings b : bookingList){
                 date.setText(b.getBookingDate());
@@ -246,14 +229,14 @@ public class BookingFormFragment extends Fragment implements View.OnClickListene
                 }
                 else {
 
-                    final List<User> list = User.listAll(User.class);
-
-                    for (User u : list) {
                         if (bookingID.equals("id")) {
+
+                            int seriolNo = databaseHelper.getMaxValue("SELECT max(SerialNo) FROM Booking") + 1;
+
                             databaseHelper.createBooking(new Bookings("o", person_name.getText().toString(), client_mobile_no.getText().toString(), address.getText().toString(),
                                     cnic_number.getText().toString(), event_name.getText().toString(), date.getText().toString(), event_date.getText().toString() + " 00:00:00.000000",
-                                    total_persons.getText().toString(), total_charges.getText().toString(), description.getText().toString(), u.getClientID(), u.getClientUserID(),
-                                    "0", "0", "0", advance_fee.getText().toString(), event_shift.getText().toString()));
+                                    total_persons.getText().toString(), total_charges.getText().toString(), description.getText().toString(), prefrence.getClientIDSession(), prefrence.getClientUserIDSession(),
+                                    "0", "0", "0", advance_fee.getText().toString(), event_shift.getText().toString(),String.valueOf(seriolNo)));
                             clearCashe();
                         }else {
                             String query = "UPDATE Booking SET ClientName = '"+person_name.getText().toString()+"', ClientMobile = '"+client_mobile_no.getText().toString()
@@ -264,7 +247,6 @@ public class BookingFormFragment extends Fragment implements View.OnClickListene
                             Toast.makeText(getContext(), "Booking Update", Toast.LENGTH_SHORT).show();
                             getActivity().onBackPressed();
                         }
-                    }
 
                 }
                 break;

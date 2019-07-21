@@ -12,8 +12,6 @@ import android.widget.TextView;
 
 import org.by9steps.shadihall.R;
 import org.by9steps.shadihall.activities.MenuClickActivity;
-import org.by9steps.shadihall.model.ProfitLoss;
-import org.by9steps.shadihall.model.Recovery;
 import org.by9steps.shadihall.model.Summerize;
 
 import java.util.List;

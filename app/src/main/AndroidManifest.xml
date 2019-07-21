@@ -27,6 +27,13 @@
         android:theme="@style/AppTheme">
         <activity android:name=".activities.SelectImagesActivity"></activity>
         <activity android:name=".activities.BookingActivity" />
+
+        <!--CrashLytics-->
+        <meta-data
+            android:name="io.fabric.ApiKey"
+            android:value="9131bbadb82bcfa052e723e275039a750b9d3add"
+            />
+
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
              (See the file "res/values/google_maps_api.xml").
@@ -68,7 +75,9 @@
             android:configChanges="orientation|screenSize|keyboardHidden" />
         <activity
             android:name=".activities.LoginActivity"
-            android:configChanges="orientation|screenSize|keyboardHidden" />
+            android:configChanges="orientation|screenSize|keyboardHidden" >
+
+        </activity>
         <activity
             android:name=".activities.SplashActivity"
             android:configChanges="orientation|screenSize|keyboardHidden"

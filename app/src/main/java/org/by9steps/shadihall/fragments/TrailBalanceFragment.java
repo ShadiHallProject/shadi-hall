@@ -27,8 +27,8 @@ import org.by9steps.shadihall.AppController;
 import org.by9steps.shadihall.R;
 import org.by9steps.shadihall.activities.TrailBalanceActivity;
 import org.by9steps.shadihall.adapters.ReportsAdapter;
+import org.by9steps.shadihall.helper.Prefrence;
 import org.by9steps.shadihall.model.Account3Name;
-import org.by9steps.shadihall.model.User;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -48,6 +48,8 @@ public class TrailBalanceFragment extends Fragment implements View.OnClickListen
     RecyclerView recyclerView;
     String currentDate;
 
+    Prefrence prefrence;
+
     CardView trailBalance, plStatement, balanceSheet;
 
 
@@ -66,6 +68,8 @@ public class TrailBalanceFragment extends Fragment implements View.OnClickListen
         trailBalance = view.findViewById(R.id.trail_balance);
         plStatement = view.findViewById(R.id.pl_statement);
         balanceSheet = view.findViewById(R.id.balance_sheet);
+
+        prefrence = new Prefrence(getContext());
 
         trailBalance.setOnClickListener(this);
         plStatement.setOnClickListener(this);
@@ -188,11 +192,10 @@ public class TrailBalanceFragment extends Fragment implements View.OnClickListen
             @Override
             protected Map<String, String> getParams() {
                 Map<String, String> params = new HashMap<String, String>();
-                List<User> list = User.listAll(User.class);
-                for (User u: list) {
-                    params.put("ClientID", u.getClientID());
+
+                    params.put("ClientID", prefrence.getClientIDSession());
                     params.put("CBDate", currentDate);
-                }
+
                 return params;
             }
         };

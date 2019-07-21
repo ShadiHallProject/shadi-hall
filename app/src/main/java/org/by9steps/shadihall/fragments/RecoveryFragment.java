@@ -60,10 +60,10 @@ import org.by9steps.shadihall.AppController;
 import org.by9steps.shadihall.R;
 import org.by9steps.shadihall.adapters.RecoveryAdapter;
 import org.by9steps.shadihall.helper.DatabaseHelper;
+import org.by9steps.shadihall.helper.Prefrence;
 import org.by9steps.shadihall.model.CashBook;
 import org.by9steps.shadihall.model.CashEntry;
 import org.by9steps.shadihall.model.Recovery;
-import org.by9steps.shadihall.model.User;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -103,6 +103,8 @@ public class RecoveryFragment extends Fragment implements View.OnClickListener {
     DatabaseHelper databaseHelper;
     List<Recovery> recoveries;
     List<Recovery> filterdList;
+
+    Prefrence prefrence;
 
     RecoveryAdapter adapter;
     //    EditText search;
@@ -153,6 +155,7 @@ public class RecoveryFragment extends Fragment implements View.OnClickListener {
         r_profit.setOnClickListener(this);
 
         databaseHelper = new DatabaseHelper(getContext());
+        prefrence = new Prefrence(getContext());
 
         getRecoveryData();
 
@@ -251,27 +254,30 @@ public class RecoveryFragment extends Fragment implements View.OnClickListener {
         return view;
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        getRecoveryData();
+    }
+
     public void getRecoveryData(){
 
         recieved = 0; expense = 0; chargesTotal = 0; balance = 0; profit = 0;
         gRecieved = 0; gExpense = 0; gChargesTotal = 0; gBalance = 0; gProfit = 0;
 
         String query = "";
-        List<User> list = User.listAll(User.class);
-        for (User u : list) {
             query = "SELECT        derivedtbl_1.ClientID, Booking.BookingID, SUM(derivedtbl_1.Received) AS Recieved, SUM(derivedtbl_1.Expense) AS Expensed, Booking.ChargesTotal, IFNULL(Booking.ChargesTotal, 0) - IFNULL(SUM(derivedtbl_1.Received), 0)\n" +
                     "                          AS Balance, IFNULL(SUM(derivedtbl_1.Received), 0) - IFNULL(SUM(derivedtbl_1.Expense), 0) AS Profit, Booking.EventName, Booking.EventDate, Booking.ClientName\n" +
-                    "FROM            (SELECT        CashBook.ClientID, CashBook.BookingID, SUM(CashBook.Amount) AS Received, 0 AS Expense\n" +
+                    "FROM            (SELECT        CashBook.ClientID, CashBook.TableID, SUM(CashBook.Amount) AS Received, 0 AS Expense\n" +
                     "                          FROM            CashBook INNER JOIN Account3Name ON CashBook.CreditAccount = Account3Name.AcNameID\n" +
                     "                          WHERE        (Account3Name.AcName = 'Booking Income')\n" +
-                    "                          GROUP BY CashBook.BookingID, CashBook.ClientID\n" +
+                    "                          GROUP BY CashBook.TableID, CashBook.ClientID\n" +
                     "                          UNION ALL\n" +
-                    "                          SELECT        CashBook_1.ClientID, CashBook_1.BookingID, 0 AS Received, SUM(CashBook_1.Amount) AS Expense\n" +
+                    "                          SELECT        CashBook_1.ClientID, CashBook_1.TableID, 0 AS Received, SUM(CashBook_1.Amount) AS Expense\n" +
                     "                          FROM            CashBook AS CashBook_1 INNER JOIN Account3Name AS Account3Name_1 ON CashBook_1.DebitAccount = Account3Name_1.AcNameID\n" +
                     "                          WHERE        (Account3Name_1.AcName = 'Booking Expense')\n" +
-                    "                          GROUP BY CashBook_1.BookingID, CashBook_1.ClientID) AS derivedtbl_1 INNER JOIN\n" +
-                    "                          Booking ON derivedtbl_1.BookingID = Booking.BookingID GROUP BY derivedtbl_1.ClientID, Booking.BookingID, Booking.ChargesTotal, Booking.EventName, Booking.EventDate,Booking.ClientName HAVING (derivedtbl_1.ClientID =" + u.getClientID() + ")"+ orderby;
-        }
+                    "                          GROUP BY CashBook_1.TableID, CashBook_1.ClientID) AS derivedtbl_1 INNER JOIN\n" +
+                    "                          Booking ON derivedtbl_1.TableID = Booking.BookingID GROUP BY derivedtbl_1.ClientID, Booking.BookingID, Booking.ChargesTotal, Booking.EventName, Booking.EventDate,Booking.ClientName HAVING (derivedtbl_1.ClientID =" + prefrence.getClientIDSession() + ")"+ orderby;
 
         recoveries = databaseHelper.getRecoveries(query);
 
@@ -468,10 +474,9 @@ public class RecoveryFragment extends Fragment implements View.OnClickListener {
             @Override
             protected Map<String, String> getParams() {
                 Map<String, String> params = new HashMap<String, String>();
-                List<User> list = User.listAll(User.class);
-                for (User u : list) {
-                    params.put("ClientID", u.getClientID());
-                }
+
+                params.put("ClientID", prefrence.getClientIDSession());
+
                 return params;
             }
         };

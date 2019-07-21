@@ -17,13 +17,6 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.volley.DefaultRetryPolicy;
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.RetryPolicy;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -37,11 +30,11 @@ import org.by9steps.shadihall.R;
 import org.by9steps.shadihall.fragments.SelectDateFragment;
 import org.by9steps.shadihall.helper.DatabaseHelper;
 import org.by9steps.shadihall.helper.InputValidation;
+import org.by9steps.shadihall.helper.Prefrence;
 import org.by9steps.shadihall.model.CBUpdate;
 import org.by9steps.shadihall.model.CashBook;
 import org.by9steps.shadihall.model.ChartOfAcc;
 import org.by9steps.shadihall.model.Spinner;
-import org.by9steps.shadihall.model.User;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -61,8 +54,9 @@ public class CashCollectionActivity extends AppCompatActivity implements View.On
     Button add;
 
     InputValidation inputValidation;
+    Prefrence prefrence;
 
-    String bookingID, spinnerType, viewType, cbID;
+    String tableID, spinnerType, viewType, cbID;
     ProgressDialog pDialog;
 
     ArrayList<String> listDebit = new ArrayList<>();
@@ -87,7 +81,7 @@ public class CashCollectionActivity extends AppCompatActivity implements View.On
 
         Intent intent = getIntent();
         if (intent != null) {
-            bookingID = intent.getStringExtra("BookingID");
+            tableID = intent.getStringExtra("BookingID");
             spinnerType = intent.getStringExtra("Spinner");
             viewType = intent.getStringExtra("Type");
             cbID = intent.getStringExtra("CashBookID");
@@ -95,17 +89,15 @@ public class CashCollectionActivity extends AppCompatActivity implements View.On
 
         inputValidation = new InputValidation(this);
         databaseHelper = new DatabaseHelper(this);
+        prefrence = new Prefrence(this);
 
 
         Date da = new Date();
         SimpleDateFormat sf = new SimpleDateFormat("yyyy-MM-dd");
         currentDate = sf.format(da);
 
-        List<User> list = User.listAll(User.class);
-        for (User u : list){
 
-            query = "SELECT * FROM Account3Name WHERE ClientID = "+u.getClientID();
-        }
+        query = "SELECT * FROM Account3Name WHERE ClientID = "+prefrence.getClientIDSession();
 
         List<Spinner> li = databaseHelper.getSpinnerAcName(query);
         for (Spinner a : li){
@@ -149,11 +141,8 @@ public class CashCollectionActivity extends AppCompatActivity implements View.On
 
             credit_account.setText("Income");
             debit_account.setText("Cash");
-            final List<User> l = User.listAll(User.class);
-            for (User u : l) {
-                dDebit = u.getCashID();
-                cCredit = u.getBookingIncomeID();
-            }
+            cCredit = databaseHelper.getID("SELECT AcNameID FROM Account3Name WHERE ClientID = "+prefrence.getClientIDSession()+" and AcName = 'Booking Income'");
+            dDebit = databaseHelper.getID("SELECT AcNameID FROM Account3Name WHERE ClientID = "+prefrence.getClientIDSession()+" and AcName = 'Cash'");
         }
 
         add.setOnClickListener(this);
@@ -248,11 +237,10 @@ public class CashCollectionActivity extends AppCompatActivity implements View.On
                         Toast.makeText(CashCollectionActivity.this, "Data Updated", Toast.LENGTH_SHORT).show();
                         finish();
                     }else {
-                        final List<User> list = User.listAll(User.class);
 
-                        for (User u : list) {
-                            databaseHelper.createCashBook(new CashBook("0", date.getText().toString(), dDebit, cCredit, description.getText().toString(), amount.getText().toString(), u.getClientID(),u.getClientUserID(),"0","0","0",bookingID));
-                        }
+                        int seriolNo = databaseHelper.getMaxValue("SELECT MAX(SerialNo) AS MaxNo FROM CashBook") + 1;
+
+                        databaseHelper.createCashBook(new CashBook("0", date.getText().toString(), dDebit, cCredit, description.getText().toString(), amount.getText().toString(), prefrence.getClientIDSession(),prefrence.getClientUserIDSession(),"0","0","0",tableID,String.valueOf(seriolNo),"Booking"));
                         clearCashe();
                     }
 

@@ -24,6 +24,7 @@ import com.android.volley.Response;
 import com.android.volley.RetryPolicy;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
+import com.crashlytics.android.Crashlytics;
 import com.orm.SugarContext;
 
 import org.by9steps.shadihall.AppController;
@@ -34,18 +35,13 @@ import org.by9steps.shadihall.fragments.LoginFragment;
 import org.by9steps.shadihall.fragments.MenuFragment;
 import org.by9steps.shadihall.fragments.TreeFragment;
 import org.by9steps.shadihall.helper.Prefrence;
-import org.by9steps.shadihall.model.AreaName;
-import org.by9steps.shadihall.model.Bookings;
-import org.by9steps.shadihall.model.Tree;
-import org.by9steps.shadihall.model.User;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
+
+import io.fabric.sdk.android.Fabric;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -63,6 +59,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         SugarContext.init(this);
 
         if (getSupportActionBar()!=null)
@@ -75,10 +72,10 @@ public class MainActivity extends AppCompatActivity {
 
 
         viewPager = (ViewPager) findViewById(R.id.viewpager);
-        viewPager.setOffscreenPageLimit(2);
+        viewPager.setOffscreenPageLimit(3);
         setupViewPager(viewPager);
 
-        tabLayout = (TabLayout) findViewById(R.id.tabs);
+        tabLayout = findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(viewPager);
 
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
@@ -213,7 +210,6 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString(login, "No");
         editor.apply();
-        User.delete(User.class);
 //        viewPager.setCurrentItem(1);
         startActivity(new Intent(MainActivity.this, MainActivity.class));
         finish();

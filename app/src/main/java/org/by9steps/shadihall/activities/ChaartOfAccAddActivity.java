@@ -16,22 +16,13 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.volley.DefaultRetryPolicy;
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.RetryPolicy;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
 
 import org.by9steps.shadihall.AppController;
 import org.by9steps.shadihall.R;
 import org.by9steps.shadihall.helper.DatabaseHelper;
 import org.by9steps.shadihall.helper.InputValidation;
+import org.by9steps.shadihall.helper.Prefrence;
 import org.by9steps.shadihall.model.Account3Name;
-import org.by9steps.shadihall.model.ChartOfAcc;
-import org.by9steps.shadihall.model.User;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.List;
@@ -59,6 +50,7 @@ public class ChaartOfAccAddActivity extends AppCompatActivity implements View.On
 
     InputValidation inputValidation;
     DatabaseHelper databaseHelper;
+    Prefrence prefrence;
     ProgressDialog pDialog;
 
     int spPosition = 0;
@@ -86,7 +78,7 @@ public class ChaartOfAccAddActivity extends AppCompatActivity implements View.On
         Log.e("CHART",groupID + "  "+ groupName);
 
         inputValidation = new InputValidation(this);
-        databaseHelper = new DatabaseHelper(this);
+        databaseHelper = new DatabaseHelper(this);prefrence = new Prefrence(this);
 
         name_layout = findViewById(R.id.name_layout);
         name = findViewById(R.id.name);
@@ -205,32 +197,31 @@ public class ChaartOfAccAddActivity extends AppCompatActivity implements View.On
                 return;
                 }else{
 
-                    List<User> list = User.listAll(User.class);
                     String query;
                     String query1;
-                        for (User u : list) {
 
 
                             if (type.equals("Add")) {
 
-                                query = "SELECT AcName FROM Account3Name WHERE ClientID = "+u.getClientID() + " AND AcName = '"+name.getText().toString()+"'";
-                                query1 = "SELECT AcMobileNo FROM Account3Name WHERE ClientID = "+u.getClientID()+" AND AcMobileNo = '"+login_mobile.getText().toString()+"'";
+                                query = "SELECT AcName FROM Account3Name WHERE ClientID = "+prefrence.getClientIDSession() + " AND AcName = '"+name.getText().toString()+"'";
+                                query1 = "SELECT AcMobileNo FROM Account3Name WHERE ClientID = "+prefrence.getClientIDSession()+" AND AcMobileNo = '"+login_mobile.getText().toString()+"'";
 
                                 if (databaseHelper.findAccount3Name(query)){
                                     Toast.makeText(ChaartOfAccAddActivity.this, "Name Already Register", Toast.LENGTH_SHORT).show();
                                 }else if (databaseHelper.findAccount3Name(query1)){
                                     Toast.makeText(ChaartOfAccAddActivity.this, "Login Number Already Register", Toast.LENGTH_SHORT).show();
                                 }else {
+                                    int seriolNo = databaseHelper.getMaxValue("SELECT max(SerialNo) FROM Account3Name") + 1;
                                     databaseHelper.createAccount3Name(new Account3Name("0", name.getText().toString(), groupID, address.getText().toString(), login_mobile.getText().toString(),
-                                            mobile.getText().toString(), email.getText().toString(), "", "", password.getText().toString(), u.getClientID(), u.getClientUserID(), "0", "0", "0", "",
+                                            mobile.getText().toString(), email.getText().toString(), "", "", password.getText().toString(), prefrence.getClientIDSession(), prefrence.getClientUserIDSession(), "0", "0", "0", String.valueOf(seriolNo),
                                             "", String.valueOf(spPosition), salary.getText().toString()));
                                     finish();
                                 }
 
                             }else if (type.equals("Edit")){
 
-                                query = "SELECT AcName FROM Account3Name WHERE ClientID = "+u.getClientID() + " AND AcName = '"+name.getText().toString() +"' AND ID != "+id;
-                                query1 = "SELECT AcMobileNo FROM Account3Name WHERE ClientID = "+u.getClientID()+" AND AcMobileNo = '"+login_mobile.getText().toString()+"' AND ID != "+id;
+                                query = "SELECT AcName FROM Account3Name WHERE ClientID = "+prefrence.getClientIDSession() + " AND AcName = '"+name.getText().toString() +"' AND ID != "+id;
+                                query1 = "SELECT AcMobileNo FROM Account3Name WHERE ClientID = "+prefrence.getClientIDSession()+" AND AcMobileNo = '"+login_mobile.getText().toString()+"' AND ID != "+id;
 
                                 if (databaseHelper.findAccount3Name(query)){
                                     Toast.makeText(ChaartOfAccAddActivity.this, "Name Already Register", Toast.LENGTH_SHORT).show();
@@ -264,7 +255,6 @@ public class ChaartOfAccAddActivity extends AppCompatActivity implements View.On
 
                                 }
                             }
-                        }
 
 
 //                    String tag_json_obj = "json_obj_req";

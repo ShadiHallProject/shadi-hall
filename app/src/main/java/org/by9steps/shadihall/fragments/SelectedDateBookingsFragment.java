@@ -17,8 +17,8 @@ import org.by9steps.shadihall.R;
 import org.by9steps.shadihall.activities.CashCollectionActivity;
 import org.by9steps.shadihall.adapters.BookingAdapter;
 import org.by9steps.shadihall.helper.DatabaseHelper;
+import org.by9steps.shadihall.helper.Prefrence;
 import org.by9steps.shadihall.model.Bookings;
-import org.by9steps.shadihall.model.User;
 
 import java.util.List;
 
@@ -32,6 +32,7 @@ public class SelectedDateBookingsFragment extends Fragment {
 
     RecyclerView recyclerView;
     BookingAdapter adapter;
+    Prefrence prefrence;
     DatabaseHelper databaseHelper;
     List<Bookings> bookingsList;
 
@@ -74,12 +75,13 @@ public class SelectedDateBookingsFragment extends Fragment {
         setHasOptionsMenu(true);
 
         recyclerView = view.findViewById(R.id.recycler);
-        databaseHelper = new DatabaseHelper(getContext());
 
-        List<User> list = User.listAll(User.class);
-        for (User u: list) {
-            query = "SELECT * FROM Booking WHERE ClientID =" + u.getClientID()+" AND EventDate = '"+eventDate+" 00:00:00.000000' AND Shift = '"+eventShift+"'";
-        }
+        databaseHelper = new DatabaseHelper(getContext());
+        prefrence = new Prefrence(getContext());
+
+
+        query = "SELECT * FROM Booking WHERE ClientID =" + prefrence.getClientIDSession()+" AND EventDate = '"+eventDate+" 00:00:00.000000' AND Shift = '"+eventShift+"'";
+
         bookingsList = databaseHelper.getBookings(query);
 
         adapter = new BookingAdapter(getContext(),bookingsList);
