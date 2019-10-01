@@ -34,6 +34,7 @@ import org.by9steps.shadihall.fragments.ListFragment;
 import org.by9steps.shadihall.fragments.LoginFragment;
 import org.by9steps.shadihall.fragments.MenuFragment;
 import org.by9steps.shadihall.fragments.TreeFragment;
+import org.by9steps.shadihall.helper.GenericConstants;
 import org.by9steps.shadihall.helper.Prefrence;
 
 import java.util.ArrayList;
@@ -94,6 +95,14 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+
+        Log.e(GenericConstants.MYEdittion,"Editing");
+
+        Log.e(this.getClass().getName(),"Client ID::"+new Prefrence(this).getClientIDSession());
+        Log.e(this.getClass().getName(),"ClientUserID::"+new Prefrence(this).getClientUserIDSession());
+        Log.e(this.getClass().getName(),"ProjectIDSerssion::"+new Prefrence(this).getProjectIDSession());
+        Log.e(this.getClass().getName(),"UserRightSession::"+new Prefrence(this).getUserRighhtsSession());
+
     }
 
     private void setupViewPager(ViewPager viewPager) {
@@ -206,6 +215,7 @@ public class MainActivity extends AppCompatActivity {
     public void LogOut(){
         prefrence.setUserRighhtsSession("0");
         prefrence.setClientUserIDSession("0");
+        prefrence.setMYClientUserIDSession("0");
         prefrence.setClientIDSession("0");
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString(login, "No");

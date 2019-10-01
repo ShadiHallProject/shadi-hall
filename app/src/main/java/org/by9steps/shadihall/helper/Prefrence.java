@@ -3,6 +3,8 @@ package org.by9steps.shadihall.helper;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+import android.util.Log;
+import android.widget.Toast;
 
 public class Prefrence {
 
@@ -39,9 +41,22 @@ public class Prefrence {
         prefs.edit().putString(PROJECT_ID_SESSION, value).apply();
     }
     public String getClientUserIDSession(){
-        return prefs.getString(CLIENT_USER_ID_SESSION,"0");
+        String idd= prefs.getString("MYID","0");
+        Log.e("IDDD",context.getClass().getName()+"IDDD::Get"+idd);
+        return idd;
     }
     public void setClientUserIDSession(String value){
+        Log.e("key","ClientUserID--"+value);
         prefs.edit().putString(USER_RIGHTS_SESSION, value).apply();
     }
+
+    ////////////////////Bilal My Custom ClientID
+    public void setMYClientUserIDSession(String ss){
+        MNotificationClass.ShowToastTem(context, "Set Client User ID::"+ss);
+        Log.e("IDDD",context.getClass().getName()+"IDDD::Set"+ss);
+        prefs.edit().putString("MYID", ss).apply();
+    }
+//    //public String getMYClientUserIDSession(){
+//        return prefs.getString("MYID", "0");
+//    }
 }

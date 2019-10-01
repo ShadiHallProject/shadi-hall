@@ -42,4 +42,12 @@ public class Account2Group implements Serializable {
     public void setAcGruopName(String acGruopName) {
         AcGruopName = acGruopName;
     }
+
+    @Override
+    public String toString() {
+        return
+                "AcGroupID='" + AcGroupID + '\'' +
+                ", AcTypeID='" + AcTypeID + '\'' +
+                ", AcGruopName='" + AcGruopName + '\'';
+    }
 }

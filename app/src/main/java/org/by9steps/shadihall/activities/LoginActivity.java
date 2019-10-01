@@ -70,6 +70,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
                     prefrence.setClientIDSession("0");
                     prefrence.setClientUserIDSession("0");
+                    prefrence.setMYClientUserIDSession("0");
                     prefrence.setProjectIDSession("0");
                     prefrence.setUserRighhtsSession("0");
 

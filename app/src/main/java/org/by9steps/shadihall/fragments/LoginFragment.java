@@ -42,6 +42,7 @@ import org.by9steps.shadihall.activities.LoginActivity;
 import org.by9steps.shadihall.activities.MapsActivity;
 import org.by9steps.shadihall.adapters.ShadiHallListAdapter;
 import org.by9steps.shadihall.helper.DatabaseHelper;
+import org.by9steps.shadihall.helper.GenericConstants;
 import org.by9steps.shadihall.helper.InputValidation;
 import org.by9steps.shadihall.helper.Prefrence;
 import org.by9steps.shadihall.model.Account1Type;
@@ -161,6 +162,11 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
                     prefrence.setClientUserIDSession(clientUserID);
                     prefrence.setProjectIDSession(projectID);
                     prefrence.setUserRighhtsSession(userRights);
+                    Log.e(GenericConstants.MYEdittion,"Editing");
+                    Log.e(this.getClass().getName(),"Client ID::"+new Prefrence(LoginFragment.this.getContext()).getClientIDSession());
+                    Log.e(this.getClass().getName(),"ClientUserID:::"+new Prefrence(LoginFragment.this.getContext()).getClientUserIDSession());
+                    Log.e(this.getClass().getName(),"ProjectIDSerssion::"+new Prefrence(LoginFragment.this.getContext()).getProjectIDSession());
+                    Log.e(this.getClass().getName(),"UserRightSession::"+new Prefrence(LoginFragment.this.getContext()).getUserRighhtsSession());
 
                     FragmentManager manager = getFragmentManager();
                     assert manager != null;
@@ -224,7 +230,10 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
                                     String CompanyAddress = jsonObject.getString("CompanyAddress");
                                     String ProjectID = jsonObject.getString("ProjectID");
                                     String ProjectName = jsonObject.getString("ProjectName");
-                                    String ClientUserID = jsonObject.getString("ClientUserID");
+                                    //String ClientUserID = jsonObject.getString("ClientUserID");
+                                    //////////////MyFix
+                                    Log.e(GenericConstants.LOG_KEY_FOR_BUG_FIX,"MyFix");
+                                    String ClientUserID = jsonObject.getString("AcNameID");
                                     databaseHelper.createActiveAccounts(new ActiveClients(AcMobileNo, UserRights,
                                             AcName,
                                             ClientID,
@@ -245,11 +254,16 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
                                     @Override
                                     public void onItemClick(String clientID, String clientUserID, String projectID, String userRights) {
 
+
                                         prefrence.setClientIDSession(clientID);
                                         prefrence.setClientUserIDSession(clientUserID);
                                         prefrence.setProjectIDSession(projectID);
                                         prefrence.setUserRighhtsSession(userRights);
-
+                                        Log.e(GenericConstants.MYEdittion,"Editing");
+                                        Log.e(this.getClass().getName(),"Client ID::"+new Prefrence(LoginFragment.this.getContext()).getClientIDSession());
+                                        Log.e(this.getClass().getName(),"ClientUserID::"+new Prefrence(LoginFragment.this.getContext()).getClientUserIDSession());
+                                        Log.e(this.getClass().getName(),"ProjectIDSerssion::"+new Prefrence(LoginFragment.this.getContext()).getProjectIDSession());
+                                        Log.e(this.getClass().getName(),"UserRightSession::"+new Prefrence(LoginFragment.this.getContext()).getUserRighhtsSession());
                                         FragmentManager manager = getFragmentManager();
                                         assert manager != null;
                                         FragmentTransaction transaction = manager.beginTransaction();

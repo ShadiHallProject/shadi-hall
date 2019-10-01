@@ -32,4 +32,10 @@ public class Account1Type implements Serializable {
     public void setAcTypeName(String acTypeName) {
         AcTypeName = acTypeName;
     }
+
+    @Override
+    public String toString() {
+        return "AcTypeID='" + AcTypeID + '\'' +
+                ", AcTypeName='" + AcTypeName + '\'' ;
+    }
 }

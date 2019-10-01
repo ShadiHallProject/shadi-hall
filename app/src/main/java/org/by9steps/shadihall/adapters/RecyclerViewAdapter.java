@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,6 +18,7 @@ import com.squareup.picasso.Picasso;
 import org.by9steps.shadihall.R;
 import org.by9steps.shadihall.activities.GeneralLedgerActivity;
 import org.by9steps.shadihall.activities.MenuClickActivity;
+import org.by9steps.shadihall.helper.MNotificationClass;
 import org.by9steps.shadihall.helper.Prefrence;
 import org.by9steps.shadihall.model.ProjectMenu;
 
@@ -61,7 +63,8 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter {
         ((MenuViewHolder)viewHolder).itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                Toast.makeText(mCtx, String.valueOf(position)+menu.getTitle(), Toast.LENGTH_SHORT).show();
+                Log.e("key","title:"+menu.getMenuName()+" Page:"
+                        +menu.getPageOpen()+" ValuePass:"+menu.getValuePass()+" ");
                 if (menu.getPageOpen().equals("Ledger")){
                         Intent intent = new Intent(mCtx, GeneralLedgerActivity.class);
                         intent.putExtra("AcID","1");

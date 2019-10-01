@@ -2,16 +2,23 @@ package org.by9steps.shadihall.adapters;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.support.annotation.NonNull;
+import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import org.by9steps.shadihall.R;
 import org.by9steps.shadihall.activities.GeneralLedgerActivity;
 import org.by9steps.shadihall.fragments.ReportsFragment;
+import org.by9steps.shadihall.helper.GenericConstants;
+import org.by9steps.shadihall.helper.MNotificationClass;
 import org.by9steps.shadihall.model.Account3Name;
 import org.by9steps.shadihall.model.BalSheet;
 import org.by9steps.shadihall.model.CashBook;
@@ -41,28 +48,37 @@ public class ReportsAdapter extends RecyclerView.Adapter {
 
     int typeSet;
 
+/////////////////////////////////Inter face for Get CAll bAck For Popup Menu For Edit
+public PopupMyCustomCallBackMethod callBackMethod;
+    public interface PopupMyCustomCallBackMethod{
+        public void getPoupCallBackInfo(String AcNameID,String dbID,String menuItemName);
+}
     public ReportsAdapter(Context mCtx, List<Reports> mList, int typeSet) {
         this.mCtx = mCtx;
         this.mList = mList;
         this.typeSet = typeSet;
     }
-    public ReportsAdapter(Context mCtx, List<Account3Name> mList2, int typeSet,String desc) {
+
+    public ReportsAdapter(Context mCtx, List<Account3Name> mList2, int typeSet, String desc) {
         this.mCtx = mCtx;
         this.mList2 = mList2;
         this.typeSet = typeSet;
     }
+
     public ReportsAdapter(Context mCtx, List<Summerize> mList3, int typeSet, String desc, String sumerize) {
         this.mCtx = mCtx;
         this.mList3 = mList3;
         this.typeSet = typeSet;
     }
+
     public ReportsAdapter(Context mCtx, List<BalSheet> mList4, int typeSet, String desc, String sumerize, String balSheet) {
         this.mCtx = mCtx;
         this.mList4 = mList4;
         this.typeSet = typeSet;
         this.baSheet = balSheet;
     }
-    public ReportsAdapter(Context mCtx, List<ProfitLoss> mList5, int typeSet, String desc, String sumerize, String balSheet,String proLoss) {
+
+    public ReportsAdapter(Context mCtx, List<ProfitLoss> mList5, int typeSet, String desc, String sumerize, String balSheet, String proLoss) {
         this.mCtx = mCtx;
         this.mList5 = mList5;
         this.typeSet = typeSet;
@@ -83,13 +99,13 @@ public class ReportsAdapter extends RecyclerView.Adapter {
                 view = inflater.inflate(R.layout.trail_balance_item, null);
                 return new ReportsAdapter.TrailBalance(view);
             case Summerize_Trail_Balance:
-                view = inflater.inflate(R.layout.summerize_trail_bal_item,null);
+                view = inflater.inflate(R.layout.summerize_trail_bal_item, null);
                 return new ReportsAdapter.SummerizeTrailBalance(view);
             case Bal_Sheet:
-                view = inflater.inflate(R.layout.bal_sheet_list_item,null);
+                view = inflater.inflate(R.layout.bal_sheet_list_item, null);
                 return new ReportsAdapter.BalanceSheet(view);
             case Profit_Loss:
-                view = inflater.inflate(R.layout.profit_loss_list_item,null);
+                view = inflater.inflate(R.layout.profit_loss_list_item, null);
                 return new ReportsAdapter.ProfitLos(view);
         }
         return null;
@@ -98,22 +114,37 @@ public class ReportsAdapter extends RecyclerView.Adapter {
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder viewHolder, final int position) {
 
-        switch (getItemViewType(0)){
+        switch (getItemViewType(0)) {
             case Cash_Book:
+
                 final Reports cashBook = mList.get(position);
 
-                ((CashBookHolder)viewHolder).ac_name.setText(cashBook.getAcName());
+                ((CashBookHolder) viewHolder).AcNameID=cashBook.getAccountID();
+                ((CashBookHolder) viewHolder).ac_name.setText(cashBook.getAcName());
+
+                if(cashBook.getUpdatedDate().equals(GenericConstants.NullFieldStandardText))
+                {
+                    if(cashBook.getAccountID().equals("0"))
+                    {
+                        ///////////////////New Insertion
+                        ((CashBookHolder) viewHolder).ac_name.setTextColor(Color.RED);
+
+                    }else{
+                        //////////////////////Updated Data
+                        ((CashBookHolder) viewHolder).ac_name.setTextColor(Color.GREEN);
+                    }
+                }
+                ((CashBookHolder) viewHolder).sqliteDbEdit=cashBook.SqliteDbID;
 //                ((CashBookHolder)viewHolder).debit.setText(cashBook.getDebit());
 //                ((CashBookHolder)viewHolder).credit.setText(cashBook.getCredit());
 //                ((CashBookHolder)viewHolder).balance.setText(cashBook.getBal());
-                ((CashBookHolder)viewHolder).debit_bal.setText(cashBook.getDebitBal());
-                ((CashBookHolder)viewHolder).credit_bal.setText(cashBook.getCreditBal());
-
-                ((CashBookHolder)viewHolder).itemView.setOnClickListener(new View.OnClickListener() {
+                ((CashBookHolder) viewHolder).debit_bal.setText(cashBook.getDebitBal());
+                ((CashBookHolder) viewHolder).credit_bal.setText(cashBook.getCreditBal());
+                ((CashBookHolder) viewHolder).itemView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Intent intent = new Intent(mCtx,GeneralLedgerActivity.class);
-                        intent.putExtra("AcID",cashBook.getAccountID());
+                        Intent intent = new Intent(mCtx, GeneralLedgerActivity.class);
+                        intent.putExtra("AcID", cashBook.getAccountID());
                         mCtx.startActivity(intent);
                     }
                 });
@@ -192,14 +223,17 @@ public class ReportsAdapter extends RecyclerView.Adapter {
         return typeSet;
     }
 
-    class CashBookHolder extends RecyclerView.ViewHolder {
+    class CashBookHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         TextView ac_name, debit, credit, balance, debit_bal, credit_bal;
-
-
+        ImageView thredotpopup;
+        String AcNameID="-1";
+        String sqliteDbEdit="-1";
         public CashBookHolder(View itemView) {
             super(itemView);
 
+            thredotpopup = itemView.findViewById(R.id.threedotpopup);
+            thredotpopup.setOnClickListener(this);
             ac_name = itemView.findViewById(R.id.ac_name);
 //            debit = itemView.findViewById(R.id.debit);
 //            credit = itemView.findViewById(R.id.credit);
@@ -208,7 +242,30 @@ public class ReportsAdapter extends RecyclerView.Adapter {
             credit_bal = itemView.findViewById(R.id.credit_bal);
 
         }
+
+        @Override
+        public void onClick(View v) {
+            MNotificationClass.ShowToast(mCtx,"Click "+ac_name.getText());
+            PopupMenu popup = new PopupMenu(mCtx, v);
+
+            popup.inflate(R.menu.contextmenu);
+            popup.show();
+            popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                @Override
+                public boolean onMenuItemClick(MenuItem menuItem) {
+                    MNotificationClass.ShowToast(mCtx,AcNameID+"click "+menuItem.getTitle()+" "+sqliteDbEdit);
+
+
+                    if(callBackMethod!=null)
+                        callBackMethod.getPoupCallBackInfo(AcNameID,sqliteDbEdit,menuItem.getTitle().toString());
+                    return false;
+                }
+            });
+
+
+        }
     }
+
     class TrailBalance extends RecyclerView.ViewHolder {
 
         TextView ac_type, ac_group, ac_name, debit, credit, balance, debit_bal, credit_bal;

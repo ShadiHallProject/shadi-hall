@@ -28,7 +28,8 @@ public class InputValidation {
      * @param message
      * @return
      */
-    public boolean isInputEditTextFilled(TextInputEditText textInputEditText, TextInputLayout textInputLayout, String message) {
+    public boolean isInputEditTextFilled(TextInputEditText textInputEditText,
+                                         TextInputLayout textInputLayout, String message) {
         String value = textInputEditText.getText().toString().trim();
         if (value.isEmpty()) {
             textInputLayout.setError(message);

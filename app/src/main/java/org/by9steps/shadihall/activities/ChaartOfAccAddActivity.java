@@ -20,7 +20,9 @@ import android.widget.Toast;
 import org.by9steps.shadihall.AppController;
 import org.by9steps.shadihall.R;
 import org.by9steps.shadihall.helper.DatabaseHelper;
+import org.by9steps.shadihall.helper.GenericConstants;
 import org.by9steps.shadihall.helper.InputValidation;
+import org.by9steps.shadihall.helper.MNotificationClass;
 import org.by9steps.shadihall.helper.Prefrence;
 import org.by9steps.shadihall.model.Account3Name;
 
@@ -28,7 +30,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class ChaartOfAccAddActivity extends AppCompatActivity implements View.OnClickListener, AdapterView.OnItemSelectedListener {
+public class ChaartOfAccAddActivity extends AppCompatActivity implements
+        View.OnClickListener, AdapterView.OnItemSelectedListener {
 
     TextInputLayout name_layout;
     TextInputEditText name;
@@ -52,10 +55,12 @@ public class ChaartOfAccAddActivity extends AppCompatActivity implements View.On
     DatabaseHelper databaseHelper;
     Prefrence prefrence;
     ProgressDialog pDialog;
-
+    ////////////////////Check for how much Edit Text Displaying
+    boolean isSingleTextView = false;
     int spPosition = 0;
     String groupID, groupName, type, acNameID, id;
     List<Account3Name> chartOfAcc;
+    String[] sp_items = {"Not Allowed To Login", "Admin", "Custom Rights"};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,10 +80,11 @@ public class ChaartOfAccAddActivity extends AppCompatActivity implements View.On
             acNameID = intent.getStringExtra("AcNameID");
         }
 
-        Log.e("CHART",groupID + "  "+ groupName);
+        Log.e("CHART", groupID + "  " + groupName);
 
         inputValidation = new InputValidation(this);
-        databaseHelper = new DatabaseHelper(this);prefrence = new Prefrence(this);
+        databaseHelper = new DatabaseHelper(this);
+        prefrence = new Prefrence(this);
 
         name_layout = findViewById(R.id.name_layout);
         name = findViewById(R.id.name);
@@ -99,7 +105,7 @@ public class ChaartOfAccAddActivity extends AppCompatActivity implements View.On
         add = findViewById(R.id.add);
 
 
-        if (groupName.equals("Client") || groupName.equals("Suppliers") || groupID.equals("5") || groupID.equals("6")){
+        if (groupName.equals("Client") || groupName.equals("Suppliers") || groupID.equals("5") || groupID.equals("6")) {
             name_layout.setVisibility(View.VISIBLE);
             address_layout.setVisibility(View.VISIBLE);
             mobile_layout.setVisibility(View.VISIBLE);
@@ -107,10 +113,10 @@ public class ChaartOfAccAddActivity extends AppCompatActivity implements View.On
             salary_layout.setVisibility(View.GONE);
             login_mobile_layout.setVisibility(View.VISIBLE);
             password_layout.setVisibility(View.VISIBLE);
-        }else if (groupName.equals("Cash And Bank") || groupName.equals("General Expense") || groupName.equals("Capital")
+        } else if (groupName.equals("Cash And Bank") || groupName.equals("General Expense") || groupName.equals("Capital")
                 || groupName.equals("Fixed Assets") || groupName.equals("Incom") || groupID.equals("1") || groupID.equals("3")
-                || groupID.equals("8") || groupID.equals("4") || groupID.equals("7")){
-
+                || groupID.equals("8") || groupID.equals("4") || groupID.equals("7")) {
+               isSingleTextView=true;
             name_layout.setVisibility(View.VISIBLE);
             address_layout.setVisibility(View.GONE);
             mobile_layout.setVisibility(View.GONE);
@@ -122,7 +128,7 @@ public class ChaartOfAccAddActivity extends AppCompatActivity implements View.On
             spinner.setVisibility(View.GONE);
             spinner.setSelection(0);
             spPosition = 0;
-        }else if (groupName.equals("Employee") || groupID.equals("2")){
+        } else if (groupName.equals("Employee") || groupID.equals("2")) {
             name_layout.setVisibility(View.VISIBLE);
             address_layout.setVisibility(View.VISIBLE);
             mobile_layout.setVisibility(View.VISIBLE);
@@ -134,16 +140,14 @@ public class ChaartOfAccAddActivity extends AppCompatActivity implements View.On
 
         add.setOnClickListener(this);
         spinner.setOnItemSelectedListener(this);
-
-        String[] sp_items = {"Not Allowed To Login","Admin","Custom Rights"};
-        ArrayAdapter adapter = new ArrayAdapter(this,android.R.layout.simple_spinner_item,sp_items);
+        ArrayAdapter adapter = new ArrayAdapter(this, android.R.layout.simple_spinner_item, sp_items);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
 
-        if (type.equals("Edit")){
-            String query = "SELECT * FROM Account3Name WHERE AcNameID = "+acNameID;
+        if (type.equals("Edit")) {
+            String query = "SELECT * FROM Account3Name WHERE AcNameID = " + acNameID;
             chartOfAcc = databaseHelper.getAccount3Name(query);
-            for (Account3Name c : chartOfAcc){
+            for (Account3Name c : chartOfAcc) {
                 id = c.getId();
                 name.setText(c.getAcName());
                 address.setText(c.getAcAddress());
@@ -152,17 +156,26 @@ public class ChaartOfAccAddActivity extends AppCompatActivity implements View.On
                 salary.setText(c.getSalary());
                 login_mobile.setText(c.getAcMobileNo());
                 password.setText(c.getAcPassward());
-                Log.e("CCCCCC",c.getSecurityRights());
-                if (c.getSecurityRights().equals("0")){
+                Log.e("CCCCCC", c.getSecurityRights());
+                if (c.getSecurityRights().equals("0")) {
                     spinner.setSelection(0);
-                }else if (c.getSecurityRights().equals("1")){
+                } else if (c.getSecurityRights().equals("1")) {
                     spinner.setSelection(1);
-                }else if (c.getSecurityRights().equals("2")){
+                } else if (c.getSecurityRights().equals("2")) {
                     spinner.setSelection(2);
                 }
                 add.setText(getString(R.string.update));
             }
         }
+        /////////////////////
+        Prefrence prefrence = new Prefrence(this);
+
+        Log.e(GenericConstants.MYEdittion, "Editing");
+        Log.e(this.getClass().getName(), "Client ID::" + prefrence.getClientIDSession());
+        Log.e(this.getClass().getName(), "ClientUserID::" + prefrence.getClientIDSession());
+        Log.e(this.getClass().getName(), "ProjectIDSerssion::" + prefrence.getProjectIDSession());
+        Log.e(this.getClass().getName(), "UserRightSession::" + prefrence.getUserRighhtsSession());
+
     }
 
 
@@ -178,83 +191,112 @@ public class ChaartOfAccAddActivity extends AppCompatActivity implements View.On
 
     @Override
     public void onClick(View v) {
-
-        switch (v.getId()){
+        MNotificationClass.ShowToastTem(this, "Click " + type);
+        switch (v.getId()) {
             case R.id.add:
                 if (!inputValidation.isInputEditTextFilled(name, name_layout, getString(R.string.error_message_c_name))) {
-                    return;
-                }if (!inputValidation.isInputEditTextFilled(address, address_layout, getString(R.string.error_message_c_address))) {
-                return;
-                }if (!inputValidation.isInputEditTextFilled(mobile, mobile_layout, getString(R.string.error_message_c_number))) {
-                return;
-                }if (!inputValidation.isInputEditTextFilled(email, email_layout, getString(R.string.error_message_email))) {
-                return;
-                }if (!inputValidation.isInputEditTextFilled(salary, salary_layout, getString(R.string.error_message_salary))) {
-                return;
-                }if (!inputValidation.isInputEditTextFilled(login_mobile, login_mobile_layout, getString(R.string.error_message_login_number))) {
-                return;
-                }if (!inputValidation.isInputEditTextFilled(password, password_layout, getString(R.string.error_message_password))) {
-                return;
-                }else{
+                    MNotificationClass.ShowToastTem(this, "Some Field May empty");
+
+                }
+                if (!inputValidation.isInputEditTextFilled(address, address_layout, getString(R.string.error_message_c_address))) {
+                    MNotificationClass.ShowToastTem(this, "Some Field May empty");
+
+                }
+                if (!inputValidation.isInputEditTextFilled(mobile, mobile_layout, getString(R.string.error_message_c_number))) {
+                    MNotificationClass.ShowToastTem(this, "Some Field May empty");
+
+                }
+                if (!inputValidation.isInputEditTextFilled(email, email_layout, getString(R.string.error_message_email))) {
+                    MNotificationClass.ShowToastTem(this, "Some Field May empty");
+
+                }
+                if (!inputValidation.isInputEditTextFilled(salary, salary_layout, getString(R.string.error_message_salary))) {
+                    MNotificationClass.ShowToastTem(this, "Some Field May empty");
+
+                }
+                if (!inputValidation.isInputEditTextFilled(login_mobile, login_mobile_layout, getString(R.string.error_message_login_number))) {
+                    MNotificationClass.ShowToastTem(this, "Some Field May empty");
+
+                }
+                if (!inputValidation.isInputEditTextFilled(password, password_layout, getString(R.string.error_message_password))) {
+                    MNotificationClass.ShowToastTem(this, "Some Field May empty");
+
+                } else {
 
                     String query;
                     String query1;
 
 
-                            if (type.equals("Add")) {
+                    if (type.equals("Add")) {
 
-                                query = "SELECT AcName FROM Account3Name WHERE ClientID = "+prefrence.getClientIDSession() + " AND AcName = '"+name.getText().toString()+"'";
-                                query1 = "SELECT AcMobileNo FROM Account3Name WHERE ClientID = "+prefrence.getClientIDSession()+" AND AcMobileNo = '"+login_mobile.getText().toString()+"'";
+                        query = "SELECT AcName FROM Account3Name WHERE ClientID = " + prefrence.getClientIDSession() + " AND AcName = '" + name.getText().toString() + "'";
+                        query1 = "SELECT AcMobileNo FROM Account3Name WHERE ClientID = " + prefrence.getClientIDSession() + " AND AcMobileNo = '" + login_mobile.getText().toString() + "'";
 
-                                if (databaseHelper.findAccount3Name(query)){
-                                    Toast.makeText(ChaartOfAccAddActivity.this, "Name Already Register", Toast.LENGTH_SHORT).show();
-                                }else if (databaseHelper.findAccount3Name(query1)){
-                                    Toast.makeText(ChaartOfAccAddActivity.this, "Login Number Already Register", Toast.LENGTH_SHORT).show();
-                                }else {
-                                    int seriolNo = databaseHelper.getMaxValue("SELECT max(SerialNo) FROM Account3Name") + 1;
-                                    databaseHelper.createAccount3Name(new Account3Name("0", name.getText().toString(), groupID, address.getText().toString(), login_mobile.getText().toString(),
-                                            mobile.getText().toString(), email.getText().toString(), "", "", password.getText().toString(), prefrence.getClientIDSession(), prefrence.getClientUserIDSession(), "0", "0", "0", String.valueOf(seriolNo),
-                                            "", String.valueOf(spPosition), salary.getText().toString()));
-                                    finish();
-                                }
+                        if (databaseHelper.findAccount3Name(query)) {
+                            Toast.makeText(ChaartOfAccAddActivity.this, "Name Already Register", Toast.LENGTH_SHORT).show();
+                        } else if (databaseHelper.findAccount3Name(query1)) {
+                            Toast.makeText(ChaartOfAccAddActivity.this, "Login Number Already Register", Toast.LENGTH_SHORT).show();
+                        } else {
+                            int seriolNo = databaseHelper.getMaxValue("SELECT max(SerialNo) FROM Account3Name") + 1;
+                            Account3Name account3Nametem = new Account3Name(
+                                    "0",
+                                    name.getText().toString(),
+                                    groupID,
+                                    address.getText().toString(),
+                                    login_mobile.getText().toString(),
+                                    mobile.getText().toString(),
+                                    email.getText().toString(),
+                                    "0", "0",
+                                    password.getText().toString(),
+                                    prefrence.getClientIDSession(),
+                                    prefrence.getClientUserIDSession(),
+                                    "0", "0", "0",
+                                    String.valueOf(seriolNo),
+                                    sp_items[spPosition],
+                                    String.valueOf(spPosition),
+                                    salary.getText().toString());
+                            Log.e("key", "" + account3Nametem.toString());
+                            databaseHelper.createAccount3Name(account3Nametem);
+                            finish();
+                        }
 
-                            }else if (type.equals("Edit")){
+                    } else if (type.equals("Edit")) {
 
-                                query = "SELECT AcName FROM Account3Name WHERE ClientID = "+prefrence.getClientIDSession() + " AND AcName = '"+name.getText().toString() +"' AND ID != "+id;
-                                query1 = "SELECT AcMobileNo FROM Account3Name WHERE ClientID = "+prefrence.getClientIDSession()+" AND AcMobileNo = '"+login_mobile.getText().toString()+"' AND ID != "+id;
+                        query = "SELECT AcName FROM Account3Name WHERE ClientID = " + prefrence.getClientIDSession() + " AND AcName = '" + name.getText().toString() + "' AND ID != " + id;
+                        query1 = "SELECT AcMobileNo FROM Account3Name WHERE ClientID = " + prefrence.getClientIDSession() + " AND AcMobileNo = '" + login_mobile.getText().toString() + "' AND ID != " + id;
 
-                                if (databaseHelper.findAccount3Name(query)){
-                                    Toast.makeText(ChaartOfAccAddActivity.this, "Name Already Register", Toast.LENGTH_SHORT).show();
-                                }else if (databaseHelper.findAccount3Name(query1)){
-                                    Toast.makeText(ChaartOfAccAddActivity.this, "Login Number Already Register", Toast.LENGTH_SHORT).show();
-                                }else {
+                        if (databaseHelper.findAccount3Name(query)) {
+                            Toast.makeText(ChaartOfAccAddActivity.this, "Name Already Register", Toast.LENGTH_SHORT).show();
+                        } else if (databaseHelper.findAccount3Name(query1)) {
+                            Toast.makeText(ChaartOfAccAddActivity.this, "Login Number Already Register", Toast.LENGTH_SHORT).show();
+                        } else {
 
-                                    if (groupName.equals("Client") || groupName.equals("Suppliers") || groupID.equals("5") || groupID.equals("6")){
+                            if (groupName.equals("Client") || groupName.equals("Suppliers") || groupID.equals("5") || groupID.equals("6")) {
 
-                                        query = "Update Account3Name SET AcName = '"+name.getText().toString()+"', AcAddress = '"+address.getText().toString()+"', AcMobileNo = '"+login_mobile.getText().toString()
-                                                +"', AcContactNo ='"+mobile.getText().toString()+"', AcEmailAddress = '"+email.getText().toString()+"', AcPassward = '"+password.getText().toString()
-                                                +"', SecurityRights = '"+spPosition+"', UpdatedDate = '0' WHERE AcNameID = "+ acNameID;
-                                        databaseHelper.updateAccount3Name(query);
-                                        finish();
+                                query = "Update Account3Name SET AcName = '" + name.getText().toString() + "', AcAddress = '" + address.getText().toString() + "', AcMobileNo = '" + login_mobile.getText().toString()
+                                        + "', AcContactNo ='" + mobile.getText().toString() + "', AcEmailAddress = '" + email.getText().toString() + "', AcPassward = '" + password.getText().toString()
+                                        + "', SecurityRights = '" + spPosition + "', UpdatedDate = '0' WHERE AcNameID = " + acNameID;
+                                databaseHelper.updateAccount3Name(query);
+                                finish();
 
-                                    }else if (groupName.equals("Cash And Bank") || groupName.equals("General Expense") || groupName.equals("Capital")
-                                            || groupName.equals("Fixed Assets") || groupName.equals("Incom") || groupID.equals("1") || groupID.equals("3")
-                                            || groupID.equals("8") || groupID.equals("4") || groupID.equals("7")){
+                            } else if (groupName.equals("Cash And Bank") || groupName.equals("General Expense") || groupName.equals("Capital")
+                                    || groupName.equals("Fixed Assets") || groupName.equals("Incom") || groupID.equals("1") || groupID.equals("3")
+                                    || groupID.equals("8") || groupID.equals("4") || groupID.equals("7")) {
 
-                                        query = "Update Account3Name SET AcName = '"+name.getText().toString()+"', UpdatedDate = '0'";
-                                        databaseHelper.updateAccount3Name(query);
-                                        finish();
+                                query = "Update Account3Name SET AcName = '" + name.getText().toString() + "', UpdatedDate = '0'";
+                                databaseHelper.updateAccount3Name(query);
+                                finish();
 
-                                    }else if (groupName.equals("Employee") || groupID.equals("2")){
-                                        query = "Update Account3Name SET AcName = '"+name.getText().toString()+"', AcAddress = '"+address.getText().toString()+"', AcMobileNo = '"+login_mobile.getText().toString()
-                                                +"', AcContactNo ='"+mobile.getText().toString()+"', AcEmailAddress = '"+email.getText().toString()+"', AcPassward = '"+password.getText().toString()
-                                                +"', SecurityRights = '"+spPosition+"', Salary = '"+salary.getText().toString()+"', UpdatedDate = '0' WHERE AcNameID = "+ acNameID;
-                                        databaseHelper.updateAccount3Name(query);
-                                        finish();
-                                    }
-
-                                }
+                            } else if (groupName.equals("Employee") || groupID.equals("2")) {
+                                query = "Update Account3Name SET AcName = '" + name.getText().toString() + "', AcAddress = '" + address.getText().toString() + "', AcMobileNo = '" + login_mobile.getText().toString()
+                                        + "', AcContactNo ='" + mobile.getText().toString() + "', AcEmailAddress = '" + email.getText().toString() + "', AcPassward = '" + password.getText().toString()
+                                        + "', SecurityRights = '" + spPosition + "', Salary = '" + salary.getText().toString() + "', UpdatedDate = '0' WHERE AcNameID = " + acNameID;
+                                databaseHelper.updateAccount3Name(query);
+                                finish();
                             }
+
+                        }
+                    }
 
 
 //                    String tag_json_obj = "json_obj_req";
@@ -327,7 +369,7 @@ public class ChaartOfAccAddActivity extends AppCompatActivity implements View.On
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
         spPosition = position;
-        Log.e("Position",String.valueOf(spPosition));
+        Log.e("Position", String.valueOf(spPosition));
     }
 
     @Override

@@ -223,6 +223,7 @@ public class HomeFragment extends Fragment implements ProjectsListAdapter.OnItem
         prefrence.setProjectIDSession(id);
         prefrence.setUserRighhtsSession("0");
         prefrence.setClientUserIDSession("0");
+        prefrence.setMYClientUserIDSession("0");
         prefrence.setClientIDSession("0");
 
         dialog.dismiss();

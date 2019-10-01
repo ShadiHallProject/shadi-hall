@@ -1,5 +1,7 @@
 package org.by9steps.shadihall.model;
 
+import org.by9steps.shadihall.helper.GenericConstants;
+
 import java.io.Serializable;
 
 public class Account3Name implements Serializable {
@@ -24,14 +26,36 @@ public class Account3Name implements Serializable {
     String UserRights;
     String SecurityRights;
     String Salary;
+    String AccountPhoto;
 
-    public Account3Name(String acNameID, String acName, String acGroupID, String acAddress, String acMobileNo, String acContactNo, String acEmailAddress, String acDebitBal, String acCreditBal, String acPassward, String clientID, String clientUserID, String sysCode, String netCode, String updatedDate, String serialNo, String userRights, String securityRights, String salary) {
+    public Account3Name(String acNameID, String acName, String acGroupID,
+                        String acAddress, String acMobileNo, String acContactNo,
+                        String acEmailAddress, String acDebitBal,
+                        String acCreditBal, String acPassward,
+                        String clientID, String clientUserID,
+                        String sysCode, String netCode, String updatedDate,
+                        String serialNo, String userRights,
+                        String securityRights, String salary) {
         AcNameID = acNameID;
         AcName = acName;
         AcGroupID = acGroupID;
-        AcAddress = acAddress;
-        AcMobileNo = acMobileNo;
-        AcContactNo = acContactNo;
+        if (acAddress.isEmpty())
+            AcAddress = GenericConstants.NullFieldStandardText;
+        else
+            AcAddress = acAddress;
+        if (acMobileNo.isEmpty()) {
+            ///////////////Matcing this Field in Cloud Dont Change It
+            AcMobileNo = "null";
+        }
+        else
+            AcMobileNo = acMobileNo;
+        if (acContactNo.isEmpty())
+            AcContactNo = GenericConstants.NullFieldStandardText;
+        else
+            AcContactNo = acContactNo;
+        if (acEmailAddress.isEmpty())
+            AcEmailAddress = GenericConstants.NullFieldStandardText;
+        else
         AcEmailAddress = acEmailAddress;
         AcDebitBal = acDebitBal;
         AcCreditBal = acCreditBal;
@@ -48,6 +72,7 @@ public class Account3Name implements Serializable {
     }
 
     public Account3Name() {
+
     }
 
     public String getId() {
@@ -208,5 +233,38 @@ public class Account3Name implements Serializable {
 
     public void setSalary(String salary) {
         Salary = salary;
+    }
+
+    @Override
+    public String toString() {
+        return "id='" + id + '\'' +
+                ", AcNameID='" + AcNameID + '\'' +
+                ", AcName='" + AcName + '\'' +
+                ", AcGroupID='" + AcGroupID + '\'' +
+                ", AcAddress='" + AcAddress + '\'' +
+                ", AcMobileNo='" + AcMobileNo + '\'' +
+                ", AcContactNo='" + AcContactNo + '\'' +
+                ", AcEmailAddress='" + AcEmailAddress + '\'' +
+                ", AcDebitBal='" + AcDebitBal + '\'' +
+                ", AcCreditBal='" + AcCreditBal + '\'' +
+                ", AcPassward='" + AcPassward + '\'' +
+                ", ClientID='" + ClientID + '\'' +
+                ", ClientUserID='" + ClientUserID + '\'' +
+                ", SysCode='" + SysCode + '\'' +
+                ", NetCode='" + NetCode + '\'' +
+                ", UpdatedDate='" + UpdatedDate + '\'' +
+                ", SerialNo='" + SerialNo + '\'' +
+                ", UserRights='" + UserRights + '\'' +
+                ", SecurityRights='" + SecurityRights + '\'' +
+                ", Salary='" + Salary + '\'' +
+                ", AccountPhoto='" + AccountPhoto + '\'';
+    }
+
+    public String getAccountPhoto() {
+        return AccountPhoto;
+    }
+
+    public void setAccountPhoto(String accountPhoto) {
+        AccountPhoto = accountPhoto;
     }
 }

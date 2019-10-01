@@ -4,6 +4,9 @@ import java.io.Serializable;
 
 public class Reports implements Serializable {
 
+    ///////Add by Bilal Develooper get the ref id from sqlite
+    public String SqliteDbID;
+    /////////////////////////
     String AccountID;
     String Debit;
     String Credit;
@@ -12,6 +15,7 @@ public class Reports implements Serializable {
     String CreditBal;
     String AcName;
     String AcGroupID;
+    private String UpdatedDate;
 
     public Reports() {
     }
@@ -89,5 +93,13 @@ public class Reports implements Serializable {
 
     public void setAcGroupID(String acGroupID) {
         AcGroupID = acGroupID;
+    }
+
+    public String getUpdatedDate() {
+        return UpdatedDate;
+    }
+
+    public void setUpdatedDate(String updatedDate) {
+        UpdatedDate = updatedDate;
     }
 }

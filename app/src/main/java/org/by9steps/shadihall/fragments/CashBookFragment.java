@@ -112,7 +112,10 @@ import android.widget.AdapterView.OnItemSelectedListener;
 
 import static com.itextpdf.text.html.HtmlTags.ALIGN_LEFT;
 import static com.itextpdf.text.html.HtmlTags.FONT;
-
+///server to sqlite
+////server get updated record insert sqlite
+/////////sqlite to server
+/////////update sqlite to server
 /**
  * A simple {@link Fragment} subclass.
  */

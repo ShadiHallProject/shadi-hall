@@ -21,6 +21,7 @@ import org.by9steps.shadihall.adapters.ProjectMenuAdapter;
 import org.by9steps.shadihall.adapters.RecyclerViewAdapter;
 import org.by9steps.shadihall.adapters.SectionViewAdapter;
 import org.by9steps.shadihall.helper.DatabaseHelper;
+import org.by9steps.shadihall.helper.GenericConstants;
 import org.by9steps.shadihall.helper.Prefrence;
 import org.by9steps.shadihall.model.Menu;
 import org.by9steps.shadihall.model.ProjectMenu;
@@ -115,6 +116,11 @@ public class MenuItemsFragment extends Fragment {
 //        SectionViewAdapter adapter = new SectionViewAdapter(getContext(),modelList);
 //        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 //        recyclerView.setAdapter(adapter);
+        Log.e(GenericConstants.MYEdittion,"Editing");
+        Log.e(this.getClass().getName(),"Client ID::"+new Prefrence(this.getContext()).getClientIDSession());
+        Log.e(this.getClass().getName(),"ClientUserID::"+new Prefrence(this.getContext()).getClientUserIDSession());
+        Log.e(this.getClass().getName(),"ProjectIDSerssion::"+new Prefrence(this.getContext()).getProjectIDSession());
+        Log.e(this.getClass().getName(),"UserRightSession::"+new Prefrence(this.getContext()).getUserRighhtsSession());
 
         mEntries = new ArrayList<>();
         modelList = new ArrayList<>();

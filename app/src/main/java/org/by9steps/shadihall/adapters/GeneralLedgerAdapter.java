@@ -50,6 +50,7 @@ public class GeneralLedgerAdapter extends RecyclerView.Adapter{
 
         final GeneralLedger balSheet = mList.get(position);
 
+
         if (balSheet.isRow() == 1) {
             ((ItemViewHolder)viewHolder).clientID.setText(balSheet.getEntryNo());
             ((ItemViewHolder)viewHolder).date.setText(balSheet.getDate());
@@ -58,6 +59,7 @@ public class GeneralLedgerAdapter extends RecyclerView.Adapter{
             ((ItemViewHolder)viewHolder).debit.setText(balSheet.getDebit());
             ((ItemViewHolder)viewHolder).credit.setText(balSheet.getCredit());
             ((ItemViewHolder)viewHolder).balance.setText(balSheet.getBalance());
+
 
         }else if (balSheet.isRow() == 2){
             ((ItemViewHolder)viewHolder).clientID.setTypeface(((ItemViewHolder)viewHolder).clientID.getTypeface(), Typeface.BOLD);
@@ -76,6 +78,8 @@ public class GeneralLedgerAdapter extends RecyclerView.Adapter{
             GeneralLedgerAdapter.MonthViewHolder h = (GeneralLedgerAdapter.MonthViewHolder) viewHolder;
             h.textView.setText(balSheet.getMonth());
         }
+        String cLID=((ItemViewHolder)viewHolder).clientID.getText().toString();
+        Log.e("kkey"," Row "+balSheet.isRow()+"  "+cLID);
 
     }
 
@@ -100,7 +104,7 @@ public class GeneralLedgerAdapter extends RecyclerView.Adapter{
     class ItemViewHolder extends RecyclerView.ViewHolder {
 
         TextView clientID, date, accountName, remarks, debit, credit, balance;
-
+        TextView editRecord,printRecord;
 
         public ItemViewHolder(View itemView) {
             super(itemView);

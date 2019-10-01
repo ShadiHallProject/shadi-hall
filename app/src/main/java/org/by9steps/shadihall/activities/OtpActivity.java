@@ -38,6 +38,7 @@ import com.orm.SugarContext;
 
 import org.by9steps.shadihall.AppController;
 import org.by9steps.shadihall.R;
+import org.by9steps.shadihall.helper.GenericConstants;
 import org.by9steps.shadihall.helper.InputValidation;
 import org.by9steps.shadihall.model.Account2Group;
 import org.json.JSONArray;
@@ -102,6 +103,11 @@ public class OtpActivity extends AppCompatActivity implements View.OnClickListen
             ph = sharedPreferences.getString(phone, "");
         phonenum = getIntent().getStringExtra("PHONE");
         sendVerificationCode(phonenum);
+
+        Log.e(GenericConstants.MYByPassForOTP,"OTP BY PASS");
+        Intent intent = new Intent(OtpActivity.this, MainActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
     }
 
     @Override

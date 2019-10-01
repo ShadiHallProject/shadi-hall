@@ -187,4 +187,27 @@ public class CashBook implements Serializable {
     public void setTableName(String tableName) {
         TableName = tableName;
     }
+
+    @Override
+    public String toString() {
+        return
+                "cId='" + cId + '\'' +
+                ", CashBookID='" + CashBookID + '\'' +
+                ", CBDate='" + CBDate + '\'' +
+                ", DebitAccount='" + DebitAccount + '\'' +
+                ", CreditAccount='" + CreditAccount + '\'' +
+                ", CBRemarks='" + CBRemarks + '\'' +
+                ", Amount='" + Amount + '\'' +
+                ", ClientID='" + ClientID + '\'' +
+                ", ClientUserID='" + ClientUserID + '\'' +
+                ", NetCode='" + NetCode + '\'' +
+                ", SysCode='" + SysCode + '\'' +
+                ", UpdatedDate='" + UpdatedDate + '\'' +
+                ", TableID='" + TableID + '\'' +
+                ", SerialNo='" + SerialNo + '\'' +
+                ", TableName='" + TableName + '\'' +
+                ", DebitAccountName='" + DebitAccountName + '\'' +
+                ", CreditAccountName='" + CreditAccountName + '\'' +
+                ", UserName='" + UserName + '\'' ;
+    }
 }

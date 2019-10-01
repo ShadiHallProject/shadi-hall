@@ -2,20 +2,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="org.by9steps.shadihall">
-    <!--
-         The ACCESS_COARSE/FINE_LOCATION permissions are not required to use
-         Google Maps Android API v2, but you must specify either coarse or fine
-         location permissions for the 'MyLocation' functionality.
-    -->
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.READ_CONTACTS" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.CAMERA" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-    <uses-permission android:name="android.permission.CALL_PHONE" />
 
     <application
         android:name=".AppController"
@@ -25,15 +11,16 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".activities.SelectImagesActivity"></activity>
+        <activity android:name=".activities.Salepur1AddNewActivity"></activity>
+
+        <activity android:name=".helper.ViewDBAllData" />
+
+        <activity android:name=".activities.SelectImagesActivity" />
         <activity android:name=".activities.BookingActivity" />
-
-        <!--CrashLytics-->
-        <meta-data
-            android:name="io.fabric.ApiKey"
-            android:value="9131bbadb82bcfa052e723e275039a750b9d3add"
-            />
-
+        <activity
+            android:name=".activities.MapsActivity"
+            android:label="@string/title_activity_maps" /> <!-- CrashLytics -->
+        <activity android:name=".activities.EventCashBookActivity" />
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
              (See the file "res/values/google_maps_api.xml").
@@ -42,14 +29,6 @@
              sign the APK for publishing.
              You can define the keys for the debug and release targets in src/debug/ and src/release/.
         -->
-        <meta-data
-            android:name="com.google.android.geo.API_KEY"
-            android:value="@string/google_maps_key" />
-
-        <activity
-            android:name=".activities.MapsActivity"
-            android:label="@string/title_activity_maps" />
-        <activity android:name=".activities.EventCashBookActivity" />
         <activity android:name=".activities.CashBookSettingActivity" />
         <activity android:name=".activities.GeneralLedgerActivity" />
         <activity
@@ -75,9 +54,7 @@
             android:configChanges="orientation|screenSize|keyboardHidden" />
         <activity
             android:name=".activities.LoginActivity"
-            android:configChanges="orientation|screenSize|keyboardHidden" >
-
-        </activity>
+            android:configChanges="orientation|screenSize|keyboardHidden" />
         <activity
             android:name=".activities.SplashActivity"
             android:configChanges="orientation|screenSize|keyboardHidden"
@@ -102,6 +79,32 @@
         <activity
             android:name=".activities.MainActivity"
             android:configChanges="orientation|screenSize|keyboardHidden" />
+        <meta-data
+            android:name="io.fabric.ApiKey"
+            android:value="9131bbadb82bcfa052e723e275039a750b9d3add" />
+
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="@string/google_maps_key" />
+        <provider
+            android:name=".helper.GenericFileProvider"
+            android:authorities="${applicationId}.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/external_files" />
+        </provider>
     </application>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+
+    <uses-permission android:name="android.permission.CALL_PHONE" />
 
 </manifest>

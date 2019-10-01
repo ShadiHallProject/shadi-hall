@@ -16,6 +16,7 @@ import com.android.volley.toolbox.StringRequest;
 
 import org.by9steps.shadihall.AppController;
 import org.by9steps.shadihall.R;
+import org.by9steps.shadihall.chartofaccountdialog.CustomDialogOnDismisListener;
 import org.by9steps.shadihall.fragments.BalSheetFragment;
 import org.by9steps.shadihall.fragments.BookCalendarFragment;
 import org.by9steps.shadihall.fragments.CashBookFragment;
@@ -28,10 +29,12 @@ import org.by9steps.shadihall.fragments.MonthTrialBalance;
 import org.by9steps.shadihall.fragments.ProfitLossFragment;
 import org.by9steps.shadihall.fragments.RecoveryFragment;
 import org.by9steps.shadihall.fragments.ReportsFragment;
+import org.by9steps.shadihall.fragments.SalePur1Fragment;
 import org.by9steps.shadihall.fragments.SummerizeTrailBalFragment;
 import org.by9steps.shadihall.fragments.TrailBalanceFragment;
 import org.by9steps.shadihall.fragments.YearProfitLossFragment;
 import org.by9steps.shadihall.helper.DatabaseHelper;
+import org.by9steps.shadihall.helper.Prefrence;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -40,13 +43,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class MenuClickActivity extends AppCompatActivity {
+public class MenuClickActivity extends AppCompatActivity implements CustomDialogOnDismisListener {
 
     String currentDate;
     DatabaseHelper databaseHelper;
-
+    //////////////////////listener for Change
+    ReportsFragment reportsFragment;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.e(this.getClass().getName(),"ClientUserID"+new Prefrence(this).getClientUserIDSession());
+        //Log.e(this.getClass().getName(),"ClientUserIDMY"+new Prefrence(this).getMYClientUserIDSession());
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_menu_click);
 
@@ -76,7 +83,11 @@ public class MenuClickActivity extends AppCompatActivity {
                 getSupportActionBar().setTitle(title);
             }
 
-            if (message.equals("Booking")) {
+            if (message.equals("SalPur1")) {
+                getSupportFragmentManager().beginTransaction()
+                        .add(R.id.menu_container, new SalePur1Fragment())
+                        .commit();
+            } else if (message.equals("Booking")) {
                 getSupportFragmentManager().beginTransaction()
                         .add(R.id.menu_container, new BookCalendarFragment())
                         .commit();
@@ -95,8 +106,9 @@ public class MenuClickActivity extends AppCompatActivity {
                         .add(R.id.menu_container, new CashBookFragment())
                         .commit();
             } else if (message.equals("AccountEntry")) {
+                reportsFragment=ReportsFragment.newInstance(ValuePass);
                 getSupportFragmentManager().beginTransaction()
-                        .add(R.id.menu_container, ReportsFragment.newInstance(ValuePass))
+                        .add(R.id.menu_container, reportsFragment)
                         .commit();
             } else if (message.equals("TreeView")) {
                 getSupportFragmentManager().beginTransaction()
@@ -140,4 +152,11 @@ public class MenuClickActivity extends AppCompatActivity {
     }
 
 
+    @Override
+    public void onDismissListener(String key) {
+        reportsFragment.getReports();
+        reportsFragment.filter = 0;
+        reportsFragment.searchView.setQuery("", false);
+        reportsFragment.searchView.clearFocus();
+    }
 }

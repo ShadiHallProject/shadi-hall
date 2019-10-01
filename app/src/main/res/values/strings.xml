@@ -72,6 +72,7 @@
     <string name="credit_account">Credit Account</string>
     <string name="debit_account">Debit Account</string>
     <string name="add">Add</string>
+
     <string name="date">Date</string>
     <string name="Recieved">Recieved</string>
     <string name="expensed">Expensed</string>
@@ -136,6 +137,53 @@
     <string name="pref_default_display_name">John Smith</string>
 
     <string name="pref_title_add_friends_to_messages">Add friends to messages</string>
+    <string name="pref_header_data_sync">Data &amp; sync</string>
+    <string name="pref_title_sync_frequency">Sync frequency</string>
+
+    <!-- Example settings for Data & Sync -->
+    <string name="pref_title_system_sync_settings">System sync settings</string>
+
+    <string name="pref_header_notifications">Notifications</string>
+    <string name="pref_title_new_message_notifications">New message notifications</string>
+    <string name="pref_title_ringtone">Ringtone</string>
+
+    <string name="pref_ringtone_silent">Silent</string>
+
+    <string name="pref_title_vibrate">Vibrate</string>
+
+    <string name="print">Print</string>
+
+    <string name="action">Action</string>
+
+    <!-- Example settings for Notifications -->
+    <string name="previous_debit">PrvDebit</string>
+
+    <string name="previous_credit">PrvCredit</string>
+
+    <string name="tradebit">TraDebit</string>
+    <string name="tracredit">TraCredit</string>
+
+    <string name="closingdebit">ClosingDebit</string>
+    <string name="closingcredit">ClosingCredit</string>
+    <string name="transaction">Transaction</string>
+    <string name="select_account">Select Account</string>
+    <string name="update">Update</string>
+    <string name="title_activity_get_shadi_hall_location">Map</string>
+    <string name="gps_network_not_enabled">GPS Network Not Enabled</string>
+    <string name="open_location_settings">Open Location Settings</string>
+    <string name="Cancel">Cancel</string>
+    <string name="title_activity_maps">Map</string>
+    <string name="select_booking_shift">Select Booking Shift</string>
+    <string name="event_shift">Event Shift</string>
+    <string name="bookingid">BookingID</string>
+    <string name="financial_year">Financial Year</string>
+    <string name="salepurnumber">No</string>
+    <string name="salepurdata">Date</string>
+    <string name="salepuracname">AccountName</string>
+    <string name="salepurremarks">ReMarks</string>
+    <string name="salepurbillamount">BillAmount</string>
+    <string name="enter_your_remarks">Enter Your Remarks</string>
+    <string name="add_invoice">Add new Invoice</string>
     <string-array name="pref_example_list_titles">
         <item>Always</item>
         <item>When possible</item>
@@ -147,10 +195,8 @@
         <item>-1</item>
     </string-array>
 
-    <!-- Example settings for Data & Sync -->
-    <string name="pref_header_data_sync">Data &amp; sync</string>
+    <!-- Sale Pur Table Cloumn Headings -->
 
-    <string name="pref_title_sync_frequency">Sync frequency</string>
     <string-array name="pref_sync_frequency_titles">
         <item>15 minutes</item>
         <item>30 minutes</item>
@@ -173,44 +219,10 @@
         <item>Entry 2</item>
         <item>Entry 3</item>
     </string-array>
-
     <string-array name="list_preference_entry_values">
         <item>1</item>
         <item>2</item>
         <item>3</item>
     </string-array>
-
     <string-array name="multi_select_list_preference_default_value" />
-
-    <string name="pref_title_system_sync_settings">System sync settings</string>
-
-    <!-- Example settings for Notifications -->
-    <string name="pref_header_notifications">Notifications</string>
-
-    <string name="pref_title_new_message_notifications">New message notifications</string>
-
-    <string name="pref_title_ringtone">Ringtone</string>
-    <string name="pref_ringtone_silent">Silent</string>
-
-    <string name="pref_title_vibrate">Vibrate</string>
-    <string name="print">Print</string>
-    <string name="action">Action</string>
-    <string name="previous_debit">PrvDebit</string>
-    <string name="previous_credit">PrvCredit</string>
-    <string name="tradebit">TraDebit</string>
-    <string name="tracredit">TraCredit</string>
-    <string name="closingdebit">ClosingDebit</string>
-    <string name="closingcredit">ClosingCredit</string>
-    <string name="transaction">Transaction</string>
-    <string name="select_account">Select Account</string>
-    <string name="update">Update</string>
-    <string name="title_activity_get_shadi_hall_location">Map</string>
-    <string name="gps_network_not_enabled">GPS Network Not Enabled</string>
-    <string name="open_location_settings">Open Location Settings</string>
-    <string name="Cancel">Cancel</string>
-    <string name="title_activity_maps">Map</string>
-    <string name="select_booking_shift">Select Booking Shift</string>
-    <string name="event_shift">Event Shift</string>
-    <string name="bookingid">BookingID</string>
-    <string name="financial_year">Financial Year</string>
 </resources>
