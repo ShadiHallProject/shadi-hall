@@ -41,7 +41,7 @@ public class Item3Name_ {
     private String itemCode;
     @SerializedName("Stock")
     @Expose
-    private Object stock;
+    private String stock;
 
     public int getID() {
         return iD;
@@ -131,11 +131,11 @@ public class Item3Name_ {
         this.itemCode = itemCode;
     }
 
-    public Object getStock() {
+    public String getStock() {
         return stock;
     }
 
-    public void setStock(Object stock) {
+    public void setStock(String stock) {
         this.stock = stock;
     }
 

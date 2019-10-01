@@ -129,7 +129,7 @@ builder.append("-------@@@@@");
             builder.append("TABLE - \n\n\n\n\n\n\n\n");
             for (i = 0; i < temp.length; i++) {
                 temp[i] = c.getString(i);
-                builder.append("TABLE - "+temp[i]+"\n");
+                builder.append((i+1)+"TABLE - "+temp[i]+"\n");
 
 
                 Cursor c1 = db.rawQuery(
@@ -138,7 +138,7 @@ builder.append("-------@@@@@");
                 String[] COLUMNS = c1.getColumnNames();
                 for(int j=0;j<COLUMNS.length;j++){
                     c1.move(j);
-                    builder.append("    COLUMN - "+COLUMNS[j]+"\n");
+                    builder.append((i+1)+"    COLUMN - "+COLUMNS[j]+"\n");
                 }
             }
             result.add(temp);

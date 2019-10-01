@@ -18,6 +18,7 @@ import org.by9steps.shadihall.model.ChartOfAcc;
 import org.by9steps.shadihall.model.Client;
 import org.by9steps.shadihall.model.GeneralLedger;
 import org.by9steps.shadihall.model.Item1Type;
+import org.by9steps.shadihall.model.Item2Group;
 import org.by9steps.shadihall.model.MonthTb;
 import org.by9steps.shadihall.model.ProfitLoss;
 import org.by9steps.shadihall.model.ProjectMenu;
@@ -27,6 +28,7 @@ import org.by9steps.shadihall.model.Reports;
 import org.by9steps.shadihall.model.Spinner;
 import org.by9steps.shadihall.model.Summerize;
 import org.by9steps.shadihall.model.Voucher;
+import org.by9steps.shadihall.model.item3name.Item3Name_;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -1774,8 +1776,43 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return db.insert(TABLE_Item1Type, null, values);
     }
 
-    ////////////////item 2 Group DAta Fun
+    ////////////////item 2 Group DAta Functions
+    public long createItem2GroupData(Item2Group item2Group){
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
 
+        values.put(refdb.Table2Group.KEY_1, item2Group.getItem2GroupID());
+        values.put(refdb.Table2Group.KEY_2, item2Group.getItem1TypeID());
+        values.put(refdb.Table2Group.KEY_3, item2Group.getItem2GroupName());
+        values.put(refdb.Table2Group.KEY_4, item2Group.getClientID());
+        values.put(refdb.Table2Group.KEY_5, item2Group.getClientUserID());
+        values.put(refdb.Table2Group.KEY_6, item2Group.getNetCode());
+        values.put(refdb.Table2Group.KEY_7, item2Group.getSysCode());
+        values.put(refdb.Table2Group.KEY_8, item2Group.getUpdatedDate().toString());
+
+        // insert row
+        return db.insert(refdb.Table2Group.TABLE_Item2Group, null, values);
+    }
+    ////////////////item 3 Name DAta Functions
+    public long createItem3NameData(Item3Name_ item3Name_){
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+
+        values.put(refdb.Table3Name.KEY_1, item3Name_.getItem3NameID());
+        values.put(refdb.Table3Name.KEY_2, item3Name_.getItem2GroupID());
+        values.put(refdb.Table3Name.KEY_3, item3Name_.getItemName());
+        values.put(refdb.Table3Name.KEY_4, item3Name_.getClientID());
+        values.put(refdb.Table3Name.KEY_5, item3Name_.getClientUserID());
+        values.put(refdb.Table3Name.KEY_6, item3Name_.getNetCode());
+        values.put(refdb.Table3Name.KEY_7, item3Name_.getSysCode());
+        values.put(refdb.Table3Name.KEY_8, item3Name_.getSalePrice());
+        values.put(refdb.Table3Name.KEY_9, item3Name_.getItemCode());
+        values.put(refdb.Table3Name.KEY_10, item3Name_.getStock());
+        values.put(refdb.Table3Name.KEY_11, item3Name_.getUpdatedDate().getDate());
+
+        // insert row
+        return db.insert(refdb.Table2Group.TABLE_Item2Group, null, values);
+    }
 
 
 }
