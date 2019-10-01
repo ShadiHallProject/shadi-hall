@@ -1,0 +1,31 @@
+package org.by9steps.shadihall.helper;
+
+import android.app.AlertDialog;
+import android.content.Context;
+import android.widget.Toast;
+
+public class GenericConstants {
+    ///////////////////////Check For Debug mode
+    public static boolean IS_DEBUG_MODE_ENABLED=true;
+
+    /////////////MYBugFixFlag
+    public static String LOG_KEY_FOR_BUG_FIX="MY Fix";
+    public static String MYByPassForOTP="My Fix";
+    //////////////Null Field Standard Text For Server
+public static String NullFieldStandardText="Null";
+
+    public static String ByPASSForGetBooking="ByPass";
+    public static String MYEdittion="myEdition";
+
+
+    public static void ShowDebugModeDialog(Context cc,String title,String mes){
+        AlertDialog.Builder builder=new AlertDialog.Builder(cc);
+        builder.setTitle(title).setMessage(mes);
+        builder.create().show();
+    }
+    public static void ShowToastTem(Context cc, String click){
+        if(IS_DEBUG_MODE_ENABLED)
+        Toast.makeText(cc, click, Toast.LENGTH_SHORT).show();
+    }
+
+}
