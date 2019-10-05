@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/col1"
+            android:layout_width="@dimen/hundred_dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="3dp"
+            android:text="col"
+            android:textAlignment="center"
+            android:textColor="@color/currentMonthDayColor"
+            android:textSize="@dimen/textSize"
+             />
+
+        <TextView
+            android:id="@+id/col2"
+            android:layout_width="@dimen/hundred_dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="3dp"
+            android:text="col"
+            android:textAlignment="center"
+            android:textColor="@color/currentMonthDayColor"
+            android:textSize="@dimen/textSize"
+             />
+
+        <TextView
+            android:id="@+id/col3"
+            android:layout_width="@dimen/hundred_dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="3dp"
+            android:text="col"
+            android:textAlignment="center"
+            android:textColor="@color/currentMonthDayColor"
+            android:textSize="@dimen/textSize"
+            />
+
+        <TextView
+            android:id="@+id/col4"
+            android:layout_width="@dimen/hundred_dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="3dp"
+            android:text="col"
+            android:textAlignment="center"
+            android:textColor="@color/currentMonthDayColor"
+            android:textSize="@dimen/textSize"
+             />
+
+        <TextView
+            android:id="@+id/col5"
+            android:layout_width="@dimen/hundred_dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="3dp"
+            android:text="col"
+            android:textAlignment="center"
+            android:textColor="@color/currentMonthDayColor"
+            android:textSize="@dimen/textSize" />
+
+        <ImageView
+            android:id="@+id/threedotpopupsaleedit"
+            app:srcCompat="@drawable/ic_more_vert_black_24dp"
+            android:layout_width="24dp"
+            android:layout_height="24dp"/>
+    </LinearLayout>
+<View
+    android:background="@android:color/black"
+    android:layout_width="match_parent"
+    android:layout_height="1dp"/>
+</LinearLayout>
