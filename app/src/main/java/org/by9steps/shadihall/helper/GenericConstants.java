@@ -2,6 +2,9 @@ package org.by9steps.shadihall.helper;
 
 import android.app.AlertDialog;
 import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.util.Log;
 import android.widget.Toast;
 
 public class GenericConstants {
@@ -15,7 +18,7 @@ public class GenericConstants {
 public static String NullFieldStandardText="Null";
 
     public static String ByPASSForGetBooking="ByPass";
-    public static String MYEdittion="myEdition";
+    public static String MYEdiMenttion="myEdition";
 
 
     public static void ShowDebugModeDialog(Context cc,String title,String mes){
@@ -27,5 +30,17 @@ public static String NullFieldStandardText="Null";
         if(IS_DEBUG_MODE_ENABLED)
         Toast.makeText(cc, click, Toast.LENGTH_SHORT).show();
     }
-
+    //Check Internet Connection
+    public static boolean isConnected(Context mCtx) {
+        boolean connected = false;
+        try {
+            ConnectivityManager cm = (ConnectivityManager) mCtx.getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo nInfo = cm.getActiveNetworkInfo();
+            connected = nInfo != null && nInfo.isAvailable() && nInfo.isConnected();
+            return connected;
+        } catch (Exception e) {
+            Log.e("Connectivity Exception", e.getMessage());
+        }
+        return connected;
+    }
 }

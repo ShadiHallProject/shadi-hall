@@ -139,4 +139,21 @@ public class Item3Name_ {
         this.stock = stock;
     }
 
+    @Override
+    public String toString() {
+        return "Item3Name_{" +
+                "iD=" + iD +
+                ", item3NameID=" + item3NameID +
+                ", item2GroupID=" + item2GroupID +
+                ", itemName='" + itemName + '\'' +
+                ", clientID=" + clientID +
+                ", clientUserID=" + clientUserID +
+                ", netCode='" + netCode + '\'' +
+                ", sysCode='" + sysCode + '\'' +
+                ", updatedDate=" + updatedDate +
+                ", salePrice='" + salePrice + '\'' +
+                ", itemCode='" + itemCode + '\'' +
+                ", stock='" + stock + '\'' +
+                '}';
+    }
 }

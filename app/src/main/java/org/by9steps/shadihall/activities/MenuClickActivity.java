@@ -51,8 +51,6 @@ public class MenuClickActivity extends AppCompatActivity implements CustomDialog
     ReportsFragment reportsFragment;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Log.e(this.getClass().getName(),"ClientUserID"+new Prefrence(this).getClientUserIDSession());
-        //Log.e(this.getClass().getName(),"ClientUserIDMY"+new Prefrence(this).getMYClientUserIDSession());
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_menu_click);
@@ -84,8 +82,12 @@ public class MenuClickActivity extends AppCompatActivity implements CustomDialog
             }
 
             if (message.equals("SalPur1")) {
+                Bundle bundle=new Bundle();
+                bundle.putString("EntryType",title);
+                SalePur1Fragment fragment=new SalePur1Fragment();
+                fragment.setArguments(bundle);
                 getSupportFragmentManager().beginTransaction()
-                        .add(R.id.menu_container, new SalePur1Fragment())
+                        .add(R.id.menu_container,fragment)
                         .commit();
             } else if (message.equals("Booking")) {
                 getSupportFragmentManager().beginTransaction()

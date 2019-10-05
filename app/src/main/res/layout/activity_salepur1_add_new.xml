@@ -21,6 +21,7 @@
         android:layout_height="wrap_content"
         android:text="Account Name " />
     <Spinner
+        android:id="@+id/accountspinner"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
     <android.support.design.widget.TextInputLayout
@@ -38,6 +39,7 @@
             android:maxLines="1" />
     </android.support.design.widget.TextInputLayout>
     <Button
+        android:onClick="AddNewDialog"
         android:layout_width="match_parent"
         android:layout_height="30dp"
         android:background="@drawable/round_corner_btn"
@@ -66,66 +68,63 @@
                         android:orientation="horizontal">
 
                         <TextView
-                            android:id="@+id/col1no"
+                            android:id="@+id/col1"
                             android:layout_width="@dimen/hundred_dp"
                             android:layout_height="wrap_content"
                             android:layout_margin="3dp"
-                            android:text="@string/salepurnumber"
+                            android:text="ID"
+                            android:textAlignment="center"
+                            android:textColor="@color/colorPrimaryDark"
+                            android:textSize="@dimen/textSize"
+                            android:textStyle="bold" />
+                        <TextView
+                            android:id="@+id/col2"
+                            android:layout_width="@dimen/hundred_dp"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="3dp"
+                            android:text="Item Desc"
                             android:textAlignment="center"
                             android:textColor="@color/colorPrimaryDark"
                             android:textSize="@dimen/textSize"
                             android:textStyle="bold" />
 
                         <TextView
-                            android:id="@+id/col2date"
+                            android:id="@+id/col3"
                             android:layout_width="@dimen/hundred_dp"
                             android:layout_height="wrap_content"
                             android:layout_margin="3dp"
-                            android:text="@string/salepurdata"
+                            android:text="Qnt"
                             android:textAlignment="center"
                             android:textColor="@color/colorPrimaryDark"
                             android:textSize="@dimen/textSize"
                             android:textStyle="bold" />
 
                         <TextView
-                            android:id="@+id/col3acname"
+                            android:id="@+id/col4"
                             android:layout_width="@dimen/hundred_dp"
                             android:layout_height="wrap_content"
                             android:layout_margin="3dp"
-                            android:text="@string/salepuracname"
+                            android:text="Price"
                             android:textAlignment="center"
                             android:textColor="@color/colorPrimaryDark"
                             android:textSize="@dimen/textSize"
                             android:textStyle="bold" />
 
                         <TextView
-                            android:id="@+id/col4remark"
+                            android:id="@+id/col5"
                             android:layout_width="@dimen/hundred_dp"
                             android:layout_height="wrap_content"
                             android:layout_margin="3dp"
-                            android:text="@string/salepurremarks"
+                            android:text="Total"
                             android:textAlignment="center"
                             android:textColor="@color/colorPrimaryDark"
                             android:textSize="@dimen/textSize"
                             android:textStyle="bold" />
 
                         <TextView
-                            android:id="@+id/col5billamnt"
-                            android:layout_width="@dimen/hundred_dp"
+                            android:id="@+id/col6"
+                            android:layout_width="30dp"
                             android:layout_height="wrap_content"
-                            android:layout_margin="3dp"
-                            android:text="@string/salepurbillamount"
-                            android:textAlignment="center"
-                            android:textColor="@color/colorPrimaryDark"
-                            android:textSize="@dimen/textSize"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:id="@+id/col56amount"
-                            android:layout_width="@dimen/hundred_dp"
-                            android:layout_height="wrap_content"
-                            android:layout_margin="3dp"
-                            android:text="@string/salepurbillamount"
                             android:textAlignment="center"
                             android:textColor="@color/colorPrimaryDark"
                             android:textSize="@dimen/textSize"
@@ -133,7 +132,13 @@
 
 
                     </LinearLayout>
+                    <android.support.v7.widget.RecyclerView
+                        android:id="@+id/recyclerviewsalepur2"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
                 </LinearLayout>
+
             </HorizontalScrollView>
+
         </LinearLayout>
 </LinearLayout>

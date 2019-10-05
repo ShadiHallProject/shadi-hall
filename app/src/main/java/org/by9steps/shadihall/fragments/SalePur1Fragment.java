@@ -5,8 +5,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -16,22 +14,17 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
-import android.widget.TextView;
-import android.widget.Toast;
-
-import com.itextpdf.text.DocumentException;
 
 import org.by9steps.shadihall.R;
 import org.by9steps.shadihall.activities.Salepur1AddNewActivity;
-import org.by9steps.shadihall.adapters.SalePur1RecyclerAdapter;
+import org.by9steps.shadihall.fragments.salepurviewtypes.salepurgridviewfrag;
 import org.by9steps.shadihall.helper.DatabaseHelper;
 import org.by9steps.shadihall.helper.MNotificationClass;
-import org.by9steps.shadihall.model.SalePur1Fragmentmodel;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,11 +36,9 @@ public class SalePur1Fragment extends Fragment implements AdapterView.OnItemSele
     private Spinner spinner;
     private SearchView searchView;
     private ImageView addnew;
-    private RecyclerView mrecyclerview;
-    private SalePur1RecyclerAdapter recyclerAdapter;
-    //////////////TAble Column
-   private TextView c1num, c2date, c3acname, c4remarks, c5billamount;
-    ////////////////////////////////////////////////////Comp End
+    private String EntryType=null;
+
+   Button viewgrid,viewtree,other;
 
 
     @Override
@@ -64,38 +55,29 @@ public class SalePur1Fragment extends Fragment implements AdapterView.OnItemSele
         AssignIdsToViewWidget(view);
         SetItemOnSpinner();
         spinner.setOnItemSelectedListener(this);
-        /////////////////////////////Sample TEsting
-        List<SalePur1Fragmentmodel> list=new ArrayList<>();
-        for (int i = 0; i < 100; i++) {
-            list.add(new SalePur1Fragmentmodel("col1"+i,
-                    "col2","col3",
-                    "col4","col5"));
-        }
-        recyclerAdapter=new SalePur1RecyclerAdapter(getContext(),list);
-        mrecyclerview.setLayoutManager(new LinearLayoutManager(getContext()));
-        mrecyclerview.setAdapter(recyclerAdapter);
-        ///////////////////////////////////////////////
+        EntryType=getArguments().getString("EntryType");
         return view;
     }
 
     private void AssignIdsToViewWidget(View vv) {
 
         databaseHelper=new DatabaseHelper(getContext());
-        //////////////TAble Column
-        TextView c1num, c2date, c3acname, c4remarks, c5billamount;
+
 
         spinner = vv.findViewById(R.id.salpur_spinner);
         addnew = vv.findViewById(R.id.salpur_add);
         addnew.setOnClickListener(this);
         searchView = vv.findViewById(R.id.salpur_search);
 
-        c1num = vv.findViewById(R.id.col1no);
-        c2date = vv.findViewById(R.id.col2date);
-        c3acname = vv.findViewById(R.id.col3acname);
-        c4remarks = vv.findViewById(R.id.col4remark);
-        c5billamount = vv.findViewById(R.id.col5billamnt);
 
-        mrecyclerview=vv.findViewById(R.id.salepurrecyclerview);
+
+        viewgrid=vv.findViewById(R.id.btnhorizontal1);viewgrid.setOnClickListener(this);
+        viewtree=vv.findViewById(R.id.btnhorizontal2);viewtree.setOnClickListener(this);
+        other=vv.findViewById(R.id.btnhorizontal3);other.setOnClickListener(this);
+
+
+
+
     }
 
     @Override
@@ -146,7 +128,31 @@ public class SalePur1Fragment extends Fragment implements AdapterView.OnItemSele
     public void onClick(View v) {
         if(R.id.salpur_add==v.getId())
         {
-            startActivity(new Intent(getContext(), Salepur1AddNewActivity.class));
+            Intent intent=new Intent(getContext(), Salepur1AddNewActivity.class);
+          intent.putExtra("EntryType",EntryType);
+            startActivity(intent);
+        }
+        switch (v.getId())
+        {
+            case R.id.btnhorizontal1:
+                MNotificationClass.ShowToastTem(getContext(),"Grid View ");
+                Bundle bundle=new Bundle();
+                bundle.putString("EntryType",EntryType);
+                salepurgridviewfrag salepurgridviewfrag=new salepurgridviewfrag();
+                salepurgridviewfrag.setArguments(bundle);
+                getChildFragmentManager().beginTransaction()
+                        .add(R.id.containersalepur1, salepurgridviewfrag)
+                        .addToBackStack(null)
+                        .commit();
+                break;
+            case R.id.btnhorizontal2:
+                MNotificationClass.ShowToastTem(getContext(),"Tree View ");
+
+                break;
+            case R.id.btnhorizontal3:
+                MNotificationClass.ShowToastTem(getContext(),"other View ");
+
+                break;
         }
     }
     //////////////////////SetItemOnSpinner

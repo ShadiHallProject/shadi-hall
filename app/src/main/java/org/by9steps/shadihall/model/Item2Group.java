@@ -1,16 +1,11 @@
 package org.by9steps.shadihall.model;
 
 public class Item2Group {
-    private String ID,Item2GroupID,Item1TypeID, ClientID,ClientUserID;
+    private int ID;
+    private String Item2GroupID,Item1TypeID, ClientID,ClientUserID;
     private String Item2GroupName ,NetCode,SysCode ,UpdatedDate;
 
-    public String getID() {
-        return ID;
-    }
 
-    public void setID(String ID) {
-        this.ID = ID;
-    }
 
     public String getItem2GroupID() {
         return Item2GroupID;
@@ -74,5 +69,28 @@ public class Item2Group {
 
     public void setUpdatedDate(String updatedDate) {
         UpdatedDate = updatedDate;
+    }
+
+    @Override
+    public String toString() {
+        return "Item2Group{" +
+                "ID='" + ID + '\'' +
+                ", Item2GroupID='" + Item2GroupID + '\'' +
+                ", Item1TypeID='" + Item1TypeID + '\'' +
+                ", ClientID='" + ClientID + '\'' +
+                ", ClientUserID='" + ClientUserID + '\'' +
+                ", Item2GroupName='" + Item2GroupName + '\'' +
+                ", NetCode='" + NetCode + '\'' +
+                ", SysCode='" + SysCode + '\'' +
+                ", UpdatedDate='" + UpdatedDate + '\'' +
+                '}';
+    }
+
+    public int getID() {
+        return ID;
+    }
+
+    public void setID(int ID) {
+        this.ID = ID;
     }
 }

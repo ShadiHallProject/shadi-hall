@@ -51,21 +51,23 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content">
             <Button
-
+                android:id="@+id/btnhorizontal1"
                 android:layout_marginEnd="10dp"
-                android:text="    Complete Sal e    "
+                android:text="    Grid View    "
                 android:background="@drawable/round_corner_btn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"/>
             <Button
+                android:id="@+id/btnhorizontal2"
                 android:layout_marginEnd="10dp"
-                android:text="    Complete Sal e    "
+                android:text="    Tree View    "
                 android:background="@drawable/round_corner_btn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"/>
             <Button
+                android:id="@+id/btnhorizontal3"
                 android:layout_marginEnd="10dp"
-                android:text="    Complete Sal e    "
+                android:text="    Other View    "
                 android:background="@drawable/round_corner_btn"
                 android:layout_width="200dp"
                 android:layout_height="wrap_content"/>
@@ -73,91 +75,14 @@
 
     </HorizontalScrollView>
 
-    <HorizontalScrollView
-        android:layout_below="@+id/search_layout"
+    <LinearLayout
+        android:orientation="vertical"
+        android:id="@+id/containersalepur1"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:fillViewport="true"
-        android:measureAllChildren="false"
-        android:scrollbars="none">
-
-        <LinearLayout
-            android:orientation="vertical"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent">
-
-            <LinearLayout
-                android:id="@+id/footer"
-                android:layout_marginTop="5dp"
-                android:orientation="horizontal"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
-
-                <TextView
-                    android:id="@+id/col1no"
-                    android:textAlignment="center"
-                    android:textSize="@dimen/textSize"
-                    android:textColor="@color/colorPrimaryDark"
-                    android:textStyle="bold"
-                    android:layout_margin="3dp"
-                    android:layout_width="@dimen/hundred_dp"
-                    android:layout_height="wrap_content"
-                    android:text="@string/salepurnumber"/>
-                <TextView
-                    android:id="@+id/col2date"
-                    android:textAlignment="center"
-                    android:textSize="@dimen/textSize"
-                    android:textColor="@color/colorPrimaryDark"
-                    android:textStyle="bold"
-                    android:layout_margin="3dp"
-                    android:layout_width="@dimen/hundred_dp"
-                    android:layout_height="wrap_content"
-                    android:text="@string/salepurdata"/>
-                <TextView
-                    android:id="@+id/col3acname"
-                    android:textAlignment="center"
-                    android:textSize="@dimen/textSize"
-                    android:textColor="@color/colorPrimaryDark"
-                    android:textStyle="bold"
-                    android:layout_margin="3dp"
-                    android:layout_width="@dimen/hundred_dp"
-                    android:layout_height="wrap_content"
-                    android:text="@string/salepuracname"/>
-
-                <TextView
-                    android:id="@+id/col4remark"
-                    android:textAlignment="center"
-                    android:textSize="@dimen/textSize"
-                    android:textColor="@color/colorPrimaryDark"
-                    android:textStyle="bold"
-                    android:layout_margin="3dp"
-                    android:layout_width="@dimen/hundred_dp"
-                    android:layout_height="wrap_content"
-                    android:text="@string/salepurremarks"/>
-                <TextView
-                    android:id="@+id/col5billamnt"
-                    android:textAlignment="center"
-                    android:textSize="@dimen/textSize"
-                    android:textColor="@color/colorPrimaryDark"
-                    android:textStyle="bold"
-                    android:layout_margin="3dp"
-                    android:layout_width="@dimen/hundred_dp"
-                    android:layout_height="wrap_content"
-                    android:text="@string/salepurbillamount"/>
+        android:layout_height="match_parent">
 
 
-
-
-            </LinearLayout>
-
-            <android.support.v7.widget.RecyclerView
-                android:id="@+id/salepurrecyclerview"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
-
-        </LinearLayout>
-
-    </HorizontalScrollView>
+    </LinearLayout>
 
 
 

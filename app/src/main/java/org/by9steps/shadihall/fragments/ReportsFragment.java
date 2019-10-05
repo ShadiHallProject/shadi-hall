@@ -279,6 +279,7 @@ public class ReportsFragment extends Fragment implements View.OnClickListener,
             public void onClick(View v) {
                 DialogFragment newFragment = new SelectDateFragment();
                 newFragment.show(getFragmentManager(), "DatePicker");
+
             }
         });
 
@@ -308,7 +309,7 @@ public class ReportsFragment extends Fragment implements View.OnClickListener,
             }
         });
 
-        Log.e(GenericConstants.MYEdittion, "Code Edited");
+        Log.e(GenericConstants.MYEdiMenttion, "Code Edited");
         date_picker.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {

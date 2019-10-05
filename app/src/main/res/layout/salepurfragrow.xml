@@ -5,7 +5,6 @@
 
 
         <LinearLayout
-            android:background="@color/cardview_shadow_start_color"
             android:id="@+id/footer"
             android:layout_marginTop="5dp"
             android:orientation="horizontal"
@@ -17,7 +16,6 @@
                 android:textAlignment="center"
                 android:textSize="@dimen/textSize"
                 android:textColor="@android:color/black"
-                android:textStyle="bold"
                 android:layout_margin="3dp"
                 android:layout_width="@dimen/hundred_dp"
                 android:layout_height="wrap_content"
@@ -27,7 +25,6 @@
                 android:textAlignment="center"
                 android:textSize="@dimen/textSize"
                 android:textColor="@android:color/black"
-                android:textStyle="bold"
                 android:layout_margin="3dp"
                 android:layout_width="@dimen/hundred_dp"
                 android:layout_height="wrap_content"
@@ -37,7 +34,6 @@
                 android:textAlignment="center"
                 android:textSize="@dimen/textSize"
                 android:textColor="@android:color/black"
-                android:textStyle="bold"
                 android:layout_margin="3dp"
                 android:layout_width="@dimen/hundred_dp"
                 android:layout_height="wrap_content"
@@ -48,7 +44,7 @@
                 android:textAlignment="center"
                 android:textSize="@dimen/textSize"
                 android:textColor="@android:color/black"
-                android:textStyle="bold"
+
                 android:layout_margin="3dp"
                 android:layout_width="@dimen/hundred_dp"
                 android:layout_height="wrap_content"
@@ -58,11 +54,13 @@
                 android:textAlignment="center"
                 android:textSize="@dimen/textSize"
                 android:textColor="@android:color/black"
-                android:textStyle="bold"
                 android:layout_margin="3dp"
                 android:layout_width="@dimen/hundred_dp"
                 android:layout_height="wrap_content"
                 android:text="@string/salepurbillamount"/>
         </LinearLayout>
-
+<View
+    android:background="@android:color/black"
+    android:layout_width="match_parent"
+    android:layout_height="2dp"/>
 </LinearLayout>

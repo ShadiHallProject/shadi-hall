@@ -245,7 +245,6 @@ public PopupMyCustomCallBackMethod callBackMethod;
 
         @Override
         public void onClick(View v) {
-            MNotificationClass.ShowToast(mCtx,"Click "+ac_name.getText());
             PopupMenu popup = new PopupMenu(mCtx, v);
 
             popup.inflate(R.menu.contextmenu);

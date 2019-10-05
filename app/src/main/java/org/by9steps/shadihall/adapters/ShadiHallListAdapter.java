@@ -61,6 +61,10 @@ import org.by9steps.shadihall.model.TableSession;
 import org.by9steps.shadihall.model.UpdateDate;
 import org.by9steps.shadihall.model.item3name.Item3Name;
 import org.by9steps.shadihall.model.item3name.Item3Name_;
+import org.by9steps.shadihall.model.salepur1data.SalePur1Data;
+import org.by9steps.shadihall.model.salepur1data.Salepur1;
+import org.by9steps.shadihall.model.salepur2data.SalePur2;
+import org.by9steps.shadihall.model.salepur2data.SalePur2Data;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -70,6 +74,7 @@ import io.fabric.sdk.android.services.common.ApiKey;
 
 public class ShadiHallListAdapter extends RecyclerView.Adapter {
 
+     String TAG="NULL";
     Context mCtx;
     List<ActiveClients> mList;
     List<Client> clients;
@@ -631,6 +636,7 @@ public class ShadiHallListAdapter extends RecyclerView.Adapter {
                             String success = jsonObj.getString("success");
                             Log.e("Success", success);
                             if (success.equals("1")) {
+                                databaseHelper.deleteAllItem1Type();
                                 JSONArray jsonArray = jsonObj.getJSONArray("Item1Type");
                                 for (int i = 0; i < jsonArray.length(); i++) {
                                     JSONObject jsonObject = jsonArray.getJSONObject(i);
@@ -669,6 +675,7 @@ public class ShadiHallListAdapter extends RecyclerView.Adapter {
     }
 
     public void getItem2Group() {
+         final String TAG="getItem2Group";
         mProgress.setMessage("Please wait...getItem2Group");
         String tag_json_obj = "json_obj_req";
         String u = ApiRefStrings.GetItem2GorupLoc;
@@ -683,13 +690,13 @@ public class ShadiHallListAdapter extends RecyclerView.Adapter {
                         try {
                             jsonObj = new JSONObject(response);
                             JSONArray jsonArray = jsonObj.getJSONArray("Item2Group");
-                            Log.e("Item2Group", response);
+                            Log.e(TAG, response);
                             String success = jsonObj.getString("success");
                             if (success.equals("1")) {
-
+                                databaseHelper.deleteAllItem2Group();
                                 for (int i = 0; i < jsonArray.length(); i++) {
                                     JSONObject jsonObject = jsonArray.getJSONObject(i);
-                                    Log.e("Item2Group", jsonObject.toString());
+                                    Log.e(TAG, jsonObject.toString());
                                     Item2Group item2Group = new Item2Group();
                                     item2Group.setClientID(jsonObject.getString("ID"));
                                     item2Group.setItem2GroupID(jsonObject.getString("Item2GroupID"));
@@ -700,14 +707,15 @@ public class ShadiHallListAdapter extends RecyclerView.Adapter {
                                     item2Group.setSysCode(jsonObject.getString("SysCode"));
                                     item2Group.setNetCode(jsonObject.getString("NetCode"));
                                     item2Group.setUpdatedDate(jsonObject.getString("UpdatedDate"));
-
+                     long idd=refdb.Table2Group.AddItem2Group(databaseHelper,item2Group);
+                     Log.e(TAG,"Item2Group InsertID "+idd);
                                 }
                                 getProjectMenu();
 
                             } else {
                                 getProjectMenu();
                                 String message = jsonObj.getString("message");
-                                Log.e("Item2Group", message);
+                                Log.e(TAG, message);
 
 //                                Toast.makeText(SplashActivity.this, message, Toast.LENGTH_SHORT).show();
                             }
@@ -741,6 +749,7 @@ public class ShadiHallListAdapter extends RecyclerView.Adapter {
     }
 
     public void getItem3Name() {
+        TAG="getitem3Name";
         mProgress.setMessage("Please wait...getItem3Name");
         String tag_json_obj = "json_obj_req";
         String u = ApiRefStrings.GetItem3NameLoc;
@@ -754,13 +763,13 @@ public class ShadiHallListAdapter extends RecyclerView.Adapter {
                             Gson gson = gsonBuilder.create();
                             Item3Name item3 = gson.fromJson(response, Item3Name.class);
                             if (item3.getSuccess() != 0) {
-
+                                databaseHelper.deleteAllItem3Name();
                                 for (Item3Name_ name : item3.getItem3Name()) {
-                                    Log.e("obj", " " + name.getClientID() + " --" + name.getUpdatedDate().getDate());
-
-
+                                    Log.e(TAG, " " + name.getClientID() + " --" + name.getUpdatedDate().getDate());
+                                    long idd=refdb.Table3Name.AddItem3Name(databaseHelper,name);
+                                    Log.e(TAG,"inser id"+idd);
                                 }
-                                Log.e("keyres", "onResponse: " + item3.getItem3Name().toString());
+                                Log.e(TAG, "onResponse: " + item3.getItem3Name().toString());
 
 
                             } else {
@@ -768,7 +777,121 @@ public class ShadiHallListAdapter extends RecyclerView.Adapter {
                             }
                         }
 
-                        Log.e("keyres", "onResponse: " + response);
+                        Log.e(TAG, "onResponse: " + response);
+
+
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                GenericConstants.ShowDebugModeDialog(mCtx, "Error", error.getMessage());
+//                mProgress.dismiss();
+                Log.e("Error", error.toString());
+//                Toast.makeText(SplashActivity.this, error.toString(), Toast.LENGTH_LONG).show();
+            }
+        }) {
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("ClientID", clientID);
+                return params;
+            }
+        };
+        int socketTimeout = 10000;//10 seconds
+        RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
+        jsonObjectRequest.setRetryPolicy(policy);
+        AppController.getInstance().addToRequestQueue(jsonObjectRequest, tag_json_obj);
+        getSalePur1Data();
+    }
+
+    public void getSalePur1Data() {
+        final String TAG="getSalePur1Data";
+        mProgress.setMessage("Please wait...getSalePur1DAta");
+        String tag_json_obj = "json_obj_req";
+        String u = ApiRefStrings.GetSalePur1Data;
+
+        StringRequest jsonObjectRequest = new StringRequest(com.android.volley.Request.Method.POST, u,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        if (response != null) {
+                            GsonBuilder gsonBuilder = new GsonBuilder();
+                            Gson gson = gsonBuilder.create();
+                            SalePur1Data salePur1Data = gson.fromJson(response, SalePur1Data.class);
+                            if (salePur1Data.getSuccess() != 0) {
+                                databaseHelper.deleteAllSalePur1();
+                                for (Salepur1 salepur1 : salePur1Data.getSalepur1()) {
+                                    Log.e("getSalePur1Data", " " + salepur1.getClientID() + " --" + salepur1.getUpdatedDate().getDate());
+                                    long idd=refdb.SlePur1.AddItemSalePur1(databaseHelper,salepur1);
+                                    Log.e("getSalePur1Data","inser id"+idd);
+                                }
+                                Log.e("getSalePur1Data", "onResponse: " + salePur1Data.getSalepur1());
+
+
+                            } else {
+                                MNotificationClass.ShowToast(mCtx, "No Data Found in SalePur1Table");
+                            }
+                        }
+
+                        Log.e("getSalePur1Data", "onResponse: " + response);
+
+
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                GenericConstants.ShowDebugModeDialog(mCtx, "Error", error.getMessage());
+//                mProgress.dismiss();
+                Log.e("Error", error.toString());
+//                Toast.makeText(SplashActivity.this, error.toString(), Toast.LENGTH_LONG).show();
+            }
+        }) {
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("ClientID", clientID);
+                //params.put("EntryType","Sales");
+                return params;
+            }
+        };
+        int socketTimeout = 10000;//10 seconds
+        RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
+        jsonObjectRequest.setRetryPolicy(policy);
+        AppController.getInstance().addToRequestQueue(jsonObjectRequest, tag_json_obj);
+        getSalePur2Data();
+    }
+
+
+    public void getSalePur2Data() {
+        final String TAG="getSalePur2Data";
+        mProgress.setMessage("Please wait...getSalePur2Data");
+        String tag_json_obj = "json_obj_req";
+        String u = ApiRefStrings.GetSalePur2Data;
+
+        StringRequest jsonObjectRequest = new StringRequest(com.android.volley.Request.Method.POST, u,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        if (response != null) {
+                            GsonBuilder gsonBuilder = new GsonBuilder();
+                            Gson gson = gsonBuilder.create();
+                            SalePur2Data salePur2Data = gson.fromJson(response, SalePur2Data.class);
+                            if (salePur2Data.getSuccess() != 0) {
+                                databaseHelper.deleteAllSalePur2();
+                                for (SalePur2 salePur2 : salePur2Data.getSalePur2()) {
+                                    Log.e("getSalePur2Data", " " + salePur2.getClientID() + " --" + salePur2.getUpdatedDate().getDate());
+                                    long idd=refdb.SalePur2.AddItemSalePur2(databaseHelper,salePur2);
+                                    Log.e("getSalePur2Data","inser id"+idd);
+                                }
+                                Log.e("getSalePur2Data", "onResponse: " + salePur2Data.getSalePur2());
+
+
+                            } else {
+                                MNotificationClass.ShowToast(mCtx, "No Data Found in SalePur1Table");
+                            }
+                        }
+
+                        Log.e("getSalePur2Data", "onResponse: " + response);
 
 
                     }
