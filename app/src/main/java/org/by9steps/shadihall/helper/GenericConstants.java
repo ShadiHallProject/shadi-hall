@@ -8,6 +8,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 public class GenericConstants {
+    public static String MYEdittion="MyEdition";
     ///////////////////////Check For Debug mode
     public static boolean IS_DEBUG_MODE_ENABLED=true;
 

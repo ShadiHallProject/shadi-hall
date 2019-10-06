@@ -170,7 +170,7 @@ public class ChaartOfAccAddActivity extends AppCompatActivity implements
         /////////////////////
         Prefrence prefrence = new Prefrence(this);
 
-        Log.e(GenericConstants.MYEdittion, "Editing");
+        Log.e(GenericConstants.MYEdittion, "EditingDoneByMe");
         Log.e(this.getClass().getName(), "Client ID::" + prefrence.getClientIDSession());
         Log.e(this.getClass().getName(), "ClientUserID::" + prefrence.getClientIDSession());
         Log.e(this.getClass().getName(), "ProjectIDSerssion::" + prefrence.getProjectIDSession());
