@@ -19,7 +19,7 @@ public class CashBook implements Serializable {
     String TableID;
     String SerialNo;
     String TableName;
-
+    /////////////////////////Other Then TAble Paramneter
     String DebitAccountName;
     String CreditAccountName;
     String UserName;
@@ -177,7 +177,10 @@ public class CashBook implements Serializable {
     }
 
     public void setSerialNo(String serialNo) {
-        SerialNo = serialNo;
+        if (serialNo == null || serialNo.isEmpty())
+            SerialNo = "0";
+        else
+            SerialNo = serialNo;
     }
 
     public String getTableName() {
@@ -192,22 +195,22 @@ public class CashBook implements Serializable {
     public String toString() {
         return
                 "cId='" + cId + '\'' +
-                ", CashBookID='" + CashBookID + '\'' +
-                ", CBDate='" + CBDate + '\'' +
-                ", DebitAccount='" + DebitAccount + '\'' +
-                ", CreditAccount='" + CreditAccount + '\'' +
-                ", CBRemarks='" + CBRemarks + '\'' +
-                ", Amount='" + Amount + '\'' +
-                ", ClientID='" + ClientID + '\'' +
-                ", ClientUserID='" + ClientUserID + '\'' +
-                ", NetCode='" + NetCode + '\'' +
-                ", SysCode='" + SysCode + '\'' +
-                ", UpdatedDate='" + UpdatedDate + '\'' +
-                ", TableID='" + TableID + '\'' +
-                ", SerialNo='" + SerialNo + '\'' +
-                ", TableName='" + TableName + '\'' +
-                ", DebitAccountName='" + DebitAccountName + '\'' +
-                ", CreditAccountName='" + CreditAccountName + '\'' +
-                ", UserName='" + UserName + '\'' ;
+                        ", CashBookID='" + CashBookID + '\'' +
+                        ", CBDate='" + CBDate + '\'' +
+                        ", DebitAccount='" + DebitAccount + '\'' +
+                        ", CreditAccount='" + CreditAccount + '\'' +
+                        ", CBRemarks='" + CBRemarks + '\'' +
+                        ", Amount='" + Amount + '\'' +
+                        ", ClientID='" + ClientID + '\'' +
+                        ", ClientUserID='" + ClientUserID + '\'' +
+                        ", NetCode='" + NetCode + '\'' +
+                        ", SysCode='" + SysCode + '\'' +
+                        ", UpdatedDate='" + UpdatedDate + '\'' +
+                        ", TableID='" + TableID + '\'' +
+                        ", SerialNo='" + SerialNo + '\'' +
+                        ", TableName='" + TableName + '\'' +
+                        ", DebitAccountName='" + DebitAccountName + '\'' +
+                        ", CreditAccountName='" + CreditAccountName + '\'' +
+                        ", UserName='" + UserName + '\'';
     }
 }

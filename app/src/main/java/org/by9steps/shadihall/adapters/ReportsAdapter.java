@@ -124,10 +124,10 @@ public PopupMyCustomCallBackMethod callBackMethod;
 
                 if(cashBook.getUpdatedDate().equals(GenericConstants.NullFieldStandardText))
                 {
-                    if(cashBook.getAccountID().equals("0"))
+                    if(Integer.parseInt(cashBook.getAccountID())<0)
                     {
                         ///////////////////New Insertion
-                        ((CashBookHolder) viewHolder).ac_name.setTextColor(Color.RED);
+                        ((CashBookHolder) viewHolder).ac_name.setTextColor(mCtx.getResources().getColor(R.color.newinserted));
 
                     }else{
                         //////////////////////Updated Data
@@ -234,6 +234,8 @@ public PopupMyCustomCallBackMethod callBackMethod;
 
             thredotpopup = itemView.findViewById(R.id.threedotpopup);
             thredotpopup.setOnClickListener(this);
+            TextView textView=new TextView(mCtx);
+
             ac_name = itemView.findViewById(R.id.ac_name);
 //            debit = itemView.findViewById(R.id.debit);
 //            credit = itemView.findViewById(R.id.credit);

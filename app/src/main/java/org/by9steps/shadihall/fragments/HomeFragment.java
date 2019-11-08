@@ -138,6 +138,7 @@ public class HomeFragment extends Fragment implements ProjectsListAdapter.OnItem
             if (projectsList.size() == 0){
                 getProject();
             }else {
+
                 adapter = new ProjectsListAdapter(getContext(), projectsList);
                 adapter.setOnItemClickListener(HomeFragment.this);
                 recyclerView.setLayoutManager(new GridLayoutManager(getContext(),3));

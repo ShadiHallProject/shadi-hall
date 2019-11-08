@@ -36,7 +36,9 @@ import com.squareup.timessquare.DefaultDayViewAdapter;
 
 import org.by9steps.shadihall.AppController;
 import org.by9steps.shadihall.R;
+import org.by9steps.shadihall.callingapi.BookingApis;
 import org.by9steps.shadihall.helper.DatabaseHelper;
+import org.by9steps.shadihall.helper.MNotificationClass;
 import org.by9steps.shadihall.helper.Prefrence;
 import org.by9steps.shadihall.model.Account3Name;
 import org.by9steps.shadihall.model.Bookings;
@@ -157,8 +159,10 @@ public class BookCalendarFragment extends Fragment implements View.OnClickListen
                         selectedDate = year + "-" + month + "-" + day;
                     }
 
-                    getActivity().getSupportFragmentManager().beginTransaction()
-                            .replace(R.id.menu_container, SelectedDateBookingsFragment.newInstance(selectedDate,bookingType))
+                    getActivity().getSupportFragmentManager().
+                            beginTransaction()
+                            .replace(R.id.menu_container,
+                                    SelectedDateBookingsFragment.newInstance(selectedDate,bookingType))
                             .addToBackStack(null)
                             .commit();
 //                    getActivity().getSupportFragmentManager().beginTransaction()
@@ -185,7 +189,8 @@ public class BookCalendarFragment extends Fragment implements View.OnClickListen
                     }
 
                     getActivity().getSupportFragmentManager().beginTransaction()
-                            .replace(R.id.menu_container, BookingFormFragment.newInstance(selectedDate,"id",bookingType))
+                            .replace(R.id.menu_container,
+                                    BookingFormFragment.newInstance(selectedDate,"id",bookingType))
                             .addToBackStack(null)
                             .commit();
 
@@ -326,7 +331,16 @@ public class BookCalendarFragment extends Fragment implements View.OnClickListen
         mProgress.setMessage("Loading...");
         mProgress.setCancelable(false);
         mProgress.show();
-        getAccount3Name();
+        //getAccount3Name();
+
+        BookingApis callapi=new BookingApis(getContext(),mProgress,databaseHelper,prefrence);
+        callapi.trigerAllMethodInRow(new BookingApis.BookingApisListener(){
+            @Override
+            public void FinishBookingCallBackMethod(String success, String funType) {
+                mProgress.dismiss();
+                MNotificationClass.ShowToastTem(getContext(),"All Done BookingApi");
+            }
+        });
 
     }
 

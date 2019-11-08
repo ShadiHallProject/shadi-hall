@@ -286,4 +286,36 @@ public class Client implements Serializable {
     public void setUpdatedDate(String updatedDate) {
         UpdatedDate = updatedDate;
     }
+
+
+    @Override
+    public String toString() {
+        return "Client{" +
+                "ClientID='" + ClientID + '\'' +
+                ", ClientParentID='" + ClientParentID + '\'' +
+                ", EntryType='" + EntryType + '\'' +
+                ", LoginMobileNo='" + LoginMobileNo + '\'' +
+                ", Distance='" + Distance + '\'' +
+                ", CompanyName='" + CompanyName + '\'' +
+                ", CompanyAddress='" + CompanyAddress + '\'' +
+                ", CompanyNumber='" + CompanyNumber + '\'' +
+                ", NameOfPerson='" + NameOfPerson + '\'' +
+                ", Email='" + Email + '\'' +
+                ", WebSite='" + WebSite + '\'' +
+                ", Password='" + Password + '\'' +
+                ", ActiveClient='" + ActiveClient + '\'' +
+                ", Country='" + Country + '\'' +
+                ", City='" + City + '\'' +
+                ", SubCity='" + SubCity + '\'' +
+                ", CapacityOfPersons='" + CapacityOfPersons + '\'' +
+                ", ClientUserID='" + ClientUserID + '\'' +
+                ", SysCode='" + SysCode + '\'' +
+                ", NetCode='" + NetCode + '\'' +
+                ", UpdatedDate='" + UpdatedDate + '\'' +
+                ", UserRights='" + UserRights + '\'' +
+                ", Lat='" + Lat + '\'' +
+                ", Lng='" + Lng + '\'' +
+                ", ProjectID='" + ProjectID + '\'' +
+                '}';
+    }
 }

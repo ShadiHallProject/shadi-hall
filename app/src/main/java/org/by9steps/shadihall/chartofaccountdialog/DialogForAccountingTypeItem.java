@@ -61,7 +61,6 @@ public class DialogForAccountingTypeItem extends DialogFragment implements View.
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
 
 
-
         customView = LayoutInflater.from(getContext()).inflate(R.layout.dialog_for_accounting, null);
         String head=getArguments().getString("head");
         spPosition=0;
@@ -161,16 +160,17 @@ public class DialogForAccountingTypeItem extends DialogFragment implements View.
                 if (databaseHelper.findAccount3Name(query)) {
                     Toast.makeText(getContext(), "Name Already Register", Toast.LENGTH_SHORT).show();
                 }  else {
-
+                    int maxacnameid=databaseHelper.getMaxAccount3NameMaxAcNameID(prefrence.getClientIDSession());
                     Account3Name account3Nametem = new Account3Name(
-                            "0",
+                            maxacnameid+"",
                             name.getText().toString(),
                             groupID,
                             GenericConstants.NullFieldStandardText,
                             "",
                             GenericConstants.NullFieldStandardText,
                             GenericConstants.NullFieldStandardText,
-                            "0", "0",
+                            "0",
+                            "0",
                             "",
                             prefrence.getClientIDSession(),
                            prefrence.getClientUserIDSession(),

@@ -85,7 +85,10 @@ import org.by9steps.shadihall.activities.CashBookSettingActivity;
 import org.by9steps.shadihall.activities.CashCollectionActivity;
 import org.by9steps.shadihall.activities.SplashActivity;
 import org.by9steps.shadihall.adapters.CashBookAdapter;
+import org.by9steps.shadihall.callingapi.CashBookApis;
+import org.by9steps.shadihall.chartofaccountdialog.CashBookEntryDialog;
 import org.by9steps.shadihall.helper.DatabaseHelper;
+import org.by9steps.shadihall.helper.GenericConstants;
 import org.by9steps.shadihall.helper.Prefrence;
 import org.by9steps.shadihall.model.Account3Name;
 import org.by9steps.shadihall.model.Bookings;
@@ -169,7 +172,7 @@ public class CashBookFragment extends Fragment implements OnItemSelectedListener
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+                             Bundle savedInstanrecyclerceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_cash_book, container, false);
 
@@ -222,12 +225,24 @@ public class CashBookFragment extends Fragment implements OnItemSelectedListener
             @Override
             public void onClick(View view) {
                 // Click action
-                Intent intent = new Intent(getContext(), CashCollectionActivity.class);
-                intent.putExtra("BookingID","0");
-                intent.putExtra("Spinner","View");
-                intent.putExtra("Type","Add");
-                intent.putExtra("CashBookID","0");
-                startActivity(intent);
+//                Intent intent = new Intent(getContext(), CashCollectionActivity.class);
+//                intent.putExtra("BookingID","0");
+//                intent.putExtra("Spinner","View");
+//                intent.putExtra("Type","Add");
+//                intent.putExtra("CashBookID","0");
+//                startActivity(intent);
+                CashBookEntryDialog dialog = new CashBookEntryDialog();
+                Bundle bb = new Bundle();
+                bb.putString("BookingID", "0");
+                bb.putString("Spinner", "View");
+                bb.putString("EntryType", CashBookEntryDialog.entrytypelist[2]);
+                ////////////////Type either Edit or New
+                bb.putString("Type", "New");
+                /////////////////////if view Type is edit then must send CashBookID to update
+                bb.putString("CashBookID", "0");
+                dialog.setArguments(bb);
+                dialog.show(getActivity().getSupportFragmentManager(), "Default Entry");
+               //
             }
         });
 
@@ -386,7 +401,7 @@ public class CashBookFragment extends Fragment implements OnItemSelectedListener
             for (CashBook c : cashBooksList){
 
                 String[] separated = c.getCBDate().split("-");
-
+              Log.e("objcount",separated[0]+"/"+separated[1]+"/"+separated[2]);
                 if (m == 0) {
                     mList.add(CashEntry.createSection(separated[0]+"/"+separated[1]+"/"+separated[2]));
                     mList.add(CashEntry.createRow(c.getCashBookID(),c.getCBDate(),c.getDebitAccount(),c.getCreditAccount(),c.getCBRemarks(),c.getAmount(),c.getClientID(),c.getClientUserID(),c.getTableID(),c.getDebitAccountName(),c.getCreditAccountName(),c.getUserName(), c.getUpdatedDate()));
@@ -1113,7 +1128,16 @@ public class CashBookFragment extends Fragment implements OnItemSelectedListener
         mProgress.setMessage("Loading...");
         mProgress.setCancelable(false);
         mProgress.show();
-        getAccount3Name();
+      //  getAccount3Name();
+       // Log.e("flag1cashbook","AllDone");
+        final CashBookApis cashBookApis=new CashBookApis(getContext(),mProgress,databaseHelper,prefrence);
+        cashBookApis.trigerAllMethodInRow(new CashBookApis.CashBookApiListener() {
+            @Override
+            public void FinishCashBookCallBackMethod(String success, String funType) {
+                mProgress.dismiss();
+                Log.e("flagcashbook4 DoneAll","Succes:"+success+" FunType:"+funType);
+            }
+        });
 
     }
 
@@ -1669,7 +1693,7 @@ public class CashBookFragment extends Fragment implements OnItemSelectedListener
                             }else {
 //                                mProgress.dismiss();
                             }Log.e("Sarem","CashBook5");
-                            addCashBook();
+                          //  addCashBook();
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -1704,7 +1728,7 @@ public class CashBookFragment extends Fragment implements OnItemSelectedListener
     }
 
     public void addCashBook(){
-        String query = "SELECT * FROM CashBook WHERE CashBookID = 0 AND UpdatedDate = 0";
+        String query = "SELECT * FROM CashBook WHERE CashBookID < 0 AND UpdatedDate = '"+ GenericConstants.NullFieldStandardText+"'";
         List<CashBook> addCashBook = databaseHelper.getCashBook(query);
 
         for (final CashBook c : addCashBook){

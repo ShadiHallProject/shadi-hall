@@ -7,9 +7,13 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import com.readystatesoftware.sqliteasset.SQLiteAssetHelper;
+
 import org.by9steps.shadihall.model.Account1Type;
 import org.by9steps.shadihall.model.Account2Group;
 import org.by9steps.shadihall.model.Account3Name;
+import org.by9steps.shadihall.model.Account5customGroup1;
+import org.by9steps.shadihall.model.Account5customGroup2;
 import org.by9steps.shadihall.model.ActiveClients;
 import org.by9steps.shadihall.model.BalSheet;
 import org.by9steps.shadihall.model.Bookings;
@@ -19,6 +23,8 @@ import org.by9steps.shadihall.model.Client;
 import org.by9steps.shadihall.model.GeneralLedger;
 import org.by9steps.shadihall.model.Item1Type;
 import org.by9steps.shadihall.model.Item2Group;
+import org.by9steps.shadihall.model.JoinQueryAccount3Name;
+import org.by9steps.shadihall.model.JoinQueryAddVehicle;
 import org.by9steps.shadihall.model.JoinQueryDaliyEntryPage1;
 import org.by9steps.shadihall.model.ModelForSalePur1page2;
 import org.by9steps.shadihall.model.MonthTb;
@@ -29,19 +35,24 @@ import org.by9steps.shadihall.model.Recovery;
 import org.by9steps.shadihall.model.Reports;
 import org.by9steps.shadihall.model.Spinner;
 import org.by9steps.shadihall.model.Summerize;
+import org.by9steps.shadihall.model.Vehicle1Group;
+import org.by9steps.shadihall.model.Vehicle2Name;
+import org.by9steps.shadihall.model.Vehicle3Booking;
 import org.by9steps.shadihall.model.Voucher;
 import org.by9steps.shadihall.model.item3name.Item3Name_;
 import org.by9steps.shadihall.model.item3name.UpdatedDate;
 import org.by9steps.shadihall.model.salepur1data.SPDate;
 import org.by9steps.shadihall.model.salepur1data.Salepur1;
 import org.by9steps.shadihall.model.salepur2data.SalePur2;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.security.auth.login.LoginException;
 
-public class DatabaseHelper extends SQLiteOpenHelper {
+
+public class DatabaseHelper extends SQLiteAssetHelper {
 
     private SQLiteDatabase db;
 
@@ -52,7 +63,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final int DATABASE_VERSION = 1;
 
     // Database Name
-    private static final String DATABASE_NAME = "ShadiHallUser";
+    private static final String DATABASE_NAME = "ShadiHallUser.db";
 
     // Table Names
     private static final String TABLE_Account3Name = "Account3Name";
@@ -71,6 +82,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String TABLE_SalePur2 = "SalePur2";
     private static final String TABLE_SalePurLocation = "SalePurLocation";
     private static final String TABLE_ActiveAccounts = "ActiveAccounts";
+
+    private static final String TABLE_Vehicle1Group = "Vehicle1Group";
+    private static final String TABLE_Vehicle2Name = "Vehicle2Name";
+    private static final String TABLE_Vehicle3Booking = "Vehicle3Booking";
 
     // Account3Name Table - column names
     private static final String KEY_AcNameID = "AcNameID";
@@ -315,6 +330,44 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String KEY_ProjectName12 = "ProjectName";
     private static final String KEY_ClientUserID12 = "ClientUserID";
 
+    //Vehicle1Group
+    private static final String KEY_VehicleGroupID="VehicleGroupID";
+    private static final String KEY_VehicleGroupName="VehicleGroupName";
+
+    //Vehicle2Name
+    private static final String KEY_VehicleID = "VehicleID";
+    private static final String KEY_VehicleGroupID13 = "VehicleGroupID";
+    private static final String KEY_VehicleName = "VehicleName";///
+    private static final String KEY_Brand = "Brand";
+    private static final String KEY_Model = "Model";//
+    private static final String KEY_Colour = "Colour";
+    private static final String KEY_RegistrationNo = "RegistrationNo";
+    private static final String KEY_Account3ID13 = "Account3ID";
+    private static final String KEY_Status = "Status";
+    private static final String KEY_Lng13 = "Lng";
+    private static final String KEY_Lat13 = "Lat";
+    private static final String KEY_ContactNo = "ContactNo";
+    private static final String KEY_SerialNo13 = "SerialNo";
+    private static final String KEY_ClientID13 = "ClientID";
+    private static final String KEY_ClientUserID13 = "ClientUserID";
+    private static final String KEY_UpdatedDate13 = "UpdatedDate";
+    private static final String KEY_NetCode13 = "NetCode";
+    private static final String KEY_SysCode13 = "SysCode";
+
+    //Vehicle3Booking
+
+    private static final String KEY_BookingID = "BookingID";
+    private static final String KEY_VehicleID14 = "VehicleID";
+    private static final String KEY_BookingDate14 = "BookingDate";
+    private static final String KEY_BookingDetail = "BookingDetail";
+    private static final String KEY_BookingCharges = "BookingCharges";
+    private static final String KEY_SerialNo14 = "SerialNo";
+    private static final String KEY_ClientID14 = "ClientID";
+    private static final String KEY_ClientUserID14 = "ClientUserID";
+    private static final String KEY_UpdatedDate14 = "UpdatedDate";
+    private static final String KEY_NetCode14 = "NetCode";
+    private static final String KEY_SysCode14 = "SysCode";
+
     // Table Create Statements
     // Account3Name table create statement
     private static final String CREATE_TABLE_Account3Name = "CREATE TABLE "
@@ -551,56 +604,56 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
-    @Override
-    public void onCreate(SQLiteDatabase db) {
-
-        // creating required tables
-        db.execSQL(CREATE_TABLE_Account3Name);
-        db.execSQL(CREATE_TABLE_CashBook);
-        db.execSQL(CREATE_TABLE_Booking);
-        db.execSQL(CREATE_TABLE_Account2Group);
-        db.execSQL(CREATE_TABLE_Account1Type);
-
-        db.execSQL(CREATE_TABLE_Client);
-        db.execSQL(CREATE_TABLE_Project);
-        db.execSQL(CREATE_TABLE_ProjectMenu);
-        db.execSQL(CREATE_TABLE_Account4UserRights);
-        db.execSQL(CREATE_TABLE_Item1Type);
-        db.execSQL(CREATE_TABLE_Item2Group);
-        db.execSQL(CREATE_TABLE_Item3Name);
-        db.execSQL(CREATE_TABLE_SalePur1);
-        db.execSQL(CREATE_TABLE_SalePur2);
-        db.execSQL(CREATE_TABLE_SalePurLocation);
-        db.execSQL(CREATE_TABLE_ActiveAccounts);
-    }
-
-    @Override
-    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        // on upgrade drop older tables
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_Account3Name);
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_CashBook);
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_Booking);
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_Account2Group);
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_Account1Type);
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_Client);
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_Project);
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_ProjectMenu);
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_Account4UserRights);
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_Item1Type);
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_Item2Group);
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_Item3Name);
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_SalePur1);
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_SalePur2);
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_SalePurLocation);
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_ActiveAccounts);
-
-//        if (newVersion > oldVersion) {
-//            db.execSQL("ALTER TABLE " + TABLE_CashBook + " ADD COLUMN ID PRIMARY KEY AUTOINCREMENT");
-//        }
-
-        // create new tables
-        onCreate(db);
-    }
+//    @Override
+//    public void onCreate(SQLiteDatabase db) {
+//
+//        // creating required tables
+//        db.execSQL(CREATE_TABLE_Account3Name);
+//        db.execSQL(CREATE_TABLE_CashBook);
+//        db.execSQL(CREATE_TABLE_Booking);
+//        db.execSQL(CREATE_TABLE_Account2Group);
+//        db.execSQL(CREATE_TABLE_Account1Type);
+//
+//        db.execSQL(CREATE_TABLE_Client);
+//        db.execSQL(CREATE_TABLE_Project);
+//        db.execSQL(CREATE_TABLE_ProjectMenu);
+//        db.execSQL(CREATE_TABLE_Account4UserRights);
+//        db.execSQL(CREATE_TABLE_Item1Type);
+//        db.execSQL(CREATE_TABLE_Item2Group);
+//        db.execSQL(CREATE_TABLE_Item3Name);
+//        db.execSQL(CREATE_TABLE_SalePur1);
+//        db.execSQL(CREATE_TABLE_SalePur2);
+//        db.execSQL(CREATE_TABLE_SalePurLocation);
+//        db.execSQL(CREATE_TABLE_ActiveAccounts);
+//    }
+//
+//    @Override
+//    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+//        // on upgrade drop older tables
+//        db.execSQL("DROP TABLE IF EXISTS " + TABLE_Account3Name);
+//        db.execSQL("DROP TABLE IF EXISTS " + TABLE_CashBook);
+//        db.execSQL("DROP TABLE IF EXISTS " + TABLE_Booking);
+//        db.execSQL("DROP TABLE IF EXISTS " + TABLE_Account2Group);
+//        db.execSQL("DROP TABLE IF EXISTS " + TABLE_Account1Type);
+//        db.execSQL("DROP TABLE IF EXISTS " + TABLE_Client);
+//        db.execSQL("DROP TABLE IF EXISTS " + TABLE_Project);
+//        db.execSQL("DROP TABLE IF EXISTS " + TABLE_ProjectMenu);
+//        db.execSQL("DROP TABLE IF EXISTS " + TABLE_Account4UserRights);
+//        db.execSQL("DROP TABLE IF EXISTS " + TABLE_Item1Type);
+//        db.execSQL("DROP TABLE IF EXISTS " + TABLE_Item2Group);
+//        db.execSQL("DROP TABLE IF EXISTS " + TABLE_Item3Name);
+//        db.execSQL("DROP TABLE IF EXISTS " + TABLE_SalePur1);
+//        db.execSQL("DROP TABLE IF EXISTS " + TABLE_SalePur2);
+//        db.execSQL("DROP TABLE IF EXISTS " + TABLE_SalePurLocation);
+//        db.execSQL("DROP TABLE IF EXISTS " + TABLE_ActiveAccounts);
+//
+////        if (newVersion > oldVersion) {
+////            db.execSQL("ALTER TABLE " + TABLE_CashBook + " ADD COLUMN ID PRIMARY KEY AUTOINCREMENT");
+////        }
+//
+//        // create new tables
+//        onCreate(db);
+//    }
 
     /**
      * Creating a Account3Name
@@ -670,10 +723,397 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(query);
     }
 
+
+    /**
+     * create Vehicle1Group
+     */
+    public void createVehicle1Group(Vehicle1Group vehicle1Group)
+    {
+        SQLiteDatabase database=this.getWritableDatabase();
+        ContentValues cv=new ContentValues();
+        cv.put(KEY_VehicleGroupID,vehicle1Group.getVehicleGroupID());
+        cv.put(KEY_VehicleGroupName,vehicle1Group.getVehicleGroupName());
+        long status=database.insert(TABLE_Vehicle1Group,null,cv);
+        Log.e("status", "createVehicle1Group: "+status);
+
+    }
+
+    //updating Vehicle1Group
+    public void updateVehicle1Group(){
+
+    }
+
+    //deleting Vehicle1Group
+    public void deleteVehicle1Group(){
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.execSQL("DELETE FROM " + TABLE_Vehicle1Group);
+    }
+
+    public void deleteVehicle1GroupEntry(){
+
+    }
+
+    public List<Vehicle1Group> getVehicle1Group(String query) {
+        List<Vehicle1Group> vehicle1GroupsList=new ArrayList<>();
+        SQLiteDatabase db=this.getReadableDatabase();
+        Cursor cursor=db.rawQuery(query,null);
+        if(cursor.moveToNext()){
+            do{
+                Vehicle1Group vehicle1Group=new Vehicle1Group();
+                vehicle1Group.setVehicleGroupID(cursor.getString(0));
+                vehicle1Group.setVehicleGroupName(cursor.getString(1));
+                vehicle1GroupsList.add(vehicle1Group);
+            }while (cursor.moveToNext());
+        }
+        return vehicle1GroupsList;
+    }
+
+    public String getVehicle1GroupSpinnerVehicleGroupName(String query) {
+
+        Log.e("TAG", "getVehicle1GroupSpinnerVehicleGroupName: "+query );
+
+        String Value=null;
+        SQLiteDatabase db=this.getReadableDatabase();
+        Cursor cursor=db.rawQuery(query,null);
+        if(cursor.moveToNext()){
+            do{
+                Value=cursor.getString(0);
+                Log.e("Tag", "getVehicle1GroupSpinnerVehicleGroupName: value of data "  +Value  );
+            }while (cursor.moveToNext());
+        }
+
+        // Value=cursor.getString(0);
+        return Value;
+    }
+
+
+    /**
+     * create Vehicle2Name
+     */
+    public long createVehicle2Name(Vehicle2Name vehicle2Name)
+    {
+        SQLiteDatabase database=this.getWritableDatabase();
+        ContentValues cv=new ContentValues();
+
+        cv.put(KEY_VehicleID , vehicle2Name.getVehicleID());
+        cv.put(KEY_VehicleGroupID13,vehicle2Name.getVehicleGroupID());
+        cv.put(KEY_VehicleName ,vehicle2Name.getVehicleName());
+        cv.put(KEY_Brand ,vehicle2Name.getBrand());
+        cv.put(KEY_Model,vehicle2Name.getModel());
+        cv.put(KEY_Colour,vehicle2Name.getColour());
+        cv.put(KEY_RegistrationNo,vehicle2Name.getRegistrationNo());
+        cv.put(KEY_Account3ID13,vehicle2Name.getAccount3ID());
+        cv.put(KEY_Status,vehicle2Name.getStatus());
+        cv.put(KEY_Lng13,vehicle2Name.getLng());
+        cv.put(KEY_Lat13,vehicle2Name.getLat());
+        cv.put(KEY_ContactNo,vehicle2Name.getContactNo());
+        cv.put(KEY_SerialNo13,vehicle2Name.getSerialNo());
+        cv.put(KEY_ClientID13,vehicle2Name.getClientID());
+        cv.put(KEY_ClientUserID13,vehicle2Name.getClientUserID());
+        cv.put(KEY_UpdatedDate13,vehicle2Name.getUpdatedDate());
+        cv.put(KEY_NetCode13,vehicle2Name.getNetCode());
+        cv.put(KEY_SysCode13,vehicle2Name.getSysCode());
+        long status=database.insert(TABLE_Vehicle2Name,null,cv);
+
+        Log.e("staus", "createVehicle2Name: "+status);
+
+        return status;
+    }
+
+    //updating Vehicle2Name
+    public void updateVehicle2NameLocal(String query){
+        Log.e("updated query ", query);
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.execSQL(query);
+    }
+
+    //deleting Vehicle2Name
+    public void deleteVehicle2Name(){
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.execSQL("DELETE FROM " + TABLE_Vehicle2Name);
+
+    }
+
+    public void deleteVehicle2NameEntry(){
+
+
+    }
+    public  List<Vehicle2Name> getVehicle2Name(String query){
+        List<Vehicle2Name> vehicle2NameList=new ArrayList<>();
+        SQLiteDatabase db=this.getReadableDatabase();
+        Cursor c=db.rawQuery(query,null);
+        if(c.moveToNext()){
+            do{
+                Vehicle2Name vehicle2Name=new Vehicle2Name();
+                vehicle2Name.setID(c.getInt(0));
+                vehicle2Name.setVehicleID(c.getString(1));
+                vehicle2Name.setVehicleGroupID(c.getString(2));
+                vehicle2Name.setVehicleName(c.getString(3));
+                vehicle2Name.setBrand(c.getString(4));
+                vehicle2Name.setModel(c.getString(5));
+                vehicle2Name.setColour(c.getString(6));
+                vehicle2Name.setRegistrationNo(c.getString(7));
+                vehicle2Name.setAccount3ID(c.getString(8));
+                vehicle2Name.setStatus(c.getString(9));
+                vehicle2Name.setLng(c.getString(10));
+                vehicle2Name.setLat(c.getString(11));
+                vehicle2Name.setContactNo(c.getString(12));
+                vehicle2Name.setSerialNo(c.getString(13));
+                vehicle2Name.setClientID(c.getString(14));
+                vehicle2Name.setClientUserID(c.getString(15));
+                vehicle2Name.setUpdatedDate(c.getString(16));
+                vehicle2Name.setNetCode(c.getString(17));
+                vehicle2Name.setSysCode(c.getString(18));
+                vehicle2NameList.add(vehicle2Name);
+            }while (c.moveToNext());
+        }
+        return vehicle2NameList;
+    }
+
+    /**
+     * create Vehicle3Booking
+     */
+    public void createVehicle3Booking(Vehicle3Booking vehicle3Booking)
+    {
+        SQLiteDatabase database=this.getWritableDatabase();
+        ContentValues cv=new ContentValues();
+
+        cv.put(KEY_BookingID ,vehicle3Booking.getBookingID());
+        cv.put(KEY_VehicleID14,vehicle3Booking.getVehicleID());
+        cv.put(KEY_BookingDate14,vehicle3Booking.getBookingDate());
+        cv.put(KEY_BookingDetail,vehicle3Booking.getBookingDetail());
+        cv.put(KEY_BookingCharges,vehicle3Booking.getBookingCharges());
+        cv.put(KEY_SerialNo14,vehicle3Booking.getSerialNo());
+        cv.put(KEY_ClientID13,vehicle3Booking.getClientID());
+        cv.put(KEY_ClientUserID14,vehicle3Booking.getClientUserID());
+        cv.put(KEY_UpdatedDate14,vehicle3Booking.getUpdatedDate());
+        cv.put(KEY_NetCode14,vehicle3Booking.getNetCode());
+        cv.put(KEY_SysCode14,vehicle3Booking.getSysCode());
+        long status=database.insert(TABLE_Vehicle3Booking,null,cv);
+        Log.e("staus", "createVehicle3Booking "+status);
+    }
+
+    //updating Vehicle3Booking
+    public void updateVehicle3Booking(){
+
+    }
+
+    public List<Vehicle3Booking> getVehicle3Booking(String query) {
+        List<Vehicle3Booking> vehicle3BookingList=new ArrayList<>();
+        SQLiteDatabase db=this.getReadableDatabase();
+        Cursor cursor=db.rawQuery(query,null);
+        if(cursor.moveToNext()){
+            do{
+                Vehicle3Booking vehicle3Booking=new Vehicle3Booking();
+                vehicle3Booking.setID(cursor.getInt(0));
+                vehicle3Booking.setBookingID(cursor.getString(1));
+                vehicle3Booking.setVehicleID(cursor.getString(2));
+                vehicle3Booking.setBookingDate(cursor.getString(3));
+                vehicle3Booking.setBookingDetail(cursor.getString(4));
+                vehicle3Booking.setBookingCharges(cursor.getString(5));
+                vehicle3Booking.setSerialNo(cursor.getString(6));
+                vehicle3Booking.setClientID(cursor.getString(7));
+                vehicle3Booking.setClientUserID(cursor.getString(8));
+                vehicle3Booking.setUpdatedDate(cursor.getString(9));
+                vehicle3Booking.setNetCode(cursor.getString(10));
+                vehicle3Booking.setSysCode(cursor.getString(11));
+                vehicle3BookingList.add(vehicle3Booking);
+            }while (cursor.moveToNext());
+        }
+        return vehicle3BookingList;
+    }
+
+    //deleting Vehicle3booking
+    public void deleteVehicle3Booking(){
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.execSQL("DELETE FROM " + TABLE_Vehicle3Booking);
+    }
+
+
+    //While uploading data into server
+    public  int updateVehicle2Name(int pk, String VehicleID, String updateDate, @Nullable Vehicle2Name vehicle2Name){
+
+        //only update the UpdateDate on local storage
+        if (VehicleID == null && updateDate != null) {
+            /////Editing While User Edit The data From Form
+            SQLiteDatabase database = this.getWritableDatabase();
+            ContentValues values = new ContentValues();
+
+            values.put(KEY_UpdatedDate13, updateDate);
+
+            int status = database.update(TABLE_Vehicle2Name,
+                    values,
+                    "ID = " + pk, null);
+            return status;
+        }else {
+            //updating the VehicleID and updateDate on local storage as well
+            //////Editing While Updating Data On Cloud
+            SQLiteDatabase database = this.getWritableDatabase();
+            ContentValues contentValues = new ContentValues();
+            contentValues.put(KEY_VehicleID, VehicleID);
+            contentValues.put(KEY_UpdatedDate13, updateDate);
+            int status = database.update(TABLE_Vehicle2Name,
+                    contentValues,
+                    "ID = " + pk, null);
+            return status;
+        }
+
+
+    }
+
+
+    //While uploading data into server
+    public  int updateAccount5customGroup1(int pk, String CustomGroup1ID, String updateDate, @Nullable Account5customGroup1 account5customGroup1){
+
+        //only update the UpdateDate on local storage
+        if (CustomGroup1ID == null && updateDate != null) {
+            /////Editing While User Edit The data From Form
+            SQLiteDatabase database = this.getWritableDatabase();
+            ContentValues values = new ContentValues();
+
+            values.put("Account5customGroup1", updateDate);
+
+            int status = database.update("Account5customGroup1",
+                    values,
+                    "ID = " + pk, null);
+            return status;
+        }else {
+            //updating the CustomGroup1ID and updateDate on local storage as well
+            //////Editing While Updating Data On Cloud
+            SQLiteDatabase database = this.getWritableDatabase();
+            ContentValues contentValues = new ContentValues();
+            contentValues.put("CustomGroup1ID", CustomGroup1ID);
+            contentValues.put("UpdatedDate", updateDate);
+            int status = database.update("Account5customGroup1",
+                    contentValues,
+                    "ID = " + pk, null);
+            return status;
+        }
+
+
+    }
+
+    ////////Update Vehicle2Name data from records that are edited on server
+    public int updateVehicle2NameTablefromserver(Vehicle2Name vehicle2Name) {
+        /////Editing While User Edit The data From Form
+
+
+        Log.e("TAG", "updateVehicle2NameTablefromserver: "+"function update " );
+
+        SQLiteDatabase database=this.getWritableDatabase();
+        ContentValues cv=new ContentValues();
+
+        cv.put(KEY_VehicleID , vehicle2Name.getVehicleID());
+        cv.put(KEY_VehicleGroupID13,vehicle2Name.getVehicleGroupID());
+        cv.put(KEY_VehicleName ,vehicle2Name.getVehicleName());
+        cv.put(KEY_Brand ,vehicle2Name.getBrand());
+        cv.put(KEY_Model,vehicle2Name.getModel());
+        cv.put(KEY_Colour,vehicle2Name.getColour());
+        cv.put(KEY_RegistrationNo,vehicle2Name.getRegistrationNo());
+        cv.put(KEY_Account3ID13,vehicle2Name.getAccount3ID());
+        cv.put(KEY_Status,vehicle2Name.getStatus());
+        cv.put(KEY_Lng13,vehicle2Name.getLng());
+        cv.put(KEY_Lat13,vehicle2Name.getLat());
+        cv.put(KEY_ContactNo,vehicle2Name.getContactNo());
+        cv.put(KEY_SerialNo13,vehicle2Name.getSerialNo());
+        cv.put(KEY_ClientID13,vehicle2Name.getClientID());
+        cv.put(KEY_ClientUserID13,vehicle2Name.getClientUserID());
+        cv.put(KEY_UpdatedDate13,vehicle2Name.getUpdatedDate());
+        cv.put(KEY_NetCode13,vehicle2Name.getNetCode());
+        cv.put(KEY_SysCode13,vehicle2Name.getSysCode());
+        int status=database.update(TABLE_Vehicle2Name,cv,
+                "ClientID = " + vehicle2Name.getClientID() +
+                        " AND VehicleID= '" + vehicle2Name.getVehicleID() + "'" +
+                        ""
+                , null);
+
+        return status;
+    }
+    public String getVehicle2NameMaxUpdatedDate(String clientIDSession) {
+
+        String query = "Select MAX(UpdatedDate) from Vehicle2Name where ClientID =" + clientIDSession;
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor c = db.rawQuery(query, null);
+        Log.e("SSSS", String.valueOf(c.moveToFirst()));
+        String maxDate = c.getString(0);
+        Log.e("key", "Vehicle2Name Last UPDATED Date " + c.getString(0));
+
+        return maxDate;
+    }
+    public List<JoinQueryAddVehicle> GetDataFromJoinQueryAddVehicle(String query){
+        Log.e("amir", "GetDataFromJoinQueryAddVehicle: " +query );
+        List<JoinQueryAddVehicle> joinQueryAddVehicleList=new ArrayList<>();
+        SQLiteDatabase database=this.getReadableDatabase();
+        Cursor c=database.rawQuery(query,null);
+        if(c.moveToFirst()){
+            do{
+                JoinQueryAddVehicle mylist=new JoinQueryAddVehicle();
+                mylist.setVehicleID(c.getString(0));
+                mylist.setVehicleGroupID(c.getString(1));
+                mylist.setVehicleName(c.getString(2));
+                mylist.setBrand(c.getString(3));
+                mylist.setModel(c.getString(4));
+                mylist.setColour(c.getString(5));
+                mylist.setRegistrationNo(c.getString(6));
+                mylist.setStatus(c.getString(7));
+                mylist.setContactNo(c.getString(8));
+                mylist.setClientID(c.getString(9));
+                mylist.setUpdatedDate(c.getString(10));
+                mylist.setDriverName(c.getString(11));
+                joinQueryAddVehicleList.add(mylist);
+            }while (c.moveToNext());
+        }
+        return joinQueryAddVehicleList;
+    }
+    public int getMaxValueOfVehicle2Name(String ClientID){
+        String query="select -(Max(Abs(Ifnull(VehicleID,0)))+1) from "+ TABLE_Vehicle2Name+
+                " where ClientID = " + ClientID+"";
+        Log.e("TEMP","("+query);
+        SQLiteDatabase dbtem = this.getReadableDatabase();
+        Cursor ctem = dbtem.rawQuery(query, null);
+        ctem.moveToFirst();
+        Log.e("TEMP" + "TEMP", "Maxium ID " + ctem.getInt(0));
+        return ctem.getInt(0);
+    }
+
+    public int getMaxValueOfAccount5customGroup1(String ClientID){
+        String query="select -(Max(Abs(Ifnull(CustomGroup1ID,0)))+1) from Account5customGroup1 where ClientID = " + ClientID+"";
+        Log.e("TEMP","("+query);
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(query, null);
+        cursor.moveToFirst();
+        Log.e("TEMP" + "TEMP", "Maxium ID " + cursor.getInt(0));
+        return cursor.getInt(0);
+    }
+//    public  List<Account5customGroup1> getAccount5customGroup1(String query){
+//        List<Account5customGroup1> account5customGroup1List=new ArrayList<>();
+//        SQLiteDatabase db=this.getReadableDatabase();
+//        Cursor c=db.rawQuery(query,null);
+//        if(c.moveToNext()){
+//            do{
+//                Account5customGroup1 account5customGroup1=new Account5customGroup1();
+//                account5customGroup1.setID(c.getInt(0));
+//                account5customGroup1.setCustomGroup1ID(c.getString(1));
+//                account5customGroup1.setCustomGroupName(c.getString(2));
+//                account5customGroup1.setClientID(c.getString(3));
+//                account5customGroup1.setClientUserID(c.getString(4));
+//                account5customGroup1.setNetCode(c.getString(5));
+//                account5customGroup1.setSysCode(c.getString(6));
+//                account5customGroup1.setUpdatedDate(c.getString(7));
+//
+//                account5customGroup1List.add(account5customGroup1);
+//
+//            }while (c.moveToNext());
+//        }
+//        return account5customGroup1List;
+//    }
+
     /**
      * Creating a CashBook
      */
-    public String createCashBook(CashBook cashBook) {
+    public long createCashBook(CashBook cashBook) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
@@ -684,7 +1124,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(KEY_CBRemarks, cashBook.getCBRemarks());
         values.put(KEY_Amount, cashBook.getAmount());
         values.put(KEY_ClientID2, cashBook.getClientID());
-        values.put(KEY_ClientUserID, cashBook.getCashBookID());
+        values.put(KEY_ClientUserID, cashBook.getClientUserID());
         values.put(KEY_NetCode2, cashBook.getNetCode());
         values.put(KEY_SysCode2, cashBook.getSysCode());
         values.put(KEY_UpdatedDate2, cashBook.getUpdatedDate());
@@ -693,7 +1133,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(KEY_TableName, cashBook.getTableName());
 
         // insert row
-        String cid = String.valueOf(db.insert(TABLE_CashBook, null, values));
+        long cid = db.insert(TABLE_CashBook, null, values);
 //        Log.e("OKK",String.valueOf(db.insert(TABLE_CashBook, null, values)));
         return cid;
 
@@ -719,6 +1159,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      * Creating a Booking
      */
     public void createBooking(Bookings bookings) {
+        Log.e("dataforsave",bookings.toString());
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
@@ -808,6 +1249,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("DELETE FROM " + TABLE_Account1Type);
     }
 
+
+    public void deleteAccount5customGroup1() {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.execSQL("DELETE FROM Account5customGroup1" );
+    }
     //Get GeneralLedger
 
     public List<GeneralLedger> getGeneralLedger(String query) {
@@ -872,6 +1318,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 generalLedger.setDescription(c.getString(c.getColumnIndex("Description")));
                 generalLedger.setClientID(c.getString(c.getColumnIndex("ClientID")));
                 generalLedger.setClientUserID(c.getString(c.getColumnIndex("ClientUserID")));
+                generalLedger.setUpdatedDate(c.getString(c.getColumnIndex("UpdatedDate")));
                 generalLedger.setArrangePersons(c.getString(c.getColumnIndex(KEY_ArrangePersons)));
                 generalLedger.setAmount(c.getString(c.getColumnIndex(KEY_Advance)));
                 generalLedger.setShift(c.getString(c.getColumnIndex(KEY_Shift)));
@@ -889,10 +1336,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         List<Recovery> mRecoveries = new ArrayList<>();
 
 
-        Log.e(LOG, query);
+        Log.e(LOG+"me", query);
 
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor c = db.rawQuery(query, null);
+        if(c!=null && c.getCount()>0){
+            for (int i = 0; i <c.getColumnCount() ; i++) {
+                Log.e("colutest","ColumnName("+i+")"+c.getColumnName(i));
+            }
+        }
+
         Log.e("SSSS", String.valueOf(c.moveToFirst()));
 
         // looping through all rows and adding to list
@@ -901,14 +1354,18 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 Recovery generalLedger = new Recovery();
                 Log.e("SSSSS", c.getString(c.getColumnIndex("BookingID")));
 
-                generalLedger.setClientID(c.getString(c.getColumnIndex("ClientID")));
+                generalLedger.setClientID(c.getString(c.getColumnIndex("ClientNic")));
                 generalLedger.setBookingID(c.getString(c.getColumnIndex("BookingID")));
-                generalLedger.setRecieved(c.getString(c.getColumnIndex("Recieved")));
-                generalLedger.setExpensed(c.getString(c.getColumnIndex("Expensed")));
-                generalLedger.setChargesTotal(c.getString(c.getColumnIndex("ChargesTotal")));
+                generalLedger.setRecieved(c.getString(c.getColumnIndex("Received"))+"");
+                generalLedger.setExpensed(c.getString(c.getColumnIndex("Expense"))+"");
+//                generalLedger.setRecieved("0");
+//                generalLedger.setExpensed("0");
+                generalLedger.setChargesTotal(c.getString(c.getColumnIndex("ChargesTotal"))+"");
+               // generalLedger.setChargesTotal("0");
                 generalLedger.setBalance(c.getString(c.getColumnIndex("Balance")));
                 generalLedger.setProfit(c.getString(c.getColumnIndex("Profit")));
                 generalLedger.setEventName(c.getString(c.getColumnIndex("EventName")));
+                //generalLedger.setEventName("Null");
                 generalLedger.setEventDate(c.getString(c.getColumnIndex("EventDate")));
                 generalLedger.setClientName(c.getString(c.getColumnIndex("ClientName")));
                 ;
@@ -1151,6 +1608,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return mAccount3Name;
     }
 
+    public int getMaxAccount3NameMaxAcNameID(String cliid){
+        String qq="select -(Max(Abs(Ifnull(AcNameID,0)))+1) from Account3Name"+
+                " where ClientID=" + cliid;
+        Log.e("TEMP","("+qq);
+        SQLiteDatabase dbtem = this.getReadableDatabase();
+        Cursor ctem = dbtem.rawQuery(qq, null);
+        ctem.moveToFirst();
+        Log.e("TEMP" + "TEMP", "Maxium ID " + ctem.getInt(0));
+        ctem.moveToFirst();
+        return ctem.getInt(0);
+    }
     //Get Entry Account2Group
     public Boolean findAccount3Name(String query) {
 
@@ -1357,11 +1825,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
                 // adding to todo list
                 cashBooks.add(cashBook);
+
             } while (c.moveToNext());
         }
 
         return cashBooks;
     }
+
 
     public String getAccountName(String query) {
         SQLiteDatabase db = this.getReadableDatabase();
@@ -1579,6 +2049,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
+        values.put(KEY_UserRights4,client.getUserRights());
         values.put(KEY_ClientID4, client.getClientID());
         values.put(KEY_ClientParentID, client.getClientParentID());
         values.put(KEY_EntryType, client.getEntryType());
@@ -1725,6 +2196,42 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("DELETE FROM " + TABLE_ProjectMenu + " WHERE EXISTS (SELECT * FROM ActiveAccounts)");
     }
 
+
+    //Getting Maximun Value of Item3Name
+    public int getMaxValueOfItem3Name(String ClientID){
+        String qq="select -(Max(Abs(Ifnull(Item3NameID,0)))+1) from "+ refdb.Table3Name.TABLE_Item3Name+
+                " where ClientID=" + ClientID+"";
+        Log.e("TEMP","("+qq);
+        SQLiteDatabase dbtem = this.getReadableDatabase();
+        Cursor ctem = dbtem.rawQuery(qq, null);
+        ctem.moveToFirst();
+        Log.e("TEMP" + "TEMP", "Maxium ID " + ctem.getInt(0));
+        return ctem.getInt(0);
+    }
+    //Getting Maximun Value of Item3Name
+    public String getMaxUpDateOfItem3Name(String ClientID){
+        String qq="select (Max(UpdatedDate)) from "+ refdb.Table3Name.TABLE_Item3Name+
+                " where ClientID=" + ClientID+"";
+        Log.e("TEMP","("+qq);
+        SQLiteDatabase dbtem = this.getReadableDatabase();
+        Cursor ctem = dbtem.rawQuery(qq, null);
+        ctem.moveToFirst();
+        Log.e("TEMP" + "TEMP", "Maxium ID " + ctem.getInt(0));
+        return ctem.getString(0);
+    }
+    //getting Maximun Value of Item2Group
+    public int getMaxValueOfItem2Group(String ClientID){
+        String qq="select -(Max(Abs(Ifnull(Item2GroupID,0)))+1) from "+ refdb.Table2Group.TABLE_Item2Group+
+                " where ClientID=" + ClientID+"";
+        Log.e("TEMP","("+qq);
+        SQLiteDatabase dbtem = this.getReadableDatabase();
+        Cursor ctem = dbtem.rawQuery(qq, null);
+        ctem.moveToFirst();
+        Log.e("TEMP" + "TEMP", "Maxium ID " + ctem.getInt(0));
+        return ctem.getInt(0);
+    }
+
+
     //Get MaxValue
     public int getMaxValue(String query) {
         int maxID = 0;
@@ -1767,6 +2274,18 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return id;
     }
 
+    //update item2Group
+    public void updateItem2Group(String query) {
+        Log.e("updated query ", query);
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.execSQL(query);
+    }
+    public void updateItem3Name(String query) {
+        Log.e("updated query ", query);
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.execSQL(query);
+    }
+
     public String getClientUpdatedDate(String id) {
         String date = "0";
         String query = "SELECT UpdatedDate FROM Client WHERE ClientID = " + id;
@@ -1805,6 +2324,67 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return item1TypeList;
     }
 
+    public List<Account5customGroup1> getAccount5customGroup1(String query){
+        Log.e("amir", "getAccount5customGroup1: "+query );
+        List<Account5customGroup1> customGroup1List=new ArrayList<>();
+        SQLiteDatabase db=this.getReadableDatabase();
+        Cursor c=db.rawQuery(query,null);
+        if(c.moveToFirst()){
+            do{
+                Account5customGroup1 list=new Account5customGroup1();
+                list.setID(c.getInt(c.getColumnIndex("ID")));
+                list.setCustomGroup1ID(c.getString(c.getColumnIndex("CustomGroup1ID")));
+                list.setCustomGroupName(c.getString(c.getColumnIndex("CustomGroupName")));
+                list.setClientID(c.getString(c.getColumnIndex("ClientID")));
+                list.setClientUserID(c.getString(c.getColumnIndex("ClientUserID")));
+                list.setNetCode(c.getString(c.getColumnIndex("NetCode")));
+                list.setSysCode(c.getString(c.getColumnIndex("SysCode")));
+                list.setUpdatedDate(c.getString(c.getColumnIndex("UpdatedDate")));
+                Log.e("amir if", "getAccount5customGroup1: "+list );
+                customGroup1List.add(list);
+            }while (c.moveToNext());
+        }
+        return customGroup1List;
+    }
+
+    public List<Account5customGroup2> getAccount5customGroup2(String query){
+        Log.e("amir", "getAccount5customGroup2: "+query );
+        List<Account5customGroup2> customGroup2List=new ArrayList<>();
+        SQLiteDatabase db=this.getReadableDatabase();
+        Cursor c=db.rawQuery(query,null);
+        if(c.moveToFirst()){
+            do{
+                Account5customGroup2 list=new Account5customGroup2();
+                list.setID(c.getInt(c.getColumnIndex("ID")));
+                list.setCustomGroup2ID(c.getString(c.getColumnIndex("CustomGroup2ID")));
+                list.setCustomGroup1ID(c.getString(c.getColumnIndex("CustomGroup1ID")));
+                list.setAcNameID(c.getString(c.getColumnIndex("AcNameID")));
+                list.setClientID(c.getString(c.getColumnIndex("ClientID")));
+                list.setClientUserID(c.getString(c.getColumnIndex("ClientUserID")));
+                list.setNetCode(c.getString(c.getColumnIndex("NetCode")));
+                list.setSysCode(c.getString(c.getColumnIndex("SysCode")));
+                list.setUpdatedDate(c.getString(c.getColumnIndex("UpdatedDate")));
+                Log.e("amir ", "getAccount5customGroup2: "+list );
+                customGroup2List.add(list);
+            }while (c.moveToNext());
+        }
+        return customGroup2List;
+    }
+
+    public long createAccount5customGroup1(Account5customGroup1 account5customGroup1) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("CustomGroup1ID", account5customGroup1.getCustomGroup1ID());
+        values.put("CustomGroupName", account5customGroup1.getCustomGroupName());
+        values.put("ClientID", account5customGroup1.getClientID());
+        values.put("ClientUserID", account5customGroup1.getClientUserID());
+        values.put("NetCode", account5customGroup1.getNetCode());
+        values.put("SysCode", account5customGroup1.getSysCode());
+        values.put("UpdatedDate", account5customGroup1.getUpdatedDate());
+        // insert row
+        return db.insert("Account5customGroup1", null, values);
+    }
+
     public long createItem1Typeitem(Item1Type item1Type) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
@@ -1820,6 +2400,91 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     ////////////////item 2 Group DAta Functions
+    public String getMaxIDItem2Group(int type,String cid){
+       if(type==1){
+           String qq="select Item2GroupID as maxid from Item2Group ";
+           SQLiteDatabase db = this.getReadableDatabase();
+           Cursor c = db.rawQuery(qq, null);
+           Log.e("Item2Groupmaxid", qq);
+           int max=0;
+          if(c.moveToFirst()){
+              do{
+                  Log.e("ItemID","--"+c.getInt(0));
+                  if(c.getInt(0)>max){
+                      max=c.getInt(0);
+                  }
+              }while (c.moveToNext());
+          }
+
+           Log.e("Item2Groupmaxid", "Item2Group Max Item2GroupID  " +max);
+           return ""+max;
+       }else if(type==2){
+           String qq="select max(UpdatedDate) as maxid from Item2Group where ClientID="+cid;
+           SQLiteDatabase db = this.getReadableDatabase();
+           Cursor c = db.rawQuery(qq, null);
+           Log.e("Item2Groupmaxid", String.valueOf(c.moveToFirst()));
+
+           String update = c.getString(0);
+           Log.e("Item2Groupmaxid", "Item2Group Max UpdatedDate  " + c.getString(0));
+           return update;
+       }
+       return "Null";
+    }
+
+    public int UpdateItem2GroupTable(Item2Group refobj,int updatetype){
+        if(updatetype==1){
+            //////////////////Update Only Item2GroupID,UpdatedDate
+            SQLiteDatabase database = this.getWritableDatabase();
+            ContentValues values = new ContentValues();
+
+            values.put(refdb.Table2Group.KEY_1, refobj.getItem2GroupID());
+            values.put(refdb.Table2Group.KEY_8, refobj.getUpdatedDate());
+
+
+            int sta = database.update(refdb.Table2Group.TABLE_Item2Group,
+                    values,
+                    "ID = " + refobj.getID()
+                    , null);
+            return sta;
+        }else  if(updatetype==2){
+            //////////////////Update Only Item2GroupID,UpdatedDate
+            SQLiteDatabase database = this.getWritableDatabase();
+            ContentValues values = new ContentValues();
+
+            values.put(refdb.Table2Group.KEY_1, refobj.getItem2GroupID());
+            values.put(refdb.Table2Group.KEY_2, refobj.getItem1TypeID());
+            values.put(refdb.Table2Group.KEY_3, refobj.getItem2GroupName());
+            values.put(refdb.Table2Group.KEY_4, refobj.getClientID());
+            values.put(refdb.Table2Group.KEY_5, refobj.getClientUserID());
+            values.put(refdb.Table2Group.KEY_6, refobj.getNetCode());
+            values.put(refdb.Table2Group.KEY_7, refobj.getSysCode());
+            values.put(refdb.Table2Group.KEY_8, refobj.getUpdatedDate().toString());
+
+
+            int sta = database.update(refdb.Table2Group.TABLE_Item2Group,
+                    values,
+                    " Item2GroupID ="+refobj.getItem2GroupID()+
+                            " AND ClientID="+refobj.getClientID()
+                    , null);
+            return sta;
+        }else  if(updatetype==3){
+            //////////////////Update Only Item2GroupID,UpdatedDate
+            SQLiteDatabase database = this.getWritableDatabase();
+            ContentValues values = new ContentValues();
+
+           // values.put(refdb.Table2Group.KEY_1, refobj.getItem2GroupID());
+            values.put(refdb.Table2Group.KEY_8, refobj.getUpdatedDate());
+
+
+            int sta = database.update(refdb.Table2Group.TABLE_Item2Group,
+                    values,
+                    "ID = " + refobj.getID()
+                    , null);
+            return sta;
+        }
+        return -9;
+    }
+
     public long createItem2GroupData(Item2Group item2Group) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
@@ -1888,6 +2553,50 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         // insert row
         return db.insert(refdb.Table3Name.TABLE_Item3Name, null, values);
     }
+    public void updateAccount5CustomGroup1DataOnLocal(String query){
+        Log.e("updated query ", query);
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.execSQL(query);
+    }
+    public List<JoinQueryAccount3Name> GetDataFromJoinQueryAccount3Name(String query){
+        List<JoinQueryAccount3Name> list=new ArrayList<>();
+        SQLiteDatabase db=this.getReadableDatabase();
+        Cursor cursor=db.rawQuery(query,null);
+        if(cursor.moveToFirst()){
+            do{
+                JoinQueryAccount3Name account3Name=new JoinQueryAccount3Name();
+                account3Name.setAcNameID(cursor.getString(0));
+                account3Name.setAcName(cursor.getString(1));
+                account3Name.setAcNameID1(cursor.getString(2));
+                account3Name.setAcNameID1(cursor.getString(3));
+                list.add(account3Name);
+            }while (cursor.moveToNext());
+        }
+        return list;
+    }
+    public int getMaxValueOfAccount5customGroup2(String ClientID){
+        String qq="select -(Max(Abs(Ifnull(CustomGroup2ID,0)))+1) from Account5customGroup2 where ClientID=" + ClientID+"";
+        Log.e("TEMP","("+qq);
+        SQLiteDatabase dbtem = this.getReadableDatabase();
+        Cursor ctem = dbtem.rawQuery(qq, null);
+        ctem.moveToFirst();
+        Log.e("TEMP" + "TEMP", "Maxium ID " + ctem.getInt(0));
+        return ctem.getInt(0);
+    }
+    public long createAccount5customGroup2(Account5customGroup2 account5customGroup2) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("CustomGroup2ID", account5customGroup2.getCustomGroup2ID());
+        values.put("CustomGroup1ID", account5customGroup2.getCustomGroup1ID());
+        values.put("AcNameID", account5customGroup2.getAcNameID());
+        values.put("ClientID", account5customGroup2.getClientID());
+        values.put("ClientUserID", account5customGroup2.getClientUserID());
+        values.put("NetCode", account5customGroup2.getNetCode());
+        values.put("SysCode", account5customGroup2.getSysCode());
+        values.put("UpdatedDate", account5customGroup2.getUpdatedDate());
+        // insert row
+        return db.insert("Account5customGroup2", null, values);
+    }
 
     public List<Item3Name_> getItem3NameData(String query) {
         List<Item3Name_> item3Name_list = new ArrayList<>();
@@ -1898,6 +2607,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         // looping through all rows and adding to list
         if (c.moveToFirst()) {
             do {
+
                 Item3Name_ item3Name = new Item3Name_();
                 item3Name.setID(c.getInt(0));
                 item3Name.setItem3NameID(c.getInt(1));
@@ -1908,19 +2618,81 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 item3Name.setNetCode(c.getString(6));
                 item3Name.setSysCode(c.getString(7));
                 item3Name.setSalePrice(c.getString(8));
-                item3Name.setItemCode(c.getString(7));
-                item3Name.setStock(c.getString(8));
+                item3Name.setItemCode(c.getString(9));
+                item3Name.setStock(c.getString(10));
                 UpdatedDate updatedDate = new UpdatedDate();
-                updatedDate.setDate(c.getString(9));
+                updatedDate.setDate(c.getString(11));
                 item3Name.setUpdatedDate(updatedDate);
 
+
+          Log.e("SendDataToDB","INGET"+item3Name.toString());
                 item3Name_list.add(item3Name);
             } while (c.moveToNext());
         }
-
+        Log.e("SendDataToDB","Sizeeitem3Name"+item3Name_list.size());
         return item3Name_list;
     }
+    public int UpdateItem3NameTable(Item3Name_ refobj,@Nullable String oldid,int updatetype){
 
+        Log.e(LOG,"item "+refobj.toString()+"\n old id:"+oldid+" updatetype:"+updatetype);
+        if(updatetype==1){
+            //////////////////Update Only Item2GroupID,UpdatedDate
+            SQLiteDatabase database = this.getWritableDatabase();
+            ContentValues values = new ContentValues();
+            values.put(refdb.Table3Name.KEY_2, refobj.getItem2GroupID());
+            values.put("UpdatedDate",GenericConstants.NullFieldStandardText);
+
+            int sta = database.update(refdb.Table3Name.TABLE_Item3Name,
+                    values,
+                    "Item2GroupID = " + oldid+
+                            " AND ClientID ="+refobj.getClientID()
+                    , null);
+            return sta;
+        }else if(updatetype==2){
+            ///////////Updated The Updated DAte and item3NameID
+            SQLiteDatabase database = this.getWritableDatabase();
+            ContentValues values = new ContentValues();
+            values.put(refdb.Table3Name.KEY_1, refobj.getItem3NameID());
+            values.put(refdb.Table3Name.KEY_11, refobj.getUpdatedDate().getDate());
+            int sta = database.update(refdb.Table3Name.TABLE_Item3Name,
+                    values,
+                    "ID = " + refobj.getID()
+                    , null);
+            return sta;
+        }else if(updatetype==3){
+            ///////////Updated The Updated DAte and item3NameID
+            SQLiteDatabase database = this.getWritableDatabase();
+            ContentValues values = new ContentValues();
+            values.put(refdb.Table3Name.KEY_11, refobj.getUpdatedDate().getDate());
+            int sta = database.update(refdb.Table3Name.TABLE_Item3Name,
+                    values,
+                    "ID = " + refobj.getID()
+                    , null);
+            return sta;
+        }else if(updatetype==4){
+            ///////////Updated The Updated DAte and item3NameID
+            SQLiteDatabase database = this.getWritableDatabase();
+            ContentValues values = new ContentValues();
+            values.put(refdb.Table3Name.KEY_1, refobj.getItem3NameID());
+            values.put(refdb.Table3Name.KEY_2, refobj.getItem2GroupID());
+            values.put(refdb.Table3Name.KEY_3, refobj.getItemName());
+            values.put(refdb.Table3Name.KEY_4, refobj.getClientID());
+            values.put(refdb.Table3Name.KEY_5, refobj.getClientUserID());
+            values.put(refdb.Table3Name.KEY_6, refobj.getNetCode());
+            values.put(refdb.Table3Name.KEY_7, refobj.getSysCode());
+            values.put(refdb.Table3Name.KEY_8, refobj.getSalePrice());
+            values.put(refdb.Table3Name.KEY_9, refobj.getItemCode());
+            values.put(refdb.Table3Name.KEY_10, refobj.getStock());
+            values.put(refdb.Table3Name.KEY_11, refobj.getUpdatedDate().getDate());
+            int sta = database.update(refdb.Table3Name.TABLE_Item3Name,
+                    values,
+                    "Item3NameID = " + refobj.getItem3NameID()+
+                            " AND ClientID = "+refobj.getClientID()
+                    , null);
+            return sta;
+        }
+        return -9;
+    }
     public void deleteAllItem3Name() {
         SQLiteDatabase db = this.getWritableDatabase();
         db.execSQL("DELETE FROM " + refdb.Table3Name.TABLE_Item3Name);
@@ -1928,6 +2700,34 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     ////////////////SalePur1 DAta Functions
+    ////////Update salepur1 data from records that are edited on server
+    public int updateSalePur1Tablefromserver(Salepur1 salepur1) {
+        /////Editing While User Edit The data From Form
+        SQLiteDatabase database = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+
+        values.put(refdb.SlePur1.KEY_1, salepur1.getSalePur1ID());
+        values.put(refdb.SlePur1.KEY_2, salepur1.getEntryType());
+        values.put(refdb.SlePur1.KEY_3, salepur1.getSPDate().getDate());
+        values.put(refdb.SlePur1.KEY_4, salepur1.getAcNameID());
+        values.put(refdb.SlePur1.KEY_5, salepur1.getRemarks());
+        values.put(refdb.SlePur1.KEY_6, salepur1.getClientID());
+        values.put(refdb.SlePur1.KEY_7, salepur1.getClientUserID());
+        values.put(refdb.SlePur1.KEY_8, salepur1.getNetCode());
+        values.put(refdb.SlePur1.KEY_9, salepur1.getSysCode());
+        values.put(refdb.SlePur1.KEY_10, salepur1.getUpdatedDate().getDate());
+        values.put(refdb.SlePur1.KEY_11, salepur1.getNameOfPerson());
+        values.put(refdb.SlePur1.KEY_12, salepur1.getPayAfterDay());
+        int sta = database.update(refdb.SlePur1.TABLE_SalePur1,
+                values,
+                "ClientID = " + salepur1.getClientID() +
+                        " AND SalePur1ID=" + salepur1.getSalePur1ID() +
+                        " AND EntryType= '" + salepur1.getEntryType() + "'" +
+                        ""
+                , null);
+        return sta;
+    }
+
     public List<JoinQueryDaliyEntryPage1> GetDataFroJoinQuery(String query) {
         Log.e(LOG, query);
         List<JoinQueryDaliyEntryPage1> list = new ArrayList<>();
@@ -1956,6 +2756,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 page1.setClientID(c.getString(6));
                 page1.setNameOfPerson(c.getString(7));
                 page1.setPayAfterDay(c.getString(8));
+                page1.PkID = c.getString(9);
                 list.add(page1);
 
             } while (c.moveToNext());
@@ -2029,25 +2830,68 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     }
 
-    public int GetMaximunSalePur1ID() {
-        String query = "select max(ID) as maxid from " + refdb.SlePur1.TABLE_SalePur1;
-        Log.e(LOG, query);
-        int maxid=-99;
+    public int GetMaximunSalePur1ID(String ClientID,String entryType) {
+
+//        String qq="select -(Max(Abs(Ifnull(SalePur1ID,0)))+1) from "+ refdb.SlePur1.TABLE_SalePur1+
+//                " where ClientID=" + ClientID+" AND EntryType= '"+entryType+"'";
+//        Log.e("TEMP","("+qq);
+//        SQLiteDatabase dbtem = this.getReadableDatabase();
+//        Cursor ctem = dbtem.rawQuery(qq, null);
+//        ctem.moveToFirst();
+//        Log.e("TEMP" + "TEMP", "Maxium ID " + ctem.getInt(0));
+
+        ///////////////////////////////////////////////////Above code is temp
+
+        String querymax = "select max(abs(SalePur1ID)) as maxid from " + refdb.SlePur1.TABLE_SalePur1 + "" +
+                " where ClientID=" + ClientID+" AND EntryType= '"+entryType+"'";
+        String querymin = "select SalePur1ID as maxid from " + refdb.SlePur1.TABLE_SalePur1 + "" +
+                " where ClientID=" + ClientID+" AND EntryType= '"+entryType+"'";
+        Log.e(LOG + "ID", "MinID:" + querymin);
+        Log.e(LOG + "ID", "MaxID:" + querymax);
+        int maxid = -99, minid = -9999;
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor c = db.rawQuery(query, null);
-        for (int i = 0; i <c.getColumnCount() ; i++) {
-            Log.e("col",c.getColumnName(i));
+        Cursor c = db.rawQuery(querymax, null);
+        Cursor cmin = db.rawQuery(querymin, null);
+        for (int i = 0; i < c.getColumnCount(); i++) {
+            Log.e("col", c.getColumnName(i));
         }
 
-        if (c != null && c.getCount()>0) {
+        if (c != null && c.getCount() > 0) {
             c.moveToFirst();
-            Log.e(LOG, "Maxium ID " + c.getInt(0));
-            maxid=c.getInt(0);
-        }
-         else
-            Log.e(LOG, "Maxium ID -99" );
+            Log.e(LOG + "ID", "Maxium ID " + c.getInt(0));
+            maxid = c.getInt(0);
+        } else
+            Log.e(LOG + "ID", "Maxium ID -99");
+        if (cmin != null && cmin.getCount() > 0) {
+            cmin.moveToFirst();
+            int pre, next, min = 0;
+            pre = next = cmin.getInt(0);
+            do {
 
-        return maxid;
+                next = cmin.getInt(0);
+                if (pre > next)
+                    min = next;
+                pre = next;
+
+            } while (cmin.moveToNext());
+            minid = min;
+            Log.e(LOG + "ID", "Menium ID " + minid);
+
+        } else
+            Log.e(LOG + "ID", "Menium ID -99");
+        ///////////////Criterial for alogrith
+
+        if (minid >= 0) {
+            minid = -maxid - 1;
+        } else {
+            minid = minid - 1;
+        }
+//        if (minid < 0)
+//            minid = minid * -1;
+
+        Log.e(LOG + "ID", "MINIMID::" + minid);
+        return minid;
+
     }
 
     public long createSalePur1Data(Salepur1 salepur1) {
@@ -2106,25 +2950,113 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         return salepur1List;
     }
-    public int UpdateSalePur1Data(int pk,String salpur1id,String updateDate)
-    {
-        SQLiteDatabase database=this.getWritableDatabase();
-        ContentValues contentValues=new ContentValues();
-        contentValues.put(refdb.SlePur1.KEY_1,salpur1id);
-        contentValues.put(refdb.SlePur1.KEY_10,updateDate);
-       int sta= database.update(refdb.SlePur1.TABLE_SalePur1,
-                contentValues,
-                "ID = "+pk,null);
-       return sta;
+
+    public int UpdateSalePur1Data(int pk, String salpur1id, String updateDate, @Nullable Salepur1 salepur1) {
+        if (salpur1id == null && updateDate != null) {
+            /////Editing While User Edit The data From Form
+            SQLiteDatabase database = this.getWritableDatabase();
+            ContentValues values = new ContentValues();
+
+            values.put(refdb.SlePur1.KEY_10, updateDate);
+
+            int sta = database.update(refdb.SlePur1.TABLE_SalePur1,
+                    values,
+                    "ID = " + pk, null);
+            return sta;
+        } else if (salpur1id == null && updateDate == null) {
+            /////Editing While User Edit The data From Form
+            SQLiteDatabase database = this.getWritableDatabase();
+            ContentValues values = new ContentValues();
+
+            //values.put(refdb.SlePur1.KEY_1, salepur1.getSalePur1ID());
+            //values.put(refdb.SlePur1.KEY_2, salepur1.getEntryType());
+            values.put(refdb.SlePur1.KEY_3, salepur1.getSPDate().getDate());
+            values.put(refdb.SlePur1.KEY_4, salepur1.getAcNameID());
+            values.put(refdb.SlePur1.KEY_5, salepur1.getRemarks());
+            //values.put(refdb.SlePur1.KEY_6, salepur1.getClientID());
+            //values.put(refdb.SlePur1.KEY_7, salepur1.getClientUserID());
+            values.put(refdb.SlePur1.KEY_8, salepur1.getNetCode());
+            values.put(refdb.SlePur1.KEY_9, salepur1.getSysCode());
+            values.put(refdb.SlePur1.KEY_10, salepur1.getUpdatedDate().getDate());
+            values.put(refdb.SlePur1.KEY_11, salepur1.getNameOfPerson());
+            values.put(refdb.SlePur1.KEY_12, salepur1.getPayAfterDay());
+            int sta = database.update(refdb.SlePur1.TABLE_SalePur1,
+                    values,
+                    "ID = " + salepur1.getID(), null);
+            return sta;
+        } else {
+            //////Editing While Updating Data On Cloud
+            SQLiteDatabase database = this.getWritableDatabase();
+            ContentValues contentValues = new ContentValues();
+            contentValues.put(refdb.SlePur1.KEY_1, salpur1id);
+            contentValues.put(refdb.SlePur1.KEY_10, updateDate);
+            int sta = database.update(refdb.SlePur1.TABLE_SalePur1,
+                    contentValues,
+                    "ID = " + pk, null);
+            return sta;
+        }
+
 
     }
+
     public void deleteAllSalePur1() {
         SQLiteDatabase db = this.getWritableDatabase();
         db.execSQL("DELETE FROM " + refdb.SlePur1.TABLE_SalePur1);
 
     }
 
+    public String getSalePur1MaxUpdatedDate(String clientIDSession) {
+
+        String query = "Select MAX(UpdatedDate) from SalePur1 where ClientID =" + clientIDSession;
+
+        Log.e(LOG, query);
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor c = db.rawQuery(query, null);
+        Log.e("SSSS", String.valueOf(c.moveToFirst()));
+
+        String maxDate = c.getString(0);
+        Log.e("key", "SalePur1 Last UPDATED Date " + c.getString(0));
+
+        return maxDate;
+    }
+
+    //////////////////////////////////////////////////End Of SalePur1 Functions
     ////////////////SalePur2 DAta Functions
+    /////////////updateSalePur2Tablefromserver:Update Record From Server Record
+    //////////that are edited on server
+    public int updateSalePur2Tablefromserver(SalePur2 salePur2) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+
+        values.put(refdb.SalePur2.KEY_1, salePur2.getItem3NameID());
+        values.put(refdb.SalePur2.KEY_2, salePur2.getSalePur1ID());
+        values.put(refdb.SalePur2.KEY_3, salePur2.getEntryType());
+        values.put(refdb.SalePur2.KEY_4, salePur2.getItemSerial());
+        values.put(refdb.SalePur2.KEY_5, salePur2.getItemDescription());
+        values.put(refdb.SalePur2.KEY_6, salePur2.getQtyAdd());
+        values.put(refdb.SalePur2.KEY_7, salePur2.getQtyLess());
+        values.put(refdb.SalePur2.KEY_8, salePur2.getQty());
+        values.put(refdb.SalePur2.KEY_9, salePur2.getPrice());
+        values.put(refdb.SalePur2.KEY_10, salePur2.getTotal());
+        values.put(refdb.SalePur2.KEY_11, salePur2.getLocation());
+        values.put(refdb.SalePur2.KEY_12, salePur2.getClientID());
+        values.put(refdb.SalePur2.KEY_13, salePur2.getClientUserID());
+        values.put(refdb.SalePur2.KEY_14, salePur2.getNetCode());
+        values.put(refdb.SalePur2.KEY_15, salePur2.getSysCode());
+        values.put(refdb.SalePur2.KEY_16, salePur2.getUpdatedDate().getDate());
+
+
+        int sta = db.update(refdb.SalePur2.TABLE_SalePur2,
+                values,
+                "ClientID = '" + salePur2.getClientID() + "'" +
+                        " AND SalePur1ID='" + salePur2.getSalePur1ID() + "'" +
+                        " AND EntryType= '" + salePur2.getEntryType() + "'" +
+                        " AND ItemSerial= '" + salePur2.getItemSerial() + "'"
+                , null);
+        return sta;
+    }
+
     public long createSalePur2Data(SalePur2 salePur2) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
@@ -2150,30 +3082,70 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         // insert row
         return db.insert(refdb.SalePur2.TABLE_SalePur2, null, values);
     }
-    public int UpdateSalePur1IdInSalePur2Table(int oldsalepurid,String newsalepur1id)
-    {
-        SQLiteDatabase database=this.getWritableDatabase();
-        ContentValues contentValues=new ContentValues();
-        contentValues.put(refdb.SalePur2.KEY_2,newsalepur1id);
 
-        int sta= database.update(refdb.SalePur2.TABLE_SalePur2,
+    ////////////UdateSalePur1Id in salepur2table
+    public int UpdateSalePur1IdInSalePur2Table(int oldsalepurid,
+                                               String entrytypee,
+                                               int cliid,
+                                               String newsalepur1id) {
+        Log.e("ambigous",GenericConstants.AmbigousStateTEmpForOnlyThiss);
+        SQLiteDatabase database = this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(refdb.SalePur2.KEY_2, newsalepur1id);
+
+        int sta = database.update(refdb.SalePur2.TABLE_SalePur2,
                 contentValues,
-                "SalePur1ID = "+oldsalepurid,null);
-        Log.e(LOG,"oldid:"+oldsalepurid+" newid:"+newsalepur1id+" Status:"+sta);
+                "SalePur1ID = " + oldsalepurid+"" +
+                        " AND EntryType= '"+entrytypee+"'" +
+                        " AND ClientID = "+cliid,
+                null);
+        Log.e(LOG, "oldid:" + oldsalepurid + " newid:" + newsalepur1id + " Status:" + sta);
         return sta;
     }
-    public int UpdateSalePur2Data(int pk,String itemserial,String updateDate)
-    {
-        SQLiteDatabase database=this.getWritableDatabase();
-        ContentValues contentValues=new ContentValues();
-        contentValues.put(refdb.SalePur2.KEY_4,itemserial);
-        contentValues.put(refdb.SalePur2.KEY_16,updateDate);
-        int sta= database.update(refdb.SalePur2.TABLE_SalePur2,
+
+    /////////////////Update Item Serial
+    public int UpdateSalePur2Data(int pk, String itemserial, String updateDate) {
+        SQLiteDatabase database = this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(refdb.SalePur2.KEY_4, itemserial);
+        contentValues.put(refdb.SalePur2.KEY_16, updateDate);
+        int sta = database.update(refdb.SalePur2.TABLE_SalePur2,
                 contentValues,
-                "ID = "+pk,null);
+                "ID = " + pk, null);
         return sta;
 
     }
+
+    /////////////////Update Whole Object of SalePur2
+    public long UpdateDataForSalePur2(String id, SalePur2 salePur2, @Nullable boolean flag) {
+        if (flag) {
+            SQLiteDatabase database = this.getWritableDatabase();
+            ContentValues contentValues = new ContentValues();
+
+            contentValues.put(refdb.SalePur2.KEY_16, salePur2.getUpdatedDate().getDate());
+
+            int sta = database.update(refdb.SalePur2.TABLE_SalePur2,
+                    contentValues,
+                    "ID = " + id, null);
+            return sta;
+        } else {
+            SQLiteDatabase database = this.getWritableDatabase();
+            ContentValues contentValues = new ContentValues();
+            contentValues.put(refdb.SalePur2.KEY_5, salePur2.getItemDescription());
+            contentValues.put(refdb.SalePur2.KEY_8, salePur2.getQty());
+            contentValues.put(refdb.SalePur2.KEY_9, salePur2.getPrice());
+            contentValues.put(refdb.SalePur2.KEY_10, salePur2.getTotal());
+            contentValues.put(refdb.SalePur2.KEY_16, salePur2.getUpdatedDate().getDate());
+
+            int sta = database.update(refdb.SalePur2.TABLE_SalePur2,
+                    contentValues,
+                    "ID = " + id,
+                    null);
+            return sta;
+        }
+
+    }
+
     public List<SalePur2> getSalePur2Data(String query) {
         List<SalePur2> salePur2s = new ArrayList<>();
         Log.e(LOG, query);
@@ -2185,7 +3157,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             do {
                 SalePur2 salePur2 = new SalePur2();
                 salePur2.setID(c.getInt(0));
-                Log.e("id","ID="+c.getInt(0));
+                Log.e("id", "ID=" + c.getInt(0));
                 salePur2.setItem3NameID(c.getInt(1));
                 salePur2.setSalePur1ID(c.getInt(2));
                 salePur2.setEntryType(c.getString(3));
@@ -2217,6 +3189,22 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         db.execSQL("DELETE FROM " + refdb.SalePur2.TABLE_SalePur2);
 
+    }
+
+    public String getSalePur2MaxUpdatedDate(String clientIDSession) {
+
+        String query = "Select MAX(UpdatedDate) from SalePur2 where ClientID =" + clientIDSession;
+
+        Log.e(LOG, query);
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor c = db.rawQuery(query, null);
+        Log.e("SSSS", String.valueOf(c.moveToFirst()));
+
+        String maxDate = c.getString(0);
+        Log.e("key", "SalePur2 Last UPDATED Date " + c.getString(0));
+
+        return maxDate;
     }
 
 }

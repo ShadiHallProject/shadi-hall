@@ -42,7 +42,7 @@ public class salepurgridviewfrag extends Fragment {
 
 
         ///////////////////////////////////////////////
-        FillRecyclerViewAdapter();
+        FillRecyclerViewAdapter(1);
 
         return view;
 
@@ -54,17 +54,17 @@ public class salepurgridviewfrag extends Fragment {
         mrecyclerview = vv.findViewById(R.id.salepurrecyclerview);
     }
 
-    private void FillRecyclerViewAdapter() {
+    private void FillRecyclerViewAdapter(int sortbyfiels) {
 
         String ClientId = new Prefrence(getContext()).getClientIDSession();
-       EntryType="Sale";
-        String query = "  SELECT        SalePur1.SalePur1ID, SalePur1.EntryType, SalePur1.SPDate, Account3Name.AcName, SalePur1.Remarks, SUM(SalePur2.Total) AS BillAmt, SalePur1.ClientID, SalePur1.NameOfPerson, SalePur1.PayAfterDay\n" +
+
+        String query = "  SELECT         SalePur1.SalePur1ID, SalePur1.EntryType, SalePur1.SPDate, Account3Name.AcName, SalePur1.Remarks, SUM(SalePur2.Total) AS BillAmt, SalePur1.ClientID, SalePur1.NameOfPerson, SalePur1.PayAfterDay,SalePur1.ID\n" +
                 "        FROM            SalePur1 INNER JOIN\n" +
                 "        Account3Name ON SalePur1.AcNameID = Account3Name.AcNameID INNER JOIN\n" +
                 "        SalePur2 ON SalePur1.SalePur1ID = SalePur2.SalePur1ID\n" +
                 "        GROUP BY SalePur1.SalePur1ID, SalePur1.EntryType, SalePur1.SPDate, Account3Name.AcName, SalePur1.ClientID, SalePur1.NameOfPerson, SalePur1.PayAfterDay, SalePur1.Remarks\n" +
                 "        HAVING        (SalePur1.EntryType = '" + EntryType + "') AND (SalePur1.ClientID = " + ClientId + ")\n" +
-                "        ORDER BY SalePur1.SalePur1ID DESC  ";
+                "        ORDER BY "+sortbyfiels+" DESC  ";
 
         page1List=databaseHelper.GetDataFroJoinQuery(query);
 

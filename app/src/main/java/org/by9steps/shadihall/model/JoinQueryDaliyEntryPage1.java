@@ -1,6 +1,13 @@
 package org.by9steps.shadihall.model;
 
-public class JoinQueryDaliyEntryPage1 {
+import android.os.Parcel;
+import android.os.Parcelable;
+
+import java.io.Serializable;
+
+public class JoinQueryDaliyEntryPage1  {
+    /////////PrimaryKeyIDForSqliteDb
+    public String PkID;
 
     private String SalePur1ID,EntryType,SPDate,AcName,Remarks,BillAmt,ClientID,NameOfPerson,PayAfterDay;
 
@@ -76,4 +83,6 @@ public class JoinQueryDaliyEntryPage1 {
     public void setPayAfterDay(String payAfterDay) {
         PayAfterDay = payAfterDay;
     }
+
+
 }

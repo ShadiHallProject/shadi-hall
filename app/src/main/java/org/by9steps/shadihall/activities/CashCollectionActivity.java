@@ -29,8 +29,10 @@ import org.by9steps.shadihall.AppController;
 import org.by9steps.shadihall.R;
 import org.by9steps.shadihall.fragments.SelectDateFragment;
 import org.by9steps.shadihall.helper.DatabaseHelper;
+import org.by9steps.shadihall.helper.GenericConstants;
 import org.by9steps.shadihall.helper.InputValidation;
 import org.by9steps.shadihall.helper.Prefrence;
+import org.by9steps.shadihall.helper.refdb;
 import org.by9steps.shadihall.model.CBUpdate;
 import org.by9steps.shadihall.model.CashBook;
 import org.by9steps.shadihall.model.ChartOfAcc;
@@ -230,7 +232,12 @@ public class CashCollectionActivity extends AppCompatActivity implements View.On
                     }
 
                     if (viewType.equals("Edit")){
-                        String query = "UPDATE CashBook SET CBDate = '"+dd+"', DebitAccount = '"+dDebit+"', CreditAccount = '"+cCredit+"', CBRemarks = '"+description.getText().toString()+"', Amount = '"+amount.getText().toString()+"', UpdatedDate = '0' WHERE CashBookID = "+cbID;
+                        String query = "UPDATE CashBook SET CBDate = '"+dd+"'," +
+                                " DebitAccount = '"+dDebit+"'," +
+                                " CreditAccount = '"+cCredit+"', " +
+                                "CBRemarks = '"+description.getText().toString()+"', " +
+                                "Amount = '"+amount.getText().toString()+"', " +
+                                "UpdatedDate = '"+GenericConstants.NullFieldStandardText+"' WHERE CashBookID = "+cbID;
                         databaseHelper.updateCashBook(query);
                         CBUpdate cbUpdate = new CBUpdate(cbID,date.getText().toString(),dDebit,cCredit,description.getText().toString(),amount.getText().toString());
                         cbUpdate.save();
@@ -238,9 +245,23 @@ public class CashCollectionActivity extends AppCompatActivity implements View.On
                         finish();
                     }else {
 
-                        int seriolNo = databaseHelper.getMaxValue("SELECT MAX(SerialNo) AS MaxNo FROM CashBook") + 1;
+                       // int seriolNo = databaseHelper.getMaxValue("SELECT MAX(SerialNo) AS MaxNo FROM CashBook") + 1;
+                        int maxcashbookid = refdb.CashBookTableRef.getmaxCashBookID(databaseHelper, "" + prefrence.getClientIDSession());
 
-                        databaseHelper.createCashBook(new CashBook("0", date.getText().toString(), dDebit, cCredit, description.getText().toString(), amount.getText().toString(), prefrence.getClientIDSession(),prefrence.getClientUserIDSession(),"0","0","0",tableID,String.valueOf(seriolNo),"Booking"));
+                        databaseHelper.createCashBook(new CashBook(maxcashbookid+"",
+                                date.getText().toString(),
+                                dDebit,
+                                cCredit,
+                                description.getText().toString(),
+                                amount.getText().toString(),
+                                prefrence.getClientIDSession(),
+                                prefrence.getClientUserIDSession(),
+                                "0",
+                                "0",
+                                GenericConstants.NullFieldStandardText,
+                                tableID,
+                                String.valueOf(maxcashbookid),
+                                "Booking"));
                         clearCashe();
                     }
 

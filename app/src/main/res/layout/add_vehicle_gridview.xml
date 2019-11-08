@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <HorizontalScrollView
+        android:layout_below="@+id/search_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        android:measureAllChildren="false"
+        android:scrollbars="none">
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent">
+
+            <LinearLayout
+                android:id="@+id/footer"
+                android:layout_marginTop="5dp"
+                android:orientation="horizontal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/col1VehicleID"
+                    android:textAlignment="center"
+                    android:textSize="@dimen/textSize"
+                    android:textColor="@color/colorPrimaryDark"
+                    android:textStyle="bold"
+                    android:layout_margin="3dp"
+                    android:layout_width="@dimen/hundred_dp"
+                    android:layout_height="wrap_content"
+                    android:text="Vehicle ID"/>
+                <TextView
+                    android:id="@+id/col2VehicleName"
+                    android:textAlignment="center"
+                    android:textSize="@dimen/textSize"
+                    android:textColor="@color/colorPrimaryDark"
+                    android:textStyle="bold"
+                    android:layout_margin="3dp"
+                    android:layout_width="@dimen/hundred_dp"
+                    android:layout_height="wrap_content"
+                    android:text="Vehicle Name"/>
+
+                <TextView
+                    android:id="@+id/col3RegistrationNo"
+                    android:textAlignment="center"
+                    android:textSize="@dimen/textSize"
+                    android:textColor="@color/colorPrimaryDark"
+                    android:textStyle="bold"
+                    android:layout_margin="3dp"
+                    android:layout_width="110dp"
+                    android:layout_height="wrap_content"
+                    android:text="Registration No"/>
+                <TextView
+                    android:id="@+id/col4Status"
+                    android:textAlignment="center"
+                    android:textSize="@dimen/textSize"
+                    android:textColor="@color/colorPrimaryDark"
+                    android:textStyle="bold"
+                    android:layout_margin="3dp"
+                    android:layout_width="@dimen/hundred_dp"
+                    android:layout_height="wrap_content"
+                    android:text="Status"/>
+
+
+                <ImageView
+                    android:id="@+id/Image3Dot"
+                    card_view:srcCompat="@drawable/ic_more_vert_black_24dp"
+                    android:background="@android:color/transparent"
+                    android:textAlignment="center"
+                    android:textSize="@dimen/textSize"
+                    android:layout_weight="2"
+                    android:layout_marginRight="6dp"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:visibility="invisible"/>
+
+
+            </LinearLayout>
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/AddVehicleRecyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
+        </LinearLayout>
+
+    </HorizontalScrollView>
+
+</LinearLayout>

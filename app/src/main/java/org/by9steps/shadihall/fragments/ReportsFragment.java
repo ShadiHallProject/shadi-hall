@@ -74,6 +74,7 @@ import org.by9steps.shadihall.activities.ChaartOfAccAddActivity;
 import org.by9steps.shadihall.activities.MenuClickActivity;
 import org.by9steps.shadihall.adapters.ReportsAdapter;
 import org.by9steps.shadihall.adapters.SpinnerAdapter;
+import org.by9steps.shadihall.callingapi.Account3NameApis;
 import org.by9steps.shadihall.chartofaccountdialog.CustomDialogOnDismisListener;
 import org.by9steps.shadihall.chartofaccountdialog.DialogForAccountingTypeItem;
 import org.by9steps.shadihall.chartofaccountdialog.DialogForCliSup;
@@ -83,6 +84,7 @@ import org.by9steps.shadihall.helper.GenericConstants;
 import org.by9steps.shadihall.helper.MNotificationClass;
 import org.by9steps.shadihall.helper.Prefrence;
 import org.by9steps.shadihall.helper.ViewDBAllData;
+import org.by9steps.shadihall.helper.refdb;
 import org.by9steps.shadihall.model.Account2Group;
 import org.by9steps.shadihall.model.Account3Name;
 import org.by9steps.shadihall.model.Bookings;
@@ -317,7 +319,7 @@ public class ReportsFragment extends Fragment implements View.OnClickListener,
                 return true;
             }
         });
-        add.setOnLongClickListener(longClickListenerForaddbtn);
+       // add.setOnLongClickListener(longClickListenerForaddbtn);
         return view;
     }
 
@@ -470,12 +472,14 @@ public class ReportsFragment extends Fragment implements View.OnClickListener,
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.add:
-                Intent intent = new Intent(getContext(), ChaartOfAccAddActivity.class);
-                intent.putExtra("AcNameID", "0");
-                intent.putExtra("GroupName", ((Account2Group) sp_acgroup.getSelectedItem()).getAcGruopName());
-                intent.putExtra("GroupID", ((Account2Group) sp_acgroup.getSelectedItem()).getAcGroupID());
-                intent.putExtra("Type", "Add");
-                startActivity(intent);
+//                Intent intent = new Intent(getContext(), ChaartOfAccAddActivity.class);
+//                intent.putExtra("AcNameID", "0");
+//                intent.putExtra("GroupName", ((Account2Group) sp_acgroup.getSelectedItem()).getAcGruopName());
+//                intent.putExtra("GroupID", ((Account2Group) sp_acgroup.getSelectedItem()).getAcGroupID());
+//                intent.putExtra("Type", "Add");
+//                startActivity(intent);
+
+                showMyDialogForForm();
                 break;
             case R.id.r_acname:
                 orderBy = "AcName";
@@ -905,449 +909,472 @@ public class ReportsFragment extends Fragment implements View.OnClickListener,
         mProgress.setCancelable(false);
         mProgress.show();
 
-        updateAccount3Name();
+        Account3NameApis account3NameApis=new Account3NameApis(getContext(),
+                mProgress,databaseHelper,prefrence);
+        account3NameApis.trigerAllMethodInSequecne();
+        account3NameApis.FinalCallBAckListner=new Account3NameApis.Acunt3namlistner() {
+            @Override
+            public void FinishCallBackmethod(String success, String funType) {
+                Log.e("Account3Namefunc","Flag4 Suces:"+success+" funType:"+funType);
+                MNotificationClass.ShowToastTem(getContext(),"All Method Finished");
+            }
+        };
+       // updateAccount3Name();
+       // addAccount3Name();
     }
 
     ////////////////////Account3Name all 4 operations
     ///////////////////////////////////////////Methos Calling Sequences
     ////////////////Get Edited Record From Server
-    public void updateAccount3Name() {
-        Log.e("method", "Flag 1 MathodName::updateAccount3Name");
-
-        mProgress.show();
-        if (GenericConstants.IS_DEBUG_MODE_ENABLED)
-            mProgress.setMessage("Loading... getUpdatedData updateAccount3Name Method:updateAccount3Name CLI " + prefrence.getClientIDSession());
-
-        String tag_json_obj = "json_obj_req";
-        String u = "http://69.167.137.121/plesk-site-preview/sky.com.pk/shadiHall/RefreshAccount3Name.php";
-
-        StringRequest jsonObjectRequest = new StringRequest(com.android.volley.Request.Method.POST, u,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        mProgress.dismiss();
-                        JSONObject jsonObj = null;
-
-                        try {
-                            jsonObj = new JSONObject(response);
-                            String success = jsonObj.getString("success");
-                            Log.e("Account3Name2", jsonObj.toString());
-                            if (success.equals("1")) {
-                                JSONArray jsonArray = jsonObj.getJSONArray("Account3Name");
-                                for (int i = 0; i < jsonArray.length(); i++) {
-                                    JSONObject jsonObject = jsonArray.getJSONObject(i);
-                                    Log.e("Account3Name", jsonObject.toString());
-                                    String AcNameID = jsonObject.getString("AcNameID");
-                                    String AcName = jsonObject.getString("AcName");
-                                    String AcGroupID = jsonObject.getString("AcGroupID");
-                                    String AcAddress = jsonObject.getString("AcAddress");
-                                    String AcMobileNo = jsonObject.getString("AcMobileNo");
-                                    String AcContactNo = jsonObject.getString("AcContactNo");
-                                    String AcEmailAddress = jsonObject.getString("AcEmailAddress");
-                                    String AcDebitBal = jsonObject.getString("AcDebitBal");
-                                    String AcCreditBal = jsonObject.getString("AcCreditBal");
-                                    String AcPassward = jsonObject.getString("AcPassward");
-                                    String ClientID = jsonObject.getString("ClientID");
-                                    String ClientUserID = jsonObject.getString("ClientUserID");
-                                    String SysCode = jsonObject.getString("SysCode");
-                                    String NetCode = jsonObject.getString("NetCode");
-                                    String ed = jsonObject.getString("UpdatedDate");
-                                    JSONObject jbb = new JSONObject(ed);
-                                    String UpdatedDate = jbb.getString("date");
-                                    String SerialNo = jsonObject.getString("SerialNo");
-                                    String UserRights = jsonObject.getString("UserRights");
-                                    String SecurityRights = jsonObject.getString("SecurityRights");
-                                    String Salary = jsonObject.getString("Salary");
-                                    String SessionDate = jsonObject.getString("SessionDate");
-
-                                    String query = "UPDATE Account3Name SET AcNameID = '" + AcNameID + "', AcName = '" + AcName + "', AcGroupID = '" + AcGroupID + "', AcAddress = '" + AcAddress + "', AcMobileNo = '" + AcMobileNo
-                                            + "', AcContactNo = '" + AcContactNo + "', AcEmailAddress = '" + AcEmailAddress + "', AcDebitBal = '" + AcDebitBal + "', AcCreditBal = '" + AcCreditBal + "', AcPassward = '" + AcPassward
-                                            + "', ClientID = '" + ClientID + "', ClientUserID = '" + ClientUserID + "', SysCode = '" + SysCode + "', NetCode = '" + NetCode + "', UpdatedDate = '" + UpdatedDate + "', SerialNo = '" + SerialNo
-                                            + "', UserRights = '" + UserRights + "', SecurityRights = '" + SecurityRights + "', Salary ='" + Salary + "' WHERE AcNameID = " + AcNameID;
-                                    databaseHelper.updateAccount3Name(query);
-                                    updatedDate = SessionDate;
-
-                                }
-                                Log.e("key", "All Fields Up To dated");
-                                getReports();
-                            } else {
-                                String message = jsonObj.getString("message");
-                                MNotificationClass.ShowToastTem(getContext(), message);
-                            }
-
-                            Log.e("Sarem", "CashBook1");
-                            //Previously Added Function
-                            // getCashBook1();
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                            GenericConstants.ShowDebugModeDialog(getContext(),
-                                    "Error", e.getMessage());
-                        }
-
-                        ////Calling Next Method
-                        getAccount3Name();
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                ////Calling Next Method
-                getAccount3Name();
-                mProgress.dismiss();
-                GenericConstants.ShowDebugModeDialog(getContext(),
-                        "Error", error.getMessage());
-                Log.e("Error", error.toString());
-            }
-        }) {
-            @Override
-            protected Map<String, String> getParams() {
-                Map<String, String> params = new HashMap<String, String>();
-
-
-                int maxID = databaseHelper.getMaxValue("SELECT max(CAST(AcNameID AS Int)) FROM Account3Name");
-
-                //  String date = databaseHelper.getClientUpdatedDate(prefrence.getClientIDSession());
-                String date = databaseHelper.getAccount3NameMaxUpdatedDate(prefrence.getClientIDSession());
-
-                ///////////////////must send date in single quotes
-                ///////////////////////////trim last 3 zero of the date other wise server not accept it
-                date = date.trim();
-                date = date.substring(0, date.length() - 3);
-                params.put("ClientID", prefrence.getClientIDSession());
-                params.put("MaxID", String.valueOf(maxID));
-                params.put("SessionDate", "'" + date + "'");
-                Log.e("key", "Look For Updata Server CLIID:" + prefrence.getClientUserIDSession() + " MaxID:" + maxID + " Serssion Date " + date);
-                return params;
-            }
-        };
-        int socketTimeout = 10000;//10 seconds
-        RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
-        jsonObjectRequest.setRetryPolicy(policy);
-        AppController.getInstance().addToRequestQueue(jsonObjectRequest, tag_json_obj);
-        ///////CAlling Next Method
-
-    }
-
-    /////////////////////Record That Are New on The server
-    public void getAccount3Name() {
-        Log.e("method", "Flag 2 MathodName::getAccount3Name");
-
-        if (GenericConstants.IS_DEBUG_MODE_ENABLED)
-            mProgress.setMessage("Loading... getNew InsertDataFromServer Method:getAccount3Name CLI " + prefrence.getClientIDSession());
-        mProgress.show();
-        String tag_json_obj = "json_obj_req";
-        String u = "http://69.167.137.121/plesk-site-preview/sky.com.pk/shadiHall/RefreshAccount3Name.php";
-
-        StringRequest jsonObjectRequest = new StringRequest(com.android.volley.Request.Method.POST, u,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        mProgress.dismiss();
-                        JSONObject jsonObj = null;
-
-                        try {
-                            jsonObj = new JSONObject(response);
-                            String success = jsonObj.getString("success");
-                            Log.e("Account3Name1", jsonObj.toString());
-                            if (success.equals("1")) {
-                                JSONArray jsonArray = jsonObj.getJSONArray("Account3Name");
-                                for (int i = 0; i < jsonArray.length(); i++) {
-                                    JSONObject jsonObject = jsonArray.getJSONObject(i);
-                                    Log.e("Account3Name", jsonObject.toString());
-                                    String AcNameID = jsonObject.getString("AcNameID");
-                                    String AcName = jsonObject.getString("AcName");
-                                    String AcGroupID = jsonObject.getString("AcGroupID");
-                                    String AcAddress = jsonObject.getString("AcAddress");
-                                    String AcMobileNo = jsonObject.getString("AcMobileNo");
-                                    String AcContactNo = jsonObject.getString("AcContactNo");
-                                    String AcEmailAddress = jsonObject.getString("AcEmailAddress");
-                                    String AcDebitBal = jsonObject.getString("AcDebitBal");
-                                    String AcCreditBal = jsonObject.getString("AcCreditBal");
-                                    String AcPassward = jsonObject.getString("AcPassward");
-                                    String ClientID = jsonObject.getString("ClientID");
-                                    String ClientUserID = jsonObject.getString("ClientUserID");
-                                    String SysCode = jsonObject.getString("SysCode");
-                                    String NetCode = jsonObject.getString("NetCode");
-                                    String ed = jsonObject.getString("UpdatedDate");
-                                    JSONObject jbb = new JSONObject(ed);
-                                    String UpdatedDate = jbb.getString("date");
-                                    String SerialNo = jsonObject.getString("SerialNo");
-                                    String UserRights = jsonObject.getString("UserRights");
-                                    String SecurityRights = jsonObject.getString("SecurityRights");
-                                    String Salary = jsonObject.getString("Salary");
-                                    String SessionDate = jsonObject.getString("SessionDate");
-
-                                    databaseHelper.createAccount3Name(new Account3Name(AcNameID, AcName, AcGroupID, AcAddress, AcMobileNo, AcContactNo, AcEmailAddress, AcDebitBal, AcCreditBal, AcPassward, ClientID, ClientUserID, SysCode, NetCode, UpdatedDate, SerialNo, UserRights, SecurityRights, Salary));
-                                    updatedDate = SessionDate;
-///////////////////////////////////////Calling This method to update the list of Account3Name data
-                                    getReports();
-//                                    if (i == jsonArray.length() - 1) {
-//                                        List<TableSession> se = TableSession.find(TableSession.class,"table_Name = ?","Account3Name");
-//                                        for (TableSession s : se){
-//                                            s.setMaxID(AcNameID);
-//                                            s.setInsertDate(SessionDate);
-//                                            s.save();
-//                                        }
+//    public void updateAccount3Name() {
+//        Log.e("method", "Flag 1 MathodName::updateAccount3Name");
 //
-//                                    }
-
-                                }
-                                if (GenericConstants.IS_DEBUG_MODE_ENABLED)
-                                    MNotificationClass.ShowToast(getContext(), "No of new inserted record " + jsonArray.length());
-
-                            } else {
-                                String message = jsonObj.getString("message");
-                                MNotificationClass.ShowToastTem(getContext(), message);
-                            }
-
-                        } catch (JSONException e) {
-                            GenericConstants.ShowDebugModeDialog(getContext(),
-                                    "Error", e.getMessage());
-                            e.printStackTrace();
-                        }
-                        //////////Calling Next Method
-                        updateAccount3Name1();
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                //////////Calling Next Method
-                updateAccount3Name1();
-                mProgress.dismiss();
-                Log.e("Error", error.toString());
-                GenericConstants.ShowDebugModeDialog(getContext(),
-                        "Error", error.getMessage());
-//                Toast.makeText(SplashActivity.this, error.toString(), Toast.LENGTH_LONG).show();
-            }
-        }) {
-            @Override
-            protected Map<String, String> getParams() {
-                Map<String, String> params = new HashMap<String, String>();
-
-                params.put("ClientID", prefrence.getClientIDSession());
-                int maxID = databaseHelper.getMaxValue("SELECT max(CAST(AcNameID AS Int)) FROM Account3Name");
-                params.put("MaxID", String.valueOf(maxID));
-                Log.e("key", "MaxID" + maxID);
-                return params;
-            }
-        };
-        int socketTimeout = 10000;//10 seconds
-        RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
-        jsonObjectRequest.setRetryPolicy(policy);
-        AppController.getInstance().addToRequestQueue(jsonObjectRequest, tag_json_obj);
-
-    }
-
-    ////////////////////Record That are Edited on Sqlite
-    public void updateAccount3Name1() {
-        Log.e("method", "Flag 3 MathodName::updateAccount3Name1");
-        mProgress.show();
-        if (GenericConstants.IS_DEBUG_MODE_ENABLED)
-            mProgress.setMessage("Loading... updateAccount3Name1 UpDateRecordFromSqliteToCloud Method:updateAccount3Name1 CLI " + prefrence.getClientIDSession());
-
-        String query = "SELECT * FROM Account3Name WHERE UpdatedDate = '" + GenericConstants.NullFieldStandardText + "'";
-        final List<Account3Name> addBooking = databaseHelper.getAccount3Name(query);
-        Log.e("BookingID UP", String.valueOf(addBooking.size()));
-
-        for (final Account3Name c : addBooking) {
-            Log.e("BookingID UP", "DAta" + c.toString());
-            String tag_json_obj = "json_obj_req";
-            String url = "http://69.167.137.121/plesk-site-preview/sky.com.pk/shadiHall/UpdateCharofAcc.php";
-
-            StringRequest jsonObjectRequest = new StringRequest(Request.Method.POST, url,
-                    new Response.Listener<String>() {
-                        @Override
-                        public void onResponse(String response) {
-                            mProgress.dismiss();
-                            Log.e("Account3Name4", response);
-                            try {
-                                JSONObject jsonObject = new JSONObject(response);
-                                String success = jsonObject.getString("success");
-                                Log.e("Success CB", success);
-                                if (success.equals("1")) {
-                                    String UpdatedDate = jsonObject.getString("UpdatedDate");
-                                    String message = jsonObject.getString("message");
-                                    databaseHelper.updateCashBook("UPDATE Account3Name SET UpdatedDate = '" + UpdatedDate + "' WHERE ID = " + c.getId());
-                                    updatedDate = UpdatedDate;
-                                    getReports();
-//                                    List<TableSession> se = TableSession.find(TableSession.class,"table_Name = ?","Account3Name");
-//                                    for (TableSession s : se){
-//                                        s.setUpdateDate(UpdatedDate);
-//                                        s.save();
-//                                    }
-                                    databaseHelper.updateClient("UPDATE Client SET UpdatedDate = '" + updatedDate + "' WHERE ClientID = " + prefrence.getClientIDSession());
-                                }
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-
-                        }
-                    }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    //////////////////////////////////Calling Next Methos
-                    addAccount3Name();
-                    mProgress.dismiss();
-                    Log.e("Error", error.toString());
-//                    Toast.makeText(CashCollectionActivity.this, error.toString(), Toast.LENGTH_SHORT).show();
-                }
-            }) {
-                @Override
-                protected Map<String, String> getParams() {
-
-                    Map<String, String> params = new HashMap<String, String>();
-
-                    params.put("AcNameID", c.getAcNameID());
-                    params.put("AcName", c.getAcName());
-                    params.put("AcAddress", c.getAcAddress());
-                    params.put("AcContactNo", c.getAcContactNo());
-                    params.put("AcEmailAddress", c.getAcEmailAddress());
-                    params.put("Salary", c.getSalary());
-                    params.put("AcMobileNo", c.getAcMobileNo());
-                    params.put("AcPassward", c.getAcPassward());
-                    params.put("SecurityRights", c.getSecurityRights());
-                    params.put("ClientID", prefrence.getClientIDSession());
-                    params.put("AcGroupID", c.getAcGroupID());
-
-                    return params;
-                }
-            };
-            int socketTimeout = 30000;//30 seconds - change to what you want
-            RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
-            jsonObjectRequest.setRetryPolicy(policy);
-            AppController.getInstance().addToRequestQueue(jsonObjectRequest, tag_json_obj);
-        }
-        //////////////////////////////////Calling Next Methos
-        addAccount3Name();
-        getReports();
-        if (addBooking.size() == 0) {
-            databaseHelper.updateClient("UPDATE Client SET UpdatedDate = '" + updatedDate + "' WHERE ClientID = " + prefrence.getClientIDSession());
-        }
-
-    }
-
-    ////////////////Record That are added in sqlite and not Uploaded on server
-    public void addAccount3Name() {
-        Log.e("method", "Flag 4 MathodName::addAccount3Name");
-
-        if (GenericConstants.IS_DEBUG_MODE_ENABLED)
-            mProgress.setMessage("Loading... addFromSqliteToCloud Method:addAccount3Name CLI " + prefrence.getClientIDSession());
-
-        String query = "SELECT * FROM Account3Name WHERE  AcNameID = 0 AND UpdatedDate = '" + GenericConstants.NullFieldStandardText + "'";
-        final List<Account3Name> addBooking = databaseHelper.getAccount3Name(query);
-        Log.e("BookingID UP", String.valueOf(addBooking.size()));
-
-        for (final Account3Name c : addBooking) {
-            mProgress.show();
-            String tag_json_obj = "json_obj_req";
-            String url = "http://69.167.137.121/plesk-site-preview/sky.com.pk/BilalApi/AddCharofAcc.php";
-
-            StringRequest jsonObjectRequest = new StringRequest(Request.Method.POST, url,
-                    new Response.Listener<String>() {
-                        @Override
-                        public void onResponse(String response) {
-                            mProgress.dismiss();
-                            Log.e("Account3Name", response);
-                            try {
-                                JSONObject jsonObject = new JSONObject(response);
-                                String success = jsonObject.getString("success");
-                                Log.e("Success CB", success);
-                                if (success.equals("1")) {
-                                    String id = jsonObject.getString("AcNameID");
-                                    String UpdatedDate = jsonObject.getString("UpdatedDate");
-                                    String message = jsonObject.getString("message");
-                                    databaseHelper.updateCashBook("UPDATE Account3Name SET AcNameID = '" + id + "', UpdatedDate = '" + UpdatedDate + "' WHERE ID = " + c.getId());
-                                    updatedDate = UpdatedDate;
-                                    if (GenericConstants.IS_DEBUG_MODE_ENABLED)
-                                        Toast.makeText(getContext(), id + " Recourd Updated", Toast.LENGTH_SHORT).show();
-                                    getReports();
-//                                    List<TableSession> se = TableSession.find(TableSession.class,"table_Name = ?","Account3Name");
-//                                    for (TableSession s : se){
-//                                        s.setMaxID(id);
-//                                        s.setInsertDate(UpdatedDate);
-//                                        s.save();
-//                                    }
-                                } else {
-                                    databaseHelper.deleteAccount3NameEntry("DELETE FROM Account3Name WHERE ID = " + c.getId());
-                                    String message = jsonObject.getString("message");
-                                    if (GenericConstants.IS_DEBUG_MODE_ENABLED)
-                                        Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
-                                }
-                            } catch (JSONException e) {
-                                MNotificationClass.ShowToastTem(getContext(), e.getMessage() + " -" + response);
-                                e.printStackTrace();
-                            }
-
-                        }
-                    }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    mProgress.dismiss();
-                    GenericConstants.ShowDebugModeDialog(getContext(),
-                            "Error", error.getMessage());
-//                    Toast.makeText(CashCollectionActivity.this, error.toString(), Toast.LENGTH_SHORT).show();
-                }
-            }) {
-                @Override
-                protected Map<String, String> getParams() {
-
-                    Map<String, String> params = new HashMap<String, String>();
-                    ///Parameter Sequences
-//                    isset($_POST['AcName']) && --
-//                    isset($_POST['AcAddress']) ---
-//                            && isset($_POST['AcContactNo']) && ---
-//                            isset($_POST['AcEmailAddress']) ---
-//                            && isset($_POST['Salary'])---
-//                            && isset($_POST['AcMobileNo']) && ---
-//                            isset($_POST['AcPassward']) ---
-//                            && isset($_POST['SecurityRights']) && ----
-//                            isset($_POST['ClientID']) -----
-//                            && isset($_POST['AcGroupID']) && ---
-//                            isset($_POST['SerialNo'])  ----
-//                            &&  isset($_POST['AcDebitBal']) && ---
-//                            isset($_POST[' AcCreditBal']) ----
-//                            && isset($_POST['ClientUserID']) && ---
-//                            isset($_POST['SysCode']) ---
-//                            && isset($_POST['NetCode']) &&----
-//                            isset($_POST['UpdatedDate']) ----
-//                            && isset($_POST['UserRights']) && ---
-//                            isset($_POST['AccountPhoto']---
-                    Log.e("key", "Set Pram ::" + c.toString());
-                    params.put("AcName", c.getAcName());
-                    params.put("AcGroupID", c.getAcGroupID());
-                    params.put("AcAddress", c.getAcAddress());
-                    params.put("AcContactNo", c.getAcContactNo());
-                    params.put("AcEmailAddress", c.getAcEmailAddress());
-                    params.put("Salary", c.getSalary());
-                    params.put("AcMobileNo", c.getAcMobileNo());
-                    params.put("AcPassward", c.getAcPassward());
-                    params.put("SecurityRights", c.getSecurityRights());
-                    params.put("ClientID", prefrence.getClientIDSession());
-                    /////////////////////////////////
-                    params.put("UpdatedDate", c.getUpdatedDate());
-                    //params.put("AcNameID", c.getAcNameID());
-                    params.put("SerialNo", c.getSerialNo());
-                    params.put("AcDebitBal", c.getAcDebitBal());
-                    params.put("AcCreditBal", c.getAcCreditBal());
-                    params.put("ClientUserID", c.getClientUserID());
-                    params.put("SysCode", c.getSysCode());
-                    params.put("NetCode", c.getNetCode());
-                    params.put("UserRights", c.getUserRights());
-                    params.put("AccountPhoto", "Not Set Yet ");
-
-                    return params;
-                }
-            };
-
-            int socketTimeout = 30000;//30 seconds - change to what you want
-            RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
-            jsonObjectRequest.setRetryPolicy(policy);
-            AppController.getInstance().addToRequestQueue(jsonObjectRequest, tag_json_obj);
-        }
-        mProgress.dismiss();
-        MNotificationClass.ShowToast(getContext(), "All Done");
-        if (addBooking.size() < 0)
-            GenericConstants.ShowDebugModeDialog(getContext(), "Error", "Updated Data Not Found ");
-    }
+//        mProgress.show();
+//        if (GenericConstants.IS_DEBUG_MODE_ENABLED)
+//            mProgress.setMessage("Loading... getUpdatedData updateAccount3Name Method:updateAccount3Name CLI " + prefrence.getClientIDSession());
+//
+//        String tag_json_obj = "json_obj_req";
+//        String u = "http://69.167.137.121/plesk-site-preview/sky.com.pk/shadiHall/RefreshAccount3Name.php";
+//
+//        StringRequest jsonObjectRequest = new StringRequest(com.android.volley.Request.Method.POST, u,
+//                new Response.Listener<String>() {
+//                    @Override
+//                    public void onResponse(String response) {
+//                        mProgress.dismiss();
+//                        JSONObject jsonObj = null;
+//
+//                        try {
+//                            jsonObj = new JSONObject(response);
+//                            String success = jsonObj.getString("success");
+//                            Log.e("Account3Name2", jsonObj.toString());
+//                            if (success.equals("1")) {
+//                                JSONArray jsonArray = jsonObj.getJSONArray("Account3Name");
+//                                for (int i = 0; i < jsonArray.length(); i++) {
+//                                    JSONObject jsonObject = jsonArray.getJSONObject(i);
+//                                    Log.e("Account3Name", jsonObject.toString());
+//                                    String AcNameID = jsonObject.getString("AcNameID");
+//                                    String AcName = jsonObject.getString("AcName");
+//                                    String AcGroupID = jsonObject.getString("AcGroupID");
+//                                    String AcAddress = jsonObject.getString("AcAddress");
+//                                    String AcMobileNo = jsonObject.getString("AcMobileNo");
+//                                    String AcContactNo = jsonObject.getString("AcContactNo");
+//                                    String AcEmailAddress = jsonObject.getString("AcEmailAddress");
+//                                    String AcDebitBal = jsonObject.getString("AcDebitBal");
+//                                    String AcCreditBal = jsonObject.getString("AcCreditBal");
+//                                    String AcPassward = jsonObject.getString("AcPassward");
+//                                    String ClientID = jsonObject.getString("ClientID");
+//                                    String ClientUserID = jsonObject.getString("ClientUserID");
+//                                    String SysCode = jsonObject.getString("SysCode");
+//                                    String NetCode = jsonObject.getString("NetCode");
+//                                    String ed = jsonObject.getString("UpdatedDate");
+//                                    JSONObject jbb = new JSONObject(ed);
+//                                    String UpdatedDate = jbb.getString("date");
+//                                    String SerialNo = jsonObject.getString("SerialNo");
+//                                    String UserRights = jsonObject.getString("UserRights");
+//                                    String SecurityRights = jsonObject.getString("SecurityRights");
+//                                    String Salary = jsonObject.getString("Salary");
+//                                    String SessionDate = jsonObject.getString("SessionDate");
+//
+//                                    String query = "UPDATE Account3Name SET AcNameID = '" + AcNameID + "', AcName = '" + AcName + "', AcGroupID = '" + AcGroupID + "', AcAddress = '" + AcAddress + "', AcMobileNo = '" + AcMobileNo
+//                                            + "', AcContactNo = '" + AcContactNo + "', AcEmailAddress = '" + AcEmailAddress + "', AcDebitBal = '" + AcDebitBal + "', AcCreditBal = '" + AcCreditBal + "', AcPassward = '" + AcPassward
+//                                            + "', ClientID = '" + ClientID + "', ClientUserID = '" + ClientUserID + "', SysCode = '" + SysCode + "', NetCode = '" + NetCode + "', UpdatedDate = '" + UpdatedDate + "', SerialNo = '" + SerialNo
+//                                            + "', UserRights = '" + UserRights + "', SecurityRights = '" + SecurityRights + "', Salary ='" + Salary + "' WHERE AcNameID = " + AcNameID;
+//                                    databaseHelper.updateAccount3Name(query);
+//                                    updatedDate = SessionDate;
+//
+//                                }
+//                                Log.e("key", "All Fields Up To dated");
+//                                getReports();
+//                            } else {
+//                                String message = jsonObj.getString("message");
+//                                MNotificationClass.ShowToastTem(getContext(), message);
+//                            }
+//
+//                            Log.e("Sarem", "CashBook1");
+//                            //Previously Added Function
+//                            // getCashBook1();
+//                        } catch (JSONException e) {
+//                            e.printStackTrace();
+//                            GenericConstants.ShowDebugModeDialog(getContext(),
+//                                    "Error", e.getMessage());
+//                        }
+//
+//                        ////Calling Next Method
+//                        getAccount3Name();
+//                    }
+//                }, new Response.ErrorListener() {
+//            @Override
+//            public void onErrorResponse(VolleyError error) {
+//                ////Calling Next Method
+//                getAccount3Name();
+//                mProgress.dismiss();
+//                GenericConstants.ShowDebugModeDialog(getContext(),
+//                        "Error", error.getMessage());
+//                Log.e("Error", error.toString());
+//            }
+//        }) {
+//            @Override
+//            protected Map<String, String> getParams() {
+//                Map<String, String> params = new HashMap<String, String>();
+//
+//
+//                int maxID = databaseHelper.getMaxValue("SELECT max(CAST(AcNameID AS Int)) FROM Account3Name");
+//
+//                //  String date = databaseHelper.getClientUpdatedDate(prefrence.getClientIDSession());
+//                String date = databaseHelper.getAccount3NameMaxUpdatedDate(prefrence.getClientIDSession());
+//
+//                ///////////////////must send date in single quotes
+//                ///////////////////////////trim last 3 zero of the date other wise server not accept it
+//                date = date.trim();
+//                date = date.substring(0, date.length() - 3);
+//                params.put("ClientID", prefrence.getClientIDSession());
+//                params.put("MaxID", String.valueOf(maxID));
+//                params.put("SessionDate", "'" + date + "'");
+//                Log.e("key", "Look For Updata Server CLIID:" + prefrence.getClientUserIDSession() + " MaxID:" + maxID + " Serssion Date " + date);
+//                return params;
+//            }
+//        };
+//        int socketTimeout = 10000;//10 seconds
+//        RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
+//        jsonObjectRequest.setRetryPolicy(policy);
+//        AppController.getInstance().addToRequestQueue(jsonObjectRequest, tag_json_obj);
+//        ///////CAlling Next Method
+//
+//    }
+//
+//    /////////////////////Record That Are New on The server
+//    public void getAccount3Name() {
+//        Log.e("method", "Flag 2 MathodName::getAccount3Name");
+//
+//        if (GenericConstants.IS_DEBUG_MODE_ENABLED)
+//            mProgress.setMessage("Loading... getNew InsertDataFromServer Method:getAccount3Name CLI " + prefrence.getClientIDSession());
+//        mProgress.show();
+//        String tag_json_obj = "json_obj_req";
+//        String u = "http://69.167.137.121/plesk-site-preview/sky.com.pk/shadiHall/RefreshAccount3Name.php";
+//
+//        StringRequest jsonObjectRequest = new StringRequest(com.android.volley.Request.Method.POST, u,
+//                new Response.Listener<String>() {
+//                    @Override
+//                    public void onResponse(String response) {
+//                        mProgress.dismiss();
+//                        JSONObject jsonObj = null;
+//
+//                        try {
+//                            jsonObj = new JSONObject(response);
+//                            String success = jsonObj.getString("success");
+//                            Log.e("Account3Name1", jsonObj.toString());
+//                            if (success.equals("1")) {
+//                                JSONArray jsonArray = jsonObj.getJSONArray("Account3Name");
+//                                for (int i = 0; i < jsonArray.length(); i++) {
+//                                    JSONObject jsonObject = jsonArray.getJSONObject(i);
+//                                    Log.e("Account3Name", jsonObject.toString());
+//                                    String AcNameID = jsonObject.getString("AcNameID");
+//                                    String AcName = jsonObject.getString("AcName");
+//                                    String AcGroupID = jsonObject.getString("AcGroupID");
+//                                    String AcAddress = jsonObject.getString("AcAddress");
+//                                    String AcMobileNo = jsonObject.getString("AcMobileNo");
+//                                    String AcContactNo = jsonObject.getString("AcContactNo");
+//                                    String AcEmailAddress = jsonObject.getString("AcEmailAddress");
+//                                    String AcDebitBal = jsonObject.getString("AcDebitBal");
+//                                    String AcCreditBal = jsonObject.getString("AcCreditBal");
+//                                    String AcPassward = jsonObject.getString("AcPassward");
+//                                    String ClientID = jsonObject.getString("ClientID");
+//                                    String ClientUserID = jsonObject.getString("ClientUserID");
+//                                    String SysCode = jsonObject.getString("SysCode");
+//                                    String NetCode = jsonObject.getString("NetCode");
+//                                    String ed = jsonObject.getString("UpdatedDate");
+//                                    JSONObject jbb = new JSONObject(ed);
+//                                    String UpdatedDate = jbb.getString("date");
+//                                    String SerialNo = jsonObject.getString("SerialNo");
+//                                    String UserRights = jsonObject.getString("UserRights");
+//                                    String SecurityRights = jsonObject.getString("SecurityRights");
+//                                    String Salary = jsonObject.getString("Salary");
+//                                    String SessionDate = jsonObject.getString("SessionDate");
+//
+//                                    databaseHelper.createAccount3Name(new Account3Name(AcNameID, AcName, AcGroupID, AcAddress, AcMobileNo, AcContactNo, AcEmailAddress, AcDebitBal, AcCreditBal, AcPassward, ClientID, ClientUserID, SysCode, NetCode, UpdatedDate, SerialNo, UserRights, SecurityRights, Salary));
+//                                    updatedDate = SessionDate;
+/////////////////////////////////////////Calling This method to update the list of Account3Name data
+//                                    getReports();
+////                                    if (i == jsonArray.length() - 1) {
+////                                        List<TableSession> se = TableSession.find(TableSession.class,"table_Name = ?","Account3Name");
+////                                        for (TableSession s : se){
+////                                            s.setMaxID(AcNameID);
+////                                            s.setInsertDate(SessionDate);
+////                                            s.save();
+////                                        }
+////
+////                                    }
+//
+//                                }
+//                                if (GenericConstants.IS_DEBUG_MODE_ENABLED)
+//                                    MNotificationClass.ShowToast(getContext(), "No of new inserted record " + jsonArray.length());
+//
+//                            } else {
+//                                String message = jsonObj.getString("message");
+//                                MNotificationClass.ShowToastTem(getContext(), message);
+//                            }
+//
+//                        } catch (JSONException e) {
+//                            GenericConstants.ShowDebugModeDialog(getContext(),
+//                                    "Error", e.getMessage());
+//                            e.printStackTrace();
+//                        }
+//                        //////////Calling Next Method
+//                        updateAccount3Name1();
+//                    }
+//                }, new Response.ErrorListener() {
+//            @Override
+//            public void onErrorResponse(VolleyError error) {
+//                //////////Calling Next Method
+//                updateAccount3Name1();
+//                mProgress.dismiss();
+//                Log.e("Error", error.toString());
+//                GenericConstants.ShowDebugModeDialog(getContext(),
+//                        "Error", error.getMessage());
+////                Toast.makeText(SplashActivity.this, error.toString(), Toast.LENGTH_LONG).show();
+//            }
+//        }) {
+//            @Override
+//            protected Map<String, String> getParams() {
+//                Map<String, String> params = new HashMap<String, String>();
+//
+//                params.put("ClientID", prefrence.getClientIDSession());
+//                int maxID = databaseHelper.getMaxValue("SELECT max(CAST(AcNameID AS Int)) FROM Account3Name");
+//                params.put("MaxID", String.valueOf(maxID));
+//                Log.e("key", "MaxID" + maxID);
+//                return params;
+//            }
+//        };
+//        int socketTimeout = 10000;//10 seconds
+//        RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
+//        jsonObjectRequest.setRetryPolicy(policy);
+//        AppController.getInstance().addToRequestQueue(jsonObjectRequest, tag_json_obj);
+//
+//    }
+//
+//    ////////////////////Record That are Edited on Sqlite
+//    public void updateAccount3Name1() {
+//        Log.e("method", "Flag 3 MathodName::updateAccount3Name1");
+//        mProgress.show();
+//        if (GenericConstants.IS_DEBUG_MODE_ENABLED)
+//            mProgress.setMessage("Loading... updateAccount3Name1 UpDateRecordFromSqliteToCloud Method:updateAccount3Name1 CLI " + prefrence.getClientIDSession());
+//
+//        String query = "SELECT * FROM Account3Name  WHERE AcNameID > 0 AND UpdatedDate = '" + GenericConstants.NullFieldStandardText + "'";
+//        final List<Account3Name> addBooking = databaseHelper.getAccount3Name(query);
+//        Log.e("BookingID UP", String.valueOf(addBooking.size()));
+//
+//        for (final Account3Name c : addBooking) {
+//            Log.e("BookingID UP", "DAta" + c.toString());
+//            String tag_json_obj = "json_obj_req";
+//            String url = "http://69.167.137.121/plesk-site-preview/sky.com.pk/shadiHall/UpdateCharofAcc.php";
+//
+//            StringRequest jsonObjectRequest = new StringRequest(Request.Method.POST, url,
+//                    new Response.Listener<String>() {
+//                        @Override
+//                        public void onResponse(String response) {
+//                            mProgress.dismiss();
+//                            Log.e("Account3Name4", response);
+//                            try {
+//                                JSONObject jsonObject = new JSONObject(response);
+//                                String success = jsonObject.getString("success");
+//                                Log.e("Success CB", success);
+//                                if (success.equals("1")) {
+//                                    String UpdatedDate = jsonObject.getString("UpdatedDate");
+//                                    String message = jsonObject.getString("message");
+//                                    databaseHelper.updateCashBook("UPDATE Account3Name SET UpdatedDate = '" + UpdatedDate + "' WHERE ID = " + c.getId());
+//                                    updatedDate = UpdatedDate;
+//                                    getReports();
+////                                    List<TableSession> se = TableSession.find(TableSession.class,"table_Name = ?","Account3Name");
+////                                    for (TableSession s : se){
+////                                        s.setUpdateDate(UpdatedDate);
+////                                        s.save();
+////                                    }
+//                                    databaseHelper.updateClient("UPDATE Client SET UpdatedDate = '" + updatedDate + "' WHERE ClientID = " + prefrence.getClientIDSession());
+//                                }
+//                            } catch (JSONException e) {
+//                                e.printStackTrace();
+//                            }
+//
+//                        }
+//                    }, new Response.ErrorListener() {
+//                @Override
+//                public void onErrorResponse(VolleyError error) {
+//                    //////////////////////////////////Calling Next Methos
+//                    addAccount3Name();
+//                    mProgress.dismiss();
+//                    Log.e("Error", error.toString());
+////                    Toast.makeText(CashCollectionActivity.this, error.toString(), Toast.LENGTH_SHORT).show();
+//                }
+//            }) {
+//                @Override
+//                protected Map<String, String> getParams() {
+//
+//                    Map<String, String> params = new HashMap<String, String>();
+//
+//                    params.put("AcNameID", c.getAcNameID());
+//                    params.put("AcName", c.getAcName());
+//                    params.put("AcAddress", c.getAcAddress());
+//                    params.put("AcContactNo", c.getAcContactNo());
+//                    params.put("AcEmailAddress", c.getAcEmailAddress());
+//                    params.put("Salary", c.getSalary());
+//                    params.put("AcMobileNo", c.getAcMobileNo());
+//                    params.put("AcPassward", c.getAcPassward());
+//                    params.put("SecurityRights", c.getSecurityRights());
+//                    params.put("ClientID", prefrence.getClientIDSession());
+//                    params.put("AcGroupID", c.getAcGroupID());
+//
+//                    return params;
+//                }
+//            };
+//            int socketTimeout = 30000;//30 seconds - change to what you want
+//            RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
+//            jsonObjectRequest.setRetryPolicy(policy);
+//            AppController.getInstance().addToRequestQueue(jsonObjectRequest, tag_json_obj);
+//        }
+//        //////////////////////////////////Calling Next Methos
+//        addAccount3Name();
+//        getReports();
+//        if (addBooking.size() == 0) {
+//            databaseHelper.updateClient("UPDATE Client SET UpdatedDate = '" + updatedDate + "' WHERE ClientID = " + prefrence.getClientIDSession());
+//        }
+//
+//    }
+//
+//    ////////////////Record That are added in sqlite and not Uploaded on server
+//    public void addAccount3Name() {
+//        Log.e("method", "Flag 4 MathodName::addAccount3Name");
+//
+//        if (GenericConstants.IS_DEBUG_MODE_ENABLED)
+//            mProgress.setMessage("Loading... addFromSqliteToCloud Method:addAccount3Name CLI " + prefrence.getClientIDSession());
+//
+//        String query = "SELECT * FROM Account3Name WHERE  AcNameID < 0 AND UpdatedDate = '" + GenericConstants.NullFieldStandardText + "'";
+//        final List<Account3Name> addBooking = databaseHelper.getAccount3Name(query);
+//        Log.e("BookingID UP", String.valueOf(addBooking.size()));
+//
+//        for (final Account3Name c : addBooking) {
+//            mProgress.show();
+//            String tag_json_obj = "json_obj_req";
+//            String url = "http://69.167.137.121/plesk-site-preview/sky.com.pk/BilalApi/AddCharofAcc.php";
+//
+//            StringRequest jsonObjectRequest = new StringRequest(Request.Method.POST, url,
+//                    new Response.Listener<String>() {
+//                        @Override
+//                        public void onResponse(String response) {
+//                            mProgress.dismiss();
+//                            Log.e("Account3Name", response);
+//                            try {
+//                                JSONObject jsonObject = new JSONObject(response);
+//                                String success = jsonObject.getString("success");
+//                                Log.e("Success CB", success);
+//                                if (success.equals("1")) {
+//                                    String id = jsonObject.getString("AcNameID");
+//                                    String UpdatedDate = jsonObject.getString("UpdatedDate");
+//                                    String message = jsonObject.getString("message");
+//                                    databaseHelper.updateCashBook("UPDATE Account3Name SET AcNameID = '" + id + "', UpdatedDate = '" + UpdatedDate + "' WHERE ID = " + c.getId());
+//                                    updatedDate = UpdatedDate;
+//
+//                                   String iddst= refdb.Account3NameTableFun.UpdateAcNameIDInCashBook(databaseHelper,
+//                                            c.getClientID(),
+//                                            c.getAcNameID(),
+//                                            id);
+////                                    String iddst= refdb.Account3NameTableFun.UpdateAcNameIDInCashBook(
+////                                            databaseHelper,
+////                                            "115",
+////                                            "-2525",
+////                                            "2525");
+//                                    Log.e("oberve",c.toString()+"");
+//                                   Log.e("oberve",iddst+"");
+//                                    if (GenericConstants.IS_DEBUG_MODE_ENABLED)
+//                                        Toast.makeText(getContext(), id + " Recourd Updated", Toast.LENGTH_SHORT).show();
+//                                    getReports();
+////                                    List<TableSession> se = TableSession.find(TableSession.class,"table_Name = ?","Account3Name");
+////                                    for (TableSession s : se){
+////                                        s.setMaxID(id);
+////                                        s.setInsertDate(UpdatedDate);
+////                                        s.save();
+////                                    }
+//                                } else {
+//                                    databaseHelper.deleteAccount3NameEntry("DELETE FROM Account3Name WHERE ID = " + c.getId());
+//                                    String message = jsonObject.getString("message");
+//                                    if (GenericConstants.IS_DEBUG_MODE_ENABLED)
+//                                        Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
+//                                }
+//                            } catch (JSONException e) {
+//                                MNotificationClass.ShowToastTem(getContext(), e.getMessage() + " -" + response);
+//                                e.printStackTrace();
+//                            }
+//
+//                        }
+//                    }, new Response.ErrorListener() {
+//                @Override
+//                public void onErrorResponse(VolleyError error) {
+//                    mProgress.dismiss();
+//                    GenericConstants.ShowDebugModeDialog(getContext(),
+//                            "Error", error.getMessage());
+////                    Toast.makeText(CashCollectionActivity.this, error.toString(), Toast.LENGTH_SHORT).show();
+//                }
+//            }) {
+//                @Override
+//                protected Map<String, String> getParams() {
+//
+//                    Map<String, String> params = new HashMap<String, String>();
+//                    ///Parameter Sequences
+////                    isset($_POST['AcName']) && --
+////                    isset($_POST['AcAddress']) ---
+////                            && isset($_POST['AcContactNo']) && ---
+////                            isset($_POST['AcEmailAddress']) ---
+////                            && isset($_POST['Salary'])---
+////                            && isset($_POST['AcMobileNo']) && ---
+////                            isset($_POST['AcPassward']) ---
+////                            && isset($_POST['SecurityRights']) && ----
+////                            isset($_POST['ClientID']) -----
+////                            && isset($_POST['AcGroupID']) && ---
+////                            isset($_POST['SerialNo'])  ----
+////                            &&  isset($_POST['AcDebitBal']) && ---
+////                            isset($_POST[' AcCreditBal']) ----
+////                            && isset($_POST['ClientUserID']) && ---
+////                            isset($_POST['SysCode']) ---
+////                            && isset($_POST['NetCode']) &&----
+////                            isset($_POST['UpdatedDate']) ----
+////                            && isset($_POST['UserRights']) && ---
+////                            isset($_POST['AccountPhoto']---
+//                    Log.e("key", "Set Pram ::" + c.toString());
+//                    params.put("AcName", c.getAcName());
+//                    params.put("AcGroupID", c.getAcGroupID());
+//                    params.put("AcAddress", c.getAcAddress());
+//                    params.put("AcContactNo", c.getAcContactNo());
+//                    params.put("AcEmailAddress", c.getAcEmailAddress());
+//                    params.put("Salary", c.getSalary());
+//                    params.put("AcMobileNo", c.getAcMobileNo());
+//                    params.put("AcPassward", c.getAcPassward());
+//                    params.put("SecurityRights", c.getSecurityRights());
+//                    params.put("ClientID", prefrence.getClientIDSession());
+//                    /////////////////////////////////
+//                    params.put("UpdatedDate", c.getUpdatedDate());
+//                    //params.put("AcNameID", c.getAcNameID());
+//                    params.put("SerialNo", c.getSerialNo());
+//                    params.put("AcDebitBal", c.getAcDebitBal());
+//                    params.put("AcCreditBal", c.getAcCreditBal());
+//                    params.put("ClientUserID", c.getClientUserID());
+//                    params.put("SysCode", c.getSysCode());
+//                    params.put("NetCode", c.getNetCode());
+//                    params.put("UserRights", c.getUserRights());
+//                    params.put("AccountPhoto", "Not Set Yet ");
+//
+//                    return params;
+//                }
+//            };
+//
+//            int socketTimeout = 30000;//30 seconds - change to what you want
+//            RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
+//            jsonObjectRequest.setRetryPolicy(policy);
+//            AppController.getInstance().addToRequestQueue(jsonObjectRequest, tag_json_obj);
+//        }
+//        mProgress.dismiss();
+//        MNotificationClass.ShowToast(getContext(), "All Done");
+//        if (addBooking.size() < 0)
+//            GenericConstants.ShowDebugModeDialog(getContext(), "Error", "Updated Data Not Found ");
+//    }
 //////////////////////////////////////////////////////////END Account3Name all 4 operations
 
     public void getCashBook1() {
@@ -2034,17 +2061,17 @@ public class ReportsFragment extends Fragment implements View.OnClickListener,
             jsonObjectRequest.setRetryPolicy(policy);
             AppController.getInstance().addToRequestQueue(jsonObjectRequest, tag_json_obj);
         }
-        addAccount3Name();
+       // addAccount3Name();
     }
 
 
-    View.OnLongClickListener longClickListenerForaddbtn = new View.OnLongClickListener() {
-        @Override
-        public boolean onLongClick(View v) {
-            showMyDialogForForm();
-            return true;
-        }
-    };
+//    View.OnLongClickListener longClickListenerForaddbtn = new View.OnLongClickListener() {
+//        @Override
+//        public boolean onLongClick(View v) {
+//            showMyDialogForForm();
+//            return true;
+//        }
+//    };
 
     public void showMyDialogForForm() {
         MNotificationClass.ShowToastTem(getContext(), "ClickLong");

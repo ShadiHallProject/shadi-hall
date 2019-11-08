@@ -7,6 +7,7 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.Environment;
 import android.support.annotation.NonNull;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -43,10 +44,12 @@ import com.itextpdf.text.pdf.PdfWriter;
 
 import org.by9steps.shadihall.AppController;
 import org.by9steps.shadihall.R;
-import org.by9steps.shadihall.activities.AddExpenseActivity;
+
 import org.by9steps.shadihall.activities.BookingActivity;
 import org.by9steps.shadihall.activities.CashCollectionActivity;
 import org.by9steps.shadihall.activities.EventCashBookActivity;
+import org.by9steps.shadihall.activities.MenuClickActivity;
+import org.by9steps.shadihall.chartofaccountdialog.CashBookEntryDialog;
 import org.by9steps.shadihall.fragments.BookingDetailFragment;
 import org.by9steps.shadihall.helper.DatabaseHelper;
 import org.by9steps.shadihall.helper.Prefrence;
@@ -160,6 +163,7 @@ public class RecoveryAdapter extends RecyclerView.Adapter {
                     intent.putExtra("CreditAc", incomeID);
                     intent.putExtra("BookingId", recovery.getBookingID());
                     intent.putExtra("Type", "Income");
+
                     mCtx.startActivity(intent);
 
                 }

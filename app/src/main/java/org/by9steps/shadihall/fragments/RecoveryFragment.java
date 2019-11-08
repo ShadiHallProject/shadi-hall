@@ -258,36 +258,36 @@ public class RecoveryFragment extends Fragment implements View.OnClickListener {
     public void onResume() {
         super.onResume();
         getRecoveryData();
+
     }
 
-    public void getRecoveryData(){
+    public void getRecoveryData() {
 
-        recieved = 0; expense = 0; chargesTotal = 0; balance = 0; profit = 0;
-        gRecieved = 0; gExpense = 0; gChargesTotal = 0; gBalance = 0; gProfit = 0;
+        recieved = 0;
+        expense = 0;
+        chargesTotal = 0;
+        balance = 0;
+        profit = 0;
+        gRecieved = 0;
+        gExpense = 0;
+        gChargesTotal = 0;
+        gBalance = 0;
+        gProfit = 0;
 
-        String query = "";
-            query = "SELECT        derivedtbl_1.ClientID, Booking.BookingID, SUM(derivedtbl_1.Received) AS Recieved, SUM(derivedtbl_1.Expense) AS Expensed, Booking.ChargesTotal, IFNULL(Booking.ChargesTotal, 0) - IFNULL(SUM(derivedtbl_1.Received), 0)\n" +
-                    "                          AS Balance, IFNULL(SUM(derivedtbl_1.Received), 0) - IFNULL(SUM(derivedtbl_1.Expense), 0) AS Profit, Booking.EventName, Booking.EventDate, Booking.ClientName\n" +
-                    "FROM            (SELECT        CashBook.ClientID, CashBook.TableID, SUM(CashBook.Amount) AS Received, 0 AS Expense\n" +
-                    "                          FROM            CashBook INNER JOIN Account3Name ON CashBook.CreditAccount = Account3Name.AcNameID\n" +
-                    "                          WHERE        (Account3Name.AcName = 'Booking Income')\n" +
-                    "                          GROUP BY CashBook.TableID, CashBook.ClientID\n" +
-                    "                          UNION ALL\n" +
-                    "                          SELECT        CashBook_1.ClientID, CashBook_1.TableID, 0 AS Received, SUM(CashBook_1.Amount) AS Expense\n" +
-                    "                          FROM            CashBook AS CashBook_1 INNER JOIN Account3Name AS Account3Name_1 ON CashBook_1.DebitAccount = Account3Name_1.AcNameID\n" +
-                    "                          WHERE        (Account3Name_1.AcName = 'Booking Expense')\n" +
-                    "                          GROUP BY CashBook_1.TableID, CashBook_1.ClientID) AS derivedtbl_1 INNER JOIN\n" +
-                    "                          Booking ON derivedtbl_1.TableID = Booking.BookingID GROUP BY derivedtbl_1.ClientID, Booking.BookingID, Booking.ChargesTotal, Booking.EventName, Booking.EventDate,Booking.ClientName HAVING (derivedtbl_1.ClientID =" + prefrence.getClientIDSession() + ")"+ orderby;
-
-        recoveries = databaseHelper.getRecoveries(query);
+        recoveries = databaseHelper.getRecoveries("select * from ShadiHallBookingProfit");
 
         mList = new ArrayList<>();
 
         for (Recovery r : recoveries) {
-//            String pattern="yyyy-MM-dd";
-//            DateFormat df = new SimpleDateFormat(pattern);
-//            Date date = df.parse(r.getEventDate());
-//            String eventDate = df.format(date);
+            String pattern = "yyyy-MM-dd";
+            DateFormat df = new SimpleDateFormat(pattern);
+            Date date = null;
+            try {
+                date = df.parse(r.getEventDate());
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            String eventDate = df.format(date);
             String[] separated = r.getEventDate().split("-");
 
             if (m == 0) {
@@ -317,7 +317,7 @@ public class RecoveryFragment extends Fragment implements View.OnClickListener {
                 gBalance = Integer.valueOf(r.getBalance()) + gBalance;
                 gProfit = Integer.valueOf(r.getProfit()) + gProfit;
                 mList.add(Recovery.createRow(r.getClientID(), r.getBookingID(), r.getRecieved(), r.getExpensed(), r.getChargesTotal(), r.getBalance(), r.getProfit(), r.getEventName(), r.getEventDate(), r.getClientName()));
-            } else if (m != Integer.valueOf(separated[1]) && m != 0){
+            } else if (m != Integer.valueOf(separated[1]) && m != 0) {
                 mList.add(Recovery.createTotal(String.valueOf(recieved), String.valueOf(expense), String.valueOf(chargesTotal), String.valueOf(balance), String.valueOf(profit)));
                 recieved = 0;
                 expense = 0;
@@ -339,6 +339,8 @@ public class RecoveryFragment extends Fragment implements View.OnClickListener {
                 m = Integer.valueOf(separated[1]);
             }
         }
+
+
 
         mList.add(Recovery.createTotal(String.valueOf(recieved), String.valueOf(expense), String.valueOf(chargesTotal), String.valueOf(balance), String.valueOf(profit)));
         mList.add(Recovery.createSection("Grand Total"));
@@ -556,7 +558,7 @@ public class RecoveryFragment extends Fragment implements View.OnClickListener {
 
     @Override
     public void onClick(View view) {
-        switch (view.getId()){
+        switch (view.getId()) {
             case R.id.r_eventname:
                 orderBy = "EventName";
                 orderBy(orderBy);
@@ -592,7 +594,7 @@ public class RecoveryFragment extends Fragment implements View.OnClickListener {
         }
     }
 
-    public void orderBy(String order_by){
+    public void orderBy(String order_by) {
         if (status == 0) {
             status = 1;
             orderby = " ORDER BY " + order_by + " DESC";
@@ -605,19 +607,19 @@ public class RecoveryFragment extends Fragment implements View.OnClickListener {
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.cb_menu,menu);
+        inflater.inflate(R.menu.cb_menu, menu);
         MenuItem settings = menu.findItem(R.id.action_settings);
         settings.setVisible(false);
         MenuItem refresh = menu.findItem(R.id.action_refresh);
         refresh.setVisible(false);
-        super.onCreateOptionsMenu(menu,inflater);
+        super.onCreateOptionsMenu(menu, inflater);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if(item.getItemId() == android.R.id.home){
+        if (item.getItemId() == android.R.id.home) {
             getActivity().onBackPressed();
-        }else if (item.getItemId() == R.id.action_print){
+        } else if (item.getItemId() == R.id.action_print) {
             try {
                 createPdf();
             } catch (FileNotFoundException e) {
@@ -629,10 +631,10 @@ public class RecoveryFragment extends Fragment implements View.OnClickListener {
             }
 
             return true;
-        }else if (item.getItemId() == R.id.action_refresh){
-            if (isConnected()){
+        } else if (item.getItemId() == R.id.action_refresh) {
+            if (isConnected()) {
                 Toast.makeText(getContext(), "Internet Connected", Toast.LENGTH_SHORT).show();
-            }else {
+            } else {
                 Toast.makeText(getContext(), "Please Check Your Internet Connection", Toast.LENGTH_SHORT).show();
             }
         }
@@ -643,7 +645,7 @@ public class RecoveryFragment extends Fragment implements View.OnClickListener {
     public boolean isConnected() {
         boolean connected = false;
         try {
-            ConnectivityManager cm = (ConnectivityManager)getContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+            ConnectivityManager cm = (ConnectivityManager) getContext().getSystemService(Context.CONNECTIVITY_SERVICE);
             NetworkInfo nInfo = cm.getActiveNetworkInfo();
             connected = nInfo != null && nInfo.isAvailable() && nInfo.isConnected();
             return connected;
@@ -673,15 +675,16 @@ public class RecoveryFragment extends Fragment implements View.OnClickListener {
         document.open();
         document.addLanguage("en-us");
 
-        PdfDictionary parameters = new PdfDictionary();Log.e("PDFDocument","Created2");
+        PdfDictionary parameters = new PdfDictionary();
+        Log.e("PDFDocument", "Created2");
         parameters.put(PdfName.MODDATE, new PdfDate());
 
         Font chapterFont = FontFactory.getFont(FontFactory.HELVETICA, 16, Font.BOLD);
         Font paragraphFont = FontFactory.getFont(FontFactory.HELVETICA, 10, Font.BOLD);
         Chunk chunk = new Chunk("Client Name", chapterFont);
-        Paragraph name = new Paragraph("Address",paragraphFont);
+        Paragraph name = new Paragraph("Address", paragraphFont);
         name.setIndentationLeft(0);
-        Paragraph contact = new Paragraph("Contact",paragraphFont);
+        Paragraph contact = new Paragraph("Contact", paragraphFont);
         contact.setIndentationLeft(0);
 
         PdfPTable title = new PdfPTable(new float[]{3, 3, 3});
@@ -691,17 +694,17 @@ public class RecoveryFragment extends Fragment implements View.OnClickListener {
         title.setWidthPercentage(100);
         title.getDefaultCell().setVerticalAlignment(Element.ALIGN_MIDDLE);
         title.setSpacingBefore(5);
-        title.addCell(footerCell("",PdfPCell.ALIGN_CENTER));
-        PdfPCell cell = new PdfPCell(new Phrase("Profit/Loss By Event",chapterFont));
+        title.addCell(footerCell("", PdfPCell.ALIGN_CENTER));
+        PdfPCell cell = new PdfPCell(new Phrase("Profit/Loss By Event", chapterFont));
         cell.setBorder(PdfPCell.NO_BORDER);
         cell.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
         cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
         title.addCell(cell);
-        title.addCell(footerCell("",PdfPCell.ALIGN_CENTER));
+        title.addCell(footerCell("", PdfPCell.ALIGN_CENTER));
 
-        title.addCell(footerCell("",PdfPCell.ALIGN_CENTER));
-        title.addCell(footerCell("",PdfPCell.ALIGN_CENTER));
-        PdfPCell pCell = new PdfPCell(new Phrase(spinner.getSelectedItem()+": "+searchView.getQuery()));
+        title.addCell(footerCell("", PdfPCell.ALIGN_CENTER));
+        title.addCell(footerCell("", PdfPCell.ALIGN_CENTER));
+        PdfPCell pCell = new PdfPCell(new Phrase(spinner.getSelectedItem() + ": " + searchView.getQuery()));
         pCell.setBorder(PdfPCell.NO_BORDER);
         pCell.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
         pCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
@@ -729,39 +732,47 @@ public class RecoveryFragment extends Fragment implements View.OnClickListener {
             cells[j].setBackgroundColor(BaseColor.PINK);
         }
 
-        recieved = 0; expense = 0; chargesTotal = 0; balance = 0; profit = 0;
-        gRecieved = 0; gExpense = 0; gChargesTotal = 0; gBalance = 0; gProfit = 0;
+        recieved = 0;
+        expense = 0;
+        chargesTotal = 0;
+        balance = 0;
+        profit = 0;
+        gRecieved = 0;
+        gExpense = 0;
+        gChargesTotal = 0;
+        gBalance = 0;
+        gProfit = 0;
 
         Font totalFont = FontFactory.getFont(FontFactory.HELVETICA, 13, Font.BOLD);
-        PdfPCell total = new PdfPCell(new Phrase("Total",totalFont));
+        PdfPCell total = new PdfPCell(new Phrase("Total", totalFont));
         total.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
         total.setVerticalAlignment(Element.ALIGN_MIDDLE);
         total.setFixedHeight(35);
         d = "0";
-        if (filter > 0){
-            for (Recovery c : filterdList){
+        if (filter > 0) {
+            for (Recovery c : filterdList) {
                 String[] separated = null;
                 if (!c.getEventDate().equals(""))
                     separated = c.getEventDate().split("-");
 
-                if (d.equals("0")){
+                if (d.equals("0")) {
                     d = separated[1];
 
-                    PdfPCell section = new PdfPCell(new Phrase(separated[1]+"-"+separated[0],totalFont));
+                    PdfPCell section = new PdfPCell(new Phrase(separated[1] + "-" + separated[0], totalFont));
                     section.setBorder(PdfPCell.NO_BORDER);
                     section.setFixedHeight(30);
                     section.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
                     section.setVerticalAlignment(Element.ALIGN_MIDDLE);
                     table.addCell(section);
-                    table.addCell(footerCell("",PdfPCell.ALIGN_RIGHT));
-                    table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
-                    table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
-                    table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
-                    table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
-                    table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
-                    table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
+                    table.addCell(footerCell("", PdfPCell.ALIGN_RIGHT));
+                    table.addCell(footerCell("", PdfPCell.ALIGN_LEFT));
+                    table.addCell(footerCell("", PdfPCell.ALIGN_LEFT));
+                    table.addCell(footerCell("", PdfPCell.ALIGN_LEFT));
+                    table.addCell(footerCell("", PdfPCell.ALIGN_LEFT));
+                    table.addCell(footerCell("", PdfPCell.ALIGN_LEFT));
+                    table.addCell(footerCell("", PdfPCell.ALIGN_LEFT));
 
-                    table.addCell(getCell(AppController.stringDateFormate("yyyy-MM-dd HH:mm:ss.SSS","yyyy-MM-dd",c.getEventDate()), PdfPCell.ALIGN_LEFT));
+                    table.addCell(getCell(AppController.stringDateFormate("yyyy-MM-dd HH:mm:ss.SSS", "yyyy-MM-dd", c.getEventDate()), PdfPCell.ALIGN_LEFT));
                     table.addCell(getCell(c.getEventName(), PdfPCell.ALIGN_LEFT));
                     table.addCell(getCell(c.getClientName(), PdfPCell.ALIGN_LEFT));
                     table.addCell(getCell(c.getChargesTotal(), PdfPCell.ALIGN_RIGHT));
@@ -780,8 +791,8 @@ public class RecoveryFragment extends Fragment implements View.OnClickListener {
                     gChargesTotal = Integer.valueOf(c.getChargesTotal()) + gChargesTotal;
                     gBalance = Integer.valueOf(c.getBalance()) + gBalance;
                     gProfit = Integer.valueOf(c.getProfit()) + gProfit;
-                }else if (d.equals(separated[1])){
-                    table.addCell(getCell(AppController.stringDateFormate("yyyy-MM-dd HH:mm:ss.SSS","yyyy-MM-dd",c.getEventDate()), PdfPCell.ALIGN_LEFT));
+                } else if (d.equals(separated[1])) {
+                    table.addCell(getCell(AppController.stringDateFormate("yyyy-MM-dd HH:mm:ss.SSS", "yyyy-MM-dd", c.getEventDate()), PdfPCell.ALIGN_LEFT));
                     table.addCell(getCell(c.getEventName(), PdfPCell.ALIGN_LEFT));
                     table.addCell(getCell(c.getClientName(), PdfPCell.ALIGN_LEFT));
                     table.addCell(getCell(c.getChargesTotal(), PdfPCell.ALIGN_RIGHT));
@@ -800,7 +811,7 @@ public class RecoveryFragment extends Fragment implements View.OnClickListener {
                     gChargesTotal = Integer.valueOf(c.getChargesTotal()) + gChargesTotal;
                     gBalance = Integer.valueOf(c.getBalance()) + gBalance;
                     gProfit = Integer.valueOf(c.getProfit()) + gProfit;
-                }else if (!d.equals("0") && !d.equals(separated[1])){
+                } else if (!d.equals("0") && !d.equals(separated[1])) {
 
                     d = separated[1];
 
@@ -813,26 +824,26 @@ public class RecoveryFragment extends Fragment implements View.OnClickListener {
                     table.addCell(getCell(String.valueOf(balance), PdfPCell.ALIGN_RIGHT));
                     table.addCell(getCell(String.valueOf(profit), PdfPCell.ALIGN_RIGHT));
 
-                    PdfPCell section = new PdfPCell(new Phrase(separated[1]+"-"+separated[0],totalFont));
+                    PdfPCell section = new PdfPCell(new Phrase(separated[1] + "-" + separated[0], totalFont));
                     section.setBorder(PdfPCell.NO_BORDER);
                     section.setFixedHeight(30);
                     section.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
                     section.setVerticalAlignment(Element.ALIGN_MIDDLE);
                     table.addCell(section);
-                    table.addCell(footerCell("",PdfPCell.ALIGN_RIGHT));
-                    table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
-                    table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
-                    table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
-                    table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
-                    table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
-                    table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
+                    table.addCell(footerCell("", PdfPCell.ALIGN_RIGHT));
+                    table.addCell(footerCell("", PdfPCell.ALIGN_LEFT));
+                    table.addCell(footerCell("", PdfPCell.ALIGN_LEFT));
+                    table.addCell(footerCell("", PdfPCell.ALIGN_LEFT));
+                    table.addCell(footerCell("", PdfPCell.ALIGN_LEFT));
+                    table.addCell(footerCell("", PdfPCell.ALIGN_LEFT));
+                    table.addCell(footerCell("", PdfPCell.ALIGN_LEFT));
 
                     recieved = 0;
                     expense = 0;
                     chargesTotal = 0;
                     balance = 0;
                     profit = 0;
-                    table.addCell(getCell(AppController.stringDateFormate("yyyy-MM-dd HH:mm:ss.SSS","yyyy-MM-dd",c.getEventDate()), PdfPCell.ALIGN_LEFT));
+                    table.addCell(getCell(AppController.stringDateFormate("yyyy-MM-dd HH:mm:ss.SSS", "yyyy-MM-dd", c.getEventDate()), PdfPCell.ALIGN_LEFT));
                     table.addCell(getCell(c.getEventName(), PdfPCell.ALIGN_LEFT));
                     table.addCell(getCell(c.getClientName(), PdfPCell.ALIGN_LEFT));
                     table.addCell(getCell(c.getChargesTotal(), PdfPCell.ALIGN_RIGHT));
@@ -853,27 +864,27 @@ public class RecoveryFragment extends Fragment implements View.OnClickListener {
                     gProfit = Integer.valueOf(c.getProfit()) + gProfit;
                 }
             }
-        }else {
-            for (Recovery c : recoveries){
+        } else {
+            for (Recovery c : recoveries) {
                 String[] separated = c.getEventDate().split("-");
-                if (d.equals("0")){
+                if (d.equals("0")) {
                     d = separated[1];
 
-                    PdfPCell section = new PdfPCell(new Phrase(separated[1]+"-"+separated[0],totalFont));
+                    PdfPCell section = new PdfPCell(new Phrase(separated[1] + "-" + separated[0], totalFont));
                     section.setBorder(PdfPCell.NO_BORDER);
                     section.setFixedHeight(30);
                     section.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
                     section.setVerticalAlignment(Element.ALIGN_MIDDLE);
                     table.addCell(section);
-                    table.addCell(footerCell("",PdfPCell.ALIGN_RIGHT));
-                    table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
-                    table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
-                    table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
-                    table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
-                    table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
-                    table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
+                    table.addCell(footerCell("", PdfPCell.ALIGN_RIGHT));
+                    table.addCell(footerCell("", PdfPCell.ALIGN_LEFT));
+                    table.addCell(footerCell("", PdfPCell.ALIGN_LEFT));
+                    table.addCell(footerCell("", PdfPCell.ALIGN_LEFT));
+                    table.addCell(footerCell("", PdfPCell.ALIGN_LEFT));
+                    table.addCell(footerCell("", PdfPCell.ALIGN_LEFT));
+                    table.addCell(footerCell("", PdfPCell.ALIGN_LEFT));
 
-                    table.addCell(getCell(AppController.stringDateFormate("yyyy-MM-dd HH:mm:ss.SSS","yyyy-MM-dd",c.getEventDate()), PdfPCell.ALIGN_LEFT));
+                    table.addCell(getCell(AppController.stringDateFormate("yyyy-MM-dd HH:mm:ss.SSS", "yyyy-MM-dd", c.getEventDate()), PdfPCell.ALIGN_LEFT));
                     table.addCell(getCell(c.getEventName(), PdfPCell.ALIGN_LEFT));
                     table.addCell(getCell(c.getClientName(), PdfPCell.ALIGN_LEFT));
                     table.addCell(getCell(c.getChargesTotal(), PdfPCell.ALIGN_RIGHT));
@@ -892,8 +903,8 @@ public class RecoveryFragment extends Fragment implements View.OnClickListener {
                     gChargesTotal = Integer.valueOf(c.getChargesTotal()) + gChargesTotal;
                     gBalance = Integer.valueOf(c.getBalance()) + gBalance;
                     gProfit = Integer.valueOf(c.getProfit()) + gProfit;
-                }else if (d.equals(separated[1])){
-                    table.addCell(getCell(AppController.stringDateFormate("yyyy-MM-dd HH:mm:ss.SSS","yyyy-MM-dd",c.getEventDate()), PdfPCell.ALIGN_LEFT));
+                } else if (d.equals(separated[1])) {
+                    table.addCell(getCell(AppController.stringDateFormate("yyyy-MM-dd HH:mm:ss.SSS", "yyyy-MM-dd", c.getEventDate()), PdfPCell.ALIGN_LEFT));
                     table.addCell(getCell(c.getEventName(), PdfPCell.ALIGN_LEFT));
                     table.addCell(getCell(c.getClientName(), PdfPCell.ALIGN_LEFT));
                     table.addCell(getCell(c.getChargesTotal(), PdfPCell.ALIGN_RIGHT));
@@ -912,7 +923,7 @@ public class RecoveryFragment extends Fragment implements View.OnClickListener {
                     gChargesTotal = Integer.valueOf(c.getChargesTotal()) + gChargesTotal;
                     gBalance = Integer.valueOf(c.getBalance()) + gBalance;
                     gProfit = Integer.valueOf(c.getProfit()) + gProfit;
-                }else if (!d.equals("0") && !d.equals(separated[1])){
+                } else if (!d.equals("0") && !d.equals(separated[1])) {
 
                     d = separated[1];
 
@@ -925,26 +936,26 @@ public class RecoveryFragment extends Fragment implements View.OnClickListener {
                     table.addCell(getCell(String.valueOf(balance), PdfPCell.ALIGN_RIGHT));
                     table.addCell(getCell(String.valueOf(profit), PdfPCell.ALIGN_RIGHT));
 
-                    PdfPCell section = new PdfPCell(new Phrase(separated[1]+"-"+separated[0],totalFont));
+                    PdfPCell section = new PdfPCell(new Phrase(separated[1] + "-" + separated[0], totalFont));
                     section.setBorder(PdfPCell.NO_BORDER);
                     section.setFixedHeight(30);
                     section.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
                     section.setVerticalAlignment(Element.ALIGN_MIDDLE);
                     table.addCell(section);
-                    table.addCell(footerCell("",PdfPCell.ALIGN_RIGHT));
-                    table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
-                    table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
-                    table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
-                    table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
-                    table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
-                    table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
+                    table.addCell(footerCell("", PdfPCell.ALIGN_RIGHT));
+                    table.addCell(footerCell("", PdfPCell.ALIGN_LEFT));
+                    table.addCell(footerCell("", PdfPCell.ALIGN_LEFT));
+                    table.addCell(footerCell("", PdfPCell.ALIGN_LEFT));
+                    table.addCell(footerCell("", PdfPCell.ALIGN_LEFT));
+                    table.addCell(footerCell("", PdfPCell.ALIGN_LEFT));
+                    table.addCell(footerCell("", PdfPCell.ALIGN_LEFT));
 
                     recieved = 0;
                     expense = 0;
                     chargesTotal = 0;
                     balance = 0;
                     profit = 0;
-                    table.addCell(getCell(AppController.stringDateFormate("yyyy-MM-dd HH:mm:ss.SSS","yyyy-MM-dd",c.getEventDate()), PdfPCell.ALIGN_LEFT));
+                    table.addCell(getCell(AppController.stringDateFormate("yyyy-MM-dd HH:mm:ss.SSS", "yyyy-MM-dd", c.getEventDate()), PdfPCell.ALIGN_LEFT));
                     table.addCell(getCell(c.getEventName(), PdfPCell.ALIGN_LEFT));
                     table.addCell(getCell(c.getClientName(), PdfPCell.ALIGN_LEFT));
                     table.addCell(getCell(c.getChargesTotal(), PdfPCell.ALIGN_RIGHT));
@@ -1000,7 +1011,7 @@ public class RecoveryFragment extends Fragment implements View.OnClickListener {
 
         document.close();
         customPDFView();
-        Log.e("PDFDocument","Created");
+        Log.e("PDFDocument", "Created");
     }
 
     public PdfPCell getCell(String text, int alignment) {
@@ -1021,7 +1032,7 @@ public class RecoveryFragment extends Fragment implements View.OnClickListener {
         return cell;
     }
 
-    public void customPDFView(){
+    public void customPDFView() {
         PackageManager packageManager = getContext().getPackageManager();
         Intent testIntent = new Intent(Intent.ACTION_VIEW);
         testIntent.setType("application/pdf");
@@ -1048,7 +1059,7 @@ public class RecoveryFragment extends Fragment implements View.OnClickListener {
             try {
                 total = Image.getInstance(t);
                 total.setRole(PdfName.ARTIFACT);
-                font =  new Font(Font.FontFamily.TIMES_ROMAN, 30.0f, Font.UNDERLINE, BaseColor.BLACK);
+                font = new Font(Font.FontFamily.TIMES_ROMAN, 30.0f, Font.UNDERLINE, BaseColor.BLACK);
             } catch (DocumentException de) {
                 throw new ExceptionConverter(de);
             }
@@ -1065,12 +1076,12 @@ public class RecoveryFragment extends Fragment implements View.OnClickListener {
             Date dat = new Date();
             SimpleDateFormat df = new SimpleDateFormat("EEE, d MMM yyyy");
             table.addCell(footerCell(df.format(dat), PdfPCell.ALIGN_LEFT));
-            table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
-            Log.e("PAGE NUMBER",String.valueOf(writer.getPageNumber()));
-            table.addCell(footerCell(String.format("Page %d ", writer.getPageNumber() -1),PdfPCell.ALIGN_LEFT));
-            table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
-            table.addCell(footerCell("www.easysoft.com.pk",PdfPCell.ALIGN_LEFT));
-            table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
+            table.addCell(footerCell("", PdfPCell.ALIGN_LEFT));
+            Log.e("PAGE NUMBER", String.valueOf(writer.getPageNumber()));
+            table.addCell(footerCell(String.format("Page %d ", writer.getPageNumber() - 1), PdfPCell.ALIGN_LEFT));
+            table.addCell(footerCell("", PdfPCell.ALIGN_LEFT));
+            table.addCell(footerCell("www.easysoft.com.pk", PdfPCell.ALIGN_LEFT));
+            table.addCell(footerCell("", PdfPCell.ALIGN_LEFT));
 
             PdfContentByte canvas = writer.getDirectContent();
             canvas.beginMarkedContentSequence(PdfName.ARTIFACT);

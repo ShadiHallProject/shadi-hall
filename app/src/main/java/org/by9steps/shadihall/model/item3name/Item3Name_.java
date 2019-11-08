@@ -141,6 +141,10 @@ public class Item3Name_ {
 
     @Override
     public String toString() {
+        String date="";
+        if(updatedDate!=null && updatedDate.getDate()!=null){
+            date=updatedDate.getDate();
+        }
         return "Item3Name_{" +
                 "iD=" + iD +
                 ", item3NameID=" + item3NameID +
@@ -150,7 +154,7 @@ public class Item3Name_ {
                 ", clientUserID=" + clientUserID +
                 ", netCode='" + netCode + '\'' +
                 ", sysCode='" + sysCode + '\'' +
-                ", updatedDate=" + updatedDate +
+                ", updatedDate=" + date +
                 ", salePrice='" + salePrice + '\'' +
                 ", itemCode='" + itemCode + '\'' +
                 ", stock='" + stock + '\'' +

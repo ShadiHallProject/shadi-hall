@@ -9,9 +9,9 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationManager;
+import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
-import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.View;
@@ -65,9 +65,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             getActionBar().setDisplayHomeAsUpEnabled(true);
         }
 
-        lm = (LocationManager)this.getSystemService(Context.LOCATION_SERVICE);
+        lm = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
 
-        if (isGpsEnabled()){
+        if (isGpsEnabled()) {
             // Obtain the SupportMapFragment and get notified when the map is ready to be used.
             SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                     .findFragmentById(R.id.map);
@@ -77,7 +77,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         next.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.e("LATITUDE",String.valueOf(marker.getPosition().latitude));
+                Log.e("LATITUDE", String.valueOf(marker.getPosition().latitude));
                 Intent intent = new Intent(MapsActivity.this, RegisterActivity.class);
                 intent.putExtra("TYPE", "Register");
                 intent.putExtra("Latitude", String.valueOf(marker.getPosition().latitude));
@@ -122,16 +122,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 List<Address> addresses = null;
                 try {
                     addresses = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1);
-                    Address obj ;
+                    Address obj;
                     if (addresses != null) {
                         obj = addresses.get(0);
-                        title = obj.getSubLocality()+obj.getFeatureName();
+                        title = obj.getSubLocality() + obj.getFeatureName();
 
                         String subCity = addresses.get(0).getSubLocality();
                         String countryName = addresses.get(0).getCountryName();
                         String cityName = addresses.get(0).getLocality();
 
-                        country.setText(countryName+" "+cityName+" "+subCity);
+                        country.setText(countryName + " " + cityName + " " + subCity);
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -147,7 +147,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     }
 
-    private void init(){
+    private void init() {
 
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
@@ -164,7 +164,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         });
     }
 
-    private void geoLocate(){
+    private void geoLocate() {
         String searchingText = searchView.getQuery().toString();
         Geocoder geocoder = new Geocoder(MapsActivity.this);
         List<Address> list = new ArrayList<>();
@@ -174,7 +174,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         } catch (IOException e) {
             e.printStackTrace();
         }
-        if (list.size() > 0){
+        if (list.size() > 0) {
             Address address = list.get(0);
             moveCamera(new LatLng(address.getLatitude(), address.getLongitude()), ZOOM, address.getLocality());
             Log.e("Address", address.toString());
@@ -209,7 +209,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 String countryName = addresses.get(0).getCountryName();
                                 String cityName = addresses.get(0).getLocality();
 
-                                country.setText(countryName+" "+cityName+" "+subCity);
+                                country.setText(countryName + " " + cityName + " " + subCity);
 
                             } catch (IOException e) {
                                 e.printStackTrace();
@@ -229,29 +229,31 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     }
 
-    private Boolean isGpsEnabled(){
+    private Boolean isGpsEnabled() {
         try {
             gps_enabled = lm.isProviderEnabled(LocationManager.GPS_PROVIDER);
-        } catch(Exception ex) {}
+        } catch (Exception ex) {
+        }
 
         try {
             network_enabled = lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
-        } catch(Exception ex) {}
+        } catch (Exception ex) {
+        }
 
-        if(!gps_enabled && !network_enabled) {
+        if (!gps_enabled && !network_enabled) {
             // notify user
 
             AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
             alertDialogBuilder.setMessage(R.string.gps_network_not_enabled);
-                    alertDialogBuilder.setPositiveButton(R.string.open_location_settings,
-                            new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface arg0, int arg1) {
-                                    startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
-                                }
-                            });
+            alertDialogBuilder.setPositiveButton(R.string.open_location_settings,
+                    new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface arg0, int arg1) {
+                            startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+                        }
+                    });
 
-            alertDialogBuilder.setNegativeButton(R.string.Cancel,new DialogInterface.OnClickListener() {
+            alertDialogBuilder.setNegativeButton(R.string.Cancel, new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     finish();

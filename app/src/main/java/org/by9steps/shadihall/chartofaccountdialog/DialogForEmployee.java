@@ -246,8 +246,10 @@ public class DialogForEmployee extends DialogFragment implements View.OnClickLis
 
                     if(saalary.isEmpty()||saalary.length()<=0)
                         saalary="0";
+                    int maxacnameid=databaseHelper.getMaxAccount3NameMaxAcNameID(prefrence.getClientIDSession());
+
                     Account3Name account3Nametem = new Account3Name(
-                            "0",
+                            maxacnameid+"",
                             name.getText().toString(),
                             groupID,
                             address.getText().toString(),

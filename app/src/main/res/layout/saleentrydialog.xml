@@ -35,14 +35,19 @@
                 android:layout_height="wrap_content"
                 app:srcCompat="@drawable/ic_add" />
         </LinearLayout>
-        <EditText
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/phone_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+        <android.support.design.widget.TextInputEditText
             android:id="@+id/itemdesc"
             android:layout_margin="16dp"
-            android:background="@color/cardview_shadow_start_color"
             android:textSize="14sp"
-            android:text="Description of Text "
+            android:hint="Enter Item Desc"
             android:layout_width="match_parent"
-            android:layout_height="200dp"/>
+            android:layout_height="wrap_content"/>
+        </android.support.design.widget.TextInputLayout>
         <LinearLayout
             android:gravity="center"
             android:weightSum="10"
@@ -56,7 +61,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"/>
             <EditText
-                android:text="0"
+
                 android:id="@+id/txtqty"
                 android:inputType="numberDecimal"
                 android:maxLines="1"
@@ -77,7 +82,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"/>
             <EditText
-                android:text="0"
+
                 android:id="@+id/txtprice"
                 android:maxLines="1"
                 android:inputType="numberDecimal"

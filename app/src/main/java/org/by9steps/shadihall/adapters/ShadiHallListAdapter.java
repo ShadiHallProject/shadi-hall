@@ -1,14 +1,15 @@
 package org.by9steps.shadihall.adapters;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.support.annotation.NonNull;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -29,36 +30,29 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.squareup.picasso.Picasso;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.by9steps.shadihall.AppController;
 import org.by9steps.shadihall.R;
-import org.by9steps.shadihall.fragments.MenuItemsFragment;
+import org.by9steps.shadihall.callingapi.AuthencateUser;
+import org.by9steps.shadihall.callingapi.CashBookApis;
+import org.by9steps.shadihall.callingapi.GetAllDataFrom0Api;
+import org.by9steps.shadihall.callingapi.MasterRefreshApi;
+import org.by9steps.shadihall.chartofaccountdialog.ProjectMenuDialog;
 import org.by9steps.shadihall.helper.ApiRefStrings;
 import org.by9steps.shadihall.helper.DatabaseHelper;
 import org.by9steps.shadihall.helper.GenericConstants;
 import org.by9steps.shadihall.helper.MNotificationClass;
 import org.by9steps.shadihall.helper.Prefrence;
+import org.by9steps.shadihall.helper.ViewDBAllData;
 import org.by9steps.shadihall.helper.refdb;
 import org.by9steps.shadihall.model.Account1Type;
 import org.by9steps.shadihall.model.Account2Group;
 import org.by9steps.shadihall.model.Account3Name;
 import org.by9steps.shadihall.model.ActiveClients;
 import org.by9steps.shadihall.model.Bookings;
-import org.by9steps.shadihall.model.CBUpdate;
-import org.by9steps.shadihall.model.CashBook;
 import org.by9steps.shadihall.model.Client;
 import org.by9steps.shadihall.model.Item1Type;
 import org.by9steps.shadihall.model.Item2Group;
 import org.by9steps.shadihall.model.ProjectMenu;
-import org.by9steps.shadihall.model.ShadiHallList;
-import org.by9steps.shadihall.model.TableSession;
-import org.by9steps.shadihall.model.UpdateDate;
 import org.by9steps.shadihall.model.item3name.Item3Name;
 import org.by9steps.shadihall.model.item3name.Item3Name_;
 import org.by9steps.shadihall.model.salepur1data.SalePur1Data;
@@ -69,12 +63,20 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import de.hdodenhof.circleimageview.CircleImageView;
-import io.fabric.sdk.android.services.common.ApiKey;
+
+import static org.by9steps.shadihall.helper.ApiRefStrings.ACCOUNT1TYPE_GET_ALL_DATA;
+import static org.by9steps.shadihall.helper.ApiRefStrings.Account3NameGetDataFromServer;
+import static org.by9steps.shadihall.helper.ApiRefStrings.BOOKING_GET_ALL_DATA_FROM_SERVER;
+
 
 public class ShadiHallListAdapter extends RecyclerView.Adapter {
 
-     String TAG="NULL";
+    String TAG = "NULL";
     Context mCtx;
     List<ActiveClients> mList;
     List<Client> clients;
@@ -126,7 +128,13 @@ public class ShadiHallListAdapter extends RecyclerView.Adapter {
                 .load(AppController.imageUrl + shadiHallList.getClientID() + "/logo.png")
                 .placeholder(R.drawable.default_avatar)
                 .into(((ListViewHolder) viewHolder).image);
-
+//        ((ListViewHolder) viewHolder).itemView.setOnLongClickListener(new View.OnLongClickListener() {
+//            @Override
+//            public boolean onLongClick(View v) {
+////                mCtx.startActivity(new Intent(mCtx, ViewDBAllData.class));
+//                return true;
+//            }
+//        });
         ((ListViewHolder) viewHolder).itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -135,30 +143,31 @@ public class ShadiHallListAdapter extends RecyclerView.Adapter {
                 clients = databaseHelper.getClient(query);
 
                 if (clients.size() > 0) {
-//                    User.deleteAll(User.class);
-//                    for (Client c : clients) {
-//                        User user = new User(c.getClientID(), "0", "0", "0", "0", c.getClientUserID(), "ss");
-//                        user.save();
-//                    }
                     SharedPreferences.Editor editor = sharedPreferences.edit();
                     editor.putString(log_in, "Yes");
                     editor.apply();
-
+                    clientID = shadiHallList.getClientID();
+                    clientUserID = shadiHallList.getClientUserID();
+                    userRights = shadiHallList.getUserRights();
+                    projectID = shadiHallList.getProjectID();
                     if (isConnected()) {
-                        clientID = shadiHallList.getClientID();
-                        clientUserID = shadiHallList.getClientUserID();
-                        userRights = shadiHallList.getUserRights();
-                        projectID = shadiHallList.getProjectID();
-
-                        mProgress.setTitle("Getting Details");
-                        mProgress.setMessage("Please wait...");
-                        mProgress.setCanceledOnTouchOutside(false);
+                        mProgress.setMessage("PlezzWait...");
                         mProgress.show();
-                        getCashBook();
-                    } else {
-                        if (listener != null)
-                            listener.onItemClick(shadiHallList.getClientID(), shadiHallList.getClientUserID(), shadiHallList.getProjectID(), shadiHallList.getUserRights());
-                    }
+                         new MasterRefreshApi(mCtx,mProgress,databaseHelper,prefrence)
+                                 .RefreshAllApis(new MasterRefreshApi.finalMasterCallBackListner() {
+                                     @Override
+                                     public void allCallBackReport(StringBuilder builder) {
+                                         Log.e("FianlRefport",builder.toString());
+                                         mProgress.dismiss();
+                                         MNotificationClass.ShowToast(mCtx,"All Updated");
+                                         if (listener != null)
+                                             listener.onItemClick(shadiHallList.getClientID(), shadiHallList.getClientUserID(), shadiHallList.getProjectID(), shadiHallList.getUserRights());
+
+                                     }
+                                 });
+                    } else if (listener != null)
+                        listener.onItemClick(shadiHallList.getClientID(), shadiHallList.getClientUserID(), shadiHallList.getProjectID(), shadiHallList.getUserRights());
+
                 } else {
 
                     LayoutInflater layoutInflaterAndroid = LayoutInflater.from(mCtx);
@@ -177,8 +186,56 @@ public class ShadiHallListAdapter extends RecyclerView.Adapter {
                                         clientUserID = shadiHallList.getClientUserID();
                                         userRights = shadiHallList.getUserRights();
                                         projectID = shadiHallList.getProjectID();
+                                        //Checking Client Credientail
+                                        mProgress.setMessage("Authencating User...");
+                                        mProgress.setTitle("Attempt To Login");
+                                        mProgress.setCancelable(false);
+                                        mProgress.show();
+                                        final String userpassword = password.getText().toString();
+                                        AuthencateUser.CheckClientActivationAndPassword(mCtx,
+                                                shadiHallList.getClientID(),
+                                                shadiHallList.getClientUserID(),
+                                                userpassword, new AuthencateUser.AuthListnerForClient() {
+                                                    @Override
+                                                    public void listenerForLoginAuth(String succescode,
+                                                                                     String message,
+                                                                                     @Nullable final String userright,
+                                                                                     @Nullable final Client client) {
 
-                                        login(shadiHallList.getClientID(), shadiHallList.getClientUserID(), password.getText().toString());
+                                                        Log.e("dispalydata", "code:" + succescode +
+                                                                " mes:" + message + " userright:" +
+                                                                userright + "");
+                                                        if (client != null)
+                                                            Log.e("dispalydatacli", client.toString());
+                                                        if (succescode.equals("1") && userright.equals("Admin") && client != null) {
+                                                            final GetAllDataFrom0Api getAllDataFrom0Api = new GetAllDataFrom0Api(
+                                                                    mCtx, mProgress, databaseHelper, prefrence);
+                                                            mProgress.setMessage("Downloading Data...");
+                                                            getAllDataFrom0Api.trigerall0apimehtd(shadiHallList.getClientID(),
+                                                                    new GetAllDataFrom0Api.EachApiListner() {
+                                                                        @Override
+                                                                        public void apifinished(String code, String message, String methodname) {
+                                                                            Log.e("ReportFinal", getAllDataFrom0Api.finalreportallmethod.toString());
+                                                                            client.setPassword(userpassword);
+                                                                            client.setUserRights(userright);
+                                                                            databaseHelper.createClient(client);
+                                                                            if (listener != null)
+                                                                                listener.onItemClick(shadiHallList.getClientID(),
+                                                                                        shadiHallList.getClientUserID(),
+                                                                                        shadiHallList.getProjectID(),
+                                                                                        userright);
+                                                                            SharedPreferences.Editor editor = sharedPreferences.edit();
+                                                                            editor.putString(log_in, "Yes");
+                                                                            editor.apply();
+                                                                            mProgress.dismiss();
+                                                                        }
+                                                                    });
+                                                        } else {
+                                                            MNotificationClass.ShowToast(mCtx, message);
+                                                        }
+                                                    }
+                                                });
+                                        //  login(shadiHallList.getClientID(), shadiHallList.getClientUserID(), password.getText().toString());
                                     } else {
                                         Toast.makeText(mCtx, "Enter Password", Toast.LENGTH_SHORT).show();
                                     }
@@ -233,13 +290,11 @@ public class ShadiHallListAdapter extends RecyclerView.Adapter {
         void onItemClick(String clientID, String clientUserId, String projectID, String userRights);
     }
 
-    //Send Request To Server
     private void login(final String mClientID, final String mClientUserID, final String mPassword) {
         mProgress.setMessage("Please wait...login");
         if (sharedPreferences.contains(phone)) {
             ph = sharedPreferences.getString(phone, "");
         }
-
         mProgress = new ProgressDialog(mCtx);
         mProgress.setTitle("Checking credentials");
         mProgress.setMessage("Please wait...");
@@ -255,7 +310,7 @@ public class ShadiHallListAdapter extends RecyclerView.Adapter {
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-                        Log.e("RES", response);
+                        Log.e("ClientLoginRES", response);
                         JSONObject jsonObj = null;
 
                         try {
@@ -264,7 +319,7 @@ public class ShadiHallListAdapter extends RecyclerView.Adapter {
                             String message = jsonObj.getString("message");
                             if (success.equals("1")) {
                                 JSONArray jsonArray = jsonObj.getJSONArray("UserInfo");
-                                Log.e("UserInfo", jsonArray.toString());
+                                Log.e("ClientLoginUserInfo", jsonArray.toString());
                                 for (int i = 0; i < jsonArray.length(); i++) {
                                     JSONObject jsonObject = jsonArray.getJSONObject(i);
                                     String cashID = jsonObject.getString("CashID");
@@ -332,6 +387,8 @@ public class ShadiHallListAdapter extends RecyclerView.Adapter {
             @Override
             protected Map<String, String> getParams() {
                 Map<String, String> params = new HashMap<String, String>();
+                Log.e("ClientLogin", "ClientID:" + mClientID + " ClientUserID:"
+                        + mClientUserID + " Password:" + mPassword);
                 params.put("ClientID", mClientID);
                 params.put("ClientUserID", mClientUserID);
                 params.put("Password", mPassword);
@@ -346,90 +403,21 @@ public class ShadiHallListAdapter extends RecyclerView.Adapter {
 
     public void getCashBook() {
         mProgress.setMessage("Please wait...getCashBook");
-        String tag_json_obj = "json_obj_req";
-        String u = "http://69.167.137.121/plesk-site-preview/sky.com.pk/shadiHall/Test2.php";
-
-        StringRequest jsonObjectRequest = new StringRequest(com.android.volley.Request.Method.POST, u,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-//                        mProgress.dismiss();
-                        JSONObject jsonObj = null;
-
-                        try {
-                            jsonObj = new JSONObject(response);
-                            JSONArray jsonArray = jsonObj.getJSONArray("CashBook");
-                            String success = jsonObj.getString("success");
-                            if (success.equals("1")) {
-                                databaseHelper.deleteCashBook();
-                                for (int i = 0; i < jsonArray.length(); i++) {
-                                    JSONObject jsonObject = jsonArray.getJSONObject(i);
-                                    Log.e("CashBook", jsonObject.toString());
-                                    String CashBookID = jsonObject.getString("CashBookID");
-                                    String cb = jsonObject.getString("CBDate");
-                                    JSONObject jbb = new JSONObject(cb);
-                                    String CBDate = jbb.getString("date");
-                                    SimpleDateFormat ss = new SimpleDateFormat("yyyy-MM-dd");
-                                    Date date = ss.parse(CBDate);
-                                    SimpleDateFormat sf = new SimpleDateFormat("yyyy-MM-dd");
-                                    String CBDate1 = sf.format(date);
-                                    String DebitAccount = jsonObject.getString("DebitAccount");
-                                    String CreditAccount = jsonObject.getString("CreditAccount");
-                                    String CBRemark = jsonObject.getString("CBRemarks");
-                                    String Amount = jsonObject.getString("Amount");
-                                    String ClientID = jsonObject.getString("ClientID");
-                                    String ClientUserID = jsonObject.getString("ClientUserID");
-                                    String NetCode = jsonObject.getString("NetCode");
-                                    String SysCode = jsonObject.getString("SysCode");
-                                    String UpdatedDate = jsonObject.getString("UpdatedDate");
-//                                    JSONObject jb = new JSONObject(ed);
-//                                    String UpdatedDate = jb.getString("date");
-                                    String TableID = jsonObject.getString("TableID");
-                                    String SessionDate = jsonObject.getString("SessionDate");
-                                    String SerialNo = jsonObject.getString("SerialNo");
-                                    String TableName = jsonObject.getString("TableName");
-
-                                    databaseHelper.createCashBook(new CashBook(CashBookID, CBDate1, DebitAccount, CreditAccount, CBRemark, Amount, ClientID, ClientUserID, NetCode, SysCode, UpdatedDate, TableID, SerialNo, TableName));
-
-                                }
-//                                mProgress.dismiss();
-
-                            } else {
-                                String message = jsonObj.getString("message");
-//                                Toast.makeText(SplashActivity.this, message, Toast.LENGTH_SHORT).show();
-                            }
-                            getAccount3Name();
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        } catch (ParseException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }, new Response.ErrorListener() {
+        CashBookApis apis = new CashBookApis(mCtx, mProgress, databaseHelper, prefrence);
+        apis.GetAllDataFromCashBook(clientID, new CashBookApis.CashBookApiListener() {
             @Override
-            public void onErrorResponse(VolleyError error) {
-//                mProgress.dismiss();
-                Log.e("Error", error.toString());
-//                Toast.makeText(SplashActivity.this, error.toString(), Toast.LENGTH_LONG).show();
+            public void FinishCashBookCallBackMethod(String success, String funType) {
+                Log.e("cashbook", "Data Inserted FunType:" + funType);
+                getAccount3Name();
             }
-        }) {
-            @Override
-            protected Map<String, String> getParams() {
-                Map<String, String> params = new HashMap<String, String>();
-                params.put("ClientID", clientID);
-                return params;
-            }
-        };
-        int socketTimeout = 10000;//10 seconds
-        RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
-        jsonObjectRequest.setRetryPolicy(policy);
-        AppController.getInstance().addToRequestQueue(jsonObjectRequest, tag_json_obj);
+        });
+
     }
 
     public void getAccount3Name() {
         mProgress.setMessage("Please wait...getAccount3Name");
         String tag_json_obj = "json_obj_req";
-        String u = "http://69.167.137.121/plesk-site-preview/sky.com.pk/shadiHall/test.php";
+        String u = Account3NameGetDataFromServer;
 
         StringRequest jsonObjectRequest = new StringRequest(com.android.volley.Request.Method.POST, u,
                 new Response.Listener<String>() {
@@ -514,7 +502,7 @@ public class ShadiHallListAdapter extends RecyclerView.Adapter {
     public void getAccountGroups() {
         mProgress.setMessage("Please wait...getAccountGroups");
         String tag_json_obj = "json_obj_req";
-        String u = "http://69.167.137.121/plesk-site-preview/sky.com.pk/shadiHall/GetAccountGroup.php";
+        String u = ApiRefStrings.ACCOUNT2GROUP_GET_ALL_DATA;
 
         StringRequest jsonObjectRequest = new StringRequest(Request.Method.GET, u,
                 new Response.Listener<String>() {
@@ -543,7 +531,7 @@ public class ShadiHallListAdapter extends RecyclerView.Adapter {
                                 getAccountTypes();
 //
 //                                mProgress.dismiss();
-//                                getCashBook();
+//                                getCafshBook();
 
                             } else {
                                 String message = jsonObj.getString("message");
@@ -570,7 +558,7 @@ public class ShadiHallListAdapter extends RecyclerView.Adapter {
     public void getAccountTypes() {
         mProgress.setMessage("Please wait...getAccountTypes");
         String tag_json_obj = "json_obj_req";
-        String u = "http://69.167.137.121/plesk-site-preview/sky.com.pk/shadiHall/GetAccountType.php";
+        String u = ACCOUNT1TYPE_GET_ALL_DATA;
 
         StringRequest jsonObjectRequest = new StringRequest(Request.Method.GET, u,
                 new Response.Listener<String>() {
@@ -651,13 +639,13 @@ public class ShadiHallListAdapter extends RecyclerView.Adapter {
 
                             } else {
                                 String message = jsonObj.getString("message");
-                                GenericConstants.ShowDebugModeDialog(mCtx, "Error",
+                                GenericConstants.ShowDebugModeDialog(mCtx, "Error item1type",
                                         message);
                             }
 
                         } catch (JSONException e) {
                             e.printStackTrace();
-                            GenericConstants.ShowDebugModeDialog(mCtx, "Error",
+                            GenericConstants.ShowDebugModeDialog(mCtx, "Error item1type2",
                                     e.getMessage());
                         }
                     }
@@ -675,7 +663,7 @@ public class ShadiHallListAdapter extends RecyclerView.Adapter {
     }
 
     public void getItem2Group() {
-         final String TAG="getItem2Group";
+        final String TAG = "getItem2Group";
         mProgress.setMessage("Please wait...getItem2Group");
         String tag_json_obj = "json_obj_req";
         String u = ApiRefStrings.GetItem2GorupLoc;
@@ -698,7 +686,7 @@ public class ShadiHallListAdapter extends RecyclerView.Adapter {
                                     JSONObject jsonObject = jsonArray.getJSONObject(i);
                                     Log.e(TAG, jsonObject.toString());
                                     Item2Group item2Group = new Item2Group();
-                                    item2Group.setClientID(jsonObject.getString("ID"));
+                                    //item2Group.setClientID(jsonObject.getString("ID"));
                                     item2Group.setItem2GroupID(jsonObject.getString("Item2GroupID"));
                                     item2Group.setItem1TypeID(jsonObject.getString("Item1TypeID"));
                                     item2Group.setItem2GroupName(jsonObject.getString("Item2GroupName"));
@@ -706,31 +694,36 @@ public class ShadiHallListAdapter extends RecyclerView.Adapter {
                                     item2Group.setClientID(jsonObject.getString("ClientID"));
                                     item2Group.setSysCode(jsonObject.getString("SysCode"));
                                     item2Group.setNetCode(jsonObject.getString("NetCode"));
-                                    item2Group.setUpdatedDate(jsonObject.getString("UpdatedDate"));
-                     long idd=refdb.Table2Group.AddItem2Group(databaseHelper,item2Group);
-                     Log.e(TAG,"Item2Group InsertID "+idd);
+                                    JSONObject dateup = jsonObject.getJSONObject("UpdatedDate");
+                                    item2Group.setUpdatedDate(dateup.getString("date"));
+                                    long idd = refdb.Table2Group.AddItem2Group(databaseHelper, item2Group);
+                                    Log.e(TAG, "Item2Group InsertID " + idd);
                                 }
-                                getProjectMenu();
+                                //getPrfojectMenu();
 
                             } else {
-                                getProjectMenu();
+                                //getPrfojectMenu();
                                 String message = jsonObj.getString("message");
                                 Log.e(TAG, message);
 
 //                                Toast.makeText(SplashActivity.this, message, Toast.LENGTH_SHORT).show();
                             }
                         } catch (JSONException e) {
-                            GenericConstants.ShowDebugModeDialog(mCtx,
-                                    "Error", e.getMessage());
+                            MNotificationClass.ShowToastTem(mCtx,
+                                    "item2groupNodata");
                             Log.e("Item2Group", e.getMessage());
                             e.printStackTrace();
                         }
                     }
                 }, new Response.ErrorListener() {
             @Override
-            public void onErrorResponse(VolleyError error) {
+            public void onErrorResponse(VolleyError e) {
 //                mProgress.dismiss();
-                Log.e("Error", error.toString());
+                GenericConstants.ShowDebugModeDialog(mCtx,
+                        "Error Item2Group", e.getMessage());
+                Log.e("Item2Group", e.getMessage());
+                e.printStackTrace();
+                Log.e("Error", e.toString());
 //                Toast.makeText(SplashActivity.this, error.toString(), Toast.LENGTH_LONG).show();
             }
         }) {
@@ -749,7 +742,7 @@ public class ShadiHallListAdapter extends RecyclerView.Adapter {
     }
 
     public void getItem3Name() {
-        TAG="getitem3Name";
+        TAG = "getitem3Name";
         mProgress.setMessage("Please wait...getItem3Name");
         String tag_json_obj = "json_obj_req";
         String u = ApiRefStrings.GetItem3NameLoc;
@@ -766,8 +759,8 @@ public class ShadiHallListAdapter extends RecyclerView.Adapter {
                                 databaseHelper.deleteAllItem3Name();
                                 for (Item3Name_ name : item3.getItem3Name()) {
                                     Log.e(TAG, " " + name.getClientID() + " --" + name.getUpdatedDate().getDate());
-                                    long idd=refdb.Table3Name.AddItem3Name(databaseHelper,name);
-                                    Log.e(TAG,"inser id"+idd);
+                                    long idd = refdb.Table3Name.AddItem3Name(databaseHelper, name);
+                                    Log.e(TAG, "inser id" + idd);
                                 }
                                 Log.e(TAG, "onResponse: " + item3.getItem3Name().toString());
 
@@ -784,7 +777,7 @@ public class ShadiHallListAdapter extends RecyclerView.Adapter {
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                GenericConstants.ShowDebugModeDialog(mCtx, "Error", error.getMessage());
+                GenericConstants.ShowDebugModeDialog(mCtx, "Error item3nam", error.getMessage());
 //                mProgress.dismiss();
                 Log.e("Error", error.toString());
 //                Toast.makeText(SplashActivity.this, error.toString(), Toast.LENGTH_LONG).show();
@@ -805,7 +798,7 @@ public class ShadiHallListAdapter extends RecyclerView.Adapter {
     }
 
     public void getSalePur1Data() {
-        final String TAG="getSalePur1Data";
+        final String TAG = "getSalePur1Data";
         mProgress.setMessage("Please wait...getSalePur1DAta");
         String tag_json_obj = "json_obj_req";
         String u = ApiRefStrings.GetSalePur1Data;
@@ -822,8 +815,8 @@ public class ShadiHallListAdapter extends RecyclerView.Adapter {
                                 databaseHelper.deleteAllSalePur1();
                                 for (Salepur1 salepur1 : salePur1Data.getSalepur1()) {
                                     Log.e("getSalePur1Data", " " + salepur1.getClientID() + " --" + salepur1.getUpdatedDate().getDate());
-                                    long idd=refdb.SlePur1.AddItemSalePur1(databaseHelper,salepur1);
-                                    Log.e("getSalePur1Data","inser id"+idd);
+                                    long idd = refdb.SlePur1.AddItemSalePur1(databaseHelper, salepur1);
+                                    Log.e("getSalePur1Data", "inser id" + idd);
                                 }
                                 Log.e("getSalePur1Data", "onResponse: " + salePur1Data.getSalepur1());
 
@@ -840,7 +833,7 @@ public class ShadiHallListAdapter extends RecyclerView.Adapter {
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                GenericConstants.ShowDebugModeDialog(mCtx, "Error", error.getMessage());
+                GenericConstants.ShowDebugModeDialog(mCtx, "Error salepur1", error.getMessage());
 //                mProgress.dismiss();
                 Log.e("Error", error.toString());
 //                Toast.makeText(SplashActivity.this, error.toString(), Toast.LENGTH_LONG).show();
@@ -861,9 +854,8 @@ public class ShadiHallListAdapter extends RecyclerView.Adapter {
         getSalePur2Data();
     }
 
-
     public void getSalePur2Data() {
-        final String TAG="getSalePur2Data";
+        final String TAG = "getSalePur2Data";
         mProgress.setMessage("Please wait...getSalePur2Data");
         String tag_json_obj = "json_obj_req";
         String u = ApiRefStrings.GetSalePur2Data;
@@ -880,8 +872,8 @@ public class ShadiHallListAdapter extends RecyclerView.Adapter {
                                 databaseHelper.deleteAllSalePur2();
                                 for (SalePur2 salePur2 : salePur2Data.getSalePur2()) {
                                     Log.e("getSalePur2Data", " " + salePur2.getClientID() + " --" + salePur2.getUpdatedDate().getDate());
-                                    long idd=refdb.SalePur2.AddItemSalePur2(databaseHelper,salePur2);
-                                    Log.e("getSalePur2Data","inser id"+idd);
+                                    long idd = refdb.SalePur2.AddItemSalePur2(databaseHelper, salePur2);
+                                    Log.e("getSalePur2Data", "inser id" + idd);
                                 }
                                 Log.e("getSalePur2Data", "onResponse: " + salePur2Data.getSalePur2());
 
@@ -893,13 +885,14 @@ public class ShadiHallListAdapter extends RecyclerView.Adapter {
 
                         Log.e("getSalePur2Data", "onResponse: " + response);
 
-
+                        getProjectMenu();
                     }
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                GenericConstants.ShowDebugModeDialog(mCtx, "Error", error.getMessage());
+                GenericConstants.ShowDebugModeDialog(mCtx, "Error SalePur2", error.getMessage());
 //                mProgress.dismiss();
+                getProjectMenu();
                 Log.e("Error", error.toString());
 //                Toast.makeText(SplashActivity.this, error.toString(), Toast.LENGTH_LONG).show();
             }
@@ -984,7 +977,7 @@ public class ShadiHallListAdapter extends RecyclerView.Adapter {
 
         // Tag used to cancel the request
         String tag_json_obj = "json_obj_req";
-        String url = "http://69.167.137.121/plesk-site-preview/sky.com.pk/shadiHall/GetBookings.php";
+        String url = BOOKING_GET_ALL_DATA_FROM_SERVER;
 
 
         StringRequest jsonObjectRequest = new StringRequest(Request.Method.POST, url,
@@ -1035,8 +1028,9 @@ public class ShadiHallListAdapter extends RecyclerView.Adapter {
                                     String SerialNo = jsonObject.getString("SerialNo");
 
                                     Log.e("TEST", "SSSS");
-
-                                    databaseHelper.createBooking(new Bookings(BookingID, ClientName, ClientMobile, ClientAddress, ClientNic, EventName, BookingDate, EventDate, ArrangePersons, ChargesTotal, Description, ClientID, ClientUserID, NetCode, SysCode, UpdatedDate, Shift, SerialNo));
+                                    Bookings servbooking = new Bookings(BookingID, ClientName, ClientMobile, ClientAddress, ClientNic, EventName, BookingDate, EventDate, ArrangePersons, ChargesTotal, Description, ClientID, ClientUserID, NetCode, SysCode, UpdatedDate, Shift, SerialNo);
+                                    Log.e("serve", servbooking.toString());
+                                    databaseHelper.createBooking(servbooking);
 
 //                                    if (i == jsonArray.length() - 1) {
 //                                        TableSession session = new TableSession("Bookings", BookingID, SessionDate, SessionDate);
@@ -1146,10 +1140,10 @@ public class ShadiHallListAdapter extends RecyclerView.Adapter {
                                 editor.apply();
 ///////////////////////////////////////////////
                                 Log.e(GenericConstants.MYEdittion, "Editing");
-                                Log.e(this.getClass().getName(), "Client ID::" + clientID);
-                                Log.e(this.getClass().getName(), "ClientUserID::" + clientUserID);
-                                Log.e(this.getClass().getName(), "ProjectIDSerssion::" + projectID);
-                                Log.e(this.getClass().getName(), "UserRightSession::" + userRights);
+                                Log.e(this.getClass().getName() + "sam", "Client ID::" + clientID);
+                                Log.e(this.getClass().getName() + "sam", "ClientUserID::" + clientUserID);
+                                Log.e(this.getClass().getName() + "sam", "ProjectIDSerssion::" + projectID);
+                                Log.e(this.getClass().getName() + "sam", "UserRightSession::" + userRights);
                                 new Prefrence(mCtx).setMYClientUserIDSession(clientUserID);
                                 ////////////////////////////////
                                 if (listener != null)
@@ -1183,7 +1177,6 @@ public class ShadiHallListAdapter extends RecyclerView.Adapter {
         jsonObjectRequest.setRetryPolicy(policy);
         AppController.getInstance().addToRequestQueue(jsonObjectRequest, tag_json_obj);
     }
-
 
     //Check Internet Connection
     public boolean isConnected() {

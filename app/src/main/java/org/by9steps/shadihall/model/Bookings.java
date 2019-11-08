@@ -30,7 +30,12 @@ public class Bookings implements Serializable {
     public Bookings() {
     }
 
-    public Bookings(String bookingID, String clientName, String clientMobile, String clientAddress, String clientNic, String eventName, String bookingDate, String eventDate, String arrangePersons, String chargesTotal, String description, String clientID, String clientUserID, String netCode, String sysCode, String updatedDate, String shift, String serialNo) {
+    public Bookings(String bookingID, String clientName, String clientMobile,
+                    String clientAddress, String clientNic, String eventName,
+                    String bookingDate, String eventDate, String arrangePersons,
+                    String chargesTotal, String description, String clientID,
+                    String clientUserID, String netCode, String sysCode,
+                    String updatedDate, String shift, String serialNo) {
         BookingID = bookingID;
         ClientName = clientName;
         ClientMobile = clientMobile;
@@ -231,5 +236,31 @@ public class Bookings implements Serializable {
 
     public void setSerialNo(String serialNo) {
         SerialNo = serialNo;
+    }
+
+    @Override
+    public String toString() {
+        return "Bookings{" +
+                "id='" + id + '\'' +
+                ", BookingID='" + BookingID + '\'' +
+                ", ClientName='" + ClientName + '\'' +
+                ", ClientMobile='" + ClientMobile + '\'' +
+                ", ClientAddress='" + ClientAddress + '\'' +
+                ", ClientNic='" + ClientNic + '\'' +
+                ", EventName='" + EventName + '\'' +
+                ", BookingDate='" + BookingDate + '\'' +
+                ", EventDate='" + EventDate + '\'' +
+                ", ArrangePersons='" + ArrangePersons + '\'' +
+                ", ChargesTotal='" + ChargesTotal + '\'' +
+                ", Description='" + Description + '\'' +
+                ", ClientID='" + ClientID + '\'' +
+                ", ClientUserID='" + ClientUserID + '\'' +
+                ", NetCode='" + NetCode + '\'' +
+                ", SysCode='" + SysCode + '\'' +
+                ", UpdatedDate='" + UpdatedDate + '\'' +
+                ", Amount='" + Amount + '\'' +
+                ", Shift='" + Shift + '\'' +
+                ", SerialNo='" + SerialNo + '\'' +
+                '}';
     }
 }

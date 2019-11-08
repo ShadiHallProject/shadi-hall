@@ -182,8 +182,14 @@
     <string name="salepuracname">AccountName</string>
     <string name="salepurremarks">ReMarks</string>
     <string name="salepurbillamount">BillAmount</string>
-    <string name="enter_your_remarks">Enter Your Remarks</string>
+    <string name="enter_your_remarks">Remarks</string>
     <string name="add_invoice">Add new Invoice</string>
+    <string name="enter_name_of_person">Enter Name of person</string>
+    <string name="enter_days_left">Payment After Days</string>
+    <string name="Item_group">Item Group</string>
+    <string name="Item_name">Item Name</string>
+    <string name="Item_price">Price</string>
+    <string name="Item_stock">Stock</string>
     <string-array name="pref_example_list_titles">
         <item>Always</item>
         <item>When possible</item>

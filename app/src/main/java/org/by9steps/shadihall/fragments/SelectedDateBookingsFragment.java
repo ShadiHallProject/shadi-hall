@@ -80,7 +80,7 @@ public class SelectedDateBookingsFragment extends Fragment {
         prefrence = new Prefrence(getContext());
 
 
-        query = "SELECT * FROM Booking WHERE ClientID =" + prefrence.getClientIDSession()+" AND EventDate = '"+eventDate+" 00:00:00.000000' AND Shift = '"+eventShift+"'";
+        query = "SELECT * FROM Booking WHERE ClientID =" + prefrence.getClientIDSession()+" AND EventDate = '"+eventDate+"' AND Shift = '"+eventShift+"'";
 
         bookingsList = databaseHelper.getBookings(query);
 

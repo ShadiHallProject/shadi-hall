@@ -225,7 +225,6 @@ public class MainActivity extends AppCompatActivity {
         finish();
     }
 
-    public void FromMyProject(){
-        int var1=99;
-    }
+
+
 }

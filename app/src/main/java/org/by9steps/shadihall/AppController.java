@@ -2,7 +2,10 @@ package org.by9steps.shadihall;
 
 import android.app.Application;
 import android.app.ProgressDialog;
+import android.app.SharedElementCallback;
+import android.content.Context;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -12,8 +15,10 @@ import com.android.volley.toolbox.Volley;
 import org.by9steps.shadihall.helper.DatabaseHelper;
 
 import java.text.ParseException;
+import java.util.Calendar;
 import java.util.Date;
 import java.text.SimpleDateFormat;
+import java.util.Locale;
 
 public class AppController extends Application {
 
@@ -71,8 +76,8 @@ public class AppController extends Application {
             mRequestQueue.cancelAll(tag);
         }
     }
-    
-    public static String stringDateFormate(String sFormate, String dFormate, String date){
+
+    public static String stringDateFormate(String sFormate, String dFormate, String date) {
         String mDate = null;
         SimpleDateFormat sf = new SimpleDateFormat(sFormate);
         try {
@@ -84,6 +89,22 @@ public class AppController extends Application {
         }
 
         return mDate;
+    }
+
+
+    public static boolean compareDate() throws ParseException {
+
+        String valid_until = "5/12/2019";
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+        Date validtill = sdf.parse(valid_until);
+        Date c = Calendar.getInstance().getTime();
+///////////////////////////////////Second DAte
+        SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy");
+        String formattedDate = df.format(c);
+        String untilformated = df.format(validtill);
+        Log.e("formdate",formattedDate+" until:"+untilformated+" compare:"+c.after(validtill));
+
+        return c.after(validtill);
     }
 
 }

@@ -3,4 +3,18 @@
     <color name="colorPrimary">#f0749f</color>
     <color name="colorPrimaryDark">#b73752</color>
     <color name="colorAccent">#cd8ac9</color>
+    <color name="rowheader">#2A2A2C</color>
+    <color name="tableheadbg">#55A8F3</color>
+    <color name="gridbottombg">#D5E5F8</color>
+    <color name="gridbottom">#000</color>
+<!--Color Scheme For Adding or updating data in grid -->
+    <color name="newinserted">#000</color>
+    <color name="updateddata">#000</color>
+
+<!--    For Generic Grid-->
+    <color name="g_gridrow1">#B9CAC0C1</color>
+    <color name="g_gridrow2">#6F88947D</color>
+    <color name="contenttextcolor">#0E0D0D</color>
+    <color name="g_gridheadcolor">#01579B</color>
+    <color name="g_gridbottomcolor">#AD4CA9E7</color>
 </resources>

@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="Gradle: com.github.satyan:sugar:1.5@aar">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/d6eec0a1a726fd3449ab11cc47739b7c/jars/classes.jar!/" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/d6eec0a1a726fd3449ab11cc47739b7c/res" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.github.satyan/sugar/1.5/f3bfcd161cda8770cce9fe8e67479903f48eed1a/sugar-1.5-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

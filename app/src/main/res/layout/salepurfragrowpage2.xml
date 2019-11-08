@@ -3,76 +3,224 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="wrap_content">
-
-
     <LinearLayout
-        android:layout_width="wrap_content"
+        android:id="@+id/topdatarowlayout"
+        android:weightSum="11"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp"
         android:orientation="horizontal">
-
         <TextView
             android:id="@+id/col1"
-            android:layout_width="@dimen/hundred_dp"
+            android:layout_weight="1"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_margin="3dp"
             android:text="col"
-            android:textAlignment="center"
             android:textColor="@color/currentMonthDayColor"
-            android:textSize="@dimen/textSize"
-             />
+            android:textSize="@dimen/textSizerow"
+            android:textAlignment="center"/>
 
         <TextView
             android:id="@+id/col2"
-            android:layout_width="@dimen/hundred_dp"
+            android:layout_weight="3.6"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_margin="3dp"
             android:text="col"
             android:textAlignment="center"
             android:textColor="@color/currentMonthDayColor"
-            android:textSize="@dimen/textSize"
+            android:textSize="@dimen/textSizerow"
              />
 
         <TextView
             android:id="@+id/col3"
-            android:layout_width="@dimen/hundred_dp"
+            android:layout_weight="2"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_margin="3dp"
+
             android:text="col"
-            android:textAlignment="center"
+            android:textAlignment="textEnd"
             android:textColor="@color/currentMonthDayColor"
-            android:textSize="@dimen/textSize"
+            android:textSize="@dimen/textSizerow"
             />
 
         <TextView
             android:id="@+id/col4"
-            android:layout_width="@dimen/hundred_dp"
+            android:layout_weight="2"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_margin="3dp"
+
             android:text="col"
-            android:textAlignment="center"
+            android:textAlignment="textEnd"
             android:textColor="@color/currentMonthDayColor"
-            android:textSize="@dimen/textSize"
+            android:textSize="@dimen/textSizerow"
              />
 
         <TextView
             android:id="@+id/col5"
-            android:layout_width="@dimen/hundred_dp"
+            android:layout_weight="2"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_margin="3dp"
             android:text="col"
-            android:textAlignment="center"
+            android:textAlignment="textEnd"
             android:textColor="@color/currentMonthDayColor"
-            android:textSize="@dimen/textSize" />
+            android:textSize="@dimen/textSizerow" />
 
         <ImageView
             android:id="@+id/threedotpopupsaleedit"
             app:srcCompat="@drawable/ic_more_vert_black_24dp"
-            android:layout_width="24dp"
-            android:layout_height="24dp"/>
+            android:layout_width="0dp"
+            android:layout_margin="6dp"
+            android:layout_weight="0.5"
+            android:layout_height="wrap_content"/>
     </LinearLayout>
+
 <View
     android:background="@android:color/black"
     android:layout_width="match_parent"
     android:layout_height="1dp"/>
+<LinearLayout
+    android:id="@+id/grandtotalview1"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:id="@+id/grandtotalview2"
+        android:weightSum="11"
+        android:visibility="gone"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:orientation="horizontal">
+        <TextView
+            android:visibility="invisible"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="col"
+            android:textColor="@color/currentMonthDayColor"
+            android:textSize="@dimen/textSizerow"
+            android:textAlignment="center"/>
+
+        <TextView
+            android:visibility="gone"
+            android:id="@+id/addnewiteminslist"
+            android:layout_weight="3.6"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Total"
+            android:textStyle="bold"
+            android:textAlignment="center"
+            android:textColorHighlight="@android:color/holo_blue_dark"
+            android:textColor="@android:color/holo_blue_dark"
+            android:textColorHint="@android:color/holo_blue_dark"
+            android:textSize="@dimen/textSizerow"
+            />
+
+        <TextView
+            android:id="@+id/textaddnewitem"
+            android:layout_weight="4"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:textStyle="bold"
+            android:text="Add More Item "
+            android:textAlignment="center"
+            android:textColor="@color/colorPrimary"
+            android:textSize="@dimen/textSizerow"
+            />
+
+        <TextView
+            android:visibility="invisible"
+
+            android:layout_weight="2"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Total"
+            android:textStyle="bold"
+            android:textAlignment="textEnd"
+            android:textColor="@color/colorPrimary"
+            android:textSize="@dimen/textSizerow"
+            />
+
+
+    </LinearLayout>
+    <View
+        android:id="@+id/lineseparator"
+        android:background="@android:color/black"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"/>
+    <LinearLayout
+        android:background="@color/gridbottombg"
+        android:id="@+id/grandtotalview"
+        android:weightSum="11"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:orientation="horizontal">
+        <TextView
+            android:id="@+id/totalcunt"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="col"
+            android:textStyle="bold"
+            android:textColor="@color/gridbottom"            android:textSize="@dimen/textSizerow"
+            android:textAlignment="center"/>
+
+        <TextView
+
+            android:layout_weight="3.6"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Grand Total"
+            android:textStyle="bold"
+            android:textAlignment="center"
+            android:textColor="@color/gridbottom"
+            android:textSize="@dimen/textSizerow"
+            />
+
+        <TextView
+            android:id="@+id/grandtotalquan"
+            android:layout_weight="2"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:textStyle="bold"
+            android:text="qat"
+            android:textAlignment="textEnd"
+            android:textColor="@color/gridbottom"
+            android:textSize="@dimen/textSizerow"
+            />
+
+        <TextView
+            android:id="@+id/grandtotalprice"
+            android:layout_weight="4"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Total"
+            android:textStyle="bold"
+            android:textAlignment="textEnd"
+            android:textColor="@color/gridbottom"
+            android:textSize="@dimen/textSizerow"
+            />
+
+
+
+        <ImageView
+            app:srcCompat="@drawable/ic_more_vert_black_24dp"
+            android:layout_width="0dp"
+            android:layout_margin="6dp"
+            android:visibility="invisible"
+            android:layout_weight="0.5"
+            android:layout_height="wrap_content"/>
+
+    </LinearLayout>
+    <View
+        android:id="@+id/lastlineview"
+        android:visibility="gone"
+        android:background="@android:color/black"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"/>
+</LinearLayout>
+
+
 </LinearLayout>

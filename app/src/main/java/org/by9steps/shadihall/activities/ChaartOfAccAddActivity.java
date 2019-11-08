@@ -238,6 +238,8 @@ public class ChaartOfAccAddActivity extends AppCompatActivity implements
                             Toast.makeText(ChaartOfAccAddActivity.this, "Login Number Already Register", Toast.LENGTH_SHORT).show();
                         } else {
                             int seriolNo = databaseHelper.getMaxValue("SELECT max(SerialNo) FROM Account3Name") + 1;
+
+
                             Account3Name account3Nametem = new Account3Name(
                                     "0",
                                     name.getText().toString(),
@@ -250,12 +252,14 @@ public class ChaartOfAccAddActivity extends AppCompatActivity implements
                                     password.getText().toString(),
                                     prefrence.getClientIDSession(),
                                     prefrence.getClientUserIDSession(),
-                                    "0", "0", "0",
+                                    "0",
+                                    "0",
+                                    "0",
                                     String.valueOf(seriolNo),
                                     sp_items[spPosition],
                                     String.valueOf(spPosition),
                                     salary.getText().toString());
-                            Log.e("key", "" + account3Nametem.toString());
+                            Log.e("keyac", "" + account3Nametem.toString());
                             databaseHelper.createAccount3Name(account3Nametem);
                             finish();
                         }

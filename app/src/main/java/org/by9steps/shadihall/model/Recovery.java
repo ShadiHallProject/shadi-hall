@@ -142,4 +142,11 @@ public class Recovery implements Serializable {
         ClientName = clientName;
     }
 
+    public int getIsRow() {
+        return isRow;
+    }
+
+    public void setIsRow(int isRow) {
+        this.isRow = isRow;
+    }
 }

@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
@@ -16,8 +17,14 @@ import com.nabinbhandari.android.permissions.PermissionHandler;
 import com.nabinbhandari.android.permissions.Permissions;
 import com.orm.SugarContext;
 
+import org.by9steps.shadihall.AppController;
 import org.by9steps.shadihall.R;
+import org.by9steps.shadihall.chartofaccountdialog.ProjectMenuDialog;
+import org.by9steps.shadihall.helper.DatabaseHelper;
+import org.by9steps.shadihall.helper.refdb;
+import org.by9steps.shadihall.model.ProjectMenu;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 
 import io.fabric.sdk.android.Fabric;
@@ -50,8 +57,20 @@ public class SplashActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
         SugarContext.init(this);
-        Fabric.with(this, new Crashlytics());
+///
 
+        String iddst= refdb.Account3NameTableFun.UpdateAcNameIDInCashBook(
+                                            new DatabaseHelper(this),
+                                            "115",
+                                            "-2527",
+                                            "999999");
+        Log.e("observeme",iddst);
+        Fabric.with(this, new Crashlytics());
+        try {
+            AppController.compareDate();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
         //shared prefrences
         sharedPreferences = getSharedPreferences(mypreference,
                 Context.MODE_PRIVATE);
@@ -71,6 +90,7 @@ public class SplashActivity extends AppCompatActivity {
                         if(sharedPreferences.contains(login)){
                             s = sharedPreferences.getString(login,"");
                         }
+
                         if (s.equals("Yes")) {
                             startActivity(new Intent(SplashActivity.this, MainActivity.class));
                             finish();

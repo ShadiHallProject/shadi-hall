@@ -8,6 +8,7 @@ import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -21,8 +22,10 @@ import com.orm.SugarContext;
 import org.by9steps.shadihall.AppController;
 import org.by9steps.shadihall.R;
 import org.by9steps.shadihall.helper.DatabaseHelper;
+import org.by9steps.shadihall.helper.GenericConstants;
 import org.by9steps.shadihall.helper.InputValidation;
 import org.by9steps.shadihall.helper.Prefrence;
+import org.by9steps.shadihall.helper.refdb;
 import org.by9steps.shadihall.model.Bookings;
 
 
@@ -98,6 +101,7 @@ public class BookingFormFragment extends Fragment implements View.OnClickListene
             eventDate = getArguments().getString(ARG_BOOKING_DATE);
             bookingID = getArguments().getString(ARG_BOOKING_ID);
             eventShift = getArguments().getString(ARG_EVENT_SHIFT);
+            Log.e("argumentpassed",eventDate+"--"+bookingID+"--"+eventShift+"--");
         }
     }
 
@@ -231,18 +235,27 @@ public class BookingFormFragment extends Fragment implements View.OnClickListene
 
                         if (bookingID.equals("id")) {
 
-                            int seriolNo = databaseHelper.getMaxValue("SELECT max(SerialNo) FROM Booking") + 1;
+                            int seriolNo = refdb.BookingTable.GetMaximumBookingIDFromDb(databaseHelper,prefrence.getClientIDSession());
 
-                            databaseHelper.createBooking(new Bookings("o", person_name.getText().toString(), client_mobile_no.getText().toString(), address.getText().toString(),
-                                    cnic_number.getText().toString(), event_name.getText().toString(), date.getText().toString(), event_date.getText().toString() + " 00:00:00.000000",
-                                    total_persons.getText().toString(), total_charges.getText().toString(), description.getText().toString(), prefrence.getClientIDSession(), prefrence.getClientUserIDSession(),
-                                    "0", "0", "0", advance_fee.getText().toString(), event_shift.getText().toString(),String.valueOf(seriolNo)));
+
+                            databaseHelper.createBooking(new Bookings(""+seriolNo, person_name.getText().toString(), client_mobile_no.getText().toString(), address.getText().toString(),
+                                    cnic_number.getText().toString(),
+                                    event_name.getText().toString(),
+                                    date.getText().toString(),
+                                    event_date.getText().toString(),
+                                    total_persons.getText().toString(),
+                                    total_charges.getText().toString(),
+                                    description.getText().toString(),
+                                    prefrence.getClientIDSession(),
+                                    prefrence.getClientUserIDSession(),
+                                    "0", "0",
+                                    GenericConstants.NullFieldStandardText, advance_fee.getText().toString(), event_shift.getText().toString(),String.valueOf(seriolNo)));
                             clearCashe();
                         }else {
                             String query = "UPDATE Booking SET ClientName = '"+person_name.getText().toString()+"', ClientMobile = '"+client_mobile_no.getText().toString()
                                     +"', ClientAddress = '"+address.getText().toString()+"', ClientNic = '"+cnic_number.getText().toString()+"', EventName = '"+event_name.getText().toString()
                                     +"', ArrangePersons = '"+total_persons.getText().toString()+"', ChargesTotal = '"+total_charges.getText().toString()+"', Description = '"+description.getText().toString()
-                                    +"', UpdatedDate = '0', Advance = '"+advance_fee.getText().toString()+"' WHERE ID = "+id;
+                                    +"', UpdatedDate = '"+GenericConstants.NullFieldStandardText+"', Advance = '"+advance_fee.getText().toString()+"' WHERE ID = "+id;
                             databaseHelper.updateBooking(query);
                             Toast.makeText(getContext(), "Booking Update", Toast.LENGTH_SHORT).show();
                             getActivity().onBackPressed();

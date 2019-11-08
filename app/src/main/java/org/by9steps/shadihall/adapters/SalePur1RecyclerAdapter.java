@@ -13,7 +13,9 @@ import android.widget.TextView;
 import org.by9steps.shadihall.R;
 import org.by9steps.shadihall.activities.Salepur1AddNewActivity;
 import org.by9steps.shadihall.model.JoinQueryDaliyEntryPage1;
+import org.by9steps.shadihall.model.ModelForSalePur1page2;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class SalePur1RecyclerAdapter extends RecyclerView.Adapter<SalePur1RecyclerAdapter.mRecyclerView> {
@@ -38,7 +40,7 @@ public class SalePur1RecyclerAdapter extends RecyclerView.Adapter<SalePur1Recycl
 
     @Override
     public void onBindViewHolder(@NonNull mRecyclerView mRecyclerView, int i) {
-        mRecyclerView.c1num.setText(""+(i+1));
+        mRecyclerView.c1num.setText(list.get(i).getSalePur1ID());
         mRecyclerView.c2date.setText(list.get(i).getSPDate());
         mRecyclerView.c3acname.setText(list.get(i).getAcName());
         mRecyclerView.c4remarks.setText(list.get(i).getRemarks());
@@ -70,8 +72,10 @@ public class SalePur1RecyclerAdapter extends RecyclerView.Adapter<SalePur1Recycl
               @Override
               public void onClick(View v) {
                   Intent i=new Intent(mcontext, Salepur1AddNewActivity.class);
+                  i.putExtra("pkid",curobj.PkID);
                   i.putExtra("salepur1id",curobj.getSalePur1ID());
                   i.putExtra("EntryType",curobj.getEntryType());
+                  i.putExtra("edit",true);
                   mcontext.startActivity(i);
               }
           });

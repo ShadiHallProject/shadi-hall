@@ -8,6 +8,7 @@ import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.Bundle;
 import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
@@ -37,6 +38,9 @@ import com.itextpdf.text.pdf.PdfWriter;
 import org.by9steps.shadihall.AppController;
 import org.by9steps.shadihall.R;
 import org.by9steps.shadihall.activities.CashCollectionActivity;
+import org.by9steps.shadihall.activities.EventCashBookActivity;
+import org.by9steps.shadihall.activities.MenuClickActivity;
+import org.by9steps.shadihall.chartofaccountdialog.CashBookEntryDialog;
 import org.by9steps.shadihall.helper.DatabaseHelper;
 import org.by9steps.shadihall.helper.Prefrence;
 import org.by9steps.shadihall.model.CBSetting;
@@ -153,12 +157,34 @@ public class CashBookAdapter extends RecyclerView.Adapter {
             ((ItemViewHolder) viewHolder).edit.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Intent intent = new Intent(mCtx, CashCollectionActivity.class);
-                    intent.putExtra("BookingID","0");
-                    intent.putExtra("Spinner","View");
-                    intent.putExtra("Type","Edit");
-                    intent.putExtra("CashBookID",cashEntry.getCashBookID());
-                    mCtx.startActivity(intent);
+//                    Intent intent = new Intent(mCtx, CashCollectionActivity.class);
+//                    intent.putExtra("BookingID","0");
+//                    intent.putExtra("Spinner","View");
+//                    intent.putExtra("Type","Edit");
+//                    intent.putExtra("CashBookID",cashEntry.getCashBookID());
+//                    mCtx.startActivity(intent);
+////////////////////////////////////////////////
+
+                    CashBookEntryDialog dialog = new CashBookEntryDialog();
+                    Bundle bb = new Bundle();
+                    bb.putString("BookingID", "0");
+                    bb.putString("Spinner", "View");
+                    bb.putString("EntryType",CashBookEntryDialog.entrytypelist[0]);
+                    ////////////////Type either Edit or New
+                    bb.putString("Type", "Edit");
+                    /////////////////////if view Type is edit then must send CashBookID to update
+                    bb.putString("CashBookID", cashEntry.getCashBookID());
+                    dialog.setArguments(bb);
+                    try {
+                        dialog.show( ((EventCashBookActivity)mCtx).getSupportFragmentManager(), "Default");
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+                    try {
+                        dialog.show( ((MenuClickActivity)mCtx).getSupportFragmentManager(), "Default");
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
                 }
             });
             ((ItemViewHolder)viewHolder).print.setOnClickListener(new View.OnClickListener() {

@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="Gradle: com.github.TellH:RecyclerTreeView:1.2.0@aar">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/aed8079eb1108d8c886b3db4f38af064/jars/classes.jar!/" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/aed8079eb1108d8c886b3db4f38af064/res" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.github.TellH/RecyclerTreeView/1.2.0/80331b340bbde697e5cbf349cdbf08f370a030ff/RecyclerTreeView-1.2.0-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

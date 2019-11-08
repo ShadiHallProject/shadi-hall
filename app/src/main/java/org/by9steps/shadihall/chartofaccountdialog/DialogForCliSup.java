@@ -12,6 +12,7 @@ import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -67,6 +68,8 @@ String dialogtype;
         databaseHelper = new DatabaseHelper(getContext());
     }
 
+
+
     @NonNull
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
@@ -83,6 +86,10 @@ String dialogtype;
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
 
+
+
+
+        setCancelable(false);
         groupName=getArguments().getString("groupName");
         if(dialogtype!=null && dialogtype.equals(DIALOG_EDIT_TEXT_TITLE)){
             String dbpkID=getArguments().getString("dbpkid");
@@ -232,9 +239,10 @@ String dialogtype;
                 } else if (databaseHelper.findAccount3Name(query1)) {
                     Toast.makeText(getContext(), "Login Number Already Register", Toast.LENGTH_SHORT).show();
                 } else {
+                    int maxacnameid=databaseHelper.getMaxAccount3NameMaxAcNameID(prefrence.getClientIDSession());
 
                     Account3Name account3Nametem = new Account3Name(
-                            "0",
+                            maxacnameid+"",
                             name.getText().toString(),
                             groupID,
                             address.getText().toString(),

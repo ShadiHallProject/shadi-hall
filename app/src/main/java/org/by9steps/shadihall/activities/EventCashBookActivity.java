@@ -64,11 +64,14 @@ import org.by9steps.shadihall.AppController;
 import org.by9steps.shadihall.R;
 import org.by9steps.shadihall.adapters.CashBookAdapter;
 import org.by9steps.shadihall.adapters.RecoveryAdapter;
+import org.by9steps.shadihall.callingapi.BookingApis;
+import org.by9steps.shadihall.chartofaccountdialog.CashBookEntryDialog;
 import org.by9steps.shadihall.fragments.CashBookFragment;
 import org.by9steps.shadihall.fragments.RecoveryFragment;
 import org.by9steps.shadihall.fragments.SelectDateFragment;
 import org.by9steps.shadihall.helper.DatabaseHelper;
 import org.by9steps.shadihall.helper.Prefrence;
+import org.by9steps.shadihall.helper.refdb;
 import org.by9steps.shadihall.model.Account3Name;
 import org.by9steps.shadihall.model.Bookings;
 import org.by9steps.shadihall.model.CBSetting;
@@ -104,7 +107,7 @@ public class EventCashBookActivity extends AppCompatActivity implements View.OnC
     //    ScrollView scrollView;
     HorizontalScrollView scrollView;
     LinearLayout header, pdfView;
-    TextView tv_date,tv_id,tv_debit,tv_credit,tv_remarks,tv_amount;
+    TextView tv_date, tv_id, tv_debit, tv_credit, tv_remarks, tv_amount;
 
     List<CashEntry> mList;
     List<CashBook> cashBooksList;
@@ -113,7 +116,7 @@ public class EventCashBookActivity extends AppCompatActivity implements View.OnC
     DatabaseHelper databaseHelper;
     Prefrence prefrence;
 
-    int m = 0, amount, gAmount , filter;
+    int m = 0, amount, gAmount, filter;
     Boolean listSorting = false;
     public static String fDate1, fDate2;
     public static Button date1;
@@ -162,15 +165,15 @@ public class EventCashBookActivity extends AppCompatActivity implements View.OnC
         tv_amount.setOnClickListener(this);
 
         Intent intent = getIntent();
-        if (intent != null){
+        if (intent != null) {
             creditAc = intent.getStringExtra("CreditAc");
             tableID = intent.getStringExtra("BookingId");
             type = intent.getStringExtra("Type");
         }
 
-        if (getSupportActionBar()!=null) {
+        if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setTitle("Booking "+type);
+            getSupportActionBar().setTitle("Booking " + type);
         }
 
         // Spinner Drop down elements
@@ -186,33 +189,61 @@ public class EventCashBookActivity extends AppCompatActivity implements View.OnC
         // Creating adapter for spinner
         ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, categories);
 
-        // Drop down layout style - list view with radio button
+        // Drop down layout style - lisRt view with radio button
         dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
         // attaching data adapter to spinner
         spinner.setAdapter(dataAdapter);
 
         FloatingActionButton fab = findViewById(R.id.fab);
-        if (type.equals("Income")){
+        if (type.equals("Income")) {
             fab.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    Intent intent = new Intent(EventCashBookActivity.this, CashCollectionActivity.class);
-                    intent.putExtra("BookingID", tableID);
-                    intent.putExtra("Spinner", "Hide");
-                    intent.putExtra("Type", "New");
-                    intent.putExtra("CashBookID", "Id");
-                    startActivity(intent);
+//                    Intent intent = new Intent(EventCashBookActivity.this, CashCollectionActivity.class);
+//                    intent.putExtra("BookingID", tableID);
+//                    intent.putExtra("Spinner", "Hide");
+//                    intent.putExtra("Type", "New");
+//                    intent.putExtra("CashBookID", "Id");
+//                    startActivity(intent);
+                    ////////////////////////TEmp Practice
+                    /////////////////////////At Receiving Side
+//                    tableID = intent.getStringExtra("BookingID");
+//                    spinnerType = intent.getStringExtra("Spinner");
+//                    viewType = intent.getStringExtra("Type");
+//                    cbID = intent.getStringExtra("CashBookID");
+                    CashBookEntryDialog dialog = new CashBookEntryDialog();
+                    Bundle bb = new Bundle();
+                    bb.putString("BookingID", tableID);
+                    bb.putString("Spinner", "View");
+                    bb.putString("EntryType",CashBookEntryDialog.entrytypelist[0]);
+                    ////////////////Type either Edit or New
+                    bb.putString("Type", "New");
+                    /////////////////////if view Type is edit then must send CashBookID to update
+                    bb.putString("CashBookID", "Id");
+                    dialog.setArguments(bb);
+                    dialog.show(getSupportFragmentManager(), "Income");
                 }
             });
-        }else if (type.equals("Expense")){
+        } else if (type.equals("Expense")) {
             fab.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    Intent intent = new Intent(EventCashBookActivity.this, AddExpenseActivity.class);
-                    intent.putExtra("BookingID", tableID);
-                    intent.putExtra("Spinner", "Hide");
-                    startActivity(intent);
+//                    Intent intent = new Intent(EventCashBookActivity.this, AddExpenseActivity.class);
+//                    intent.putExtra("BookingID", tableID);
+//                    intent.putExtra("Spinner", "View");
+                    //////////////////////////////////////
+                    CashBookEntryDialog dialog = new CashBookEntryDialog();
+                    Bundle bb = new Bundle();
+                    bb.putString("BookingID", tableID);
+                    bb.putString("Spinner", "View");
+                    bb.putString("EntryType",CashBookEntryDialog.entrytypelist[1]);
+                    bb.putString("Type", "New");
+                    bb.putString("CashBookID", "Id");
+                    dialog.setArguments(bb);
+                    dialog.show(getSupportFragmentManager(), "Expense");
+                  // startActivity(intent);
+
                 }
             });
         }
@@ -221,8 +252,8 @@ public class EventCashBookActivity extends AppCompatActivity implements View.OnC
 
 
         List<CBSetting> list = CBSetting.listAll(CBSetting.class);
-        if (list.size() == 0){
-            CBSetting cbSetting = new CBSetting(true,true,true,true,true,true);
+        if (list.size() == 0) {
+            CBSetting cbSetting = new CBSetting(true, true, true, true, true, true);
             cbSetting.save();
         }
 
@@ -244,7 +275,7 @@ public class EventCashBookActivity extends AppCompatActivity implements View.OnC
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()){
+        switch (v.getId()) {
             case R.id.tv_date:
                 orderBy = "CBDate";
                 orderBy(orderBy);
@@ -282,9 +313,9 @@ public class EventCashBookActivity extends AppCompatActivity implements View.OnC
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if(item.getItemId() == android.R.id.home){
+        if (item.getItemId() == android.R.id.home) {
             onBackPressed();
-        }else if (item.getItemId() == R.id.action_print){
+        } else if (item.getItemId() == R.id.action_print) {
             try {
 
                 createPdf();
@@ -297,13 +328,13 @@ public class EventCashBookActivity extends AppCompatActivity implements View.OnC
             }
 
             return true;
-        }else if (item.getItemId() == R.id.action_settings){
+        } else if (item.getItemId() == R.id.action_settings) {
             startActivity(new Intent(EventCashBookActivity.this, CashBookSettingActivity.class));
             return true;
-        }else if (item.getItemId() == R.id.action_refresh){
-            if (isConnected()){
+        } else if (item.getItemId() == R.id.action_refresh) {
+            if (isConnected()) {
                 refereshTables(EventCashBookActivity.this);
-            }else {
+            } else {
                 Toast.makeText(EventCashBookActivity.this, "Please Check Your Internet Connection", Toast.LENGTH_SHORT).show();
             }
         }
@@ -316,98 +347,98 @@ public class EventCashBookActivity extends AppCompatActivity implements View.OnC
         getCashBook();
 
         List<CBSetting> list = CBSetting.listAll(CBSetting.class);
-        for (CBSetting c : list){
-            if (!c.getDste()){
+        for (CBSetting c : list) {
+            if (!c.getDste()) {
                 tv_date.setVisibility(View.GONE);
-            }else {
+            } else {
                 tv_date.setVisibility(View.VISIBLE);
             }
 
-            if (!c.getCbId()){
+            if (!c.getCbId()) {
                 tv_id.setVisibility(View.GONE);
-            }else {
+            } else {
                 tv_id.setVisibility(View.VISIBLE);
             }
 
-            if (!c.getDebit()){
+            if (!c.getDebit()) {
                 tv_debit.setVisibility(View.GONE);
-            }else {
+            } else {
                 tv_debit.setVisibility(View.VISIBLE);
             }
 
-            if (!c.getCredit()){
+            if (!c.getCredit()) {
                 tv_credit.setVisibility(View.GONE);
-            }else {
+            } else {
                 tv_credit.setVisibility(View.VISIBLE);
             }
 
-            if (!c.getRemarks()){
+            if (!c.getRemarks()) {
                 tv_remarks.setVisibility(View.GONE);
-            }else {
+            } else {
                 tv_remarks.setVisibility(View.VISIBLE);
             }
 
-            if (!c.getAmount()){
+            if (!c.getAmount()) {
                 tv_amount.setVisibility(View.GONE);
-            }else {
+            } else {
                 tv_amount.setVisibility(View.VISIBLE);
             }
         }
     }
 
-    private void getCashBook(){
+    private void getCashBook() {
         mList.clear();
         m = 0;
         amount = 0;
         gAmount = 0;
         String query = "";
 
-            if (type.equals("Income")){
-                query = "SELECT      CashBook.ID, CashBook.CashBookID, CashBook.CBDate, CashBook.DebitAccount, CashBook.CreditAccount, CashBook.CBRemarks, CashBook.Amount, CashBook.ClientID, CashBook.ClientUserID, CashBook.TableID, \n" +
-                        "                         Account3Name.AcName AS DebitAccountName, Account3Name_1.AcName AS CreditAccountName, Account3Name_2.AcName AS UserName, CashBook.UpdatedDate\n" +
-                        "FROM            CashBook LEFT OUTER JOIN\n" +
-                        "                         Account3Name AS Account3Name_1 ON CashBook.CreditAccount = Account3Name_1.AcNameID LEFT OUTER JOIN\n" +
-                        "                         Account3Name AS Account3Name_2 ON CashBook.ClientUserID = Account3Name_2.AcNameID LEFT OUTER JOIN\n" +
-                        "                         Account3Name ON CashBook.DebitAccount = Account3Name.AcNameID\n" +
-                        "WHERE        (CashBook.ClientID = "+prefrence.getClientIDSession()+" AND CashBook.CreditAccount = "+creditAc+" AND CashBook.TableID = "+tableID+")" + orderby;
-                Log.e("CASHBOOK QUERY",query);
-            }else if (type.equals("Expense")){
-                query = "SELECT      CashBook.ID, CashBook.CashBookID, CashBook.CBDate, CashBook.DebitAccount, CashBook.CreditAccount, CashBook.CBRemarks, CashBook.Amount, CashBook.ClientID, CashBook.ClientUserID, CashBook.TableID, \n" +
-                        "                         Account3Name.AcName AS DebitAccountName, Account3Name_1.AcName AS CreditAccountName, Account3Name_2.AcName AS UserName, CashBook.UpdatedDate\n" +
-                        "FROM            CashBook LEFT OUTER JOIN\n" +
-                        "                         Account3Name AS Account3Name_1 ON CashBook.CreditAccount = Account3Name_1.AcNameID LEFT OUTER JOIN\n" +
-                        "                         Account3Name AS Account3Name_2 ON CashBook.ClientUserID = Account3Name_2.AcNameID LEFT OUTER JOIN\n" +
-                        "                         Account3Name ON CashBook.DebitAccount = Account3Name.AcNameID\n" +
-                        "WHERE        (CashBook.ClientID = "+prefrence.getClientIDSession()+" AND CashBook.DebitAccount = "+creditAc+" AND CashBook.TableID = "+tableID+")" + orderby;
-                Log.e("CASHBOOK QUERY",query);
-            }
-            cashBooksList = databaseHelper.getCashBookEntry(query);
+        if (type.equals("Income")) {
+            query = "SELECT      CashBook.ID, CashBook.CashBookID, CashBook.CBDate, CashBook.DebitAccount, CashBook.CreditAccount, CashBook.CBRemarks, CashBook.Amount, CashBook.ClientID, CashBook.ClientUserID, CashBook.TableID, \n" +
+                    "                         Account3Name.AcName AS DebitAccountName, Account3Name_1.AcName AS CreditAccountName, Account3Name_2.AcName AS UserName, CashBook.UpdatedDate\n" +
+                    "FROM            CashBook LEFT OUTER JOIN\n" +
+                    "                         Account3Name AS Account3Name_1 ON CashBook.CreditAccount = Account3Name_1.AcNameID LEFT OUTER JOIN\n" +
+                    "                         Account3Name AS Account3Name_2 ON CashBook.ClientUserID = Account3Name_2.AcNameID LEFT OUTER JOIN\n" +
+                    "                         Account3Name ON CashBook.DebitAccount = Account3Name.AcNameID\n" +
+                    "WHERE        (CashBook.ClientID = " + prefrence.getClientIDSession() + " AND CashBook.TableName = 'Booking_Received'  AND CashBook.TableID = " + tableID + ")" + orderby;
+            Log.e("CASHBOOK QUERY", query);
+        } else if (type.equals("Expense")) {
+            query = "SELECT      CashBook.ID, CashBook.CashBookID, CashBook.CBDate, CashBook.DebitAccount, CashBook.CreditAccount, CashBook.CBRemarks, CashBook.Amount, CashBook.ClientID, CashBook.ClientUserID, CashBook.TableID, \n" +
+                    "                         Account3Name.AcName AS DebitAccountName, Account3Name_1.AcName AS CreditAccountName, Account3Name_2.AcName AS UserName, CashBook.UpdatedDate\n" +
+                    "FROM            CashBook LEFT OUTER JOIN\n" +
+                    "                         Account3Name AS Account3Name_1 ON CashBook.CreditAccount = Account3Name_1.AcNameID LEFT OUTER JOIN\n" +
+                    "                         Account3Name AS Account3Name_2 ON CashBook.ClientUserID = Account3Name_2.AcNameID LEFT OUTER JOIN\n" +
+                    "                         Account3Name ON CashBook.DebitAccount = Account3Name.AcNameID\n" +
+                    "WHERE        (CashBook.ClientID = " + prefrence.getClientIDSession() + " AND CashBook.TableName = 'Booking_Expense' AND CashBook.TableID = " + tableID + ")" + orderby;
+            Log.e("CASHBOOK QUERY", query);
+        }
+        cashBooksList = databaseHelper.getCashBookEntry(query);
 
-            Log.e("CASHCOLLLL",String.valueOf(cashBooksList.size()));
+        Log.e("CASHCOLLLL", String.valueOf(cashBooksList.size()));
 
-        for (CashBook c : cashBooksList){
+        for (CashBook c : cashBooksList) {
 
             String[] separated = c.getCBDate().split("-");
 
             if (m == 0) {
-                mList.add(CashEntry.createSection(separated[0]+"/"+separated[1]+"/"+separated[2]));
-                mList.add(CashEntry.createRow(c.getCashBookID(),c.getCBDate(),c.getDebitAccount(),c.getCreditAccount(),c.getCBRemarks(),c.getAmount(),c.getClientID(),c.getClientUserID(),c.getTableID(),c.getDebitAccountName(),c.getCreditAccountName(),c.getUserName(), c.getUpdatedDate()));
+                mList.add(CashEntry.createSection(separated[0] + "/" + separated[1] + "/" + separated[2]));
+                mList.add(CashEntry.createRow(c.getCashBookID(), c.getCBDate(), c.getDebitAccount(), c.getCreditAccount(), c.getCBRemarks(), c.getAmount(), c.getClientID(), c.getClientUserID(), c.getTableID(), c.getDebitAccountName(), c.getCreditAccountName(), c.getUserName(), c.getUpdatedDate()));
                 m = Integer.valueOf(separated[2]);
 
                 amount = Integer.valueOf(c.getAmount()) + amount;
                 gAmount = Integer.valueOf(c.getAmount()) + gAmount;
-            }else if (m == Integer.valueOf(separated[2])){
+            } else if (m == Integer.valueOf(separated[2])) {
                 amount = Integer.valueOf(c.getAmount()) + amount;
                 gAmount = Integer.valueOf(c.getAmount()) + gAmount;
-                mList.add(CashEntry.createRow(c.getCashBookID(),c.getCBDate(),c.getDebitAccount(),c.getCreditAccount(),c.getCBRemarks(),c.getAmount(),c.getClientID(),c.getClientUserID(),c.getTableID(),c.getDebitAccountName(),c.getCreditAccountName(),c.getUserName(), c.getUpdatedDate()));
-            }else {
+                mList.add(CashEntry.createRow(c.getCashBookID(), c.getCBDate(), c.getDebitAccount(), c.getCreditAccount(), c.getCBRemarks(), c.getAmount(), c.getClientID(), c.getClientUserID(), c.getTableID(), c.getDebitAccountName(), c.getCreditAccountName(), c.getUserName(), c.getUpdatedDate()));
+            } else {
                 mList.add(CashEntry.createTotal(String.valueOf(amount)));
                 amount = 0;
                 amount = Integer.valueOf(c.getAmount()) + amount;
                 gAmount = Integer.valueOf(c.getAmount()) + gAmount;
 
-                mList.add(CashEntry.createSection(separated[0]+"/"+separated[1]+"/"+separated[2]));
-                mList.add(CashEntry.createRow(c.getCashBookID(),c.getCBDate(),c.getDebitAccount(),c.getCreditAccount(),c.getCBRemarks(),c.getAmount(),c.getClientID(),c.getClientUserID(),c.getTableID(),c.getDebitAccountName(),c.getCreditAccountName(),c.getUserName(), c.getUpdatedDate()));
+                mList.add(CashEntry.createSection(separated[0] + "/" + separated[1] + "/" + separated[2]));
+                mList.add(CashEntry.createRow(c.getCashBookID(), c.getCBDate(), c.getDebitAccount(), c.getCreditAccount(), c.getCBRemarks(), c.getAmount(), c.getClientID(), c.getClientUserID(), c.getTableID(), c.getDebitAccountName(), c.getCreditAccountName(), c.getUserName(), c.getUpdatedDate()));
                 m = Integer.valueOf(separated[2]);
             }
         }
@@ -416,13 +447,13 @@ public class EventCashBookActivity extends AppCompatActivity implements View.OnC
         mList.add(CashEntry.createTotal(String.valueOf(amount)));
         mList.add(CashEntry.createSection("Grand Total"));
         mList.add(CashEntry.createTotal(String.valueOf(gAmount)));
-        adapter = new CashBookAdapter(this,mList);
+        adapter = new CashBookAdapter(this, mList);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(adapter);
     }
 
     private void filter(String text) {
-        Log.e("Search","SEARCH");
+        Log.e("Search", "SEARCH");
         //new array list that will hold the filtered data
         filterd = new ArrayList<>();
 
@@ -432,7 +463,7 @@ public class EventCashBookActivity extends AppCompatActivity implements View.OnC
                 Log.e("Search", String.valueOf(s.isRow()));
                 //if the existing elements contains the search input
                 if (s.isRow() == 1) {
-                    switch (filter){
+                    switch (filter) {
                         case 2:
                             if (s.getCashBookID().contains(text.toLowerCase())) {
                                 //adding the element to filtered list
@@ -466,7 +497,7 @@ public class EventCashBookActivity extends AppCompatActivity implements View.OnC
                     }
                 }
             }
-        }else {
+        } else {
             filterd = mList;
         }
 
@@ -477,17 +508,17 @@ public class EventCashBookActivity extends AppCompatActivity implements View.OnC
 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-        if (position!=1 && position != 0){
+        if (position != 1 && position != 0) {
             getCashBook();
         }
-        switch (position){
+        switch (position) {
             case 0:
                 filter = 0;
-                searchView.setQuery("",false);
+                searchView.setQuery("", false);
                 searchView.clearFocus();
                 break;
             case 1:
-                searchView.setQuery("",false);
+                searchView.setQuery("", false);
                 searchView.clearFocus();
                 // custom dialog
                 final Dialog dialog = new Dialog(EventCashBookActivity.this);
@@ -543,27 +574,27 @@ public class EventCashBookActivity extends AppCompatActivity implements View.OnC
                 break;
             case 2:
                 filter = 2;
-                searchView.setQuery("",false);
+                searchView.setQuery("", false);
                 searchView.clearFocus();
                 break;
             case 3:
                 filter = 3;
-                searchView.setQuery("",false);
+                searchView.setQuery("", false);
                 searchView.clearFocus();
                 break;
             case 4:
                 filter = 4;
-                searchView.setQuery("",false);
+                searchView.setQuery("", false);
                 searchView.clearFocus();
                 break;
             case 5:
                 filter = 5;
-                searchView.setQuery("",false);
+                searchView.setQuery("", false);
                 searchView.clearFocus();
                 break;
             case 6:
                 filter = 6;
-                searchView.setQuery("",false);
+                searchView.setQuery("", false);
                 searchView.clearFocus();
                 break;
         }
@@ -574,73 +605,72 @@ public class EventCashBookActivity extends AppCompatActivity implements View.OnC
 
     }
 
-    private void dateFilter(){
+    private void dateFilter() {
         mList.clear();
         m = 0;
         amount = 0;
         gAmount = 0;
         String query = "";
 
-            query = "SELECT        CashBook.CashBookID, CashBook.CBDate, CashBook.DebitAccount, CashBook.CreditAccount, CashBook.CBRemarks, CashBook.Amount, CashBook.ClientID, CashBook.ClientUserID, CashBook.BookingID, \n" +
-                    "                         Account3Name.AcName AS DebitAccountName, Account3Name_1.AcName AS CreditAccountName, Account3Name_2.AcName AS UserName, CashBook.UpdatedDate\n" +
-                    "FROM            CashBook LEFT OUTER JOIN\n" +
-                    "                         Account3Name AS Account3Name_1 ON CashBook.CreditAccount = Account3Name_1.AcNameID LEFT OUTER JOIN\n" +
-                    "                         Account3Name AS Account3Name_2 ON CashBook.ClientUserID = Account3Name_2.AcNameID LEFT OUTER JOIN\n" +
-                    "                         Account3Name ON CashBook.DebitAccount = Account3Name.AcNameID\n" +
-                    "WHERE        (CashBook.ClientID = "+prefrence.getClientIDSession()+" AND CashBook.CBDate >= Datetime('"+fDate1+"') AND CashBook.CBDate <= Datetime('"+fDate2+"'))";
-            cashBooksList = databaseHelper.getCashBookEntry(query);
+        query = "SELECT        CashBook.CashBookID, CashBook.CBDate, CashBook.DebitAccount, CashBook.CreditAccount, CashBook.CBRemarks, CashBook.Amount, CashBook.ClientID, CashBook.ClientUserID, CashBook.BookingID, \n" +
+                "                         Account3Name.AcName AS DebitAccountName, Account3Name_1.AcName AS CreditAccountName, Account3Name_2.AcName AS UserName, CashBook.UpdatedDate\n" +
+                "FROM            CashBook LEFT OUTER JOIN\n" +
+                "                         Account3Name AS Account3Name_1 ON CashBook.CreditAccount = Account3Name_1.AcNameID LEFT OUTER JOIN\n" +
+                "                         Account3Name AS Account3Name_2 ON CashBook.ClientUserID = Account3Name_2.AcNameID LEFT OUTER JOIN\n" +
+                "                         Account3Name ON CashBook.DebitAccount = Account3Name.AcNameID\n" +
+                "WHERE        (CashBook.ClientID = " + prefrence.getClientIDSession() + " AND CashBook.CBDate >= Datetime('" + fDate1 + "') AND CashBook.CBDate <= Datetime('" + fDate2 + "'))";
+        cashBooksList = databaseHelper.getCashBookEntry(query);
 
 
-
-        if (listSorting){
-            for (int i = cashBooksList.size()-1; i >= 0; i--){
+        if (listSorting) {
+            for (int i = cashBooksList.size() - 1; i >= 0; i--) {
                 String[] separated = cashBooksList.get(i).getCBDate().split("-");
                 if (m == 0) {
-                    mList.add(CashEntry.createSection(separated[0]+"/"+separated[1]));
-                    mList.add(CashEntry.createRow(cashBooksList.get(i).getCashBookID(),cashBooksList.get(i).getCBDate(),cashBooksList.get(i).getDebitAccount(),cashBooksList.get(i).getCreditAccount(),cashBooksList.get(i).getCBRemarks(),cashBooksList.get(i).getAmount(),cashBooksList.get(i).getClientID(),cashBooksList.get(i).getClientUserID(),cashBooksList.get(i).getTableID(),cashBooksList.get(i).getDebitAccountName(),cashBooksList.get(i).getCreditAccountName(),cashBooksList.get(i).getUserName(), cashBooksList.get(i).getUpdatedDate()));
+                    mList.add(CashEntry.createSection(separated[0] + "/" + separated[1]));
+                    mList.add(CashEntry.createRow(cashBooksList.get(i).getCashBookID(), cashBooksList.get(i).getCBDate(), cashBooksList.get(i).getDebitAccount(), cashBooksList.get(i).getCreditAccount(), cashBooksList.get(i).getCBRemarks(), cashBooksList.get(i).getAmount(), cashBooksList.get(i).getClientID(), cashBooksList.get(i).getClientUserID(), cashBooksList.get(i).getTableID(), cashBooksList.get(i).getDebitAccountName(), cashBooksList.get(i).getCreditAccountName(), cashBooksList.get(i).getUserName(), cashBooksList.get(i).getUpdatedDate()));
                     m = Integer.valueOf(separated[1]);
 
                     amount = Integer.valueOf(cashBooksList.get(i).getAmount()) + amount;
                     gAmount = Integer.valueOf(cashBooksList.get(i).getAmount()) + gAmount;
-                }else if (m == Integer.valueOf(separated[1])){
+                } else if (m == Integer.valueOf(separated[1])) {
                     amount = Integer.valueOf(cashBooksList.get(i).getAmount()) + amount;
                     gAmount = Integer.valueOf(cashBooksList.get(i).getAmount()) + gAmount;
-                    mList.add(CashEntry.createRow(cashBooksList.get(i).getCashBookID(),cashBooksList.get(i).getCBDate(),cashBooksList.get(i).getDebitAccount(),cashBooksList.get(i).getCreditAccount(),cashBooksList.get(i).getCBRemarks(),cashBooksList.get(i).getAmount(),cashBooksList.get(i).getClientID(),cashBooksList.get(i).getClientUserID(),cashBooksList.get(i).getTableID(),cashBooksList.get(i).getDebitAccountName(),cashBooksList.get(i).getCreditAccountName(),cashBooksList.get(i).getUserName(), cashBooksList.get(i).getUpdatedDate()));
-                }else {
+                    mList.add(CashEntry.createRow(cashBooksList.get(i).getCashBookID(), cashBooksList.get(i).getCBDate(), cashBooksList.get(i).getDebitAccount(), cashBooksList.get(i).getCreditAccount(), cashBooksList.get(i).getCBRemarks(), cashBooksList.get(i).getAmount(), cashBooksList.get(i).getClientID(), cashBooksList.get(i).getClientUserID(), cashBooksList.get(i).getTableID(), cashBooksList.get(i).getDebitAccountName(), cashBooksList.get(i).getCreditAccountName(), cashBooksList.get(i).getUserName(), cashBooksList.get(i).getUpdatedDate()));
+                } else {
                     mList.add(CashEntry.createTotal(String.valueOf(amount)));
                     amount = 0;
                     amount = Integer.valueOf(cashBooksList.get(i).getAmount()) + amount;
                     gAmount = Integer.valueOf(cashBooksList.get(i).getAmount()) + gAmount;
 
-                    mList.add(CashEntry.createSection(separated[0]+"/"+separated[1]));
-                    mList.add(CashEntry.createRow(cashBooksList.get(i).getCashBookID(),cashBooksList.get(i).getCBDate(),cashBooksList.get(i).getDebitAccount(),cashBooksList.get(i).getCreditAccount(),cashBooksList.get(i).getCBRemarks(),cashBooksList.get(i).getAmount(),cashBooksList.get(i).getClientID(),cashBooksList.get(i).getClientUserID(),cashBooksList.get(i).getTableID(),cashBooksList.get(i).getDebitAccountName(),cashBooksList.get(i).getCreditAccountName(),cashBooksList.get(i).getUserName(), cashBooksList.get(i).getUpdatedDate()));
+                    mList.add(CashEntry.createSection(separated[0] + "/" + separated[1]));
+                    mList.add(CashEntry.createRow(cashBooksList.get(i).getCashBookID(), cashBooksList.get(i).getCBDate(), cashBooksList.get(i).getDebitAccount(), cashBooksList.get(i).getCreditAccount(), cashBooksList.get(i).getCBRemarks(), cashBooksList.get(i).getAmount(), cashBooksList.get(i).getClientID(), cashBooksList.get(i).getClientUserID(), cashBooksList.get(i).getTableID(), cashBooksList.get(i).getDebitAccountName(), cashBooksList.get(i).getCreditAccountName(), cashBooksList.get(i).getUserName(), cashBooksList.get(i).getUpdatedDate()));
                     m = Integer.valueOf(separated[1]);
                 }
             }
-        }else {
-            for (CashBook c : cashBooksList){
+        } else {
+            for (CashBook c : cashBooksList) {
 
                 String[] separated = c.getCBDate().split("-");
 
                 if (m == 0) {
-                    mList.add(CashEntry.createSection(separated[0]+"/"+separated[1]));
-                    mList.add(CashEntry.createRow(c.getCashBookID(),c.getCBDate(),c.getDebitAccount(),c.getCreditAccount(),c.getCBRemarks(),c.getAmount(),c.getClientID(),c.getClientUserID(),c.getTableID(),c.getDebitAccountName(),c.getCreditAccountName(),c.getUserName(), c.getUpdatedDate()));
+                    mList.add(CashEntry.createSection(separated[0] + "/" + separated[1]));
+                    mList.add(CashEntry.createRow(c.getCashBookID(), c.getCBDate(), c.getDebitAccount(), c.getCreditAccount(), c.getCBRemarks(), c.getAmount(), c.getClientID(), c.getClientUserID(), c.getTableID(), c.getDebitAccountName(), c.getCreditAccountName(), c.getUserName(), c.getUpdatedDate()));
                     m = Integer.valueOf(separated[1]);
 
                     amount = Integer.valueOf(c.getAmount()) + amount;
                     gAmount = Integer.valueOf(c.getAmount()) + gAmount;
-                }else if (m == Integer.valueOf(separated[1])){
+                } else if (m == Integer.valueOf(separated[1])) {
                     amount = Integer.valueOf(c.getAmount()) + amount;
                     gAmount = Integer.valueOf(c.getAmount()) + gAmount;
-                    mList.add(CashEntry.createRow(c.getCashBookID(),c.getCBDate(),c.getDebitAccount(),c.getCreditAccount(),c.getCBRemarks(),c.getAmount(),c.getClientID(),c.getClientUserID(),c.getTableID(),c.getDebitAccountName(),c.getCreditAccountName(),c.getUserName(), c.getUpdatedDate()));
-                }else {
+                    mList.add(CashEntry.createRow(c.getCashBookID(), c.getCBDate(), c.getDebitAccount(), c.getCreditAccount(), c.getCBRemarks(), c.getAmount(), c.getClientID(), c.getClientUserID(), c.getTableID(), c.getDebitAccountName(), c.getCreditAccountName(), c.getUserName(), c.getUpdatedDate()));
+                } else {
                     mList.add(CashEntry.createTotal(String.valueOf(amount)));
                     amount = 0;
                     amount = Integer.valueOf(c.getAmount()) + amount;
                     gAmount = Integer.valueOf(c.getAmount()) + gAmount;
 
-                    mList.add(CashEntry.createSection(separated[0]+"/"+separated[1]));
-                    mList.add(CashEntry.createRow(c.getCashBookID(),c.getCBDate(),c.getDebitAccount(),c.getCreditAccount(),c.getCBRemarks(),c.getAmount(),c.getClientID(),c.getClientUserID(),c.getTableID(),c.getDebitAccountName(),c.getCreditAccountName(),c.getUserName(), c.getUpdatedDate()));
+                    mList.add(CashEntry.createSection(separated[0] + "/" + separated[1]));
+                    mList.add(CashEntry.createRow(c.getCashBookID(), c.getCBDate(), c.getDebitAccount(), c.getCreditAccount(), c.getCBRemarks(), c.getAmount(), c.getClientID(), c.getClientUserID(), c.getTableID(), c.getDebitAccountName(), c.getCreditAccountName(), c.getUserName(), c.getUpdatedDate()));
                     m = Integer.valueOf(separated[1]);
                 }
             }
@@ -649,7 +679,7 @@ public class EventCashBookActivity extends AppCompatActivity implements View.OnC
         mList.add(CashEntry.createTotal(String.valueOf(amount)));
         mList.add(CashEntry.createSection("Grand Total"));
         mList.add(CashEntry.createTotal(String.valueOf(gAmount)));
-        adapter = new CashBookAdapter(EventCashBookActivity.this,mList);
+        adapter = new CashBookAdapter(EventCashBookActivity.this, mList);
         recyclerView.setLayoutManager(new LinearLayoutManager(EventCashBookActivity.this));
         recyclerView.setAdapter(adapter);
     }
@@ -658,7 +688,7 @@ public class EventCashBookActivity extends AppCompatActivity implements View.OnC
     public boolean isConnected() {
         boolean connected = false;
         try {
-            ConnectivityManager cm = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
+            ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
             NetworkInfo nInfo = cm.getActiveNetworkInfo();
             connected = nInfo != null && nInfo.isAvailable() && nInfo.isConnected();
             return connected;
@@ -668,7 +698,7 @@ public class EventCashBookActivity extends AppCompatActivity implements View.OnC
         return connected;
     }
 
-    public void orderBy(String order_by){
+    public void orderBy(String order_by) {
         if (status == 0) {
             status = 1;
             orderby = " ORDER BY " + order_by + " DESC";
@@ -699,15 +729,16 @@ public class EventCashBookActivity extends AppCompatActivity implements View.OnC
         document.open();
         document.addLanguage("en-us");
 
-        PdfDictionary parameters = new PdfDictionary();Log.e("PDFDocument","Created2");
+        PdfDictionary parameters = new PdfDictionary();
+        Log.e("PDFDocument", "Created2");
         parameters.put(PdfName.MODDATE, new PdfDate());
 
         Font chapterFont = FontFactory.getFont(FontFactory.HELVETICA, 16, Font.BOLD);
         Font paragraphFont = FontFactory.getFont(FontFactory.HELVETICA, 10, Font.BOLD);
         Chunk chunk = new Chunk("Client Name", chapterFont);
-        Paragraph name = new Paragraph("Address",paragraphFont);
+        Paragraph name = new Paragraph("Address", paragraphFont);
         name.setIndentationLeft(0);
-        Paragraph contact = new Paragraph("Contact",paragraphFont);
+        Paragraph contact = new Paragraph("Contact", paragraphFont);
         contact.setIndentationLeft(0);
 
         PdfPTable title = new PdfPTable(new float[]{3, 3, 3});
@@ -717,25 +748,25 @@ public class EventCashBookActivity extends AppCompatActivity implements View.OnC
         title.setWidthPercentage(100);
         title.getDefaultCell().setVerticalAlignment(Element.ALIGN_MIDDLE);
         title.setSpacingBefore(5);
-        title.addCell(footerCell("",PdfPCell.ALIGN_CENTER));
-        PdfPCell cell = new PdfPCell(new Phrase("Cash Book",chapterFont));
+        title.addCell(footerCell("", PdfPCell.ALIGN_CENTER));
+        PdfPCell cell = new PdfPCell(new Phrase("Cash Book", chapterFont));
         cell.setBorder(PdfPCell.NO_BORDER);
         cell.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
         cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
         title.addCell(cell);
-        title.addCell(footerCell("",PdfPCell.ALIGN_CENTER));
+        title.addCell(footerCell("", PdfPCell.ALIGN_CENTER));
 
 //        PdfPTable param = new PdfPTable(new float[]{3, 3, 3});
-        title.addCell(footerCell("",PdfPCell.ALIGN_CENTER));
-        title.addCell(footerCell("",PdfPCell.ALIGN_CENTER));
+        title.addCell(footerCell("", PdfPCell.ALIGN_CENTER));
+        title.addCell(footerCell("", PdfPCell.ALIGN_CENTER));
 
         PdfPCell pCell = null;
-        if (f.equals("Date")){
-            value = fDate1+" to "+fDate2;
-            pCell = new PdfPCell(new Phrase("Date"+": "+value,paragraphFont));
-        }else {
+        if (f.equals("Date")) {
+            value = fDate1 + " to " + fDate2;
+            pCell = new PdfPCell(new Phrase("Date" + ": " + value, paragraphFont));
+        } else {
             value = searchView.getQuery().toString().trim();
-            pCell = new PdfPCell(new Phrase(spinner.getSelectedItem().toString()+": "+value,paragraphFont));
+            pCell = new PdfPCell(new Phrase(spinner.getSelectedItem().toString() + ": " + value, paragraphFont));
         }
         pCell.setBorder(PdfPCell.NO_BORDER);
         pCell.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
@@ -764,147 +795,147 @@ public class EventCashBookActivity extends AppCompatActivity implements View.OnC
         int mTotal = 0;
 
         Font totalFont = FontFactory.getFont(FontFactory.HELVETICA, 13, Font.BOLD);
-        PdfPCell total = new PdfPCell(new Phrase("Total",totalFont));
+        PdfPCell total = new PdfPCell(new Phrase("Total", totalFont));
         total.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
         total.setVerticalAlignment(Element.ALIGN_MIDDLE);
         total.setFixedHeight(35);
 
-        if (filter > 1 && !searchView.getQuery().toString().equals("") && !f.equals("Date")){
+        if (filter > 1 && !searchView.getQuery().toString().equals("") && !f.equals("Date")) {
             d = "0";
-            for (CashEntry c : filterd){
-                if (d.equals("0")){
-                    PdfPCell section = new PdfPCell(new Phrase(c.getCBDate(),totalFont));
+            for (CashEntry c : filterd) {
+                if (d.equals("0")) {
+                    PdfPCell section = new PdfPCell(new Phrase(c.getCBDate(), totalFont));
                     section.setBorder(PdfPCell.NO_BORDER);
                     section.setFixedHeight(30);
                     section.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
                     section.setVerticalAlignment(Element.ALIGN_MIDDLE);
                     table.addCell(section);
-                    table.addCell(footerCell("",PdfPCell.ALIGN_RIGHT));
-                    table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
-                    table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
-                    table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
+                    table.addCell(footerCell("", PdfPCell.ALIGN_RIGHT));
+                    table.addCell(footerCell("", PdfPCell.ALIGN_LEFT));
+                    table.addCell(footerCell("", PdfPCell.ALIGN_LEFT));
+                    table.addCell(footerCell("", PdfPCell.ALIGN_LEFT));
 //                    table.addCell(footerCell("",PdfPCell.ALIGN_RIGHT));
 
 
 //                    table.addCell(getCell(c.getCBDate(),PdfPCell.ALIGN_LEFT));
-                    table.addCell(getCell(c.getCashBookID(),PdfPCell.ALIGN_RIGHT));
-                    table.addCell(getCell(c.getDebitAccountName(),PdfPCell.ALIGN_LEFT));
-                    table.addCell(getCell(c.getCreditAccountName(),PdfPCell.ALIGN_LEFT));
-                    table.addCell(getCell(c.getCBRemarks(),PdfPCell.ALIGN_LEFT));
-                    table.addCell(getCell(c.getAmount(),PdfPCell.ALIGN_RIGHT));
+                    table.addCell(getCell(c.getCashBookID(), PdfPCell.ALIGN_RIGHT));
+                    table.addCell(getCell(c.getDebitAccountName(), PdfPCell.ALIGN_LEFT));
+                    table.addCell(getCell(c.getCreditAccountName(), PdfPCell.ALIGN_LEFT));
+                    table.addCell(getCell(c.getCBRemarks(), PdfPCell.ALIGN_LEFT));
+                    table.addCell(getCell(c.getAmount(), PdfPCell.ALIGN_RIGHT));
 
                     tot = tot + Integer.valueOf(c.getAmount());
                     mTotal = mTotal + Integer.valueOf(c.getAmount());
                     d = c.getCBDate();
-                }else if(d.equals(c.getCBDate())){
+                } else if (d.equals(c.getCBDate())) {
 //                    table.addCell(getCell(c.getCBDate(),PdfPCell.ALIGN_LEFT));
-                    table.addCell(getCell(c.getCashBookID(),PdfPCell.ALIGN_RIGHT));
-                    table.addCell(getCell(c.getDebitAccountName(),PdfPCell.ALIGN_LEFT));
-                    table.addCell(getCell(c.getCreditAccountName(),PdfPCell.ALIGN_LEFT));
-                    table.addCell(getCell(c.getCBRemarks(),PdfPCell.ALIGN_LEFT));
-                    table.addCell(getCell(c.getAmount(),PdfPCell.ALIGN_RIGHT));
+                    table.addCell(getCell(c.getCashBookID(), PdfPCell.ALIGN_RIGHT));
+                    table.addCell(getCell(c.getDebitAccountName(), PdfPCell.ALIGN_LEFT));
+                    table.addCell(getCell(c.getCreditAccountName(), PdfPCell.ALIGN_LEFT));
+                    table.addCell(getCell(c.getCBRemarks(), PdfPCell.ALIGN_LEFT));
+                    table.addCell(getCell(c.getAmount(), PdfPCell.ALIGN_RIGHT));
 
                     tot = tot + Integer.valueOf(c.getAmount());
                     mTotal = mTotal + Integer.valueOf(c.getAmount());
                     d = c.getCBDate();
-                }else if (!d.equals(c.getCBDate()) && !d.equals("0")){
+                } else if (!d.equals(c.getCBDate()) && !d.equals("0")) {
 //                    table.addCell("");
                     table.addCell("");
                     table.addCell("");
                     table.addCell("");
                     table.addCell(total);
-                    table.addCell(getCell(String.valueOf(tot),PdfPCell.ALIGN_RIGHT));
+                    table.addCell(getCell(String.valueOf(tot), PdfPCell.ALIGN_RIGHT));
                     tot = 0;
 
-                    PdfPCell section = new PdfPCell(new Phrase(c.getCBDate(),totalFont));
+                    PdfPCell section = new PdfPCell(new Phrase(c.getCBDate(), totalFont));
                     section.setBorder(PdfPCell.NO_BORDER);
                     section.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
                     section.setVerticalAlignment(Element.ALIGN_MIDDLE);
                     section.setFixedHeight(30);
                     table.addCell(section);
-                    table.addCell(footerCell("",PdfPCell.ALIGN_RIGHT));
-                    table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
-                    table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
-                    table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
+                    table.addCell(footerCell("", PdfPCell.ALIGN_RIGHT));
+                    table.addCell(footerCell("", PdfPCell.ALIGN_LEFT));
+                    table.addCell(footerCell("", PdfPCell.ALIGN_LEFT));
+                    table.addCell(footerCell("", PdfPCell.ALIGN_LEFT));
 //                    table.addCell(footerCell("",PdfPCell.ALIGN_RIGHT));
 
 //                    table.addCell(getCell(c.getCBDate(),PdfPCell.ALIGN_LEFT));
-                    table.addCell(getCell(c.getCashBookID(),PdfPCell.ALIGN_RIGHT));
-                    table.addCell(getCell(c.getDebitAccountName(),PdfPCell.ALIGN_LEFT));
-                    table.addCell(getCell(c.getCreditAccountName(),PdfPCell.ALIGN_LEFT));
-                    table.addCell(getCell(c.getCBRemarks(),PdfPCell.ALIGN_LEFT));
-                    table.addCell(getCell(c.getAmount(),PdfPCell.ALIGN_RIGHT));
+                    table.addCell(getCell(c.getCashBookID(), PdfPCell.ALIGN_RIGHT));
+                    table.addCell(getCell(c.getDebitAccountName(), PdfPCell.ALIGN_LEFT));
+                    table.addCell(getCell(c.getCreditAccountName(), PdfPCell.ALIGN_LEFT));
+                    table.addCell(getCell(c.getCBRemarks(), PdfPCell.ALIGN_LEFT));
+                    table.addCell(getCell(c.getAmount(), PdfPCell.ALIGN_RIGHT));
 
                     tot = tot + Integer.valueOf(c.getAmount());
                     mTotal = mTotal + Integer.valueOf(c.getAmount());
                     d = c.getCBDate();
                 }
             }
-        }else if (filter > 1 && searchView.getQuery().toString().equals("") && f.equals("Date")){
+        } else if (filter > 1 && searchView.getQuery().toString().equals("") && f.equals("Date")) {
             d = "0";
-            for (CashEntry c : filterd){
-                if (d.equals("0")){
-                    PdfPCell section = new PdfPCell(new Phrase(c.getCBDate(),totalFont));
+            for (CashEntry c : filterd) {
+                if (d.equals("0")) {
+                    PdfPCell section = new PdfPCell(new Phrase(c.getCBDate(), totalFont));
                     section.setBorder(PdfPCell.NO_BORDER);
                     section.setFixedHeight(30);
                     section.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
                     section.setVerticalAlignment(Element.ALIGN_MIDDLE);
                     table.addCell(section);
-                    table.addCell(footerCell("",PdfPCell.ALIGN_RIGHT));
-                    table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
-                    table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
-                    table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
+                    table.addCell(footerCell("", PdfPCell.ALIGN_RIGHT));
+                    table.addCell(footerCell("", PdfPCell.ALIGN_LEFT));
+                    table.addCell(footerCell("", PdfPCell.ALIGN_LEFT));
+                    table.addCell(footerCell("", PdfPCell.ALIGN_LEFT));
 //                    table.addCell(footerCell("",PdfPCell.ALIGN_RIGHT));
 
 
 //                    table.addCell(getCell(c.getCBDate(),PdfPCell.ALIGN_LEFT));
-                    table.addCell(getCell(c.getCashBookID(),PdfPCell.ALIGN_RIGHT));
-                    table.addCell(getCell(c.getDebitAccountName(),PdfPCell.ALIGN_LEFT));
-                    table.addCell(getCell(c.getCreditAccountName(),PdfPCell.ALIGN_LEFT));
-                    table.addCell(getCell(c.getCBRemarks(),PdfPCell.ALIGN_LEFT));
-                    table.addCell(getCell(c.getAmount(),PdfPCell.ALIGN_RIGHT));
+                    table.addCell(getCell(c.getCashBookID(), PdfPCell.ALIGN_RIGHT));
+                    table.addCell(getCell(c.getDebitAccountName(), PdfPCell.ALIGN_LEFT));
+                    table.addCell(getCell(c.getCreditAccountName(), PdfPCell.ALIGN_LEFT));
+                    table.addCell(getCell(c.getCBRemarks(), PdfPCell.ALIGN_LEFT));
+                    table.addCell(getCell(c.getAmount(), PdfPCell.ALIGN_RIGHT));
 
                     tot = tot + Integer.valueOf(c.getAmount());
                     mTotal = mTotal + Integer.valueOf(c.getAmount());
                     d = c.getCBDate();
-                }else if(d.equals(c.getCBDate())){
+                } else if (d.equals(c.getCBDate())) {
 //                    table.addCell(getCell(c.getCBDate(),PdfPCell.ALIGN_LEFT));
-                    table.addCell(getCell(c.getCashBookID(),PdfPCell.ALIGN_RIGHT));
-                    table.addCell(getCell(c.getDebitAccountName(),PdfPCell.ALIGN_LEFT));
-                    table.addCell(getCell(c.getCreditAccountName(),PdfPCell.ALIGN_LEFT));
-                    table.addCell(getCell(c.getCBRemarks(),PdfPCell.ALIGN_LEFT));
-                    table.addCell(getCell(c.getAmount(),PdfPCell.ALIGN_RIGHT));
+                    table.addCell(getCell(c.getCashBookID(), PdfPCell.ALIGN_RIGHT));
+                    table.addCell(getCell(c.getDebitAccountName(), PdfPCell.ALIGN_LEFT));
+                    table.addCell(getCell(c.getCreditAccountName(), PdfPCell.ALIGN_LEFT));
+                    table.addCell(getCell(c.getCBRemarks(), PdfPCell.ALIGN_LEFT));
+                    table.addCell(getCell(c.getAmount(), PdfPCell.ALIGN_RIGHT));
 
                     tot = tot + Integer.valueOf(c.getAmount());
                     mTotal = mTotal + Integer.valueOf(c.getAmount());
                     d = c.getCBDate();
-                }else if (!d.equals(c.getCBDate()) && !d.equals("0")){
+                } else if (!d.equals(c.getCBDate()) && !d.equals("0")) {
 //                    table.addCell("");
                     table.addCell("");
                     table.addCell("");
                     table.addCell("");
                     table.addCell(total);
-                    table.addCell(getCell(String.valueOf(tot),PdfPCell.ALIGN_RIGHT));
+                    table.addCell(getCell(String.valueOf(tot), PdfPCell.ALIGN_RIGHT));
                     tot = 0;
 
-                    PdfPCell section = new PdfPCell(new Phrase(c.getCBDate(),totalFont));
+                    PdfPCell section = new PdfPCell(new Phrase(c.getCBDate(), totalFont));
                     section.setBorder(PdfPCell.NO_BORDER);
                     section.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
                     section.setVerticalAlignment(Element.ALIGN_MIDDLE);
                     section.setFixedHeight(30);
                     table.addCell(section);
-                    table.addCell(footerCell("",PdfPCell.ALIGN_RIGHT));
-                    table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
-                    table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
-                    table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
+                    table.addCell(footerCell("", PdfPCell.ALIGN_RIGHT));
+                    table.addCell(footerCell("", PdfPCell.ALIGN_LEFT));
+                    table.addCell(footerCell("", PdfPCell.ALIGN_LEFT));
+                    table.addCell(footerCell("", PdfPCell.ALIGN_LEFT));
 //                    table.addCell(footerCell("",PdfPCell.ALIGN_RIGHT));
 
 //                    table.addCell(getCell(c.getCBDate(),PdfPCell.ALIGN_LEFT));
-                    table.addCell(getCell(c.getCashBookID(),PdfPCell.ALIGN_RIGHT));
-                    table.addCell(getCell(c.getDebitAccountName(),PdfPCell.ALIGN_LEFT));
-                    table.addCell(getCell(c.getCreditAccountName(),PdfPCell.ALIGN_LEFT));
-                    table.addCell(getCell(c.getCBRemarks(),PdfPCell.ALIGN_LEFT));
-                    table.addCell(getCell(c.getAmount(),PdfPCell.ALIGN_RIGHT));
+                    table.addCell(getCell(c.getCashBookID(), PdfPCell.ALIGN_RIGHT));
+                    table.addCell(getCell(c.getDebitAccountName(), PdfPCell.ALIGN_LEFT));
+                    table.addCell(getCell(c.getCreditAccountName(), PdfPCell.ALIGN_LEFT));
+                    table.addCell(getCell(c.getCBRemarks(), PdfPCell.ALIGN_LEFT));
+                    table.addCell(getCell(c.getAmount(), PdfPCell.ALIGN_RIGHT));
 
                     tot = tot + Integer.valueOf(c.getAmount());
                     mTotal = mTotal + Integer.valueOf(c.getAmount());
@@ -913,70 +944,70 @@ public class EventCashBookActivity extends AppCompatActivity implements View.OnC
             }
         } else {
             d = "0";
-            for (CashBook c : cashBooksList){
+            for (CashBook c : cashBooksList) {
 
-                if (d.equals("0")){
+                if (d.equals("0")) {
 
-                    PdfPCell section = new PdfPCell(new Phrase(c.getCBDate(),totalFont));
+                    PdfPCell section = new PdfPCell(new Phrase(c.getCBDate(), totalFont));
                     section.setBorder(PdfPCell.NO_BORDER);
                     section.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
                     section.setVerticalAlignment(Element.ALIGN_MIDDLE);
                     section.setFixedHeight(30);
                     table.addCell(section);
-                    table.addCell(footerCell("",PdfPCell.ALIGN_RIGHT));
-                    table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
-                    table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
-                    table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
+                    table.addCell(footerCell("", PdfPCell.ALIGN_RIGHT));
+                    table.addCell(footerCell("", PdfPCell.ALIGN_LEFT));
+                    table.addCell(footerCell("", PdfPCell.ALIGN_LEFT));
+                    table.addCell(footerCell("", PdfPCell.ALIGN_LEFT));
 //                    table.addCell(footerCell("",PdfPCell.ALIGN_RIGHT));
 
 //                    table.addCell(getCell(c.getCBDate(),PdfPCell.ALIGN_LEFT));
-                    table.addCell(getCell(c.getCashBookID(),PdfPCell.ALIGN_RIGHT));
-                    table.addCell(getCell(c.getDebitAccountName(),PdfPCell.ALIGN_LEFT));
-                    table.addCell(getCell(c.getCreditAccountName(),PdfPCell.ALIGN_LEFT));
-                    table.addCell(getCell(c.getCBRemarks(),PdfPCell.ALIGN_LEFT));
-                    table.addCell(getCell(c.getAmount(),PdfPCell.ALIGN_RIGHT));
+                    table.addCell(getCell(c.getCashBookID(), PdfPCell.ALIGN_RIGHT));
+                    table.addCell(getCell(c.getDebitAccountName(), PdfPCell.ALIGN_LEFT));
+                    table.addCell(getCell(c.getCreditAccountName(), PdfPCell.ALIGN_LEFT));
+                    table.addCell(getCell(c.getCBRemarks(), PdfPCell.ALIGN_LEFT));
+                    table.addCell(getCell(c.getAmount(), PdfPCell.ALIGN_RIGHT));
 
                     tot = tot + Integer.valueOf(c.getAmount());
                     mTotal = mTotal + Integer.valueOf(c.getAmount());
                     d = c.getCBDate();
-                }else if(d.equals(c.getCBDate())){
+                } else if (d.equals(c.getCBDate())) {
 //                    table.addCell(getCell(c.getCBDate(),PdfPCell.ALIGN_LEFT));
-                    table.addCell(getCell(c.getCashBookID(),PdfPCell.ALIGN_RIGHT));
-                    table.addCell(getCell(c.getDebitAccountName(),PdfPCell.ALIGN_LEFT));
-                    table.addCell(getCell(c.getCreditAccountName(),PdfPCell.ALIGN_LEFT));
-                    table.addCell(getCell(c.getCBRemarks(),PdfPCell.ALIGN_LEFT));
-                    table.addCell(getCell(c.getAmount(),PdfPCell.ALIGN_RIGHT));
+                    table.addCell(getCell(c.getCashBookID(), PdfPCell.ALIGN_RIGHT));
+                    table.addCell(getCell(c.getDebitAccountName(), PdfPCell.ALIGN_LEFT));
+                    table.addCell(getCell(c.getCreditAccountName(), PdfPCell.ALIGN_LEFT));
+                    table.addCell(getCell(c.getCBRemarks(), PdfPCell.ALIGN_LEFT));
+                    table.addCell(getCell(c.getAmount(), PdfPCell.ALIGN_RIGHT));
 
                     tot = tot + Integer.valueOf(c.getAmount());
                     mTotal = mTotal + Integer.valueOf(c.getAmount());
                     d = c.getCBDate();
-                }else if (!d.equals(c.getCBDate()) && !d.equals("0")){
+                } else if (!d.equals(c.getCBDate()) && !d.equals("0")) {
 //                    table.addCell("");
                     table.addCell("");
                     table.addCell("");
                     table.addCell("");
                     table.addCell(total);
-                    table.addCell(getCell(String.valueOf(tot),PdfPCell.ALIGN_RIGHT));
+                    table.addCell(getCell(String.valueOf(tot), PdfPCell.ALIGN_RIGHT));
                     tot = 0;
 
-                    PdfPCell section = new PdfPCell(new Phrase(c.getCBDate(),totalFont));
+                    PdfPCell section = new PdfPCell(new Phrase(c.getCBDate(), totalFont));
                     section.setBorder(PdfPCell.NO_BORDER);
                     section.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
                     section.setVerticalAlignment(Element.ALIGN_MIDDLE);
                     section.setFixedHeight(30);
                     table.addCell(section);
-                    table.addCell(footerCell("",PdfPCell.ALIGN_RIGHT));
-                    table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
-                    table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
-                    table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
+                    table.addCell(footerCell("", PdfPCell.ALIGN_RIGHT));
+                    table.addCell(footerCell("", PdfPCell.ALIGN_LEFT));
+                    table.addCell(footerCell("", PdfPCell.ALIGN_LEFT));
+                    table.addCell(footerCell("", PdfPCell.ALIGN_LEFT));
 //                    table.addCell(footerCell("",PdfPCell.ALIGN_RIGHT));
 
 //                    table.addCell(getCell(c.getCBDate(),PdfPCell.ALIGN_LEFT));
-                    table.addCell(getCell(c.getCashBookID(),PdfPCell.ALIGN_RIGHT));
-                    table.addCell(getCell(c.getDebitAccountName(),PdfPCell.ALIGN_LEFT));
-                    table.addCell(getCell(c.getCreditAccountName(),PdfPCell.ALIGN_LEFT));
-                    table.addCell(getCell(c.getCBRemarks(),PdfPCell.ALIGN_LEFT));
-                    table.addCell(getCell(c.getAmount(),PdfPCell.ALIGN_RIGHT));
+                    table.addCell(getCell(c.getCashBookID(), PdfPCell.ALIGN_RIGHT));
+                    table.addCell(getCell(c.getDebitAccountName(), PdfPCell.ALIGN_LEFT));
+                    table.addCell(getCell(c.getCreditAccountName(), PdfPCell.ALIGN_LEFT));
+                    table.addCell(getCell(c.getCBRemarks(), PdfPCell.ALIGN_LEFT));
+                    table.addCell(getCell(c.getAmount(), PdfPCell.ALIGN_RIGHT));
 
                     tot = tot + Integer.valueOf(c.getAmount());
                     mTotal = mTotal + Integer.valueOf(c.getAmount());
@@ -990,14 +1021,14 @@ public class EventCashBookActivity extends AppCompatActivity implements View.OnC
         table.addCell("");
         table.addCell("");
         table.addCell(total);
-        table.addCell(getCell(String.valueOf(tot),PdfPCell.ALIGN_RIGHT));
+        table.addCell(getCell(String.valueOf(tot), PdfPCell.ALIGN_RIGHT));
 
 //        table.addCell("");
         table.addCell("");
         table.addCell("");
         table.addCell("");
         table.addCell("Grand Total");
-        table.addCell(getCell(String.valueOf(mTotal),PdfPCell.ALIGN_RIGHT));
+        table.addCell(getCell(String.valueOf(mTotal), PdfPCell.ALIGN_RIGHT));
 
 //        Footer footer = new Footer();
 
@@ -1015,7 +1046,7 @@ public class EventCashBookActivity extends AppCompatActivity implements View.OnC
 
         document.close();
         customPDFView();
-        Log.e("PDFDocument","Created");
+        Log.e("PDFDocument", "Created");
     }
 
     public PdfPCell getCell(String text, int alignment) {
@@ -1036,7 +1067,7 @@ public class EventCashBookActivity extends AppCompatActivity implements View.OnC
         return cell;
     }
 
-    public void customPDFView(){
+    public void customPDFView() {
         PackageManager packageManager = getPackageManager();
         Intent testIntent = new Intent(Intent.ACTION_VIEW);
         testIntent.setType("application/pdf");
@@ -1063,7 +1094,7 @@ public class EventCashBookActivity extends AppCompatActivity implements View.OnC
             try {
                 total = Image.getInstance(t);
                 total.setRole(PdfName.ARTIFACT);
-                font =  new Font(Font.FontFamily.TIMES_ROMAN, 30.0f, Font.UNDERLINE, BaseColor.BLACK);
+                font = new Font(Font.FontFamily.TIMES_ROMAN, 30.0f, Font.UNDERLINE, BaseColor.BLACK);
             } catch (DocumentException de) {
                 throw new ExceptionConverter(de);
             }
@@ -1080,12 +1111,12 @@ public class EventCashBookActivity extends AppCompatActivity implements View.OnC
             Date dat = new Date();
             SimpleDateFormat df = new SimpleDateFormat("EEE, d MMM yyyy");
             table.addCell(footerCell(df.format(dat), PdfPCell.ALIGN_LEFT));
-            table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
-            Log.e("PAGE NUMBER",String.valueOf(writer.getPageNumber()));
-            table.addCell(footerCell(String.format("Page %s", writer.getPageNumber() - 1),PdfPCell.ALIGN_LEFT));
-            table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
-            table.addCell(footerCell("www.easysoft.com.pk",PdfPCell.ALIGN_LEFT));
-            table.addCell(footerCell("",PdfPCell.ALIGN_LEFT));
+            table.addCell(footerCell("", PdfPCell.ALIGN_LEFT));
+            Log.e("PAGE NUMBER", String.valueOf(writer.getPageNumber()));
+            table.addCell(footerCell(String.format("Page %s", writer.getPageNumber() - 1), PdfPCell.ALIGN_LEFT));
+            table.addCell(footerCell("", PdfPCell.ALIGN_LEFT));
+            table.addCell(footerCell("www.easysoft.com.pk", PdfPCell.ALIGN_LEFT));
+            table.addCell(footerCell("", PdfPCell.ALIGN_LEFT));
 
             PdfContentByte canvas = writer.getDirectContent();
             canvas.beginMarkedContentSequence(PdfName.ARTIFACT);
@@ -1105,22 +1136,25 @@ public class EventCashBookActivity extends AppCompatActivity implements View.OnC
     //FOR TESTING CASHBOOK
     String cashID, incomeID, expenseID;
 
-    public void refereshTables(Context context){
+    public void refereshTables(Context context) {
 
-        cashID = databaseHelper.getID("SELECT AcNameID FROM Account3Name WHERE ClientID = "+prefrence.getClientIDSession()+" and AcName = 'Cash'");
-        incomeID = databaseHelper.getID("SELECT AcNameID FROM Account3Name WHERE ClientID = "+prefrence.getClientIDSession()+" and AcName = 'Booking Income'");
-        expenseID = databaseHelper.getID("SELECT AcNameID FROM Account3Name WHERE ClientID = "+prefrence.getClientIDSession()+" and AcName = 'Booking Expense'");
+        cashID = databaseHelper.getID("SELECT AcNameID FROM Account3Name WHERE ClientID = " + prefrence.getClientIDSession() + " and AcName = 'Cash'");
+        incomeID = databaseHelper.getID("SELECT AcNameID FROM Account3Name WHERE ClientID = " + prefrence.getClientIDSession() + " and AcName = 'Booking Income'");
+        expenseID = databaseHelper.getID("SELECT AcNameID FROM Account3Name WHERE ClientID = " + prefrence.getClientIDSession() + " and AcName = 'Booking Expense'");
 
         databaseHelper = new DatabaseHelper(context);
         mProgress = new ProgressDialog(context);
         mProgress.setMessage("Loading...");
         mProgress.setCancelable(false);
+        Log.e("sta", "refresh Click Booking");
         mProgress.show();
+
+
         getAccount3Name();
 
     }
 
-    public void getAccount3Name(){
+    public void getAccount3Name() {
         String tag_json_obj = "json_obj_req";
         String u = "http://69.167.137.121/plesk-site-preview/sky.com.pk/shadiHall/RefreshAccount3Name.php";
 
@@ -1132,14 +1166,14 @@ public class EventCashBookActivity extends AppCompatActivity implements View.OnC
                         JSONObject jsonObj = null;
 
                         try {
-                            jsonObj= new JSONObject(response);
+                            jsonObj = new JSONObject(response);
                             String success = jsonObj.getString("success");
-                            Log.e("Account3Name1",jsonObj.toString());
-                            if (success.equals("1")){
+                            Log.e("Account3Name1", jsonObj.toString());
+                            if (success.equals("1")) {
                                 JSONArray jsonArray = jsonObj.getJSONArray("Account3Name");
                                 for (int i = 0; i < jsonArray.length(); i++) {
                                     JSONObject jsonObject = jsonArray.getJSONObject(i);
-                                    Log.e("Account3Name",jsonObject.toString());
+                                    Log.e("Account3Name", jsonObject.toString());
                                     String AcNameID = jsonObject.getString("AcNameID");
                                     String AcName = jsonObject.getString("AcName");
                                     String AcGroupID = jsonObject.getString("AcGroupID");
@@ -1163,7 +1197,7 @@ public class EventCashBookActivity extends AppCompatActivity implements View.OnC
                                     String Salary = jsonObject.getString("Salary");
                                     String SessionDate = jsonObject.getString("SessionDate");
 
-                                    databaseHelper.createAccount3Name(new Account3Name(AcNameID,AcName,AcGroupID,AcAddress,AcMobileNo,AcContactNo,AcEmailAddress,AcDebitBal,AcCreditBal,AcPassward,ClientID,ClientUserID,SysCode,NetCode,UpdatedDate,SerialNo,UserRights,SecurityRights,Salary));
+                                    databaseHelper.createAccount3Name(new Account3Name(AcNameID, AcName, AcGroupID, AcAddress, AcMobileNo, AcContactNo, AcEmailAddress, AcDebitBal, AcCreditBal, AcPassward, ClientID, ClientUserID, SysCode, NetCode, UpdatedDate, SerialNo, UserRights, SecurityRights, Salary));
                                     updatedDate = SessionDate;
 //                                    if (i == jsonArray.length() - 1) {
 //                                        List<TableSession> se = TableSession.find(TableSession.class,"table_Name = ?","Account3Name");
@@ -1177,7 +1211,7 @@ public class EventCashBookActivity extends AppCompatActivity implements View.OnC
 
                                 }
 
-                            }else {
+                            } else {
                                 String message = jsonObj.getString("message");
 //                                Toast.makeText(SplashActivity.this, message, Toast.LENGTH_SHORT).show();
                             }
@@ -1190,10 +1224,10 @@ public class EventCashBookActivity extends AppCompatActivity implements View.OnC
             @Override
             public void onErrorResponse(VolleyError error) {
 //                mProgress.dismiss();
-                Log.e("Error",error.toString());
+                Log.e("Error", error.toString());
 //                Toast.makeText(SplashActivity.this, error.toString(), Toast.LENGTH_LONG).show();
             }
-        }){
+        }) {
             @Override
             protected Map<String, String> getParams() {
                 Map<String, String> params = new HashMap<String, String>();
@@ -1210,7 +1244,7 @@ public class EventCashBookActivity extends AppCompatActivity implements View.OnC
         AppController.getInstance().addToRequestQueue(jsonObjectRequest, tag_json_obj);
     }
 
-    public void updateAccount3Name(){
+    public void updateAccount3Name() {
         String tag_json_obj = "json_obj_req";
         String u = "http://69.167.137.121/plesk-site-preview/sky.com.pk/shadiHall/RefreshAccount3Name.php";
 
@@ -1222,14 +1256,14 @@ public class EventCashBookActivity extends AppCompatActivity implements View.OnC
                         JSONObject jsonObj = null;
 
                         try {
-                            jsonObj= new JSONObject(response);
+                            jsonObj = new JSONObject(response);
                             String success = jsonObj.getString("success");
-                            Log.e("Account3Name2",jsonObj.toString());
-                            if (success.equals("1")){
+                            Log.e("Account3Name2", jsonObj.toString());
+                            if (success.equals("1")) {
                                 JSONArray jsonArray = jsonObj.getJSONArray("Account3Name");
                                 for (int i = 0; i < jsonArray.length(); i++) {
                                     JSONObject jsonObject = jsonArray.getJSONObject(i);
-                                    Log.e("Account3Name",jsonObject.toString());
+                                    Log.e("Account3Name", jsonObject.toString());
                                     String AcNameID = jsonObject.getString("AcNameID");
                                     String AcName = jsonObject.getString("AcName");
                                     String AcGroupID = jsonObject.getString("AcGroupID");
@@ -1253,12 +1287,13 @@ public class EventCashBookActivity extends AppCompatActivity implements View.OnC
                                     String Salary = jsonObject.getString("Salary");
                                     String SessionDate = jsonObject.getString("SessionDate");
 
-                                    String query = "UPDATE Account3Name SET AcNameID = '"+AcNameID+"', AcName = '"+AcName+"', AcGroupID = '"+AcGroupID+"', AcAddress = '"+AcAddress+"', AcMobileNo = '"+AcMobileNo
-                                            + "', AcContactNo = '"+AcContactNo+"', AcEmailAddress = '"+AcEmailAddress+"', AcDebitBal = '"+AcDebitBal+"', AcCreditBal = '"+AcCreditBal+"', AcPassward = '"+AcPassward
-                                            + "', ClientID = '"+ClientID+"', ClientUserID = '"+ClientUserID+"', SysCode = '"+SysCode+"', NetCode = '"+NetCode+"', UpdatedDate = '"+UpdatedDate+"', SerialNo = '"+SerialNo
-                                            +"', UserRights = '"+UserRights+"', SecurityRights = '"+SecurityRights+"', Salary '"+Salary+"' WHERE AcNameID = "+AcNameID;
+                                    String query = "UPDATE Account3Name SET AcNameID = '" + AcNameID + "', AcName = '" + AcName + "', AcGroupID = '" + AcGroupID + "', AcAddress = '" + AcAddress + "', AcMobileNo = '" + AcMobileNo
+                                            + "', AcContactNo = '" + AcContactNo + "', AcEmailAddress = '" + AcEmailAddress + "', AcDebitBal = '" + AcDebitBal + "', AcCreditBal = '" + AcCreditBal + "', AcPassward = '" + AcPassward
+                                            + "', ClientID = '" + ClientID + "', ClientUserID = '" + ClientUserID + "', SysCode = '" + SysCode + "', NetCode = '" + NetCode + "', UpdatedDate = '" + UpdatedDate + "', SerialNo = '" + SerialNo
+                                            + "', UserRights = '" + UserRights + "', SecurityRights = '" + SecurityRights + "', Salary '" + Salary + "' WHERE AcNameID = " + AcNameID;
                                     databaseHelper.updateAccount3Name(query);
                                     updatedDate = SessionDate;
+
 //                                    if (i == jsonArray.length() - 1) {
 //                                        List<TableSession> se = TableSession.find(TableSession.class,"table_Name = ?","Account3Name");
 //                                        for (TableSession s : se){
@@ -1270,10 +1305,11 @@ public class EventCashBookActivity extends AppCompatActivity implements View.OnC
 
                                 }
 
-                            }else {
+                            } else {
                                 String message = jsonObj.getString("message");
 //                                Toast.makeText(SplashActivity.this, message, Toast.LENGTH_SHORT).show();
-                            }Log.e("Sarem","CashBook1");
+                            }
+                            Log.e("Sarem", "CashBook1");
                             getCashBook1();
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -1283,19 +1319,19 @@ public class EventCashBookActivity extends AppCompatActivity implements View.OnC
             @Override
             public void onErrorResponse(VolleyError error) {
 //                mProgress.dismiss();
-                Log.e("Error",error.toString());
+                Log.e("Error", error.toString());
 //                Toast.makeText(SplashActivity.this, error.toString(), Toast.LENGTH_LONG).show();
             }
-        }){
+        }) {
             @Override
             protected Map<String, String> getParams() {
                 Map<String, String> params = new HashMap<String, String>();
 
                 params.put("ClientID", prefrence.getClientIDSession());
                 int maxID = databaseHelper.getMaxValue("SELECT max(CAST(AcNameID AS Int)) FROM Account3Name");
-                params.put("MaxID",String.valueOf(maxID));
+                params.put("MaxID", String.valueOf(maxID));
                 String date = databaseHelper.getClientUpdatedDate(prefrence.getClientIDSession());
-                params.put("SessionDate",date);
+                params.put("SessionDate", date);
 
                 return params;
             }
@@ -1306,7 +1342,7 @@ public class EventCashBookActivity extends AppCompatActivity implements View.OnC
         AppController.getInstance().addToRequestQueue(jsonObjectRequest, tag_json_obj);
     }
 
-    public void getCashBook1(){
+    public void getCashBook1() {
 
         String tag_json_obj = "json_obj_req";
         String u = "http://69.167.137.121/plesk-site-preview/sky.com.pk/shadiHall/RefreshCashBook.php";
@@ -1319,10 +1355,10 @@ public class EventCashBookActivity extends AppCompatActivity implements View.OnC
                         JSONObject jsonObj = null;
 
                         try {
-                            jsonObj= new JSONObject(response);
+                            jsonObj = new JSONObject(response);
                             String success = jsonObj.getString("success");
-                            Log.e("CashBook1",jsonObj.toString());
-                            if (success.equals("1")){
+                            Log.e("CashBook1", jsonObj.toString());
+                            if (success.equals("1")) {
                                 JSONArray jsonArray = jsonObj.getJSONArray("CashBook");
                                 for (int i = 0; i < jsonArray.length(); i++) {
                                     JSONObject jsonObject = jsonArray.getJSONObject(i);
@@ -1350,7 +1386,7 @@ public class EventCashBookActivity extends AppCompatActivity implements View.OnC
                                     String SerialNo = jsonObject.getString("SerialNo");
                                     String TableName = jsonObject.getString("TableName");
 
-                                    databaseHelper.createCashBook(new CashBook(CashBookID,CBDate1,DebitAccount,CreditAccount,CBRemark,Amount,ClientID,ClientUserID,NetCode,SysCode,UpdatedDate,TableID, SerialNo, TableName));
+                                    databaseHelper.createCashBook(new CashBook(CashBookID, CBDate1, DebitAccount, CreditAccount, CBRemark, Amount, ClientID, ClientUserID, NetCode, SysCode, UpdatedDate, TableID, SerialNo, TableName));
                                     updatedDate = SessionDate;
 //                                    if (i == jsonArray.length() - 1) {
 //                                        List<TableSession> se = TableSession.find(TableSession.class,"table_Name = ?","CashBook");
@@ -1364,10 +1400,11 @@ public class EventCashBookActivity extends AppCompatActivity implements View.OnC
 
                                 }
 
-                            }else {
+                            } else {
                                 String message = jsonObj.getString("message");
 //                                Toast.makeText(SplashActivity.this, message, Toast.LENGTH_SHORT).show();
-                            }Log.e("Sarem","CashBook2");
+                            }
+                            Log.e("Sarem", "CashBook2");
                             updateCashBook();
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -1379,10 +1416,10 @@ public class EventCashBookActivity extends AppCompatActivity implements View.OnC
             @Override
             public void onErrorResponse(VolleyError error) {
 //                mProgress.dismiss();
-                Log.e("Error",error.toString());
+                Log.e("Error", error.toString());
 //                Toast.makeText(SplashActivity.this, error.toString(), Toast.LENGTH_LONG).show();
             }
-        }){
+        }) {
             @Override
             protected Map<String, String> getParams() {
                 Map<String, String> params = new HashMap<String, String>();
@@ -1390,9 +1427,9 @@ public class EventCashBookActivity extends AppCompatActivity implements View.OnC
                 params.put("ClientID", prefrence.getClientIDSession());
                 int maxID = databaseHelper.getMaxValue("SELECT max(CAST(CashBookID AS Int)) FROM CashBook");
                 Log.e("MAXIDCASH", String.valueOf(maxID));
-                params.put("MaxID",String.valueOf(maxID));
+                params.put("MaxID", String.valueOf(maxID));
 
-                Log.e("MAXID",String.valueOf(maxID));
+                Log.e("MAXID", String.valueOf(maxID));
 
                 return params;
             }
@@ -1403,7 +1440,7 @@ public class EventCashBookActivity extends AppCompatActivity implements View.OnC
         AppController.getInstance().addToRequestQueue(jsonObjectRequest, tag_json_obj);
     }
 
-    public void updateCashBook(){
+    public void updateCashBook() {
 
         String tag_json_obj = "json_obj_req";
         String u = "http://69.167.137.121/plesk-site-preview/sky.com.pk/shadiHall/RefreshCashBook.php";
@@ -1416,14 +1453,14 @@ public class EventCashBookActivity extends AppCompatActivity implements View.OnC
                         JSONObject jsonObj = null;
 
                         try {
-                            jsonObj= new JSONObject(response);
-                            Log.e("CashBook2",response);
+                            jsonObj = new JSONObject(response);
+                            Log.e("CashBook2", response);
                             String success = jsonObj.getString("success");
-                            if (success.equals("1")){
+                            if (success.equals("1")) {
                                 JSONArray jsonArray = jsonObj.getJSONArray("CashBook");
                                 for (int i = 0; i < jsonArray.length(); i++) {
                                     JSONObject jsonObject = jsonArray.getJSONObject(i);
-                                    Log.e("Account3Name",jsonObject.toString());
+                                    Log.e("Account3Name", jsonObject.toString());
                                     String CashBookID = jsonObject.getString("CashBookID");
                                     String cb = jsonObject.getString("CBDate");
                                     JSONObject jbb = new JSONObject(cb);
@@ -1446,8 +1483,8 @@ public class EventCashBookActivity extends AppCompatActivity implements View.OnC
                                     String TableID = jsonObject.getString("TableID");
                                     String SessionDate = jsonObject.getString("SessionDate");
 
-                                    String query = "UPDATE CashBook SET CBDate = '"+CBDate1+"', DebitAccount = '"+DebitAccount+"', CreditAccount = '"+CreditAccount+"', CBRemarks = '"+CBRemark+"', Amount = '"+Amount+"', ClientID = '"+ClientID+"', ClientUserID = '"+ClientUserID+"', NetCode = '"+NetCode+"', SysCode = '"+SysCode+"', UpdatedDate = '"+UpdatedDate+"', TableID = '"+TableID+
-                                            "' WHERE CashBookID = "+CashBookID;
+                                    String query = "UPDATE CashBook SET CBDate = '" + CBDate1 + "', DebitAccount = '" + DebitAccount + "', CreditAccount = '" + CreditAccount + "', CBRemarks = '" + CBRemark + "', Amount = '" + Amount + "', ClientID = '" + ClientID + "', ClientUserID = '" + ClientUserID + "', NetCode = '" + NetCode + "', SysCode = '" + SysCode + "', UpdatedDate = '" + UpdatedDate + "', TableID = '" + TableID +
+                                            "' WHERE CashBookID = " + CashBookID;
                                     databaseHelper.updateCashBook(query);
                                     updatedDate = SessionDate;
                                     getCashBook();
@@ -1463,10 +1500,11 @@ public class EventCashBookActivity extends AppCompatActivity implements View.OnC
 
                                 }
 
-                            }else {
+                            } else {
                                 String message = jsonObj.getString("message");
 //                                Toast.makeText(SplashActivity.this, message, Toast.LENGTH_SHORT).show();
-                            }Log.e("Sarem","CashBook3");
+                            }
+                            Log.e("Sarem", "CashBook3");
                             getBookings1();
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -1478,10 +1516,10 @@ public class EventCashBookActivity extends AppCompatActivity implements View.OnC
             @Override
             public void onErrorResponse(VolleyError error) {
 //                mProgress.dismiss();
-                Log.e("Error",error.toString());
+                Log.e("Error", error.toString());
 //                Toast.makeText(SplashActivity.this, error.toString(), Toast.LENGTH_LONG).show();
             }
-        }){
+        }) {
             @Override
             protected Map<String, String> getParams() {
                 Map<String, String> params = new HashMap<String, String>();
@@ -1489,9 +1527,9 @@ public class EventCashBookActivity extends AppCompatActivity implements View.OnC
                 params.put("ClientID", prefrence.getClientIDSession());
                 int maxID = databaseHelper.getMaxValue("SELECT max(CAST(CashBookID AS Int)) FROM CashBook");
                 Log.e("MAXIDCASH", String.valueOf(maxID));
-                params.put("MaxID",String.valueOf(maxID));
+                params.put("MaxID", String.valueOf(maxID));
                 String date = databaseHelper.getClientUpdatedDate(prefrence.getClientIDSession());
-                params.put("SessionDate",date);
+                params.put("SessionDate", date);
 
                 return params;
             }
@@ -1502,7 +1540,7 @@ public class EventCashBookActivity extends AppCompatActivity implements View.OnC
         AppController.getInstance().addToRequestQueue(jsonObjectRequest, tag_json_obj);
     }
 
-    public void getBookings1(){
+    public void getBookings1() {
         // Tag used to cancel the request
         String tag_json_obj = "json_obj_req";
         String url = "http://69.167.137.121/plesk-site-preview/sky.com.pk/shadiHall/RefreshBooking.php";
@@ -1512,9 +1550,9 @@ public class EventCashBookActivity extends AppCompatActivity implements View.OnC
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-                        Log.e("Booking1",response);
+                        Log.e("Booking1", response);
                         String text = "", BookingID = "", ClientName = "", ClientMobile = "", ClientAddress = "", ClientNic = "", EventName = "", BookingDate = "", EventDate = "",
-                                ArrangePersons ="", ChargesTotal = "",Description = "", ClientID ="", ClientUserID = "", NetCode = "",SysCode = "", UpdatedDate = "";
+                                ArrangePersons = "", ChargesTotal = "", Description = "", ClientID = "", ClientUserID = "", NetCode = "", SysCode = "", UpdatedDate = "";
                         try {
                             JSONObject json = new JSONObject(response);
                             String success = json.getString("success");
@@ -1536,7 +1574,7 @@ public class EventCashBookActivity extends AppCompatActivity implements View.OnC
                                     String ed = jsonObject.getString("EventDate");
                                     JSONObject jb = new JSONObject(ed);
                                     EventDate = jb.getString("date");
-                                    Log.e("TEST",EventDate);
+                                    Log.e("TEST", EventDate);
                                     ArrangePersons = jsonObject.getString("ArrangePersons");
                                     ChargesTotal = jsonObject.getString("ChargesTotal");
                                     Description = jsonObject.getString("Description");
@@ -1544,7 +1582,7 @@ public class EventCashBookActivity extends AppCompatActivity implements View.OnC
                                     ClientUserID = jsonObject.getString("ClientUserID");
                                     NetCode = jsonObject.getString("NetCode");
                                     SysCode = jsonObject.getString("SysCode");
-                                    Log.e("TEST","TEST");
+                                    Log.e("TEST", "TEST");
                                     String up = jsonObject.getString("UpdatedDate");
                                     JSONObject jbb = new JSONObject(up);
                                     UpdatedDate = jbb.getString("date");
@@ -1552,7 +1590,7 @@ public class EventCashBookActivity extends AppCompatActivity implements View.OnC
                                     String Shift = jsonObject.getString("Shift");
                                     String SerialNo = jsonObject.getString("SerialNo");
 
-                                    databaseHelper.createBooking(new Bookings(BookingID,ClientName,ClientMobile,ClientAddress,ClientNic,EventName,BookingDate,EventDate,ArrangePersons,ChargesTotal,Description,ClientID,ClientUserID,NetCode,SysCode,UpdatedDate,Shift, SerialNo));
+                                    databaseHelper.createBooking(new Bookings(BookingID, ClientName, ClientMobile, ClientAddress, ClientNic, EventName, BookingDate, EventDate, ArrangePersons, ChargesTotal, Description, ClientID, ClientUserID, NetCode, SysCode, UpdatedDate, Shift, SerialNo));
                                     updatedDate = SessionDate;
 //                                    if (i == jsonArray.length() - 1) {
 //                                        List<TableSession> se = TableSession.find(TableSession.class,"table_Name = ?","Bookings");
@@ -1566,9 +1604,10 @@ public class EventCashBookActivity extends AppCompatActivity implements View.OnC
 
 //                                FetchFromDb();
 //                                pDialog.dismiss();
-                            }else {
+                            } else {
 //                                pDialog.dismiss();
-                            }Log.e("Sarem","CashBook4");
+                            }
+                            Log.e("Sarem", "CashBook4");
                             updateBookings();
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -1582,14 +1621,14 @@ public class EventCashBookActivity extends AppCompatActivity implements View.OnC
 //                pDialog.dismiss();
 //                Toast.makeText(SplashActivity.this, error.toString(), Toast.LENGTH_LONG).show();
             }
-        }){
+        }) {
             @Override
             protected Map<String, String> getParams() {
                 Map<String, String> params = new HashMap<String, String>();
 
                 params.put("ClientID", prefrence.getClientIDSession());
                 int maxID = databaseHelper.getMaxValue("SELECT max(CAST(BookingID AS Int)) FROM Booking");
-                params.put("MaxID",String.valueOf(maxID));
+                params.put("MaxID", String.valueOf(maxID));
 
                 return params;
             }
@@ -1601,7 +1640,7 @@ public class EventCashBookActivity extends AppCompatActivity implements View.OnC
         AppController.getInstance().addToRequestQueue(jsonObjectRequest, tag_json_obj);
     }
 
-    public void updateBookings(){
+    public void updateBookings() {
         // Tag used to cancel the request
         String tag_json_obj = "json_obj_req";
         String url = "http://69.167.137.121/plesk-site-preview/sky.com.pk/shadiHall/RefreshBooking.php";
@@ -1613,11 +1652,11 @@ public class EventCashBookActivity extends AppCompatActivity implements View.OnC
                     public void onResponse(String response) {
 
                         String text = "", BookingID = "", ClientName = "", ClientMobile = "", ClientAddress = "", ClientNic = "", EventName = "", BookingDate = "", EventDate = "",
-                                ArrangePersons ="", ChargesTotal = "",Description = "", ClientID ="", ClientUserID = "", NetCode = "",SysCode = "", UpdatedDate = "";
+                                ArrangePersons = "", ChargesTotal = "", Description = "", ClientID = "", ClientUserID = "", NetCode = "", SysCode = "", UpdatedDate = "";
                         try {
                             JSONObject json = new JSONObject(response);
                             String success = json.getString("success");
-                            Log.e("Booking2",json.toString());
+                            Log.e("Booking2", json.toString());
 
                             if (success.equals("1")) {
                                 JSONArray jsonArray = json.getJSONArray("Bookings");
@@ -1636,7 +1675,7 @@ public class EventCashBookActivity extends AppCompatActivity implements View.OnC
                                     String ed = jsonObject.getString("EventDate");
                                     JSONObject jb = new JSONObject(ed);
                                     EventDate = jb.getString("date");
-                                    Log.e("TEST",EventDate);
+                                    Log.e("TEST", EventDate);
                                     ArrangePersons = jsonObject.getString("ArrangePersons");
                                     ChargesTotal = jsonObject.getString("ChargesTotal");
                                     Description = jsonObject.getString("Description");
@@ -1644,15 +1683,15 @@ public class EventCashBookActivity extends AppCompatActivity implements View.OnC
                                     ClientUserID = jsonObject.getString("ClientUserID");
                                     NetCode = jsonObject.getString("NetCode");
                                     SysCode = jsonObject.getString("SysCode");
-                                    Log.e("TEST","TEST");
+                                    Log.e("TEST", "TEST");
                                     String up = jsonObject.getString("UpdatedDate");
                                     JSONObject jbb = new JSONObject(up);
                                     UpdatedDate = jbb.getString("date");
                                     String SessionDate = jsonObject.getString("SessionDate");
 
-                                    String query = "UPDATE Booking SET BookingID = '"+BookingID+"', ClientName = '"+ClientName+"', ClientMobile = '"+ClientMobile+"', ClientAddress = '"+ClientAddress+"', ClientNic = '"+ClientNic
-                                            +"', EventName = '"+EventName+"', BookingDate = '"+BookingDate+"', EventDate = '"+EventDate+"', ArrangePersons ='"+ArrangePersons+"', ChargesTotal = '"+ChargesTotal+"', Description = '"+Description
-                                            +"', ClientID = '"+ClientID+"', ClientUserID = '"+ClientUserID+"', NetCode = '"+NetCode+"', SysCode = '"+SysCode+"', UpdatedDate = '"+UpdatedDate+"' WHERE BookingID = "+ BookingID;
+                                    String query = "UPDATE Booking SET BookingID = '" + BookingID + "', ClientName = '" + ClientName + "', ClientMobile = '" + ClientMobile + "', ClientAddress = '" + ClientAddress + "', ClientNic = '" + ClientNic
+                                            + "', EventName = '" + EventName + "', BookingDate = '" + BookingDate + "', EventDate = '" + EventDate + "', ArrangePersons ='" + ArrangePersons + "', ChargesTotal = '" + ChargesTotal + "', Description = '" + Description
+                                            + "', ClientID = '" + ClientID + "', ClientUserID = '" + ClientUserID + "', NetCode = '" + NetCode + "', SysCode = '" + SysCode + "', UpdatedDate = '" + UpdatedDate + "' WHERE BookingID = " + BookingID;
                                     databaseHelper.updateBooking(query);
                                     updatedDate = SessionDate;
 
@@ -1669,9 +1708,10 @@ public class EventCashBookActivity extends AppCompatActivity implements View.OnC
 
 //                                FetchFromDb();
 //                                mProgress.dismiss();
-                            }else {
+                            } else {
 //                                mProgress.dismiss();
-                            }Log.e("Sarem","CashBook5");
+                            }
+                            Log.e("Sarem", "CashBook5");
                             addCashBook();
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -1685,16 +1725,16 @@ public class EventCashBookActivity extends AppCompatActivity implements View.OnC
 //                pDialog.dismiss();
 //                Toast.makeText(SplashActivity.this, error.toString(), Toast.LENGTH_LONG).show();
             }
-        }){
+        }) {
             @Override
             protected Map<String, String> getParams() {
                 Map<String, String> params = new HashMap<String, String>();
 
                 params.put("ClientID", prefrence.getClientIDSession());
                 int maxID = databaseHelper.getMaxValue("SELECT max(CAST(BookingID AS Int)) FROM Booking");
-                params.put("MaxID",String.valueOf(maxID));
+                params.put("MaxID", String.valueOf(maxID));
                 String date = databaseHelper.getClientUpdatedDate(prefrence.getClientIDSession());
-                params.put("SessionDate",date);
+                params.put("SessionDate", date);
 
                 return params;
             }
@@ -1706,11 +1746,11 @@ public class EventCashBookActivity extends AppCompatActivity implements View.OnC
         AppController.getInstance().addToRequestQueue(jsonObjectRequest, tag_json_obj);
     }
 
-    public void addCashBook(){
+    public void addCashBook() {
         String query = "SELECT * FROM CashBook WHERE CashBookID = 0 AND UpdatedDate = 0";
         List<CashBook> addCashBook = databaseHelper.getCashBook(query);
 
-        for (final CashBook c : addCashBook){
+        for (final CashBook c : addCashBook) {
             String tag_json_obj = "json_obj_req";
             String url = "http://69.167.137.121/plesk-site-preview/sky.com.pk/shadiHall/AddCashBook.php";
 
@@ -1718,15 +1758,15 @@ public class EventCashBookActivity extends AppCompatActivity implements View.OnC
                     new Response.Listener<String>() {
                         @Override
                         public void onResponse(String response) {
-                            Log.e("CashBook3",response);
+                            Log.e("CashBook3", response);
                             try {
                                 JSONObject jsonObject = new JSONObject(response);
                                 String success = jsonObject.getString("success");
-                                if (success.equals("1")){
+                                if (success.equals("1")) {
                                     String id = jsonObject.getString("CBID");
                                     String UpdatedDate = jsonObject.getString("UpdatedDate");
                                     String message = jsonObject.getString("message");
-                                    databaseHelper.updateCashBook("UPDATE CashBook SET CashBookID = '"+id+"', UpdatedDate = '"+UpdatedDate+"' WHERE ID = "+c.getcId());
+                                    databaseHelper.updateCashBook("UPDATE CashBook SET CashBookID = '" + id + "', UpdatedDate = '" + UpdatedDate + "' WHERE ID = " + c.getcId());
                                     updatedDate = UpdatedDate;
 //                                    getCashBook();
 //                                    List<TableSession> se = TableSession.find(TableSession.class,"table_Name = ?","CashBook");
@@ -1745,10 +1785,10 @@ public class EventCashBookActivity extends AppCompatActivity implements View.OnC
                     }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
-                    Log.e("Error",error.toString());
+                    Log.e("Error", error.toString());
 //                    Toast.makeText(CashCollectionActivity.this, error.toString(), Toast.LENGTH_SHORT).show();
                 }
-            }){
+            }) {
                 @Override
                 protected Map<String, String> getParams() {
 
@@ -1774,16 +1814,17 @@ public class EventCashBookActivity extends AppCompatActivity implements View.OnC
             RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
             jsonObjectRequest.setRetryPolicy(policy);
             AppController.getInstance().addToRequestQueue(jsonObjectRequest, tag_json_obj);
-        }Log.e("Sarem","CashBook5");
+        }
+        Log.e("Sarem", "CashBook5");
         addCashBook2();
     }
 
-    public void addCashBook2(){
+    public void addCashBook2() {
         String query = "SELECT * FROM CashBook WHERE UpdatedDate = 0";
         List<CashBook> addCashBook = databaseHelper.getCashBook(query);
         Log.e("CASHBOOK UP", String.valueOf(addCashBook.size()));
 
-        for (final CashBook c : addCashBook){
+        for (final CashBook c : addCashBook) {
             String tag_json_obj = "json_obj_req";
             String url = "http://69.167.137.121/plesk-site-preview/sky.com.pk/shadiHall/UpdateCashBook.php";
 
@@ -1791,15 +1832,15 @@ public class EventCashBookActivity extends AppCompatActivity implements View.OnC
                     new Response.Listener<String>() {
                         @Override
                         public void onResponse(String response) {
-                            Log.e("CashBook4",response);
+                            Log.e("CashBook4", response);
                             try {
                                 JSONObject jsonObject = new JSONObject(response);
                                 String success = jsonObject.getString("success");
-                                Log.e("Success CB",success);
-                                if (success.equals("1")){
+                                Log.e("Success CB", success);
+                                if (success.equals("1")) {
                                     String UpdatedDate = jsonObject.getString("UpdatedDate");
                                     String message = jsonObject.getString("message");
-                                    databaseHelper.updateCashBook("UPDATE CashBook SET UpdatedDate = '"+UpdatedDate+"' WHERE ID = "+c.getcId());
+                                    databaseHelper.updateCashBook("UPDATE CashBook SET UpdatedDate = '" + UpdatedDate + "' WHERE ID = " + c.getcId());
 
                                     updatedDate = UpdatedDate;
 //                                    getCashBook();
@@ -1818,10 +1859,10 @@ public class EventCashBookActivity extends AppCompatActivity implements View.OnC
                 @Override
                 public void onErrorResponse(VolleyError error) {
                     mProgress.dismiss();
-                    Log.e("Error",error.toString());
+                    Log.e("Error", error.toString());
 //                    Toast.makeText(CashCollectionActivity.this, error.toString(), Toast.LENGTH_SHORT).show();
                 }
-            }){
+            }) {
                 @Override
                 protected Map<String, String> getParams() {
 
@@ -1847,18 +1888,18 @@ public class EventCashBookActivity extends AppCompatActivity implements View.OnC
             jsonObjectRequest.setRetryPolicy(policy);
             AppController.getInstance().addToRequestQueue(jsonObjectRequest, tag_json_obj);
         }
-        Log.e("Sarem","CashBook6");
+        Log.e("Sarem", "CashBook6");
         addBooking();
         //For Refresh Recycler
 //        mProgress.dismiss();
     }
 
-    public void addBooking(){
+    public void addBooking() {
         String query = "SELECT * FROM Booking WHERE BookingID = 'o' AND UpdatedDate = 0";
         final List<Bookings> addBooking = databaseHelper.getBookings(query);
         Log.e("BookingID UP", String.valueOf(addBooking.size()));
 
-        for (final Bookings c : addBooking){
+        for (final Bookings c : addBooking) {
             String tag_json_obj = "json_obj_req";
             String url = "http://69.167.137.121/plesk-site-preview/sky.com.pk/shadiHall/AddEvent.php";
 
@@ -1866,16 +1907,16 @@ public class EventCashBookActivity extends AppCompatActivity implements View.OnC
                     new Response.Listener<String>() {
                         @Override
                         public void onResponse(String response) {
-                            Log.e("Booking3",response);
+                            Log.e("Booking3", response);
                             try {
                                 JSONObject jsonObject = new JSONObject(response);
                                 String success = jsonObject.getString("success");
-                                Log.e("Success Boo",success);
-                                if (success.equals("1")){
+                                Log.e("Success Boo", success);
+                                if (success.equals("1")) {
                                     String id = jsonObject.getString("BookingID");
                                     String UpdatedDate = jsonObject.getString("UpdatedDate");
                                     String message = jsonObject.getString("message");
-                                    databaseHelper.updateCashBook("UPDATE Booking SET BookingID = '"+ id +"', UpdatedDate = '"+UpdatedDate+"' WHERE ID = "+c.getId());
+                                    databaseHelper.updateCashBook("UPDATE Booking SET BookingID = '" + id + "', UpdatedDate = '" + UpdatedDate + "' WHERE ID = " + c.getId());
                                     updatedDate = UpdatedDate;
 //                                    List<TableSession> se = TableSession.find(TableSession.class,"table_Name = ?","Bookings");
 //                                    for (TableSession s : se){
@@ -1886,7 +1927,8 @@ public class EventCashBookActivity extends AppCompatActivity implements View.OnC
                                 }
                             } catch (JSONException e) {
                                 e.printStackTrace();
-                            }Log.e("Sarem","CashBook7");
+                            }
+                            Log.e("Sarem", "CashBook7");
 //                            addAccount3Name();
                             mProgress.dismiss();
                         }
@@ -1894,34 +1936,34 @@ public class EventCashBookActivity extends AppCompatActivity implements View.OnC
                 @Override
                 public void onErrorResponse(VolleyError error) {
                     mProgress.dismiss();
-                    Log.e("Error",error.toString());
+                    Log.e("Error", error.toString());
 //                    Toast.makeText(CashCollectionActivity.this, error.toString(), Toast.LENGTH_SHORT).show();
                 }
-            }){
+            }) {
                 @Override
                 protected Map<String, String> getParams() {
 
                     Map<String, String> params = new HashMap<String, String>();
 
-                        params.put("ClientName", c.getClientName());
-                        params.put("ClientMobile", c.getClientMobile());
-                        params.put("ClientAddress", c.getClientAddress());
-                        params.put("ClientNic", c.getClientNic());
-                        params.put("EventName", c.getEventName());
-                        params.put("BookingDate", c.getBookingDate());
-                        params.put("EventDate", c.getEventDate());
-                        params.put("ArrangePersons", c.getArrangePersons());
-                        params.put("ChargesTotal", c.getChargesTotal());
-                        params.put("Description", c.getDescription());
-                        params.put("ClientID", prefrence.getClientIDSession());
-                        params.put("ClientUserID", prefrence.getClientUserIDSession());
-                        params.put("NetCode", "0");
-                        params.put("SysCode", "0");
-                        params.put("DebitAccount", cashID);
-                        params.put("CreditAccount", incomeID);
-                        params.put("Amount", c.getAmount());
-                        params.put("Shift", c.getShift());
-                        params.put("SerialNo", c.getSerialNo());
+                    params.put("ClientName", c.getClientName());
+                    params.put("ClientMobile", c.getClientMobile());
+                    params.put("ClientAddress", c.getClientAddress());
+                    params.put("ClientNic", c.getClientNic());
+                    params.put("EventName", c.getEventName());
+                    params.put("BookingDate", c.getBookingDate());
+                    params.put("EventDate", c.getEventDate());
+                    params.put("ArrangePersons", c.getArrangePersons());
+                    params.put("ChargesTotal", c.getChargesTotal());
+                    params.put("Description", c.getDescription());
+                    params.put("ClientID", prefrence.getClientIDSession());
+                    params.put("ClientUserID", prefrence.getClientUserIDSession());
+                    params.put("NetCode", "0");
+                    params.put("SysCode", "0");
+                    params.put("DebitAccount", cashID);
+                    params.put("CreditAccount", incomeID);
+                    params.put("Amount", c.getAmount());
+                    params.put("Shift", c.getShift());
+                    params.put("SerialNo", c.getSerialNo());
 
                     return params;
                 }
@@ -1934,12 +1976,12 @@ public class EventCashBookActivity extends AppCompatActivity implements View.OnC
         updateBooking();
     }
 
-    public void updateBooking(){
+    public void updateBooking() {
         String query = "SELECT * FROM Booking WHERE UpdatedDate = 0 AND BookingID != 'o'";
         final List<Bookings> addBooking = databaseHelper.getBookings(query);
         Log.e("BookingID UP", String.valueOf(addBooking.size()));
 
-        for (final Bookings c : addBooking){
+        for (final Bookings c : addBooking) {
             String tag_json_obj = "json_obj_req";
             String url = "http://69.167.137.121/plesk-site-preview/sky.com.pk/shadiHall/UpdateEvent.php";
 
@@ -1947,15 +1989,15 @@ public class EventCashBookActivity extends AppCompatActivity implements View.OnC
                     new Response.Listener<String>() {
                         @Override
                         public void onResponse(String response) {
-                            Log.e("Booking4",response);
+                            Log.e("Booking4", response);
                             try {
                                 JSONObject jsonObject = new JSONObject(response);
                                 String success = jsonObject.getString("success");
-                                Log.e("Success CB",success);
-                                if (success.equals("1")){
+                                Log.e("Success CB", success);
+                                if (success.equals("1")) {
                                     String UpdatedDate = jsonObject.getString("UpdatedDate");
                                     String message = jsonObject.getString("message");
-                                    databaseHelper.updateCashBook("UPDATE Booking SET UpdatedDate = '"+UpdatedDate+"' WHERE ID = "+c.getId());
+                                    databaseHelper.updateCashBook("UPDATE Booking SET UpdatedDate = '" + UpdatedDate + "' WHERE ID = " + c.getId());
                                     updatedDate = UpdatedDate;
 //                                    List<TableSession> se = TableSession.find(TableSession.class,"table_Name = ?","Bookings");
 //                                    for (TableSession s : se){
@@ -1971,32 +2013,32 @@ public class EventCashBookActivity extends AppCompatActivity implements View.OnC
                 @Override
                 public void onErrorResponse(VolleyError error) {
                     mProgress.dismiss();
-                    Log.e("Error",error.toString());
+                    Log.e("Error", error.toString());
 //                    Toast.makeText(CashCollectionActivity.this, error.toString(), Toast.LENGTH_SHORT).show();
                 }
-            }){
+            }) {
                 @Override
                 protected Map<String, String> getParams() {
 
                     Map<String, String> params = new HashMap<String, String>();
 
-                        params.put("BookingID", c.getBookingID());
-                        params.put("ClientName", c.getClientName());
-                        params.put("ClientMobile", c.getClientMobile());
-                        params.put("ClientAddress", c.getClientAddress());
-                        params.put("ClientNic", c.getClientNic());
-                        params.put("EventName", c.getEventName());
-                        params.put("BookingDate", c.getBookingDate());
-                        params.put("EventDate", c.getEventDate());
-                        params.put("ArrangePersons", c.getArrangePersons());
-                        params.put("ChargesTotal", c.getChargesTotal());
-                        params.put("Description", c.getDescription());
-                        params.put("ClientID", prefrence.getClientIDSession());
-                        params.put("ClientUserID", prefrence.getClientUserIDSession());
-                        params.put("NetCode", "0");
-                        params.put("SysCode", "0");
-                        params.put("DebitAccount", cashID);
-                        params.put("CreditAccount", incomeID);
+                    params.put("BookingID", c.getBookingID());
+                    params.put("ClientName", c.getClientName());
+                    params.put("ClientMobile", c.getClientMobile());
+                    params.put("ClientAddress", c.getClientAddress());
+                    params.put("ClientNic", c.getClientNic());
+                    params.put("EventName", c.getEventName());
+                    params.put("BookingDate", c.getBookingDate());
+                    params.put("EventDate", c.getEventDate());
+                    params.put("ArrangePersons", c.getArrangePersons());
+                    params.put("ChargesTotal", c.getChargesTotal());
+                    params.put("Description", c.getDescription());
+                    params.put("ClientID", prefrence.getClientIDSession());
+                    params.put("ClientUserID", prefrence.getClientUserIDSession());
+                    params.put("NetCode", "0");
+                    params.put("SysCode", "0");
+                    params.put("DebitAccount", cashID);
+                    params.put("CreditAccount", incomeID);
 
                     return params;
                 }
@@ -2009,12 +2051,12 @@ public class EventCashBookActivity extends AppCompatActivity implements View.OnC
         addAccount3Name();
     }
 
-    public void addAccount3Name(){
+    public void addAccount3Name() {
         String query = "SELECT * FROM Account3Name WHERE AcNameID = 0 AND UpdatedDate = 0";
         final List<Account3Name> addBooking = databaseHelper.getAccount3Name(query);
         Log.e("BookingID UP", String.valueOf(addBooking.size()));
 
-        for (final Account3Name c : addBooking){
+        for (final Account3Name c : addBooking) {
             String tag_json_obj = "json_obj_req";
             String url = "http://69.167.137.121/plesk-site-preview/sky.com.pk/shadiHall/AddCharofAcc.php";
 
@@ -2022,25 +2064,30 @@ public class EventCashBookActivity extends AppCompatActivity implements View.OnC
                     new Response.Listener<String>() {
                         @Override
                         public void onResponse(String response) {
-                            Log.e("Account3Name3",response);
+                            Log.e("Account3Name3", response);
                             try {
                                 JSONObject jsonObject = new JSONObject(response);
                                 String success = jsonObject.getString("success");
-                                Log.e("Success CB",success);
-                                if (success.equals("1")){
+                                Log.e("Success CB", success);
+                                if (success.equals("1")) {
                                     String id = jsonObject.getString("AcNameID");
                                     String UpdatedDate = jsonObject.getString("UpdatedDate");
                                     String message = jsonObject.getString("message");
-                                    databaseHelper.updateCashBook("UPDATE Account3Name SET AcNameID = '"+ id +"', UpdatedDate = '"+UpdatedDate+"' WHERE ID = "+c.getId());
+                                    databaseHelper.updateCashBook("UPDATE Account3Name SET AcNameID = '" + id + "', UpdatedDate = '" + UpdatedDate + "' WHERE ID = " + c.getId());
                                     updatedDate = UpdatedDate;
+                                    ////////////////Updating this id in salepur1
+                                    int idstatus = refdb.SlePur1.updateAcNameIDFromAc3NameTable(databaseHelper,
+                                            c.getAcNameID(), c.getClientID(),
+                                            id);
+                                    Log.e("updatestatusslepur1", "->" + idstatus);
 //                                    List<TableSession> se = TableSession.find(TableSession.class,"table_Name = ?","Account3Name");
 //                                    for (TableSession s : se){
 //                                        s.setMaxID(id);
 //                                        s.setInsertDate(UpdatedDate);
 //                                        s.save();
 //                                    }
-                                }else {
-                                    databaseHelper.deleteAccount3NameEntry("DELETE FROM Account3Name WHERE ID = "+c.getId());
+                                } else {
+                                    databaseHelper.deleteAccount3NameEntry("DELETE FROM Account3Name WHERE ID = " + c.getId());
                                     String message = jsonObject.getString("message");
                                     Toast.makeText(EventCashBookActivity.this, message, Toast.LENGTH_SHORT).show();
                                 }
@@ -2053,26 +2100,26 @@ public class EventCashBookActivity extends AppCompatActivity implements View.OnC
                 @Override
                 public void onErrorResponse(VolleyError error) {
                     mProgress.dismiss();
-                    Log.e("Error",error.toString());
+                    Log.e("Error", error.toString());
 //                    Toast.makeText(CashCollectionActivity.this, error.toString(), Toast.LENGTH_SHORT).show();
                 }
-            }){
+            }) {
                 @Override
                 protected Map<String, String> getParams() {
 
                     Map<String, String> params = new HashMap<String, String>();
 
-                        params.put("AcName", c.getAcName());
-                        params.put("AcAddress", c.getAcAddress());
-                        params.put("AcContactNo", c.getAcContactNo());
-                        params.put("AcEmailAddress", c.getAcEmailAddress());
-                        params.put("Salary", c.getSalary());
-                        params.put("AcMobileNo", c.getAcMobileNo());
-                        params.put("AcPassward", c.getAcPassward());
-                        params.put("SecurityRights", c.getSecurityRights());
-                        params.put("ClientID", prefrence.getClientIDSession());
-                        params.put("AcGroupID", c.getAcGroupID());
-                        params.put("SerialNo", c.getSerialNo());
+                    params.put("AcName", c.getAcName());
+                    params.put("AcAddress", c.getAcAddress());
+                    params.put("AcContactNo", c.getAcContactNo());
+                    params.put("AcEmailAddress", c.getAcEmailAddress());
+                    params.put("Salary", c.getSalary());
+                    params.put("AcMobileNo", c.getAcMobileNo());
+                    params.put("AcPassward", c.getAcPassward());
+                    params.put("SecurityRights", c.getSecurityRights());
+                    params.put("ClientID", prefrence.getClientIDSession());
+                    params.put("AcGroupID", c.getAcGroupID());
+                    params.put("SerialNo", c.getSerialNo());
 
                     return params;
                 }
@@ -2086,12 +2133,12 @@ public class EventCashBookActivity extends AppCompatActivity implements View.OnC
         updateAccount3Name1();
     }
 
-    public void updateAccount3Name1(){
+    public void updateAccount3Name1() {
         String query = "SELECT * FROM Account3Name WHERE UpdatedDate = 0";
         final List<Account3Name> addBooking = databaseHelper.getAccount3Name(query);
         Log.e("BookingID UP", String.valueOf(addBooking.size()));
 
-        for (final Account3Name c : addBooking){
+        for (final Account3Name c : addBooking) {
             String tag_json_obj = "json_obj_req";
             String url = "http://69.167.137.121/plesk-site-preview/sky.com.pk/shadiHall/UpdateCharofAcc.php";
 
@@ -2099,22 +2146,22 @@ public class EventCashBookActivity extends AppCompatActivity implements View.OnC
                     new Response.Listener<String>() {
                         @Override
                         public void onResponse(String response) {
-                            Log.e("Account3Name4",response);
+                            Log.e("Account3Name4", response);
                             try {
                                 JSONObject jsonObject = new JSONObject(response);
                                 String success = jsonObject.getString("success");
-                                Log.e("Success CB",success);
-                                if (success.equals("1")){
+                                Log.e("Success CB", success);
+                                if (success.equals("1")) {
                                     String UpdatedDate = jsonObject.getString("UpdatedDate");
                                     String message = jsonObject.getString("message");
-                                    databaseHelper.updateCashBook("UPDATE Account3Name SET UpdatedDate = '"+UpdatedDate+"' WHERE ID = "+c.getId());
+                                    databaseHelper.updateCashBook("UPDATE Account3Name SET UpdatedDate = '" + UpdatedDate + "' WHERE ID = " + c.getId());
                                     updatedDate = UpdatedDate;
 //                                    List<TableSession> se = TableSession.find(TableSession.class,"table_Name = ?","Account3Name");
 //                                    for (TableSession s : se){
 //                                        s.setUpdateDate(UpdatedDate);
 //                                        s.save();
 //                                    }
-                                    databaseHelper.updateClient("UPDATE Client SET UpdatedDate = '"+updatedDate+"' WHERE ClientID = "+prefrence.getClientIDSession());
+                                    databaseHelper.updateClient("UPDATE Client SET UpdatedDate = '" + updatedDate + "' WHERE ClientID = " + prefrence.getClientIDSession());
                                 }
                             } catch (JSONException e) {
                                 e.printStackTrace();
@@ -2125,26 +2172,26 @@ public class EventCashBookActivity extends AppCompatActivity implements View.OnC
                 @Override
                 public void onErrorResponse(VolleyError error) {
                     mProgress.dismiss();
-                    Log.e("Error",error.toString());
+                    Log.e("Error", error.toString());
 //                    Toast.makeText(CashCollectionActivity.this, error.toString(), Toast.LENGTH_SHORT).show();
                 }
-            }){
+            }) {
                 @Override
                 protected Map<String, String> getParams() {
 
                     Map<String, String> params = new HashMap<String, String>();
 
-                        params.put("AcNameID", c.getAcNameID());
-                        params.put("AcName", c.getAcName());
-                        params.put("AcAddress", c.getAcAddress());
-                        params.put("AcContactNo", c.getAcContactNo());
-                        params.put("AcEmailAddress", c.getAcEmailAddress());
-                        params.put("Salary", c.getSalary());
-                        params.put("AcMobileNo", c.getAcMobileNo());
-                        params.put("AcPassward", c.getAcPassward());
-                        params.put("SecurityRights", c.getSecurityRights());
-                        params.put("ClientID", prefrence.getClientIDSession());
-                        params.put("AcGroupID", c.getAcGroupID());
+                    params.put("AcNameID", c.getAcNameID());
+                    params.put("AcName", c.getAcName());
+                    params.put("AcAddress", c.getAcAddress());
+                    params.put("AcContactNo", c.getAcContactNo());
+                    params.put("AcEmailAddress", c.getAcEmailAddress());
+                    params.put("Salary", c.getSalary());
+                    params.put("AcMobileNo", c.getAcMobileNo());
+                    params.put("AcPassward", c.getAcPassward());
+                    params.put("SecurityRights", c.getSecurityRights());
+                    params.put("ClientID", prefrence.getClientIDSession());
+                    params.put("AcGroupID", c.getAcGroupID());
 
                     return params;
                 }
@@ -2155,8 +2202,8 @@ public class EventCashBookActivity extends AppCompatActivity implements View.OnC
             AppController.getInstance().addToRequestQueue(jsonObjectRequest, tag_json_obj);
         }
         getCashBook();
-        if (addBooking.size() == 0){
-            databaseHelper.updateClient("UPDATE Client SET UpdatedDate = '"+updatedDate+"' WHERE ClientID = "+prefrence.getClientIDSession());
+        if (addBooking.size() == 0) {
+            databaseHelper.updateClient("UPDATE Client SET UpdatedDate = '" + updatedDate + "' WHERE ClientID = " + prefrence.getClientIDSession());
         }
         mProgress.dismiss();
     }

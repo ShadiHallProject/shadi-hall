@@ -56,6 +56,7 @@ public class SalePur1Fragment extends Fragment implements AdapterView.OnItemSele
         SetItemOnSpinner();
         spinner.setOnItemSelectedListener(this);
         EntryType=getArguments().getString("EntryType");
+        ShowGridData();
         return view;
     }
 
@@ -78,6 +79,17 @@ public class SalePur1Fragment extends Fragment implements AdapterView.OnItemSele
 
 
 
+    }
+    public void ShowGridData(){
+        MNotificationClass.ShowToastTem(getContext(),"Grid View ");
+        Bundle bundle=new Bundle();
+        bundle.putString("EntryType",EntryType);
+        salepurgridviewfrag salepurgridviewfrag=new salepurgridviewfrag();
+        salepurgridviewfrag.setArguments(bundle);
+        getChildFragmentManager().beginTransaction()
+                .add(R.id.containersalepur1, salepurgridviewfrag)
+                .addToBackStack(null)
+                .commit();
     }
 
     @Override
@@ -130,20 +142,13 @@ public class SalePur1Fragment extends Fragment implements AdapterView.OnItemSele
         {
             Intent intent=new Intent(getContext(), Salepur1AddNewActivity.class);
           intent.putExtra("EntryType",EntryType);
+            intent.putExtra("edit",false);
             startActivity(intent);
         }
         switch (v.getId())
         {
             case R.id.btnhorizontal1:
-                MNotificationClass.ShowToastTem(getContext(),"Grid View ");
-                Bundle bundle=new Bundle();
-                bundle.putString("EntryType",EntryType);
-                salepurgridviewfrag salepurgridviewfrag=new salepurgridviewfrag();
-                salepurgridviewfrag.setArguments(bundle);
-                getChildFragmentManager().beginTransaction()
-                        .add(R.id.containersalepur1, salepurgridviewfrag)
-                        .addToBackStack(null)
-                        .commit();
+               ShowGridData();
                 break;
             case R.id.btnhorizontal2:
                 MNotificationClass.ShowToastTem(getContext(),"Tree View ");
