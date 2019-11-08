@@ -224,4 +224,8 @@ public class MainActivity extends AppCompatActivity {
         startActivity(new Intent(MainActivity.this, MainActivity.class));
         finish();
     }
+
+    public void FromMyProject(){
+        int var1=99;
+    }
 }
