@@ -1,6 +1,7 @@
 package org.by9steps.shadihall.activities;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -47,7 +48,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     boolean gps_enabled = false;
     boolean network_enabled = false;
     Button next;
-
+    String subCity = "";
+    String countryName ="";
+    String cityName="";
     private Float ZOOM = 18f;
 
     TextView country;
@@ -78,11 +81,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             public void onClick(View v) {
                 Log.e("LATITUDE", String.valueOf(marker.getPosition().latitude));
-                Intent intent = new Intent(MapsActivity.this, RegisterActivity.class);
-                intent.putExtra("TYPE", "Register");
-                intent.putExtra("Latitude", String.valueOf(marker.getPosition().latitude));
-                intent.putExtra("Longitude", String.valueOf(marker.getPosition().longitude));
-                startActivity(intent);
+
+//
+                Intent returnIntent = new Intent();
+                returnIntent.putExtra("country",countryName);
+                returnIntent.putExtra("city",cityName);
+                returnIntent.putExtra("subcity",subCity);
+                Log.e("resultbymap2",countryName+" "+cityName+" "+subCity);
+
+                setResult(Activity.RESULT_OK,returnIntent);
+
                 finish();
             }
         });
@@ -127,9 +135,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         obj = addresses.get(0);
                         title = obj.getSubLocality() + obj.getFeatureName();
 
-                        String subCity = addresses.get(0).getSubLocality();
-                        String countryName = addresses.get(0).getCountryName();
-                        String cityName = addresses.get(0).getLocality();
+                         subCity = addresses.get(0).getSubLocality();
+                         countryName = addresses.get(0).getCountryName();
+                         cityName = addresses.get(0).getLocality();
 
                         country.setText(countryName + " " + cityName + " " + subCity);
                     }
@@ -205,9 +213,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             List<Address> addresses = null;
                             try {
                                 addresses = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
-                                String subCity = addresses.get(0).getSubLocality();
-                                String countryName = addresses.get(0).getCountryName();
-                                String cityName = addresses.get(0).getLocality();
+                                 subCity = addresses.get(0).getSubLocality();
+                                 countryName = addresses.get(0).getCountryName();
+                                 cityName = addresses.get(0).getLocality();
 
                                 country.setText(countryName + " " + cityName + " " + subCity);
 

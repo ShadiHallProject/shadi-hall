@@ -99,11 +99,13 @@ public class MenuClickActivity extends AppCompatActivity implements CustomDialog
                 getSupportFragmentManager().beginTransaction()
                         .add(R.id.menu_container,fragment)
                         .commit();
-            } else if (message.equals("Booking")) {
+            }
+            else if (message.equals("Booking")) {
                 getSupportFragmentManager().beginTransaction()
                         .add(R.id.menu_container, new BookCalendarFragment())
                         .commit();
-            } else if (message.equals("Recovery")) {
+            }
+            else if (message.equals("Recovery")) {
                 getSupportFragmentManager().beginTransaction()
                         .add(R.id.menu_container, new RecoveryFragment())
                         .commit();
@@ -128,8 +130,7 @@ public class MenuClickActivity extends AppCompatActivity implements CustomDialog
                         .commit();
 
             }
-            else if(message.equals("AddItemCategory"))
-            {
+            else if(message.equals("AddItemCategory")) {
                 MNotificationClass.ShowToastTem(this,"AddItemCategory");
                 fragmentAddItemCategory AddItemCategory=new fragmentAddItemCategory();
                 getSupportFragmentManager().beginTransaction()
@@ -142,8 +143,7 @@ public class MenuClickActivity extends AppCompatActivity implements CustomDialog
                         .add(R.id.menu_container,vehicleBookingFragment)
                         .commit();
             }
-            else if(message.equals("AccountCustomGroup"))
-            {
+            else if(message.equals("AccountCustomGroup")) {
                 MNotificationClass.ShowToastTem(this,"CustomiseGroup");
                 AccountCustomGroup accountCustomGroup=new AccountCustomGroup();
                 getSupportFragmentManager().beginTransaction()
@@ -156,44 +156,54 @@ public class MenuClickActivity extends AppCompatActivity implements CustomDialog
                 getSupportFragmentManager().beginTransaction()
                         .add(R.id.menu_container, new CashBookFragment())
                         .commit();
-            } else if (message.equals("AccountEntry")) {
+            }
+            else if (message.equals("AccountEntry")) {
                 reportsFragment=ReportsFragment.newInstance(ValuePass);
                 getSupportFragmentManager().beginTransaction()
                         .add(R.id.menu_container, reportsFragment)
                         .commit();
-            } else if (message.equals("TreeView")) {
+            }
+            else if (message.equals("TreeView")) {
                 getSupportFragmentManager().beginTransaction()
                         .add(R.id.menu_container, new ChartOfAccFragment())
                         .commit();
-            } else if (message.equals("CompletTrailBalance")) {
+            }
+            else if (message.equals("CompletTrailBalance")) {
                 getSupportFragmentManager().beginTransaction()
                         .add(R.id.menu_container, new ChartOfAccFragment())
                         .commit();
-            } else if (message.equals("MonthWiseTrailBalance")) {
+            }
+            else if (message.equals("MonthWiseTrailBalance")) {
                 getSupportFragmentManager().beginTransaction()
                         .add(R.id.menu_container, new SummerizeTrailBalFragment())
                         .commit();
-            } else if (message.equals("YearlyTrailBalance")) {
+            }
+            else if (message.equals("YearlyTrailBalance")) {
                 getSupportFragmentManager().beginTransaction()
                         .add(R.id.menu_container, new MonthTrialBalance())
                         .commit();
-            } else if (message.equals("P/LStatmentBooking")) {
+            }
+            else if (message.equals("P/LStatmentBooking")) {
                 getSupportFragmentManager().beginTransaction()
                         .add(R.id.menu_container, new RecoveryFragment())
                         .commit();
-            } else if (message.equals("P/LStatmentDateWise")) {
+            }
+            else if (message.equals("P/LStatmentDateWise")) {
                 getSupportFragmentManager().beginTransaction()
                         .add(R.id.menu_container, new DateProfitLossFragment())
                         .commit();
-            } else if (message.equals("P/LStatmentyearly")) {
+            }
+            else if (message.equals("P/LStatmentyearly")) {
                 getSupportFragmentManager().beginTransaction()
                         .add(R.id.menu_container, new YearProfitLossFragment())
                         .commit();
-            } else if (message.equals("BalanceSheetDate")) {
+            }
+            else if (message.equals("BalanceSheetDate")) {
                 getSupportFragmentManager().beginTransaction()
                         .add(R.id.menu_container, new DateBalSheetFragment())
                         .commit();
-            } else if (message.equals("BalanceSheetMonth")) {
+            }
+            else if (message.equals("BalanceSheetMonth")) {
                 getSupportFragmentManager().beginTransaction()
                         .add(R.id.menu_container, new MonthBalSheetFragment())
                         .commit();
@@ -202,6 +212,12 @@ public class MenuClickActivity extends AppCompatActivity implements CustomDialog
 
 
         }
+
+        Log.e(this.getClass().getName(),"Client ID::"+new Prefrence(this).getClientIDSession());
+        Log.e(this.getClass().getName(),"ClientUserID::"+new Prefrence(this).getClientUserIDSession());
+        Log.e(this.getClass().getName(),"ProjectIDSerssion::"+new Prefrence(this).getProjectIDSession());
+        Log.e(this.getClass().getName(),"UserRightSession::"+new Prefrence(this).getUserRighhtsSession());
+
     }
 
 

@@ -49,7 +49,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:textSize="15sp"
-        android:text="Next"
+        android:text="Set"
         android:background="@color/colorPrimaryDark"
         android:textColor="@android:color/white"
         android:id="@+id/next"/>

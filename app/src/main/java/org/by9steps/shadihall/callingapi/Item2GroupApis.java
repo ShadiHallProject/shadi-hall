@@ -60,7 +60,7 @@ public class Item2GroupApis {
                     new Response.Listener<String>() {
                         @Override
                         public void onResponse(String response) {
-                            a_count++;
+                            count++;
 //                        mProgress.dismiss();
                             JSONObject jsonObj = null;
                             try {

@@ -99,8 +99,8 @@ public class SelectImagesActivity extends AppCompatActivity {
         if (resultCode == Activity.RESULT_OK && requestCode == RequestCode) {
             imageList = data.getStringArrayListExtra(Pix.IMAGE_RESULTS);
 
-            GalleryAdapter galleryAdapter = new GalleryAdapter(SelectImagesActivity.this, imageList);
-            gvGallery.setAdapter(galleryAdapter);
+//            GalleryAdapter galleryAdapter = new GalleryAdapter(SelectImagesActivity.this, imageList);
+//            gvGallery.setAdapter(galleryAdapter);
             gvGallery.setVerticalSpacing(gvGallery.getHorizontalSpacing());
             ViewGroup.MarginLayoutParams mlp = (ViewGroup.MarginLayoutParams) gvGallery
                     .getLayoutParams();
@@ -125,6 +125,7 @@ public class SelectImagesActivity extends AppCompatActivity {
     private void uploadImages(){
         for (int i = 0; i < imageList.size(); i++) {
             j++;
+
             File f = new File(imageList.get(i));
             Bitmap bitmap = new BitmapDrawable(SelectImagesActivity.this.getResources(), f.getAbsolutePath()).getBitmap();
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();

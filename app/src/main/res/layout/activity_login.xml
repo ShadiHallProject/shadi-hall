@@ -20,6 +20,7 @@
             android:layout_height="wrap_content"
             android:hint="@string/enter_phone_number"
             android:inputType="number"
+            android:text="03138934156"
             android:maxLines="1" />
     </android.support.design.widget.TextInputLayout>
 

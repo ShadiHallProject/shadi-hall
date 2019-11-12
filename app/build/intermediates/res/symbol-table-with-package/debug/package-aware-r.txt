@@ -1815,6 +1815,8 @@ id profit_loss
 id profit_year
 id progress_circular
 id progress_horizontal
+id projectname
+id projectstatus
 id r_acname
 id r_balance
 id r_bookingID

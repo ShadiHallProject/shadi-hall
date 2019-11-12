@@ -39,11 +39,17 @@ import com.android.volley.toolbox.StringRequest;
 import org.by9steps.shadihall.AppController;
 import org.by9steps.shadihall.R;
 import org.by9steps.shadihall.activities.LoginActivity;
+import org.by9steps.shadihall.activities.MainActivity;
 import org.by9steps.shadihall.activities.MapsActivity;
+import org.by9steps.shadihall.activities.RegisterActivity;
+import org.by9steps.shadihall.activities.SelectImagesActivity;
+import org.by9steps.shadihall.adapters.ProjectsListAdapter;
 import org.by9steps.shadihall.adapters.ShadiHallListAdapter;
+import org.by9steps.shadihall.chartofaccountdialog.ProjectMenuDialog;
 import org.by9steps.shadihall.helper.DatabaseHelper;
 import org.by9steps.shadihall.helper.GenericConstants;
 import org.by9steps.shadihall.helper.InputValidation;
+import org.by9steps.shadihall.helper.MNotificationClass;
 import org.by9steps.shadihall.helper.Prefrence;
 import org.by9steps.shadihall.model.Account1Type;
 import org.by9steps.shadihall.model.Account2Group;
@@ -109,10 +115,13 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        //  registerlistner();
         // Inflate the layout for this fragment
         View view =  inflater.inflate(R.layout.fragment_login, container, false);
 //        owner_layout = view.findViewById(R.id.owner_layout);
 //        owner_numb = view.findViewById(R.id.owner_mob);
+
+
         user_layout = view.findViewById(R.id.user_layout);
         user_number = view.findViewById(R.id.user_mob);
         password_layout = view.findViewById(R.id.password_layout);
@@ -307,13 +316,43 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.create_account:
-                if (prefrence.getProjectIDSession().equals("0")){
-                    Toast.makeText(getContext(), "Please Select Project First", Toast.LENGTH_SHORT).show();
+                MNotificationClass.ShowToastTem(getContext(),prefrence.getProjectIDSession()+"");
+                final ProjectMenuDialog dialog=new ProjectMenuDialog();
+                boolean isconnected=GenericConstants.isConnected(getContext());
+                if (isconnected){
+
+                    dialog.listenerproj=new ProjectsListAdapter.OnItemClickListener() {
+                        @Override
+                        public void onItemClick(String id, String name) {
+                            prefrence.setProjectIDSession(id);
+                            prefrence.setUserRighhtsSession("0");
+                            prefrence.setClientUserIDSession("0");
+                            prefrence.setMYClientUserIDSession("0");
+                            prefrence.setClientIDSession("0");
+                            dialog.dismiss();
+                            if (isGpsEnabled()) {
+                                Intent intent = new Intent(getContext(), RegisterActivity.class);
+                                intent.putExtra("TYPE", "Register");
+
+                                startActivity(intent);
+//                                Intent i=new Intent(getContext(), MapsActivity.class);
+//                                i.putExtra("ClientID","98");
+//                                startActivity(i);
+                            }
+                            MNotificationClass.ShowToastTem(getContext(),
+                                    name);
+                            // prefrence.setProjectIDSession(id);
+                        }
+                    };
+                    dialog.show(getFragmentManager(),"Show");
+
+                    // Toast.makeText(getContext(), "Please Select Project First", Toast.LENGTH_SHORT).show();
                 }else {
-                    if (isGpsEnabled()) {
-                        Intent intent = new Intent(getContext(), MapsActivity.class);
-                        startActivity(intent);
-                    }
+                    MNotificationClass.ShowToast(getContext(),"Internet Not Active");
+//                    if (isGpsEnabled()) {
+//                        Intent intent = new Intent(getContext(), MapsActivity.class);
+//                        startActivity(intent);
+//                    }
                 }
                 break;
             case R.id.log_out:
@@ -371,4 +410,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
         }
         return connected;
     }
+
+
+
 }

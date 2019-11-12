@@ -177,7 +177,7 @@ public class ViewDBAllData extends AppCompatActivity implements View.OnClickList
         Cursor cc=helper.getReadableDatabase().rawQuery("Select * from ShadiHallBookingProfit",null);
         Log.e("aaaaaa",""+cc.getCount());
        final MediatorClass mediatorClass=new MediatorClass(cc,recyclerView);
-       // mediatorClass.setSortingAllowed(true);
+        //mediatorClass.setSortingAllowed(true);
         mediatorClass.ShowGrid();
         mediatorClass.listenForSortClick(new GenericGridAdapter.ListenerForChange() {
             @Override
@@ -335,7 +335,7 @@ builder.append("-------@@@@@");
         Cursor cc=helper.getReadableDatabase().rawQuery("Select * from "+ TAbleName,null);
         Log.e("aaaaaa",""+cc.getCount());
         final MediatorClass mediatorClass=new MediatorClass(cc,recyclerView);
-            mediatorClass.setSortingAllowed(true);
+          //  mediatorClass.setSortingAllowed(true);
         mediatorClass.ShowGrid();
         mediatorClass.listenForSortClick(new GenericGridAdapter.ListenerForChange() {
             @Override
