@@ -20,6 +20,8 @@ import org.json.JSONObject;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.by9steps.shadihall.helper.ApiRefStrings.LoginAttempApiRef;
+
 public class AuthencateUser {
 
     public interface AuthListnerForClient {
@@ -29,7 +31,7 @@ public class AuthencateUser {
 
     public static void CheckClientActivationAndPassword(final Context cc, final String clientID, final String clientUserID, final String password, final AuthListnerForClient mlistner) {
         String tag_json_obj = "json_obj_req";
-        String u = "http://69.167.137.121/plesk-site-preview/sky.com.pk/shadiHall/Login.php";
+        String u = LoginAttempApiRef;
 
         StringRequest jsonObjectRequest = new StringRequest(com.android.volley.Request.Method.POST, u,
                 new Response.Listener<String>() {
@@ -48,11 +50,6 @@ public class AuthencateUser {
                                 for (int i = 0; i < jsonArray.length(); i++) {
                                     JSONObject jsonObject = jsonArray.getJSONObject(i);
                                     String userright = jsonObject.getString("UserRights");
-//                                    String cashID = jsonObject.getString("CashID");
-//                                    String bookingIncomeID = jsonObject.getString("BookingIncomeID");
-//                                    String bookingExpenseID = jsonObject.getString("BookingExpenseID");
-//                                    String acNameID = "0";
-//                                    String acName = "ss";
                                     String cId = jsonObject.getString("ClientID");
                                     String ClientParentID = jsonObject.getString("ClientParentID");
                                     String EntryType = jsonObject.getString("EntryType");

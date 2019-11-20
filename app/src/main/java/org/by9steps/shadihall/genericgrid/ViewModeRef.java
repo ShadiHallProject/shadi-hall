@@ -3,8 +3,14 @@ package org.by9steps.shadihall.genericgrid;
 import android.util.Log;
 
 public class ViewModeRef {
-
-
+///////////////////////////////////Providing The width of each Column Width
+    public static boolean isNumberCoumn[];
+     public static int eachColWidth[];
+    // public static boolean isColWidthCustom=false;
+     public static final int MaxLimitForEachColWidth=400;
+     public static final int MaxPxlEachCharTake=32;
+    public static int MaxPxlEachCharTakeINSectionOFSec=400;
+    // public static final int MaxPxlEachCharTake=41;
     ///////////////////////////////variable For Section Of Grid
     static String Ref_Column_Name_For_Sorting = "";
     ////////////////Index Position To sort the list
@@ -22,14 +28,21 @@ public class ViewModeRef {
     boolean isheaderview = false;
     /////////////////////////////
     boolean isbottomrow = false;
+    ////////////////////////
+    boolean isSectionOfSectionView=false;
 
 
     public ViewModeRef(int rowsize) {
         this.columns = new String[rowsize];
         this.checkvisibility = new boolean[rowsize];
+        eachColWidth=new int[rowsize];
+        isNumberCoumn=new boolean[rowsize];
         for (int i = 0; i < columns.length; i++) {
             this.columns[i] = "";
             this.checkvisibility[i] = true;
+            isNumberCoumn[i]=true;
+            //////////////////////////////Characher Length
+            eachColWidth[i]=0;
         }
     }
 

@@ -14,12 +14,12 @@
     <string name="menu_thumbnail">Menu thumbnail</string>
     <string name="title_activity_detail_calendar">DetailCalendarActivity</string>
     <string name="create_account">Create account</string>
-    <string name="c_name">Shadi Hall Name</string>
-    <string name="c_address">Shadi Hall Address</string>
-    <string name="name_of_person">NameOfPerson</string>
+    <string name="c_name">Business Name*</string>
+    <string name="c_address">Business Address</string>
+    <string name="name_of_person">AdminUserName</string>
     <string name="country">Country</string>
-    <string name="password">Password</string>
-    <string name="c_number">Shadi Hall Number</string>
+    <string name="password">Password*</string>
+    <string name="c_number">Business Number</string>
     <string name="login_number">LoginMobileNo</string>
     <string name="contact_num">Contact number</string>
     <string name="website">Website</string>
@@ -63,7 +63,7 @@
     <string name="event_name">Event Name</string>
     <string name="total_persons">Total Persons</string>
     <string name="advance_fee">Advance Fee</string>
-    <string name="description">Description</string>
+    <string name="description">Business Description</string>
     <string name="booking_date">Booking Date</string>
     <string name="event_date">Event Date</string>
     <string name="name">Name</string>
@@ -190,6 +190,7 @@
     <string name="Item_name">Item Name</string>
     <string name="Item_price">Price</string>
     <string name="Item_stock">Stock</string>
+    <string name="login_information">Login information</string>
     <string-array name="pref_example_list_titles">
         <item>Always</item>
         <item>When possible</item>

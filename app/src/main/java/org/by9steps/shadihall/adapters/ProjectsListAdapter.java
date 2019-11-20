@@ -21,6 +21,8 @@ import org.by9steps.shadihall.model.ShadiHallList;
 
 import java.util.List;
 
+import static org.by9steps.shadihall.helper.ApiRefStrings.ServerAddress;
+
 public class ProjectsListAdapter extends RecyclerView.Adapter{
 
     Context mCtx;
@@ -50,7 +52,7 @@ public class ProjectsListAdapter extends RecyclerView.Adapter{
 
         ((ListViewHolder)viewHolder).title.setText(projects.getProjectName());
         int i = position + 1;
-        url = "http://shadihall.easysoft.com.pk/ProjectImages/ProjectsLogo/"+projects.getProjectID()+".png";
+        url = ServerAddress+"ProjectImages/ProjectsLogo/"+projects.getProjectID()+".png";
         Log.e("URL",url);
         Picasso.get()
                 .load(url)

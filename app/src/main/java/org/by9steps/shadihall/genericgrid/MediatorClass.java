@@ -1,18 +1,31 @@
 package org.by9steps.shadihall.genericgrid;
 
+import android.app.Activity;
 import android.database.Cursor;
+import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.util.Log;
+import android.view.MenuItem;
 import android.widget.Toast;
+
+import org.by9steps.shadihall.chartofaccountdialog.CustomDialogOnDismisListener;
+import org.by9steps.shadihall.helper.MNotificationClass;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
+///////////////////////////30.7 Max Width of Each Character
+//////////////////////////(400/13=30.7 aprox=31)
 public class MediatorClass {
 
-    private Cursor cc;
+    ////////////////////////////////Listener For Search Dialog Click Listener
+    DialogForSearchGrid.DialogClickListener dialogClickListener;
+
+    private Cursor cc,cursorCloneForBackup;
     private RecyclerView recyclerView;
     private GenericGridAdapter adapterobj;
     private List<ViewModeRef> list;
@@ -20,6 +33,7 @@ public class MediatorClass {
 
     public MediatorClass(Cursor cc, RecyclerView recyclerView) {
         this.cc = cc;
+        cursorCloneForBackup=cc;
         this.recyclerView = recyclerView;
         this.recyclerView.setLayoutManager(new LinearLayoutManager(recyclerView.getContext()));
         list = new ArrayList<>();
@@ -40,7 +54,10 @@ public class MediatorClass {
     public void ShowGrid() {
         ViewModeRef helperclass;
         cc.moveToFirst();
-        setHeaderRowColumnNames(0, 'A');
+        if (isSortingAllowed)
+            setHeaderRowColumnNames(0, 'A');
+        else
+            setHeaderRowColumnNames(-1, 'A');
 
         for (int i = 0; i < cc.getCount(); i++) {
             helperclass = new ViewModeRef(cc.getColumnCount());
@@ -60,12 +77,11 @@ public class MediatorClass {
             addSectionView();
 
         }
-
+        settingEachColumnWidth();
         adapterobj = new GenericGridAdapter(list, recyclerView.getContext());
+        adapterobj.headrowClickListner=menuItemHeaderRowClickListner;
         if (!isSortingAllowed) {
-
             adapterobj.listenerForChange = listenGrouping;
-
         }
         recyclerView.setAdapter(adapterobj);
     }
@@ -114,6 +130,7 @@ public class MediatorClass {
 
             }
             setBottomRowColumnNames();
+            settingEachColumnWidth();
 //            if (!isSortingAllowed)
 //                addSectionView();
             recyclerView.getAdapter().notifyDataSetChanged();
@@ -180,6 +197,7 @@ public class MediatorClass {
     }
 
     public List<ViewModeRef> addSectionView() {
+        Log.e("addSectView","addSectionView()  CAlls");
         //Log.e("helloaa","CAlled");
         String sorttype = ViewModeRef.Ref_Column_Name_For_Sorting;
         int index = cc.getColumnIndex(sorttype);
@@ -200,6 +218,9 @@ public class MediatorClass {
         int counter = 0;
         ///////////////////////////Adding Frist Row To New List
         list.add(firstRow);
+        ////////////////Creating uper and lower bound for section
+        int star = 0, end = 0;
+        //////////////////////Adding Other Items
         for (String ss : hashSet) {
             sectionref = new ViewModeRef(cc.getColumnCount());
             Log.e("setitem", counter + "=>" + ss);
@@ -207,20 +228,34 @@ public class MediatorClass {
             sectionref.isSectionRow = true;
             sectionref.SectionName = ss + "";
             list.add(sectionref);
+            star = list.size();
+            end = 0;
+            List<ViewModeRef> minilist = new ArrayList<>();
             for (int i = 0; i < reflist.size(); i++) {
                 if (reflist.get(i).columns[index].equals(ss)) {
                     list.add(reflist.get(i));
+                    minilist.add(reflist.get(i));
+                    end++;
                 }
+            }
+            if (minilist.size() > 0) {
+                Log.e("mimilistsize", "TotalSize:" + minilist.size());
+                AddSectionViseTotalRow(minilist);
             }
             // setBottomRowColumnNames();
         }
         ////////////////////////Addding Lat Row to New List
         list.add(endrow);
+        hideColumVisibility();
         return list;
     }
 
     public void reisterItemMenuClickListner(GenericGridAdapter.MenuItemClickListner listner) {
         adapterobj.menuItemClickListner = listner;
+    }
+
+    public void registerHeaderRowMenuClickListner(DialogForSearchGrid.DialogClickListener dialogClickListener1) {
+        dialogClickListener=dialogClickListener1;
     }
 
     public void setSortingAllowed(boolean sortingAllowed) {
@@ -236,19 +271,201 @@ public class MediatorClass {
         @Override
         public void listenForSortClick(String columnName, int index, char sorttype) {
             //Toast.makeText(recyclerView.getContext(), "=>" + columnName, Toast.LENGTH_SHORT).show();
-            if (!isSortingAllowed) {
-                ViewModeRef.Ref_Column_Name_For_Sorting = columnName;
-//                try {
-                addSectionView();
-//                }catch (Exception e)
-//                {
-//                    e.printStackTrace();
-//                }
-                adapterobj.setList(list);
-                adapterobj.notifyDataSetChanged();
-            }
+//            if (!isSortingAllowed) {
+//                ViewModeRef.Ref_Column_Name_For_Sorting = columnName;
+//
+//                addSectionView();
+//
+//                adapterobj.setList(list);
+//                adapterobj.notifyDataSetChanged();
+//            }
         }
 
     };
 
+    public void AddSectionViseTotalRow(List<ViewModeRef> list1) {
+
+        Log.e("litmetiofeach", "--Tsize--" + list1.size());
+        cc.moveToFirst();
+        ViewModeRef helperclass = new ViewModeRef(cc.getColumnCount());
+
+        //helperclass = new ViewModeRef(cc.getColumnCount());
+        //Log.e("obstotala","pass----------------");
+        boolean isContentQuailfied = false;
+        for (int i = 0; i < list1.size(); i++) {
+            for (int j = 0; j < cc.getColumnCount(); j++) {
+                String cname = cc.getColumnName(j);
+                if (cname.contains("_") && !list1.get(i).isSectionRow && !list1.get(i).isbottomrow
+                        && !list1.get(i).isheaderview) {
+                    String ary[] = cname.split("_");
+                    isContentQuailfied = true;
+                    if (ary[1].equals("S")) {
+                        try {
+                            int s1 = Integer.parseInt(list1.get(i).columns[j]);
+                            int st = Integer.parseInt("0" + helperclass.columns[j]);
+                            st += s1;
+                            Log.e("obstotala", j + ")" + st + "--" + s1 + " ColName" + cc.getColumnName(j));
+                            helperclass.columns[j] = st + "";
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    } else if (ary[1].equals("C")) {
+                        helperclass.columns[j] = (i + 1) + "";
+                    }
+                }
+            }
+            //isContentQuailfied=true;
+            cc.moveToNext();
+            // ViewModeRef.showdata();
+            //  list.add(ViewModeRef);
+        }
+        // helperclass.isbottomrow = true;
+        helperclass.isSectionOfSectionView = true;
+        if (isContentQuailfied)
+            list.add(helperclass);
+    }
+
+
+    public void settingEachColumnWidth() {
+
+
+        Log.e("TotalCount", cc.getCount() + "-----" + cc.getColumnCount());
+        cc.moveToFirst();
+        do {
+            for (int i = 0; i < cc.getColumnCount() && cc.getCount() > 0; i++) {
+                int len = (cc.getString(i) + "").length();
+                if (len > ViewModeRef.eachColWidth[i]) {
+                    ViewModeRef.eachColWidth[i] = len;
+                }
+                ///////////////////////////Cehcking For number
+                if (!TextUtils.isDigitsOnly(cc.getString(i) + "")) {
+                    ViewModeRef.isNumberCoumn[i] = false;
+                }
+            }
+
+        } while (cc.moveToNext());
+        for (int i = 0; i < cc.getColumnCount(); i++) {
+            int len = (cc.getColumnName(i)).length();
+            if (len > ViewModeRef.eachColWidth[i]) {
+                ViewModeRef.eachColWidth[i] = len;
+            }
+        }
+        ///////////////////Adding Extra Width Fro Firest Column Due To Three Dot Menu
+        if (ViewModeRef.eachColWidth.length > 0) {
+            ViewModeRef.eachColWidth[0] += 1;
+        }
+        for (int i = 0; i < ViewModeRef.eachColWidth.length; i++) {
+            Log.e("widthOFCol", "isColNum(" + ViewModeRef.isNumberCoumn[i] + ")ColNo" + i + ") Width :" + ViewModeRef.eachColWidth[i] * ViewModeRef.MaxPxlEachCharTake);
+        }
+    }
+
+    private GenericGridAdapter.MenuItemHeaderRowClickListner menuItemHeaderRowClickListner=new GenericGridAdapter.MenuItemHeaderRowClickListner() {
+        @Override
+        public void ListenForDotMenuItemClick(MenuItem menuItem) {
+            if(menuItem.getTitle().toString().equals("ClearFilter")){
+                cc=cursorCloneForBackup;
+                list.clear();
+                ShowGridAgaiFromBackup();
+                Log.e("checck23",isSortingAllowed+" <->");
+            }else{
+                DialogForSearchGrid dialogForSearchGrid=new DialogForSearchGrid();
+                try {
+                    FragmentActivity activity=(FragmentActivity) recyclerView.getContext();
+                    ArrayList<String> arrayList=new ArrayList<>();
+                    for (int i = 0; i <cc.getColumnCount() ; i++) {
+                        arrayList.add(cc.getColumnName(i));
+                    }
+                    Bundle bb=new Bundle();
+                    bb.putStringArrayList("columnarray",arrayList);
+                    dialogForSearchGrid.setArguments(bb);
+                    dialogForSearchGrid.show(activity.getSupportFragmentManager(),"Filter Grid");
+                    if(dialogClickListener!=null){
+                        dialogForSearchGrid.listener=dialogClickListener;
+                    }
+//                dialogForSearchGrid.listener=new DialogForSearchGrid.DialogClickListener() {
+//                    @Override
+//                    public void HandleClickLisnterOfDialog(String colName, String SearchText) {
+//
+//                    }
+//                };
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+
+
+        }
+    };
+
+    private void ShowGridAgaiFromBackup() {
+        ViewModeRef helperclass;
+        cc.moveToFirst();
+        if (isSortingAllowed)
+            setHeaderRowColumnNames(0, 'A');
+        else
+            setHeaderRowColumnNames(-1, 'A');
+
+        for (int i = 0; i < cc.getCount(); i++) {
+            helperclass = new ViewModeRef(cc.getColumnCount());
+            for (int j = 0; j < cc.getColumnCount(); j++) {
+
+                helperclass.columns[j] = cc.getString(j);
+
+            }
+            cc.moveToNext();
+         //   helperclass.showdata();
+            list.add(helperclass);
+        }
+        setBottomRowColumnNames();
+        hideColumVisibility();
+        if (!isSortingAllowed) {
+//            try {
+        adapterobj.list=addSectionView();
+
+        }
+        settingEachColumnWidth();
+        //adapterobj = new GenericGridAdapter(list, recyclerView.getContext());
+       // adapterobj.headrowClickListner=menuItemHeaderRowClickListner;
+//        if (!isSortingAllowed) {
+//            adapterobj.listenerForChange = listenGrouping;
+//        }
+        adapterobj.notifyDataSetChanged();
+        //recyclerView.setAdapter(adapterobj);
+    }
+
+    ///////////////////////////Send All Parament
+    public void FilterListByEnterText(Cursor cco) {
+        ViewModeRef helperclass;
+        cc=cco;
+        list.clear();
+        if (adapterobj != null && recyclerView != null) {
+            cc.moveToFirst();
+            if (isSortingAllowed)
+                setHeaderRowColumnNames(0, 'A');
+            else
+                setHeaderRowColumnNames(-1, 'A');
+
+            for (int i = 0; i < cc.getCount(); i++) {
+                helperclass = new ViewModeRef(cc.getColumnCount());
+                for (int j = 0; j < cc.getColumnCount(); j++) {
+                    helperclass.columns[j] = cc.getString(j);
+                }
+                cc.moveToNext();
+               // helperclass.showdata();
+                list.add(helperclass);
+            }
+            setBottomRowColumnNames();
+            hideColumVisibility();
+            if (!isSortingAllowed) {
+
+                addSectionView();
+            }
+            settingEachColumnWidth();
+        } else {
+            Toast.makeText(recyclerView.getContext(), "Show Grid First", Toast.LENGTH_SHORT).show();
+        }
+        hideColumVisibility();
+        adapterobj.list=list;
+        adapterobj.notifyDataSetChanged();
+    }
 }

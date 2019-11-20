@@ -711,7 +711,7 @@ public class GetAllDataFrom0Api {
 
         Log.e("GetProjectMenu", "OK");
         String tag_json_obj = "json_obj_req";
-        String u = "http://69.167.137.121/plesk-site-preview/sky.com.pk/shadiHall/GetProjectMenu.php";
+        String u = ApiRefStrings.GetProjectMenu;
 
         StringRequest jsonObjectRequest = new StringRequest(Request.Method.GET, u,
                 new Response.Listener<String>() {
@@ -880,7 +880,7 @@ public class GetAllDataFrom0Api {
 
         // Tag used to cancel the request
         String tag_json_obj = "json_obj_req";
-        String url = "http://69.167.137.121/plesk-site-preview/sky.com.pk/shadiHall/GetAccount4UserRights.php";
+        String url = ApiRefStrings.GetAccount4userRights;
 
 
         StringRequest jsonObjectRequest = new StringRequest(Request.Method.POST, url,

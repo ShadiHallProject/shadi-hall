@@ -28,6 +28,7 @@ import org.by9steps.shadihall.R;
 import org.by9steps.shadihall.activities.MainActivity;
 import org.by9steps.shadihall.adapters.ProjectsListAdapter;
 import org.by9steps.shadihall.fragments.HomeFragment;
+import org.by9steps.shadihall.helper.ApiRefStrings;
 import org.by9steps.shadihall.helper.DatabaseHelper;
 import org.by9steps.shadihall.helper.Prefrence;
 import org.by9steps.shadihall.model.Projects;
@@ -112,7 +113,8 @@ public class ProjectMenuDialog extends DialogFragment {
         mProgress.show();
 
         String tag_json_obj = "json_obj_req";
-        String u = "http://69.167.137.121/plesk-site-preview/sky.com.pk/shadiHall/GetProject.php";
+
+        String u= ApiRefStrings.GetProject;
 
         StringRequest jsonObjectRequest = new StringRequest(Request.Method.GET, u,
                 new Response.Listener<String>() {

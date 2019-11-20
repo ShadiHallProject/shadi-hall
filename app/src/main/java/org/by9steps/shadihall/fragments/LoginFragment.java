@@ -46,6 +46,7 @@ import org.by9steps.shadihall.activities.SelectImagesActivity;
 import org.by9steps.shadihall.adapters.ProjectsListAdapter;
 import org.by9steps.shadihall.adapters.ShadiHallListAdapter;
 import org.by9steps.shadihall.chartofaccountdialog.ProjectMenuDialog;
+import org.by9steps.shadihall.helper.ApiRefStrings;
 import org.by9steps.shadihall.helper.DatabaseHelper;
 import org.by9steps.shadihall.helper.GenericConstants;
 import org.by9steps.shadihall.helper.InputValidation;
@@ -212,7 +213,8 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
         mProgress.show();
 
         String tag_json_obj = "json_obj_req";
-        String u = "http://69.167.137.121/plesk-site-preview/sky.com.pk/shadiHall/GetShadiHallList.php";
+
+        String u= ApiRefStrings.GetShadiHallList;
 
         StringRequest jsonObjectRequest = new StringRequest(com.android.volley.Request.Method.POST, u,
                 new Response.Listener<String>() {

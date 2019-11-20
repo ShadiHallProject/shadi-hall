@@ -234,6 +234,38 @@ attr counterEnabled
 attr counterMaxLength
 attr counterOverflowTextAppearance
 attr counterTextAppearance
+attr cropAspectRatioX
+attr cropAspectRatioY
+attr cropAutoZoomEnabled
+attr cropBackgroundColor
+attr cropBorderCornerColor
+attr cropBorderCornerLength
+attr cropBorderCornerOffset
+attr cropBorderCornerThickness
+attr cropBorderLineColor
+attr cropBorderLineThickness
+attr cropFixAspectRatio
+attr cropFlipHorizontally
+attr cropFlipVertically
+attr cropGuidelines
+attr cropGuidelinesColor
+attr cropGuidelinesThickness
+attr cropInitialCropWindowPaddingRatio
+attr cropMaxCropResultHeightPX
+attr cropMaxCropResultWidthPX
+attr cropMaxZoom
+attr cropMinCropResultHeightPX
+attr cropMinCropResultWidthPX
+attr cropMinCropWindowHeight
+attr cropMinCropWindowWidth
+attr cropMultiTouchEnabled
+attr cropSaveBitmapToInstanceState
+attr cropScaleType
+attr cropShape
+attr cropShowCropOverlay
+attr cropShowProgressBar
+attr cropSnapRadius
+attr cropTouchRadius
 attr customNavigationLayout
 attr datePicker
 attr daysLabelsColor
@@ -758,6 +790,7 @@ color fontWhiteEnable
 color foreground_material_dark
 color foreground_material_light
 color g_gridbottomcolor
+color g_gridbottomsec_of_sec_color
 color g_gridheadcolor
 color g_gridrow1
 color g_gridrow2
@@ -990,6 +1023,7 @@ dimen fastscroll_margin
 dimen fastscroll_minimum_range
 dimen fastscroll_scrollbar_padding_end
 dimen focus_diameter
+dimen gridtextviewdim
 dimen h0
 dimen h1
 dimen h2
@@ -1008,6 +1042,8 @@ dimen hint_alpha_material_light
 dimen hint_pressed_alpha_material_dark
 dimen hint_pressed_alpha_material_light
 dimen hundred_dp
+dimen imgheight
+dimen imgwith
 dimen item_touch_helper_max_drag_scroll_per_frame
 dimen item_touch_helper_swipe_escape_max_velocity
 dimen item_touch_helper_swipe_escape_velocity
@@ -1230,6 +1266,11 @@ drawable common_google_signin_btn_text_light
 drawable common_google_signin_btn_text_light_focused
 drawable common_google_signin_btn_text_light_normal
 drawable common_google_signin_btn_text_light_normal_background
+drawable crop_image_menu_crop
+drawable crop_image_menu_crop_stub
+drawable crop_image_menu_flip
+drawable crop_image_menu_rotate_left
+drawable crop_image_menu_rotate_right
 drawable day_item_background
 drawable default_avatar
 drawable design_bottom_navigation_item_background
@@ -1275,6 +1316,7 @@ drawable ic_info_black_24dp
 drawable ic_keyboard_arrow_right_black_18dp
 drawable ic_launcher_background
 drawable ic_launcher_foreground
+drawable ic_location_on_black_24dp
 drawable ic_more_vert_black_24dp
 drawable ic_mtrl_chip_checked_black
 drawable ic_mtrl_chip_checked_circle
@@ -1319,6 +1361,7 @@ drawable ring
 drawable round_corner_btn
 drawable rounded_button
 drawable search
+drawable selecimg
 drawable spinner_background
 drawable supplier
 drawable tooltip_frame_dark
@@ -1330,11 +1373,14 @@ id ALT
 id AddItemCategoryRecyclerView
 id AddVehicleRecyclerView
 id CTRL
+id CropOverlayView
+id CropProgressBar
 id EditGroupName
 id FUNCTION
 id GVcontainer
 id GridViewcontainer
 id Image3Dot
+id ImageView_image
 id Imagebtn_add
 id Imagethreedotpopup
 id ItemCategorySearch
@@ -1463,6 +1509,8 @@ id capital
 id cash
 id cashBookID
 id center
+id centerCrop
+id centerInside
 id center_horizontal
 id center_vertical
 id chains
@@ -1470,6 +1518,7 @@ id checkbox
 id chronometer
 id city
 id classic
+id clear
 id clickme
 id client_id
 id client_mobile_no
@@ -1535,6 +1584,13 @@ id credit
 id credit_account
 id credit_account_layout
 id credit_bal
+id cropImageView
+id crop_image_menu_crop
+id crop_image_menu_flip
+id crop_image_menu_flip_horizontally
+id crop_image_menu_flip_vertically
+id crop_image_menu_rotate_left
+id crop_image_menu_rotate_right
 id currentDateLabel
 id custom
 id customPanel
@@ -1636,6 +1692,7 @@ id fill_vertical
 id filled
 id financial_year
 id financial_year_layout
+id fitCenter
 id fixed
 id flash
 id footer
@@ -1646,6 +1703,7 @@ id forwardButton
 id fridayLabel
 id front
 id g_total_charges
+id ggridsearchbtn
 id ghost_view
 id gl_spinner
 id gone
@@ -1654,6 +1712,7 @@ id grandtotalquan
 id grandtotalview
 id grandtotalview1
 id grandtotalview2
+id grideditext
 id group_divider
 id groups
 id gv
@@ -1677,6 +1736,11 @@ id id
 id ifRoom
 id image
 id image_dir
+id img1
+id img2
+id img3
+id img4
+id img5
 id img_count
 id income
 id info
@@ -1714,6 +1778,7 @@ id list_item
 id list_item_text
 id listview
 id ll
+id locationimage
 id log_out
 id login_btn
 id login_info
@@ -1776,13 +1841,17 @@ id normal
 id notification_background
 id notification_main_column
 id notification_main_column_container
+id off
 id ok
 id ok_action
+id on
+id onTouch
 id one_day_picker
 id otp_btn
 id otp_layout
 id otpcode
 id outline
+id oval
 id packed
 id parallax
 id parent
@@ -1815,6 +1884,7 @@ id profit_loss
 id profit_year
 id progress_circular
 id progress_horizontal
+id projectimage
 id projectname
 id projectstatus
 id r_acname
@@ -1835,6 +1905,7 @@ id receiyptno
 id recieved
 id recovery_search
 id recovery_spinner
+id rectangle
 id recycler
 id recyclerView
 id recycler_layout
@@ -1890,6 +1961,7 @@ id search_mag_icon
 id search_plate
 id search_src_text
 id search_voice_btn
+id searchitem
 id section_name
 id selectImages
 id select_dialog_listview
@@ -1918,6 +1990,7 @@ id spinerTitle
 id spinner
 id spinnerDriver
 id spinnerVehicleCategory
+id spinnerforcol
 id splash_icon
 id split_action_bar
 id spread
@@ -2127,6 +2200,8 @@ layout cash_book_entry_item
 layout cash_book_group_total
 layout cash_book_item
 layout contentrow
+layout crop_image_activity
+layout crop_image_view
 layout customegroup_dialog2
 layout customgroup1_gv_row
 layout customgroup_dialog
@@ -2188,7 +2263,9 @@ layout fragment_trail_balance
 layout fragment_tree
 layout fragment_year_profit_loss
 layout general_ledger_list_item
+layout generic_grid_search
 layout gridbottomrow
+layout gridbottomsec_of_sec_row
 layout gridsectionview
 layout gv_item
 layout header_row
@@ -2238,6 +2315,7 @@ layout saleentrydialog
 layout salepur1fragment_part1gridview
 layout salepurfragrow
 layout salepurfragrowpage2
+layout samplelayoutimageselection
 layout select_dialog_item_material
 layout select_dialog_multichoice_material
 layout select_dialog_singlechoice_material
@@ -2258,7 +2336,9 @@ layout year_label_text_view
 menu additemcategorymenu
 menu cb_menu
 menu contextmenu
+menu crop_image_menu
 menu dropdown
+menu generic_grid_header_menu
 menu menu_main
 menu setting_menu
 mipmap ic_launcher
@@ -2382,6 +2462,13 @@ string create_account
 string credit
 string credit_account
 string credit_bal
+string crop_image_activity_title
+string crop_image_menu_crop
+string crop_image_menu_flip
+string crop_image_menu_flip_horizontally
+string crop_image_menu_flip_vertically
+string crop_image_menu_rotate_left
+string crop_image_menu_rotate_right
 string date
 string day_name_format
 string debit
@@ -2450,6 +2537,7 @@ string label_month
 string label_year
 string liabilities
 string login
+string login_information
 string login_number
 string map
 string material_calendar_friday
@@ -2478,6 +2566,7 @@ string path_password_eye
 string path_password_eye_mask_strike_through
 string path_password_eye_mask_visible
 string path_password_strike_through
+string pick_image_intent_chooser_title
 string pix_last_month
 string pix_last_week
 string pix_ok
@@ -3088,6 +3177,7 @@ styleable ConstraintLayout_placeholder content emptyVisibility
 styleable ConstraintSet android_orientation android_id android_visibility android_layout_width android_layout_height android_layout_marginLeft android_layout_marginTop android_layout_marginRight android_layout_marginBottom android_maxWidth android_maxHeight android_minWidth android_minHeight android_alpha android_transformPivotX android_transformPivotY android_translationX android_translationY android_scaleX android_scaleY android_rotation android_rotationX android_rotationY android_layout_marginStart android_layout_marginEnd android_translationZ android_elevation barrierAllowsGoneWidgets barrierDirection chainUseRtl constraint_referenced_ids layout_constrainedHeight layout_constrainedWidth layout_constraintBaseline_creator layout_constraintBaseline_toBaselineOf layout_constraintBottom_creator layout_constraintBottom_toBottomOf layout_constraintBottom_toTopOf layout_constraintCircle layout_constraintCircleAngle layout_constraintCircleRadius layout_constraintDimensionRatio layout_constraintEnd_toEndOf layout_constraintEnd_toStartOf layout_constraintGuide_begin layout_constraintGuide_end layout_constraintGuide_percent layout_constraintHeight_default layout_constraintHeight_max layout_constraintHeight_min layout_constraintHeight_percent layout_constraintHorizontal_bias layout_constraintHorizontal_chainStyle layout_constraintHorizontal_weight layout_constraintLeft_creator layout_constraintLeft_toLeftOf layout_constraintLeft_toRightOf layout_constraintRight_creator layout_constraintRight_toLeftOf layout_constraintRight_toRightOf layout_constraintStart_toEndOf layout_constraintStart_toStartOf layout_constraintTop_creator layout_constraintTop_toBottomOf layout_constraintTop_toTopOf layout_constraintVertical_bias layout_constraintVertical_chainStyle layout_constraintVertical_weight layout_constraintWidth_default layout_constraintWidth_max layout_constraintWidth_min layout_constraintWidth_percent layout_editor_absoluteX layout_editor_absoluteY layout_goneMarginBottom layout_goneMarginEnd layout_goneMarginLeft layout_goneMarginRight layout_goneMarginStart layout_goneMarginTop
 styleable CoordinatorLayout keylines statusBarBackground
 styleable CoordinatorLayout_Layout android_layout_gravity layout_anchor layout_anchorGravity layout_behavior layout_dodgeInsetEdges layout_insetEdge layout_keyline
+styleable CropImageView cropAspectRatioX cropAspectRatioY cropAutoZoomEnabled cropBackgroundColor cropBorderCornerColor cropBorderCornerLength cropBorderCornerOffset cropBorderCornerThickness cropBorderLineColor cropBorderLineThickness cropFixAspectRatio cropFlipHorizontally cropFlipVertically cropGuidelines cropGuidelinesColor cropGuidelinesThickness cropInitialCropWindowPaddingRatio cropMaxCropResultHeightPX cropMaxCropResultWidthPX cropMaxZoom cropMinCropResultHeightPX cropMinCropResultWidthPX cropMinCropWindowHeight cropMinCropWindowWidth cropMultiTouchEnabled cropSaveBitmapToInstanceState cropScaleType cropShape cropShowCropOverlay cropShowProgressBar cropSnapRadius cropTouchRadius
 styleable DesignTheme bottomSheetDialogTheme bottomSheetStyle
 styleable DrawerArrowToggle arrowHeadLength arrowShaftLength barLength color drawableSize gapBetweenBars spinBars thickness
 styleable FloatingActionButton backgroundTint backgroundTintMode borderWidth elevation fabCustomSize fabSize hideMotionSpec hoveredFocusedTranslationZ maxImageSize pressedTranslationZ rippleColor showMotionSpec useCompatPadding

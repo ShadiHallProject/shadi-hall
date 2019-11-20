@@ -21,6 +21,7 @@ import org.by9steps.shadihall.AppController;
 import org.by9steps.shadihall.R;
 import org.by9steps.shadihall.chartofaccountdialog.ProjectMenuDialog;
 import org.by9steps.shadihall.helper.DatabaseHelper;
+import org.by9steps.shadihall.helper.ViewDBAllData;
 import org.by9steps.shadihall.helper.refdb;
 import org.by9steps.shadihall.model.ProjectMenu;
 
@@ -98,6 +99,7 @@ public class SplashActivity extends AppCompatActivity {
                             startActivity(new Intent(SplashActivity.this, LoginActivity.class));
                             finish();
                         }
+                      //  startActivity(new Intent(SplashActivity.this, ViewDBAllData.class));
 
                     }
                 },3000);

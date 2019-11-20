@@ -8,14 +8,13 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
+import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
@@ -23,20 +22,14 @@ import android.support.design.widget.TextInputEditText;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Base64;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.GridView;
 import android.widget.ImageView;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -45,56 +38,58 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.RetryPolicy;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.fxn.pix.Pix;
 import com.orm.SugarContext;
-import com.orm.util.NamingHelper;
 import com.squareup.picasso.Picasso;
+import com.theartofdev.edmodo.cropper.CropImage;
+import com.theartofdev.edmodo.cropper.CropImageView;
 import com.whiteelephant.monthpicker.MonthPickerDialog;
 
 import org.by9steps.shadihall.AppController;
 import org.by9steps.shadihall.R;
 import org.by9steps.shadihall.adapters.GalleryAdapter;
-import org.by9steps.shadihall.adapters.SpinnerAdapter;
+import org.by9steps.shadihall.adapters.ProjectsListAdapter;
+import org.by9steps.shadihall.callingapi.ImageUploadingApi;
+import org.by9steps.shadihall.chartofaccountdialog.ProjectMenuDialog;
 import org.by9steps.shadihall.helper.DatabaseHelper;
+import org.by9steps.shadihall.helper.GenericConstants;
 import org.by9steps.shadihall.helper.InputValidation;
 import org.by9steps.shadihall.helper.MNotificationClass;
 import org.by9steps.shadihall.helper.Prefrence;
 import org.by9steps.shadihall.model.AreaName;
-import org.by9steps.shadihall.model.ProjectMenu;
 import org.by9steps.shadihall.model.Projects;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Date;
 import java.util.Locale;
+import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class RegisterActivity extends AppCompatActivity implements View.OnClickListener {
-  final int REQUEST_MAP_FOR_CITY=22;
+    final int REQUEST_MAP_FOR_CITY = 22;
+    int IMAGE_Code = 0;
     LocationManager lm;
     boolean gps_enabled = false;
     boolean network_enabled = false;
-   ///////////////////////////Counter For Breaking Asycn Task
-    int j=0;
-    int count,total;
+    ///////////////////////////Counter For Breaking Asycn Task
+    int j = 0;
+    int count, total;
     private int RequestCode = 102;
     private RecyclerView recyclerView;
-     GalleryAdapter galleryAdapter;
-     TextView projectstatus;
+    GalleryAdapter galleryAdapter;
+    TextView projectstatus;
     //////////////////////////Current SelectedImage From Image group
-   // private ImageView currentSelectImage;
+    // private ImageView currentSelectImage;
     private int posi;
     ArrayList<String> imageList;
     InputValidation inputValidation;
@@ -110,7 +105,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
     TextInputLayout c_number_layout;
     TextInputEditText c_number;
     TextInputLayout login_number_layout;
-    TextView login_number,selectImages,projectnamed;
+    TextView login_number, selectImages, projectnamed;
     //    TextInputLayout country_layout;
 //    TextView country;
     TextInputLayout financial_year_layout;
@@ -123,9 +118,13 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
     TextInputEditText website;
     TextInputLayout email_layout;
     TextInputEditText email;
-    CircleImageView image;
+    CircleImageView image, projimage;
     Button register;
-    ImageView contact_list;
+    ImageView contact_list, iclocationlogo, img1, img2, img3, img4, img5;
+    ///////////////////////Hash map for images and ites uri
+    HashMap<Integer,Uri> imageshashmap;
+    /////////////TAG if img set tag=set else tag=null
+    String TAGSET = "set", TAGNULL = "null";
 //    Spinner sp_country;
 //    Spinner sp_city;
 //    Spinner sp_sub_city;
@@ -134,10 +133,10 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
     private final int GALLERY = 100;
     private final int CAMERA = 101;
     private final int RefImage_CAMERA = 105;
-   // private final int RefImage_GALLERY = 106;
+    // private final int RefImage_GALLERY = 106;
     String encodedImage = "";
-    String ph,type, latitude, longitude;
-    String country="", city="", subCity="";
+    String ph, type, latitude, longitude;
+    String country = "", city = "", subCity = "";
     int choosenYear = 2019;
 
     //shared prefrences
@@ -153,11 +152,29 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
         SugarContext.init(this);
-        projectnamed=findViewById(R.id.projectname);
+        img1 = findViewById(R.id.img1);
+        img1.setOnClickListener(this);
+        img2 = findViewById(R.id.img2);
+        img2.setOnClickListener(this);
+        img3 = findViewById(R.id.img3);
+        img3.setOnClickListener(this);
+        img4 = findViewById(R.id.img3);
+        img4.setOnClickListener(this);
+        img5 = findViewById(R.id.img3);
+        img5.setOnClickListener(this);
+        imageshashmap=new HashMap<>();
+        /////////////////////////////Setting initial tag to nnull
+        img1.setTag(TAGNULL);
+        img2.setTag(TAGNULL);
+        img3.setTag(TAGNULL);
+        img4.setTag(TAGNULL);
+        img5.setTag(TAGNULL);
+        iclocationlogo = findViewById(R.id.locationimage);
+        projectnamed = findViewById(R.id.projectname);
         recyclerView = findViewById(R.id.gv);
-        recyclerView.setLayoutManager(new GridLayoutManager(this,2));
+        recyclerView.setLayoutManager(new GridLayoutManager(this, 2));
         selectImages = findViewById(R.id.selectImages);
-        projectstatus=findViewById(R.id.projectstatus);
+        projectstatus = findViewById(R.id.projectstatus);
         c_name = findViewById(R.id.c_name);
         c_name_layout = findViewById(R.id.c_name_layout);
         c_address = findViewById(R.id.c_address);
@@ -172,6 +189,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         login_number_layout = findViewById(R.id.login_number_layout);
 //        persons = findViewById(R.id.persons);
 //        persons_layout = findViewById(R.id.persons_layout);
+        projimage = findViewById(R.id.projectimage);
         website = findViewById(R.id.website);
         website_layout = findViewById(R.id.website_layout);
         email = findViewById(R.id.email);
@@ -188,7 +206,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
 //        sp_country = findViewById(R.id.sp_country);
 //        sp_city = findViewById(R.id.sp_city);
 //        sp_sub_city = findViewById(R.id.sp_sub_city);
-        lm = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
+        lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         inputValidation = new InputValidation(this);
 
         //shared prefrences
@@ -207,16 +225,22 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         Intent intent = getIntent();
         if (intent != null) {
             type = intent.getStringExtra("TYPE");
-            if (type.equals("Register")){
+            if (type.equals("Register")) {
 //                latitude = intent.getStringExtra("Latitude");
 //                longitude = intent.getStringExtra("Longitude");
-                String query = "SELECT * FROM Project where ProjectID="+prefrence.getProjectIDSession();
-              List<Projects>  projectsList = new DatabaseHelper(this).getProjects(query);
-              String projname="";
-              if(projectsList!=null){
-                  projname=projectsList.get(0).getProjectName();
-                  projectnamed.setText("Project:"+projname);
-              }
+                String url = "http://shadihall.easysoft.com.pk/ProjectImages/ProjectsLogo/" + prefrence.getProjectIDSession() + ".png";
+                Log.e("URL", url);
+                Picasso.get()
+                        .load(url)
+                        .placeholder(R.drawable.default_avatar)
+                        .into(projimage);
+                String query = "SELECT * FROM Project where ProjectID=" + prefrence.getProjectIDSession();
+                List<Projects> projectsList = new DatabaseHelper(this).getProjects(query);
+                String projname = "";
+                if (projectsList != null) {
+                    projname = projectsList.get(0).getProjectName();
+                    projectnamed.setText(projname);
+                }
                 projectstatus.setText("Click To Set Location");
                 Geocoder geocoder = new Geocoder(this, Locale.getDefault());
                 List<Address> addresses = null;
@@ -239,9 +263,9 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
 
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            if (type.equals(AppController.profileType)){
+            if (type.equals(AppController.profileType)) {
                 getSupportActionBar().setTitle("Edit");
-            }else {
+            } else {
                 getSupportActionBar().setTitle("Register");
             }
 
@@ -264,12 +288,12 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
 
 //        getAreaName();
 
-        if(sharedPreferences.contains(phone)){
-            ph = sharedPreferences.getString(phone,"");
+        if (sharedPreferences.contains(phone)) {
+            ph = sharedPreferences.getString(phone, "");
             login_number.setText(ph);
         }
 
-        if (type.equals(AppController.profileType)){
+        if (type.equals(AppController.profileType)) {
             password_layout.setVisibility(View.GONE);
             getUserProfile();
             register.setText(R.string.update);
@@ -281,6 +305,64 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                 if (isGpsEnabled()) {
                     Intent i = new Intent(RegisterActivity.this, MapsActivity.class);
                     startActivityForResult(i, REQUEST_MAP_FOR_CITY);
+                }
+            }
+        });
+        iclocationlogo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (isGpsEnabled()) {
+                    Intent i = new Intent(RegisterActivity.this, MapsActivity.class);
+                    startActivityForResult(i, REQUEST_MAP_FOR_CITY);
+                }
+            }
+        });
+        projimage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final ProjectMenuDialog dialog = new ProjectMenuDialog();
+                boolean isconnected = GenericConstants.isConnected(RegisterActivity.this);
+                if (isconnected) {
+
+                    dialog.listenerproj = new ProjectsListAdapter.OnItemClickListener() {
+                        @Override
+                        public void onItemClick(String id, String name) {
+                            prefrence.setProjectIDSession(id);
+                            prefrence.setUserRighhtsSession("0");
+                            prefrence.setClientUserIDSession("0");
+                            prefrence.setMYClientUserIDSession("0");
+                            prefrence.setClientIDSession("0");
+                            dialog.dismiss();
+                            String url = "http://shadihall.easysoft.com.pk/ProjectImages/ProjectsLogo/" + prefrence.getProjectIDSession() + ".png";
+                            Log.e("URL", url);
+                            Picasso.get()
+                                    .load(url)
+                                    .placeholder(R.drawable.default_avatar)
+                                    .into(projimage);
+                            String query = "SELECT * FROM Project where ProjectID=" + prefrence.getProjectIDSession();
+                            List<Projects> projectsList = new DatabaseHelper(RegisterActivity.this).getProjects(query);
+                            String projname = "";
+                            if (projectsList != null) {
+                                projname = projectsList.get(0).getProjectName();
+                                projectnamed.setText(projname);
+                            }
+//                            if (isGpsEnabled()) {
+//                                Intent intent = new Intent(RegisterActivity.this, RegisterActivity.class);
+//                                intent.putExtra("TYPE", "Register");
+//
+//                                startActivity(intent);
+////                                Intent i=new Intent(getContext(), MapsActivity.class);
+////                                i.putExtra("ClientID","98");
+////                                startActivity(i);
+//                            }
+                            MNotificationClass.ShowToastTem(RegisterActivity.this,
+                                    name);
+                            // prefrence.setProjectIDSession(id);
+                        }
+                    };
+                    dialog.show(getSupportFragmentManager(), "Show");
+
+                    // Toast.makeText(getContext(), "Please Select Project First", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -336,15 +418,32 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
 //                final String cty = city.getText().toString();
 //                final String subCty = sub_city.getText().toString();
                 if (city.equals("") || country.equals("") || subCity.equals("")) {
-                    MNotificationClass.ShowToast(this,"Select City First");
+                    //uploadImages("9");
+                    pDialog = new ProgressDialog(RegisterActivity.this);
+                    pDialog.setTitle("New Image Upload");
+                    pDialog.setMessage("Uploading image");
+                    pDialog.setCancelable(false);
+                    pDialog.show();
+                    ImageUploadingApi.uploadImageToCloud(this,
+                            "1051212",  "1",img5,Uri.parse(imageList.get(0)), new ImageUploadingApi.ImageUploadingImage() {
+                                @Override
+                                public void FinishCallBackmethod(String success, String funType) {
+                                    Log.e("imageurisss",success+"---"+funType);
+                                    //img5.setTag("up");
+//                                    pDialog.setMessage("Sending Images To Cloud...5");
+                                    pDialog.dismiss();
+                                    Toast.makeText(RegisterActivity.this, "All Images Done", Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                    MNotificationClass.ShowToast(this, "Select City First");
                     return;
                 }
                 if (!inputValidation.isInputEditTextFilled(c_name, c_name_layout, getString(R.string.error_message_c_name))) {
                     return;
                 }
-                if (!inputValidation.isInputEditTextFilled(c_address, c_address_layout, getString(R.string.error_message_c_address))) {
-                    return;
-                }
+//                if (!inputValidation.isInputEditTextFilled(c_address, c_address_layout, getString(R.string.error_message_c_address))) {
+//                    return;
+//                }
                 if (!inputValidation.isInputEditTextFilled(name_of_person, name_of_person_layout, getString(R.string.error_message_name_of_person))) {
                     return;
                 }
@@ -353,9 +452,10 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                 if (!inputValidation.isInputEditTextFilled(password, password_layout, getString(R.string.error_message_password))) {
                     return;
                 }
-                if (!inputValidation.isInputEditTextFilled(c_number, c_number_layout, getString(R.string.error_message_c_number))) {
-                    return;
-                }
+//                if (!inputValidation.isInputEditTextFilled(c_number, c_number_layout, getString(R.string.error_message_c_number))) {
+//                    return;
+//                }
+                ////////////////////////////////////
 //                if (!inputValidation.isInputEditTextFilled(login_number, login_number_layout, getString(R.string.error_message_login_number))) {
 //                    return;
 //                }
@@ -368,23 +468,22 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
 //                if (!inputValidation.isInputEditTextFilled(persons, persons_layout, getString(R.string.error_message_persons))) {
 //                    return;
 //                }
-                if (!inputValidation.isInputEditTextFilled(website, website_layout, getString(R.string.error_message_website))) {
-                    return;
-                }
-                if (!inputValidation.isInputEditTextFilled(email, email_layout, getString(R.string.error_message_email))) {
-                    return;
-                }
-                if (!inputValidation.isInputEditTextFilled(description, description_layout, getString(R.string.error_message_description))) {
-                    return;
-                }
-                if (encodedImage.isEmpty() || encodedImage.equals("")){
-                    Toast.makeText(RegisterActivity.this,"Select Company Logo",Toast.LENGTH_LONG).show();
-                }
-                else {
+//                if (!inputValidation.isInputEditTextFilled(website, website_layout, getString(R.string.error_message_website))) {
+//                    return;
+//                }
+//                if (!inputValidation.isInputEditTextFilled(email, email_layout, getString(R.string.error_message_email))) {
+//                    return;
+//                }
+//                if (!inputValidation.isInputEditTextFilled(description, description_layout, getString(R.string.error_message_description))) {
+//                    return;
+//                }
+                if (encodedImage.isEmpty() || encodedImage.equals("")) {
+                    Toast.makeText(RegisterActivity.this, "Select Company Logo", Toast.LENGTH_LONG).show();
+                } else {
 
-                    if (type.equals(AppController.profileType)){
+                    if (type.equals(AppController.profileType)) {
 
-                    }else{
+                    } else {
                         String tag_json_obj = "json_obj_req";
                         String url = "http://69.167.137.121/plesk-site-preview/sky.com.pk/shadiHall/Register.php";
 
@@ -397,16 +496,17 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                         StringRequest jsonObjectRequest = new StringRequest(Request.Method.POST, url,
                                 new Response.Listener<String>() {
                                     JSONObject jsonObj = null;
+
                                     @Override
                                     public void onResponse(String response) {
-                                        Log.e("Register",response);
+                                        Log.e("Register", response);
                                         try {
-                                            jsonObj= new JSONObject(response);
+                                            jsonObj = new JSONObject(response);
                                             String success = jsonObj.getString("success");
 
-                                            if (success.equals("1")){
+                                            if (success.equals("1")) {
                                                 pDialog.dismiss();
-                                                Log.e("Response",response);
+                                                Log.e("Response", response);
                                                 String id = jsonObj.getString("ClientID");
 //                                                Toast.makeText(RegisterActivity.this, "User Register", Toast.LENGTH_SHORT).show();
 //                                                Intent intent = new Intent(RegisterActivity.this, SelectImagesActivity.class);
@@ -417,11 +517,11 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                                                 SharedPreferences.Editor editor = sharedPreferences.edit();
                                                 editor.putString(resume, "1");
                                                 editor.apply();
-                                            }else if (success.equals("0")){
+                                            } else if (success.equals("0")) {
                                                 pDialog.dismiss();
                                                 String message = jsonObj.getString("message");
                                                 Toast.makeText(RegisterActivity.this, message, Toast.LENGTH_SHORT).show();
-                                            }else {
+                                            } else {
                                                 pDialog.dismiss();
                                                 Toast.makeText(RegisterActivity.this, response, Toast.LENGTH_SHORT).show();
                                             }
@@ -434,34 +534,34 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                             @Override
                             public void onErrorResponse(VolleyError error) {
                                 pDialog.dismiss();
-                                Log.e("Error",error.toString());
+                                Log.e("Error", error.toString());
                                 Toast.makeText(RegisterActivity.this, error.toString(), Toast.LENGTH_SHORT).show();
                             }
-                        }){
+                        }) {
                             @Override
                             protected Map<String, String> getParams() {
 
                                 Map<String, String> params = new HashMap<String, String>();
                                 params.put("NetCode", "0");
                                 params.put("SysCode", "0");
-                                params.put("CompanyName", c_name.getText().toString());
-                                params.put("CompanyAddress", c_address.getText().toString());
-                                params.put("CompanyNumber", c_number.getText().toString());
-                                params.put("NameOfPerson", name_of_person.getText().toString());
-                                params.put("LoginMobileNo", login_number.getText().toString());
-                                params.put("Email", email.getText().toString());
-                                params.put("Country", country);
-                                params.put("Password", password.getText().toString());
-                                params.put("City", city);
-                                params.put("SubCity", subCity);
-                                params.put("Website", website.getText().toString());
+                                params.put("CompanyName", checkNullField(c_name.getText().toString()));
+                                params.put("CompanyAddress", checkNullField(c_address.getText().toString()));
+                                params.put("CompanyNumber", checkNullField(c_number.getText().toString()));
+                                params.put("NameOfPerson", checkNullField(name_of_person.getText().toString()));
+                                params.put("LoginMobileNo", checkNullField(login_number.getText().toString()));
+                                params.put("Email", checkNullField(email.getText().toString()));
+                                params.put("Country", checkNullField(country));
+                                params.put("Password", checkNullField(password.getText().toString()));
+                                params.put("City", checkNullField(city));
+                                params.put("SubCity", checkNullField(subCity));
+                                params.put("Website", checkNullField(website.getText().toString()));
                                 params.put("CapacityOfPersons", "0");
                                 params.put("CompanyLogo", encodedImage);
                                 params.put("DisplayImage", encodedImage);
                                 params.put("Lat", latitude);
                                 params.put("Lng", longitude);
                                 params.put("ProjectID", prefrence.getProjectIDSession());
-                                params.put("BusinessDescriptions", description.getText().toString());
+                                params.put("BusinessDescriptions", checkNullField(description.getText().toString()));
                                 params.put("FinancialYear", financial_year.getText().toString());
                                 return params;
                             }
@@ -474,7 +574,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                 }
                 break;
             case R.id.image:
-                final CharSequence[] options = { "Take Photo", "Choose from Gallery","Cancel" };
+                final CharSequence[] options = {"Take Photo", "Choose from Gallery", "Cancel"};
                 AlertDialog.Builder builder = new AlertDialog.Builder(RegisterActivity.this);
 
                 builder.setTitle("Add Photo!");
@@ -487,13 +587,12 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                             Intent takePicture = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                             startActivityForResult(takePicture, CAMERA);
 
-                        }else if (options[item].equals("Choose from Gallery")){
+                        } else if (options[item].equals("Choose from Gallery")) {
 
                             Intent in = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
                             startActivityForResult(in, GALLERY);
 
-                        }
-                        else if (options[item].equals("Cancel")) {
+                        } else if (options[item].equals("Cancel")) {
                             dialog.dismiss();
                         }
                     }
@@ -518,43 +617,68 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                         .build()
                         .show();
                 break;
+            case R.id.img1:
+                IMAGE_Code = 1;
+                requestImageFromAndroidPhone();
+                break;
+            case R.id.img2:
+                IMAGE_Code = 2;
+                requestImageFromAndroidPhone();
+                break;
+            case R.id.img3:
+                IMAGE_Code = 3;
+                requestImageFromAndroidPhone();
+                break;
+            case R.id.img4:
+                IMAGE_Code = 4;
+                requestImageFromAndroidPhone();
+                break;
+            case R.id.img5:
+                IMAGE_Code = 5;
+                requestImageFromAndroidPhone();
+                break;
+
 
         }
+    }
+
+    private String checkNullField(String toString) {
+        if (toString.isEmpty())
+            return GenericConstants.NullFieldStandardText;
+        else
+            return toString;
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         if (resultCode == Activity.RESULT_OK && requestCode == 1) {
             Uri contactData = data.getData();
-            Cursor c =  getContentResolver().query(contactData, null, null, null, null);
+            Cursor c = getContentResolver().query(contactData, null, null, null, null);
             if (c.moveToFirst()) {
 
-                String phoneNumber="",emailAddress="";
+                String phoneNumber = "", emailAddress = "";
                 String name = c.getString(c.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
                 String contactId = c.getString(c.getColumnIndex(ContactsContract.Contacts._ID));
                 //http://stackoverflow.com/questions/866769/how-to-call-android-contacts-list   our upvoted answer
 
                 String hasPhone = c.getString(c.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER));
 
-                if ( hasPhone.equalsIgnoreCase("1"))
+                if (hasPhone.equalsIgnoreCase("1"))
                     hasPhone = "true";
                 else
-                    hasPhone = "false" ;
+                    hasPhone = "false";
 
-                if (Boolean.parseBoolean(hasPhone))
-                {
-                    Cursor phones = getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null,ContactsContract.CommonDataKinds.Phone.CONTACT_ID +" = "+ contactId,null, null);
-                    while (phones.moveToNext())
-                    {
+                if (Boolean.parseBoolean(hasPhone)) {
+                    Cursor phones = getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = " + contactId, null, null);
+                    while (phones.moveToNext()) {
                         phoneNumber = phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
                     }
                     phones.close();
                 }
 
                 // Find Email Addresses
-                Cursor emails = getContentResolver().query(ContactsContract.CommonDataKinds.Email.CONTENT_URI,null,ContactsContract.CommonDataKinds.Email.CONTACT_ID + " = " + contactId,null, null);
-                while (emails.moveToNext())
-                {
+                Cursor emails = getContentResolver().query(ContactsContract.CommonDataKinds.Email.CONTENT_URI, null, ContactsContract.CommonDataKinds.Email.CONTACT_ID + " = " + contactId, null, null);
+                while (emails.moveToNext()) {
                     emailAddress = emails.getString(emails.getColumnIndex(ContactsContract.CommonDataKinds.Email.DATA));
                 }
                 emails.close();
@@ -562,69 +686,120 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                 c_number.setText(phoneNumber);
             }
             c.close();
-        }else if (resultCode == Activity.RESULT_OK && requestCode == GALLERY){
+        } else if (resultCode == Activity.RESULT_OK && requestCode == GALLERY) {
             if (data != null) {
                 getImage(data, requestCode);
             }
-        }
-        else if (resultCode == Activity.RESULT_OK && requestCode == CAMERA){
-            if (data != null){
+        } else if (resultCode == Activity.RESULT_OK && requestCode == CAMERA) {
+            if (data != null) {
                 getImage(data, requestCode);
             }
-        }
-        else  if (resultCode == Activity.RESULT_OK && requestCode == RequestCode) {
+        } else if (resultCode == Activity.RESULT_OK && requestCode == RequestCode) {
             imageList = data.getStringArrayListExtra(Pix.IMAGE_RESULTS);
 
-             galleryAdapter = new GalleryAdapter(RegisterActivity.this, imageList);
-              galleryAdapter.listeneachclicklistner=new GalleryAdapter.listeneachclicklistner() {
-                  @Override
-                  public void ImageClicked(int pos, String obj, ImageView imageView) {
-                      SelectImageFrom(pos,obj,imageView,galleryAdapter,imageList);
-                  }
+            galleryAdapter = new GalleryAdapter(RegisterActivity.this, imageList);
+            galleryAdapter.listeneachclicklistner = new GalleryAdapter.listeneachclicklistner() {
+                @Override
+                public void ImageClicked(int pos, String obj, ImageView imageView) {
+                    SelectImageFrom(pos, obj, imageView, galleryAdapter, imageList);
+                }
 
-                  @Override
-                  public void onImageDeleteClick(int pos, String obj, ImageView imageView) {
-                      Log.e("deletepos","->"+pos+" tsize:"+imageList.size());
-                      imageList.remove(pos);
-                      for(int i=0;i<imageList.size();i++)
-                          Log.e("deleteposobjectsim",imageList.get(i));
-                      galleryAdapter.notifyDataSetChanged();
-                  }
-              };
+                @Override
+                public void onImageDeleteClick(int pos, String obj, ImageView imageView) {
+                    Log.e("deletepos", "->" + pos + " tsize:" + imageList.size());
+                    imageList.remove(pos);
+                    for (int i = 0; i < imageList.size(); i++)
+                        Log.e("deleteposobjectsim", imageList.get(i));
+                    galleryAdapter.notifyDataSetChanged();
+                }
+            };
             recyclerView.setAdapter(galleryAdapter);
 
 
-        }
-        else if(resultCode == Activity.RESULT_OK && requestCode == RefImage_CAMERA){
+        } else if (resultCode == Activity.RESULT_OK && requestCode == RefImage_CAMERA) {
             imageList.remove(posi);
             imageList.add(posi, data.getStringArrayListExtra(Pix.IMAGE_RESULTS).get(0));
             galleryAdapter.notifyItemChanged(posi);
-        }
-        else if(resultCode==Activity.RESULT_OK && requestCode==REQUEST_MAP_FOR_CITY){
-            if(data.getExtras()!=null){
+        } else if (resultCode == Activity.RESULT_OK && requestCode == REQUEST_MAP_FOR_CITY) {
+            if (data.getExtras() != null) {
 
-             country=data.getStringExtra("country");
-                city=data.getStringExtra("city");
-                subCity=data.getStringExtra("subcity");
-                Log.e("resultbymap",country+" "+city+" "+subCity);
-                projectstatus.setText(country+" "+city+" "+subCity);
+                country = data.getStringExtra("country");
+                city = data.getStringExtra("city");
+                subCity = data.getStringExtra("subcity");
+                latitude = data.getStringExtra("Lat");
+                longitude = data.getStringExtra("Long");
+                Log.e("resultbymap", country + " " + city + " " + subCity);
+                projectstatus.setText(country + " " + city + " " + subCity);
+            }
+        } else if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
+            CropImage.ActivityResult result = CropImage.getActivityResult(data);
+
+            if (resultCode == RESULT_OK) {
+                Uri resultUri = result.getUri();
+                Log.e("image1uri",resultUri.toString());
+                if (IMAGE_Code == 1) {
+                    imageshashmap.put(1,resultUri);
+                    img1.setImageURI(resultUri);
+                    img1.setTag(TAGSET);
+
+                } else if (IMAGE_Code == 2) {
+                    imageshashmap.put(2,resultUri);
+                    img2.setImageURI(resultUri);
+                    img2.setTag(TAGSET);
+                    // requestImageFromAndroidPhone();
+                } else if (IMAGE_Code == 3) {
+                    imageshashmap.put(3,resultUri);
+                    img3.setImageURI(resultUri);
+                    img3.setTag(TAGSET);
+                    //requestImageFromAndroidPhone();
+                } else if (IMAGE_Code == 4) {
+                    imageshashmap.put(4,resultUri);
+                    img4.setImageURI(resultUri);
+                    img4.setTag(TAGSET);
+                    //requestImageFromAndroidPhone();
+                } else if (IMAGE_Code == 5) {
+                    imageshashmap.put(5,resultUri);
+                    img5.setImageURI(resultUri);
+                    img5.setTag(TAGSET);
+                    //requestImageFromAndroidPhone();
+                }
+
+            } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
+                Exception error = result.getError();
             }
         }
     }
 
+    private void requestImageFromAndroidPhone() {
+        int rationx = 1800;
+        int rationy = 1900;
+
+        CropImage.activity()
+                .setAllowFlipping(false)
+                //.setRequestedSize(500, 500, CropImageView.RequestSizeOptions.RESIZE_INSIDE)
+                .setMinCropResultSize(rationx, rationy)
+                .setMaxCropResultSize(rationx, rationy)
+                .setAllowCounterRotation(false)
+                .setAllowRotation(false)
+                .setAutoZoomEnabled(true)
+//                        .setAspectRatio(4,3)
+                .setGuidelines(CropImageView.Guidelines.OFF)
+                .start(RegisterActivity.this);
+    }
+
     //Get images from gallery and camera
-    public void getImage(Intent data, int code){
+    public void getImage(Intent data, int code) {
         Uri contentURI;
         Bundle bundle;
         Bitmap bit = null;
-        if (code == GALLERY){
+        if (code == GALLERY) {
             contentURI = data.getData();
             try {
                 bit = MediaStore.Images.Media.getBitmap(this.getContentResolver(), contentURI);
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        }else if (code == CAMERA){
+        } else if (code == CAMERA) {
             bundle = data.getExtras();
             bit = (Bitmap) bundle.get("data");
         }
@@ -644,7 +819,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
     public boolean isConnected() {
         boolean connected = false;
         try {
-            ConnectivityManager cm = (ConnectivityManager)getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+            ConnectivityManager cm = (ConnectivityManager) getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
             NetworkInfo nInfo = cm.getActiveNetworkInfo();
             connected = nInfo != null && nInfo.isAvailable() && nInfo.isConnected();
             return connected;
@@ -654,7 +829,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         return connected;
     }
 
-    public void getUserProfile(){
+    public void getUserProfile() {
         // Tag used to cancel the request
         final String tag_json_obj = "json_obj_req";
         String url = "http://69.167.137.121/plesk-site-preview/sky.com.pk/shadiHall/GetUserProfile.php";
@@ -668,15 +843,15 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-                        Log.e("Profile",response);
+                        Log.e("Profile", response);
                         try {
                             JSONObject json = new JSONObject(response);
                             String success = json.getString("success");
-                            Log.e("Profile",success);
+                            Log.e("Profile", success);
 
                             if (success.equals("1")) {
                                 JSONArray jsonArray = json.getJSONArray("UserProfile");
-                                Log.e("Profile",jsonArray.toString());
+                                Log.e("Profile", jsonArray.toString());
                                 AreaName.deleteAll(AreaName.class);
                                 for (int i = 0; i < jsonArray.length(); i++) {
                                     JSONObject jsonObject = jsonArray.getJSONObject(i);
@@ -693,7 +868,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                                     String cPersons = jsonObject.getString("CapacityOfPersons");
 
                                     Picasso.get()
-                                            .load(AppController.imageUrl+cId+"/logo.png")
+                                            .load(AppController.imageUrl + cId + "/logo.png")
                                             .placeholder(R.drawable.default_avatar)
                                             .into(image);
 
@@ -707,7 +882,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
 
                                     pDialog.dismiss();
                                 }
-                            }else {
+                            } else {
                                 pDialog.dismiss();
                             }
 
@@ -719,14 +894,14 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
             @Override
             public void onErrorResponse(VolleyError error) {
                 pDialog.dismiss();
-                Log.e("Error",error.toString());
+                Log.e("Error", error.toString());
                 Toast.makeText(RegisterActivity.this, error.toString(), Toast.LENGTH_SHORT).show();
             }
-        }){
+        }) {
             @Override
             protected Map<String, String> getParams() {
                 Map<String, String> params = new HashMap<String, String>();
-                Log.e("Phone",ph);
+                Log.e("Phone", ph);
                 params.put("LoginMobileNo", ph);
                 return params;
             }
@@ -736,11 +911,12 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         jsonObjectRequest.setRetryPolicy(policy);
         AppController.getInstance().addToRequestQueue(jsonObjectRequest, tag_json_obj);
     }
-///////////////////////////////////////////////Click Listener For Each Image
-    public void SelectImageFrom(int pos, String src, ImageView imageView, GalleryAdapter adapter, ArrayList<String> imageList){
-       //currentSelectImage=imageView;
-       posi=pos;
-        final CharSequence[] options = { "Take Photo","Cancel" };
+
+    ///////////////////////////////////////////////Click Listener For Each Image
+    public void SelectImageFrom(int pos, String src, ImageView imageView, GalleryAdapter adapter, ArrayList<String> imageList) {
+        //currentSelectImage=imageView;
+        posi = pos;
+        final CharSequence[] options = {"Take Photo", "Cancel"};
         AlertDialog.Builder builder = new AlertDialog.Builder(RegisterActivity.this);
 
         builder.setTitle("Reselect Photo!");
@@ -755,8 +931,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                             1);
 
 
-                }
-                else if (options[item].equals("Cancel")) {
+                } else if (options[item].equals("Cancel")) {
                     dialog.dismiss();
                 }
             }
@@ -764,96 +939,171 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         builder.show();
     }
 
-    private void uploadImages(final String clientID){
-        count=total=0;
-        int size=0;
-        if(imageList!=null && imageList.size()>0){
-            size=imageList.size();
-            pDialog = new ProgressDialog(RegisterActivity.this);
-            pDialog.setMessage("Searching...");
-            pDialog.setCancelable(false);
-            pDialog.show();
-        }else{
-            MNotificationClass.ShowToast(this,"No Image ");
-        }
-total=size;
-        for (int i = 0; i < size; i++) {
-            j++;
-            File f = new File(imageList.get(i));
-            Bitmap bitmap = new BitmapDrawable(RegisterActivity.this.getResources(), f.getAbsolutePath()).getBitmap();
-            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
-            final String encodedImage = Base64.encodeToString(byteArrayOutputStream.toByteArray(), Base64.DEFAULT);
+    private void uploadImages(final String clientID) {
+        IMAGE_Code++;
+        pDialog = new ProgressDialog(RegisterActivity.this);
+        pDialog.setTitle("Uploading Images"+IMAGE_Code);
+        pDialog.setMessage("Sending Images To Cloud...");
+        pDialog.setCancelable(false);
+        pDialog.show();
+        if (img1.getTag().equals(TAGSET)) {
 
-            String tag_json_obj = "json_obj_req";
-            String url = "http://69.167.137.121/plesk-site-preview/sky.com.pk/shadiHall/UploadImages.php";
-
-
-            StringRequest jsonObjectRequest = new StringRequest(Request.Method.POST, url,
-                    new Response.Listener<String>() {
-                        JSONObject jsonObj = null;
+            ImageUploadingApi.uploadImageToCloud(this,
+                    clientID,  "1",img1,imageshashmap.get(0), new ImageUploadingApi.ImageUploadingImage() {
                         @Override
-                        public void onResponse(String response) {
-                            count++;
-                            try {
-                                Log.e("IMAGES",response);
-                                jsonObj= new JSONObject(response);
-                                String success = jsonObj.getString("success");
-                                pDialog.setMessage("Uploading Image..."+count);
-                                if (success.equals("1")){
-                                    if (count >= total){
-                                        SharedPreferences.Editor editor = sharedPreferences.edit();
-                                        editor.putString(resume, "1");
-                                        editor.apply();
-                                        Toast.makeText(RegisterActivity.this, "Register Successful", Toast.LENGTH_SHORT).show();
-                                        finish();
-                                        pDialog.dismiss();
-                                    }
-                                }else {
-                                    String message = jsonObj.getString("message");
-                                    Toast.makeText(RegisterActivity.this, message, Toast.LENGTH_SHORT).show();
-                                    pDialog.dismiss();
-                                }
-
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
+                        public void FinishCallBackmethod(String success, String funType) {
+                            Log.e("upimagesst1",success+"--"+funType);
+                            pDialog.setMessage("Sending Images To Cloud...1");
+                            img1.setTag("up");
+                            uploadImages(clientID);
                         }
-                    }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    pDialog.dismiss();
-                    Log.e("Error",error.toString());
-                    Toast.makeText(RegisterActivity.this, error.toString(), Toast.LENGTH_SHORT).show();
-                }
-            }){
-                @Override
-                protected Map<String, String> getParams() {
-
-                    Map<String, String> params = new HashMap<String, String>();
-                    params.put("DisplayImage",encodedImage);
-                    params.put("Name","image"+String.valueOf(j)+".png");
-                    params.put("ClientID",clientID);
-                    return params;
-                }
-            };
-            int socketTimeout = 30000;//30 seconds
-            RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
-            jsonObjectRequest.setRetryPolicy(policy);
-            AppController.getInstance().addToRequestQueue(jsonObjectRequest, tag_json_obj);
+                    });
+        }else if(img2.getTag().equals(TAGSET)) {
+            ImageUploadingApi.uploadImageToCloud(this,
+                    clientID,  "2",img2,imageshashmap.get(1), new ImageUploadingApi.ImageUploadingImage() {
+                        @Override
+                        public void FinishCallBackmethod(String success, String funType) {
+                            Log.e("upimagesst2",success+"--"+funType);
+                            pDialog.setMessage("Sending Images To Cloud...2");
+                            img2.setTag("up");
+                            uploadImages(clientID);
+                        }
+                    });
+        }else if(img3.getTag().equals(TAGSET)) {
+            ImageUploadingApi.uploadImageToCloud(this,
+                    clientID,  "3",img3,imageshashmap.get(2), new ImageUploadingApi.ImageUploadingImage() {
+                        @Override
+                        public void FinishCallBackmethod(String success, String funType) {
+                            Log.e("upimagesst3",success+"--"+funType);
+                            pDialog.setMessage("Sending Images To Cloud...3");
+                            img3.setTag("up");
+                            uploadImages(clientID);
+                        }
+                    });
+        }else if(img4.getTag().equals(TAGSET))
+        {
+            ImageUploadingApi.uploadImageToCloud(this,
+                    clientID,  "4",img4,imageshashmap.get(3), new ImageUploadingApi.ImageUploadingImage() {
+                        @Override
+                        public void FinishCallBackmethod(String success, String funType) {
+                            Log.e("upimagesst4",success+"--"+funType);
+                            pDialog.setMessage("Sending Images To Cloud...4");
+                            img4.setTag("up");
+                            uploadImages(clientID);
+                        }
+                    });
+        }else if(img5.getTag().equals(TAGSET)) {
+            ImageUploadingApi.uploadImageToCloud(this,
+                    clientID,  "5",img5,imageshashmap.get(4), new ImageUploadingApi.ImageUploadingImage() {
+                        @Override
+                        public void FinishCallBackmethod(String success, String funType) {
+                            img5.setTag("up");
+                            pDialog.setMessage("Sending Images To Cloud...5");
+                            pDialog.dismiss();
+                            Toast.makeText(RegisterActivity.this, "All Images Done", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+        }else{
+            pDialog.dismiss();
+            Toast.makeText(RegisterActivity.this, "All Images Done", Toast.LENGTH_SHORT).show();
         }
+
+
+//        count = total = 0;
+//        int size = 0;
+//        if (imageList != null && imageList.size() > 0) {
+//            size = imageList.size();
+//            pDialog = new ProgressDialog(RegisterActivity.this);
+//            pDialog.setMessage("Searching...");
+//            pDialog.setCancelable(false);
+//            pDialog.show();
+//        } else {
+//            MNotificationClass.ShowToast(this, "No Image ");
+//        }
+//        total = size;
+//        for (int i = 0; i < size; i++) {
+//            j++;
+//            File f = new File(imageList.get(i));
+////            imageView.setDrawingCacheEnabled(true);
+////            imageView.buildDrawingCache();
+////            Bitmap bitmap = Bitmap.createBitmap(imageView.getDrawingCache());
+//            Bitmap bitmap = new BitmapDrawable(RegisterActivity.this.getResources(), f.getAbsolutePath()).getBitmap();
+//            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+//            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
+//            final String encodedImage = Base64.encodeToString(byteArrayOutputStream.toByteArray(), Base64.DEFAULT);
+//
+//            String tag_json_obj = "json_obj_req";
+//            String url = "http://69.167.137.121/plesk-site-preview/sky.com.pk/shadiHall/UploadImages.php";
+//
+//
+//            StringRequest jsonObjectRequest = new StringRequest(Request.Method.POST, url,
+//                    new Response.Listener<String>() {
+//                        JSONObject jsonObj = null;
+//
+//                        @Override
+//                        public void onResponse(String response) {
+//                            count++;
+//                            try {
+//                                Log.e("IMAGES", response);
+//                                jsonObj = new JSONObject(response);
+//                                String success = jsonObj.getString("success");
+//                                pDialog.setMessage("Uploading Image..." + count);
+//                                if (success.equals("1")) {
+//                                    if (count >= total) {
+//                                        SharedPreferences.Editor editor = sharedPreferences.edit();
+//                                        editor.putString(resume, "1");
+//                                        editor.apply();
+//                                        Toast.makeText(RegisterActivity.this, "Register Successful", Toast.LENGTH_SHORT).show();
+//                                        finish();
+//                                        pDialog.dismiss();
+//                                    }
+//                                } else {
+//                                    String message = jsonObj.getString("message");
+//                                    Toast.makeText(RegisterActivity.this, message, Toast.LENGTH_SHORT).show();
+//                                    pDialog.dismiss();
+//                                }
+//
+//                            } catch (JSONException e) {
+//                                e.printStackTrace();
+//                            }
+//                        }
+//                    }, new Response.ErrorListener() {
+//                @Override
+//                public void onErrorResponse(VolleyError error) {
+//                    pDialog.dismiss();
+//                    Log.e("Error", error.toString());
+//                    Toast.makeText(RegisterActivity.this, error.toString(), Toast.LENGTH_SHORT).show();
+//                }
+//            }) {
+//                @Override
+//                protected Map<String, String> getParams() {
+//
+//                    Map<String, String> params = new HashMap<String, String>();
+//                    params.put("DisplayImage", encodedImage);
+//                    params.put("Name", "image" + String.valueOf(j) + ".png");
+//                    params.put("ClientID", clientID);
+//                    return params;
+//                }
+//            };
+//            int socketTimeout = 30000;//30 seconds
+//            RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
+//            jsonObjectRequest.setRetryPolicy(policy);
+//            AppController.getInstance().addToRequestQueue(jsonObjectRequest, tag_json_obj);
+//        }
     }
 
-    private Boolean isGpsEnabled(){
+    private Boolean isGpsEnabled() {
         try {
             gps_enabled = lm.isProviderEnabled(LocationManager.GPS_PROVIDER);
-        } catch(Exception ex) {}
+        } catch (Exception ex) {
+        }
 
         try {
             network_enabled = lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
-        } catch(Exception ex) {}
+        } catch (Exception ex) {
+        }
 
-        if(!gps_enabled && !network_enabled) {
+        if (!gps_enabled && !network_enabled) {
             // notify user
 
             AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
@@ -866,7 +1116,7 @@ total=size;
                         }
                     });
 
-            alertDialogBuilder.setNegativeButton(R.string.Cancel,new DialogInterface.OnClickListener() {
+            alertDialogBuilder.setNegativeButton(R.string.Cancel, new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     dialog.dismiss();

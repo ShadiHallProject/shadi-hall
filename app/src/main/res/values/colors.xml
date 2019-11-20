@@ -17,4 +17,5 @@
     <color name="contenttextcolor">#0E0D0D</color>
     <color name="g_gridheadcolor">#01579B</color>
     <color name="g_gridbottomcolor">#AD4CA9E7</color>
+    <color name="g_gridbottomsec_of_sec_color">#AD426B81</color>
 </resources>

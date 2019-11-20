@@ -48,6 +48,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import org.by9steps.shadihall.AppController;
 import org.by9steps.shadihall.R;
 import org.by9steps.shadihall.adapters.NearestListAdapter;
+import org.by9steps.shadihall.helper.ApiRefStrings;
 import org.by9steps.shadihall.helper.DatabaseHelper;
 import org.by9steps.shadihall.model.Client;
 import org.by9steps.shadihall.model.Projects;
@@ -329,8 +330,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         mProgress.show();
 
         String tag_json_obj = "json_obj_req";
-        String u = "http://69.167.137.121/plesk-site-preview/sky.com.pk/shadiHall/GetShadiHallDetail.php";
 
+        //String u = "";
+        String u= ApiRefStrings.GetShadiHallDetail;
         StringRequest jsonObjectRequest = new StringRequest(com.android.volley.Request.Method.POST, u,
                 new Response.Listener<String>() {
                     @Override
@@ -468,7 +470,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
     public void getProject(){
         String tag_json_obj = "json_obj_req";
-        String u = "http://69.167.137.121/plesk-site-preview/sky.com.pk/shadiHall/GetProject.php";
+        String u= ApiRefStrings.GetProject;
 
         StringRequest jsonObjectRequest = new StringRequest(Request.Method.GET, u,
                 new Response.Listener<String>() {

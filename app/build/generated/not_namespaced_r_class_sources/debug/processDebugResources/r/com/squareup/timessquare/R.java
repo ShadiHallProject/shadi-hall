@@ -12,19 +12,19 @@ public final class R {
     public static final class attr {
         private attr() {}
 
-        public static final int tsquare_dayBackground = 0x7f040238;
-        public static final int tsquare_dayTextColor = 0x7f040239;
-        public static final int tsquare_displayHeader = 0x7f04023a;
-        public static final int tsquare_dividerColor = 0x7f04023b;
-        public static final int tsquare_headerTextColor = 0x7f04023c;
-        public static final int tsquare_state_current_month = 0x7f04023d;
-        public static final int tsquare_state_highlighted = 0x7f04023e;
-        public static final int tsquare_state_range_first = 0x7f04023f;
-        public static final int tsquare_state_range_last = 0x7f040240;
-        public static final int tsquare_state_range_middle = 0x7f040241;
-        public static final int tsquare_state_selectable = 0x7f040242;
-        public static final int tsquare_state_today = 0x7f040243;
-        public static final int tsquare_titleTextColor = 0x7f040244;
+        public static final int tsquare_dayBackground = 0x7f040258;
+        public static final int tsquare_dayTextColor = 0x7f040259;
+        public static final int tsquare_displayHeader = 0x7f04025a;
+        public static final int tsquare_dividerColor = 0x7f04025b;
+        public static final int tsquare_headerTextColor = 0x7f04025c;
+        public static final int tsquare_state_current_month = 0x7f04025d;
+        public static final int tsquare_state_highlighted = 0x7f04025e;
+        public static final int tsquare_state_range_first = 0x7f04025f;
+        public static final int tsquare_state_range_last = 0x7f040260;
+        public static final int tsquare_state_range_middle = 0x7f040261;
+        public static final int tsquare_state_selectable = 0x7f040262;
+        public static final int tsquare_state_today = 0x7f040263;
+        public static final int tsquare_titleTextColor = 0x7f040264;
     }
     public static final class color {
         private color() {}
@@ -60,22 +60,22 @@ public final class R {
     public static final class id {
         private id() {}
 
-        public static final int calendar_grid = 0x7f09007d;
-        public static final int day_view_adapter_class = 0x7f0900df;
-        public static final int title = 0x7f090281;
+        public static final int calendar_grid = 0x7f090080;
+        public static final int day_view_adapter_class = 0x7f0900ec;
+        public static final int title = 0x7f09029f;
     }
     public static final class layout {
         private layout() {}
 
-        public static final int month = 0x7f0c008b;
-        public static final int week = 0x7f0c00bf;
+        public static final int month = 0x7f0c008f;
+        public static final int week = 0x7f0c00c4;
     }
     public static final class string {
         private string() {}
 
-        public static final int day_name_format = 0x7f0f0077;
-        public static final int invalid_date = 0x7f0f00b5;
-        public static final int month_name_format = 0x7f0f00ca;
+        public static final int day_name_format = 0x7f0f007e;
+        public static final int invalid_date = 0x7f0f00bc;
+        public static final int month_name_format = 0x7f0f00d2;
     }
     public static final class style {
         private style() {}
@@ -88,7 +88,7 @@ public final class R {
     public static final class styleable {
         private styleable() {}
 
-        public static final int[] CalendarPickerView = { 0x10100d4, 0x7f040238, 0x7f040239, 0x7f04023a, 0x7f04023b, 0x7f04023c, 0x7f040244 };
+        public static final int[] CalendarPickerView = { 0x10100d4, 0x7f040258, 0x7f040259, 0x7f04025a, 0x7f04025b, 0x7f04025c, 0x7f040264 };
         public static final int CalendarPickerView_android_background = 0;
         public static final int CalendarPickerView_tsquare_dayBackground = 1;
         public static final int CalendarPickerView_tsquare_dayTextColor = 2;
@@ -96,7 +96,7 @@ public final class R {
         public static final int CalendarPickerView_tsquare_dividerColor = 4;
         public static final int CalendarPickerView_tsquare_headerTextColor = 5;
         public static final int CalendarPickerView_tsquare_titleTextColor = 6;
-        public static final int[] calendar_cell = { 0x7f04023d, 0x7f04023e, 0x7f04023f, 0x7f040240, 0x7f040241, 0x7f040242, 0x7f040243 };
+        public static final int[] calendar_cell = { 0x7f04025d, 0x7f04025e, 0x7f04025f, 0x7f040260, 0x7f040261, 0x7f040262, 0x7f040263 };
         public static final int calendar_cell_tsquare_state_current_month = 0;
         public static final int calendar_cell_tsquare_state_highlighted = 1;
         public static final int calendar_cell_tsquare_state_range_first = 2;

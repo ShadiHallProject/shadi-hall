@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -15,8 +16,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import org.by9steps.shadihall.R;
+import org.by9steps.shadihall.genericgrid.DialogForSearchGrid;
 import org.by9steps.shadihall.genericgrid.GenericGridAdapter;
 import org.by9steps.shadihall.genericgrid.MediatorClass;
+import org.by9steps.shadihall.genericgrid.ViewModeRef;
 import org.by9steps.shadihall.model.Account1Type;
 import org.by9steps.shadihall.model.Account2Group;
 import org.by9steps.shadihall.model.Account3Name;
@@ -179,6 +182,25 @@ public class ViewDBAllData extends AppCompatActivity implements View.OnClickList
        final MediatorClass mediatorClass=new MediatorClass(cc,recyclerView);
         //mediatorClass.setSortingAllowed(true);
         mediatorClass.ShowGrid();
+        mediatorClass.registerHeaderRowMenuClickListner(new DialogForSearchGrid.DialogClickListener() {
+            @Override
+            public void HandleClickLisnterOfDialog(String colName, String SearchText) {
+                Log.e("asdfasdfasdf",colName+"---"+SearchText);
+                String qq="Select * from ShadiHallBookingProfit where "+colName+" "
+                        +"LIKE '%"+SearchText+"%';";
+
+
+                Cursor cc = helper.getReadableDatabase().rawQuery(qq, null);
+                MNotificationClass.ShowToast(ViewDBAllData.this,cc.getCount()+" Row Found");
+                mediatorClass.FilterListByEnterText(cc);
+            }
+        });
+//        mediatorClass.registerHeaderRowMenuClickListner(new GenericGridAdapter.MenuItemHeaderRowClickListner() {
+//            @Override
+//            public void ListenForDotMenuItemClick(MenuItem menuItem) {
+//                MNotificationClass.ShowToastTem(ViewDBAllData.this,""+menuItem.getTitle());
+//            }
+//        });
         mediatorClass.listenForSortClick(new GenericGridAdapter.ListenerForChange() {
             @Override
             public void listenForSortClick(String columnName, int index, char sorttype) {
@@ -335,7 +357,7 @@ builder.append("-------@@@@@");
         Cursor cc=helper.getReadableDatabase().rawQuery("Select * from "+ TAbleName,null);
         Log.e("aaaaaa",""+cc.getCount());
         final MediatorClass mediatorClass=new MediatorClass(cc,recyclerView);
-          //  mediatorClass.setSortingAllowed(true);
+            mediatorClass.setSortingAllowed(true);
         mediatorClass.ShowGrid();
         mediatorClass.listenForSortClick(new GenericGridAdapter.ListenerForChange() {
             @Override
@@ -354,6 +376,19 @@ builder.append("-------@@@@@");
                 Log.e("query",qq);
                 Cursor cc = helper.getReadableDatabase().rawQuery(qq, null);
                 mediatorClass.FilterList(cc, index,sorttype);
+            }
+        });
+        mediatorClass.registerHeaderRowMenuClickListner(new DialogForSearchGrid.DialogClickListener() {
+            @Override
+            public void HandleClickLisnterOfDialog(String colName, String SearchText) {
+                Log.e("asdfasdfasdf",colName+"---"+SearchText);
+                String qq="Select * from "+TAbleName+" where "+colName+" "
+                        +"LIKE '%"+SearchText+"%';";
+
+
+                Cursor cc = helper.getReadableDatabase().rawQuery(qq, null);
+                MNotificationClass.ShowToast(ViewDBAllData.this,cc.getCount()+" Row Found");
+                mediatorClass.FilterListByEnterText(cc);
             }
         });
     }

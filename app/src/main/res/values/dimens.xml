@@ -11,4 +11,11 @@
     <dimen name="textSizerow">12sp</dimen>
 
     <dimen name="sp_18">18sp</dimen>
+
+<!--    Image Size Wile Creating new Account-->
+    <dimen name="imgwith">200dp</dimen>
+    <dimen name="imgheight">200dp</dimen>
+
+<!--    For Generic Grid Each Text View Width-->
+    <dimen name="gridtextviewdim">400</dimen>
 </resources>
