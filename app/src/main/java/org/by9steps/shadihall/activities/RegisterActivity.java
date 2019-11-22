@@ -52,6 +52,7 @@ import org.by9steps.shadihall.adapters.GalleryAdapter;
 import org.by9steps.shadihall.adapters.ProjectsListAdapter;
 import org.by9steps.shadihall.callingapi.ImageUploadingApi;
 import org.by9steps.shadihall.chartofaccountdialog.ProjectMenuDialog;
+import org.by9steps.shadihall.helper.ApiRefStrings;
 import org.by9steps.shadihall.helper.DatabaseHelper;
 import org.by9steps.shadihall.helper.GenericConstants;
 import org.by9steps.shadihall.helper.InputValidation;
@@ -122,7 +123,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
     Button register;
     ImageView contact_list, iclocationlogo, img1, img2, img3, img4, img5;
     ///////////////////////Hash map for images and ites uri
-    HashMap<Integer,Uri> imageshashmap;
+    HashMap<Integer, Uri> imageshashmap;
     /////////////TAG if img set tag=set else tag=null
     String TAGSET = "set", TAGNULL = "null";
 //    Spinner sp_country;
@@ -158,11 +159,11 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         img2.setOnClickListener(this);
         img3 = findViewById(R.id.img3);
         img3.setOnClickListener(this);
-        img4 = findViewById(R.id.img3);
+        img4 = findViewById(R.id.img4);
         img4.setOnClickListener(this);
-        img5 = findViewById(R.id.img3);
+        img5 = findViewById(R.id.img5);
         img5.setOnClickListener(this);
-        imageshashmap=new HashMap<>();
+        imageshashmap = new HashMap<>();
         /////////////////////////////Setting initial tag to nnull
         img1.setTag(TAGNULL);
         img2.setTag(TAGNULL);
@@ -228,7 +229,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
             if (type.equals("Register")) {
 //                latitude = intent.getStringExtra("Latitude");
 //                longitude = intent.getStringExtra("Longitude");
-                String url = "http://shadihall.easysoft.com.pk/ProjectImages/ProjectsLogo/" + prefrence.getProjectIDSession() + ".png";
+                String url = ApiRefStrings.ServerAddress+ "ProjectImages/ProjectsLogo/" + prefrence.getProjectIDSession() + ".png";
                 Log.e("URL", url);
                 Picasso.get()
                         .load(url)
@@ -418,23 +419,26 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
 //                final String cty = city.getText().toString();
 //                final String subCty = sub_city.getText().toString();
                 if (city.equals("") || country.equals("") || subCity.equals("")) {
-                    //uploadImages("9");
-                    pDialog = new ProgressDialog(RegisterActivity.this);
-                    pDialog.setTitle("New Image Upload");
-                    pDialog.setMessage("Uploading image");
-                    pDialog.setCancelable(false);
-                    pDialog.show();
-                    ImageUploadingApi.uploadImageToCloud(this,
-                            "1051212",  "1",img5,Uri.parse(imageList.get(0)), new ImageUploadingApi.ImageUploadingImage() {
-                                @Override
-                                public void FinishCallBackmethod(String success, String funType) {
-                                    Log.e("imageurisss",success+"---"+funType);
-                                    //img5.setTag("up");
-//                                    pDialog.setMessage("Sending Images To Cloud...5");
-                                    pDialog.dismiss();
-                                    Toast.makeText(RegisterActivity.this, "All Images Done", Toast.LENGTH_SHORT).show();
-                                }
-                            });
+
+                   // uploadImages("115");
+//                    pDialog = new ProgressDialog(RegisterActivity.this);
+//                    pDialog.setTitle("New Image Upload");
+//                    pDialog.setMessage("Uploading image");
+//                    pDialog.setCancelable(false);
+//                    pDialog.show();
+//                    ImageUploadingApi.uploadImageToCloud(this,
+//                            "1051212", "1", img5,
+//                            Uri.parse(imageList.get(0)), new ImageUploadingApi.ImageUploadingImage() {
+//                                @Override
+//                                public void FinishCallBackmethod(String success, String funType) {
+//                                    Log.e("imageurisss", success + "---" + funType);
+//                                    //img5.setTag("up");
+////                                    pDialog.setMessage("Sending Images To Cloud...5");
+//                                    pDialog.dismiss();
+//                                    Toast.makeText(RegisterActivity.this, "All Images Done",
+//                                            Toast.LENGTH_SHORT).show();
+//                                }
+//                            });
                     MNotificationClass.ShowToast(this, "Select City First");
                     return;
                 }
@@ -485,7 +489,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
 
                     } else {
                         String tag_json_obj = "json_obj_req";
-                        String url = "http://69.167.137.121/plesk-site-preview/sky.com.pk/shadiHall/Register.php";
+                        String url = ApiRefStrings.RegisterAccountApiRef;
 
                         pDialog = new ProgressDialog(RegisterActivity.this);
                         pDialog.setTitle("New Account");
@@ -505,7 +509,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                                             String success = jsonObj.getString("success");
 
                                             if (success.equals("1")) {
-                                                pDialog.dismiss();
+                                               // pDialog.dismiss();
                                                 Log.e("Response", response);
                                                 String id = jsonObj.getString("ClientID");
 //                                                Toast.makeText(RegisterActivity.this, "User Register", Toast.LENGTH_SHORT).show();
@@ -736,29 +740,29 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
 
             if (resultCode == RESULT_OK) {
                 Uri resultUri = result.getUri();
-                Log.e("image1uri",resultUri.toString());
+                Log.e("image1uri", resultUri.toString());
                 if (IMAGE_Code == 1) {
-                    imageshashmap.put(1,resultUri);
+                    imageshashmap.put(1, resultUri);
                     img1.setImageURI(resultUri);
                     img1.setTag(TAGSET);
 
                 } else if (IMAGE_Code == 2) {
-                    imageshashmap.put(2,resultUri);
+                    imageshashmap.put(2, resultUri);
                     img2.setImageURI(resultUri);
                     img2.setTag(TAGSET);
                     // requestImageFromAndroidPhone();
                 } else if (IMAGE_Code == 3) {
-                    imageshashmap.put(3,resultUri);
+                    imageshashmap.put(3, resultUri);
                     img3.setImageURI(resultUri);
                     img3.setTag(TAGSET);
                     //requestImageFromAndroidPhone();
                 } else if (IMAGE_Code == 4) {
-                    imageshashmap.put(4,resultUri);
+                    imageshashmap.put(4, resultUri);
                     img4.setImageURI(resultUri);
                     img4.setTag(TAGSET);
                     //requestImageFromAndroidPhone();
                 } else if (IMAGE_Code == 5) {
-                    imageshashmap.put(5,resultUri);
+                    imageshashmap.put(5, resultUri);
                     img5.setImageURI(resultUri);
                     img5.setTag(TAGSET);
                     //requestImageFromAndroidPhone();
@@ -939,76 +943,61 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         builder.show();
     }
 
-    private void uploadImages(final String clientID) {
-        IMAGE_Code++;
-        pDialog = new ProgressDialog(RegisterActivity.this);
-        pDialog.setTitle("Uploading Images"+IMAGE_Code);
-        pDialog.setMessage("Sending Images To Cloud...");
-        pDialog.setCancelable(false);
-        pDialog.show();
-        if (img1.getTag().equals(TAGSET)) {
 
-            ImageUploadingApi.uploadImageToCloud(this,
-                    clientID,  "1",img1,imageshashmap.get(0), new ImageUploadingApi.ImageUploadingImage() {
-                        @Override
-                        public void FinishCallBackmethod(String success, String funType) {
-                            Log.e("upimagesst1",success+"--"+funType);
-                            pDialog.setMessage("Sending Images To Cloud...1");
-                            img1.setTag("up");
-                            uploadImages(clientID);
-                        }
-                    });
-        }else if(img2.getTag().equals(TAGSET)) {
-            ImageUploadingApi.uploadImageToCloud(this,
-                    clientID,  "2",img2,imageshashmap.get(1), new ImageUploadingApi.ImageUploadingImage() {
-                        @Override
-                        public void FinishCallBackmethod(String success, String funType) {
-                            Log.e("upimagesst2",success+"--"+funType);
-                            pDialog.setMessage("Sending Images To Cloud...2");
-                            img2.setTag("up");
-                            uploadImages(clientID);
-                        }
-                    });
-        }else if(img3.getTag().equals(TAGSET)) {
-            ImageUploadingApi.uploadImageToCloud(this,
-                    clientID,  "3",img3,imageshashmap.get(2), new ImageUploadingApi.ImageUploadingImage() {
-                        @Override
-                        public void FinishCallBackmethod(String success, String funType) {
-                            Log.e("upimagesst3",success+"--"+funType);
-                            pDialog.setMessage("Sending Images To Cloud...3");
-                            img3.setTag("up");
-                            uploadImages(clientID);
-                        }
-                    });
-        }else if(img4.getTag().equals(TAGSET))
-        {
-            ImageUploadingApi.uploadImageToCloud(this,
-                    clientID,  "4",img4,imageshashmap.get(3), new ImageUploadingApi.ImageUploadingImage() {
-                        @Override
-                        public void FinishCallBackmethod(String success, String funType) {
-                            Log.e("upimagesst4",success+"--"+funType);
-                            pDialog.setMessage("Sending Images To Cloud...4");
-                            img4.setTag("up");
-                            uploadImages(clientID);
-                        }
-                    });
-        }else if(img5.getTag().equals(TAGSET)) {
-            ImageUploadingApi.uploadImageToCloud(this,
-                    clientID,  "5",img5,imageshashmap.get(4), new ImageUploadingApi.ImageUploadingImage() {
-                        @Override
-                        public void FinishCallBackmethod(String success, String funType) {
-                            img5.setTag("up");
-                            pDialog.setMessage("Sending Images To Cloud...5");
-                            pDialog.dismiss();
-                            Toast.makeText(RegisterActivity.this, "All Images Done", Toast.LENGTH_SHORT).show();
-                        }
-                    });
-        }else{
-            pDialog.dismiss();
-            Toast.makeText(RegisterActivity.this, "All Images Done", Toast.LENGTH_SHORT).show();
+
+    private Boolean isGpsEnabled() {
+        try {
+            gps_enabled = lm.isProviderEnabled(LocationManager.GPS_PROVIDER);
+        } catch (Exception ex) {
         }
 
+        try {
+            network_enabled = lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+        } catch (Exception ex) {
+        }
 
+        if (!gps_enabled && !network_enabled) {
+            // notify user
+
+            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+            alertDialogBuilder.setMessage(R.string.gps_network_not_enabled);
+            alertDialogBuilder.setPositiveButton(R.string.open_location_settings,
+                    new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface arg0, int arg1) {
+                            startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+                        }
+                    });
+
+            alertDialogBuilder.setNegativeButton(R.string.Cancel, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
+                }
+            });
+
+            AlertDialog alertDialog = alertDialogBuilder.create();
+            alertDialog.show();
+        }
+        return gps_enabled;
+    }
+///////////////////////////////////////////////All Fun Related To Image Uploading
+    private void uploadImages(final String clientID) {
+        pDialog.setMessage("Sending Images To Cloud...0");
+        Log.e("flageimage1","inimg1");
+       // IMAGE_Code++;
+        if (img1.getTag().equals(TAGSET)) {
+            ImageUploadingApi.uploadImageToCloud(this,
+                    clientID, "1", img1, imageshashmap.get(1), new ImageUploadingApi.ImageUploadingImage() {
+                        @Override
+                        public void FinishCallBackmethod(String success, String funType) {
+                            Log.e("upimagesst1", success + "--" + funType);
+                            pDialog.setMessage("Sending Images To Cloud...1");
+                            img1.setTag("up");
+                            SendImage2ToColud(clientID);
+                        }
+                    });
+        }else  SendImage2ToColud(clientID);
 //        count = total = 0;
 //        int size = 0;
 //        if (imageList != null && imageList.size() > 0) {
@@ -1091,41 +1080,68 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
 //            AppController.getInstance().addToRequestQueue(jsonObjectRequest, tag_json_obj);
 //        }
     }
-
-    private Boolean isGpsEnabled() {
-        try {
-            gps_enabled = lm.isProviderEnabled(LocationManager.GPS_PROVIDER);
-        } catch (Exception ex) {
-        }
-
-        try {
-            network_enabled = lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
-        } catch (Exception ex) {
-        }
-
-        if (!gps_enabled && !network_enabled) {
-            // notify user
-
-            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
-            alertDialogBuilder.setMessage(R.string.gps_network_not_enabled);
-            alertDialogBuilder.setPositiveButton(R.string.open_location_settings,
-                    new DialogInterface.OnClickListener() {
+    private void SendImage2ToColud(final String clientID){
+        Log.e("flageimage2","inimg2");
+        if (img2.getTag().equals(TAGSET)) {
+            ImageUploadingApi.uploadImageToCloud(this,
+                    clientID, "2", img2, imageshashmap.get(2), new ImageUploadingApi.ImageUploadingImage() {
                         @Override
-                        public void onClick(DialogInterface arg0, int arg1) {
-                            startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+                        public void FinishCallBackmethod(String success, String funType) {
+                            Log.e("upimagesst2", success + "--" + funType);
+                            pDialog.setMessage("Sending Images To Cloud...2");
+                            img2.setTag("up");
+                            SendImage3ToColud(clientID);
+
                         }
                     });
-
-            alertDialogBuilder.setNegativeButton(R.string.Cancel, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    dialog.dismiss();
-                }
-            });
-
-            AlertDialog alertDialog = alertDialogBuilder.create();
-            alertDialog.show();
+        }else SendImage3ToColud(clientID);
+    }
+    private void SendImage3ToColud(final String clientID){
+        Log.e("flageimage3","inimg3");
+        if (img3.getTag().equals(TAGSET)) {
+            ImageUploadingApi.uploadImageToCloud(this,
+                    clientID, "3", img3, imageshashmap.get(3), new ImageUploadingApi.ImageUploadingImage() {
+                        @Override
+                        public void FinishCallBackmethod(String success, String funType) {
+                            Log.e("upimagesst3", success + "--" + funType);
+                            pDialog.setMessage("Sending Images To Cloud...3");
+                            img3.setTag("up");
+                            SendImage4ToColud(clientID);
+                        }
+                    });
+        }else SendImage4ToColud(clientID);
+    }
+    private void SendImage4ToColud(final String clientID){
+        Log.e("flageimage4","inimg4");
+        if (img4.getTag().equals(TAGSET)) {
+            ImageUploadingApi.uploadImageToCloud(this,
+                    clientID, "4", img4, imageshashmap.get(4), new ImageUploadingApi.ImageUploadingImage() {
+                        @Override
+                        public void FinishCallBackmethod(String success, String funType) {
+                            Log.e("upimagesst4", success + "--" + funType);
+                            pDialog.setMessage("Sending Images To Cloud...4");
+                            img4.setTag("up");
+                            SendImage5ToColud(clientID);
+                        }
+                    });
+        }else SendImage5ToColud(clientID);
+    }
+    private void SendImage5ToColud(final String clientID){
+        Log.e("flageimage5","inimg5");
+        if (img5.getTag().equals(TAGSET)) {
+            ImageUploadingApi.uploadImageToCloud(this,
+                    clientID, "5", img5, imageshashmap.get(5), new ImageUploadingApi.ImageUploadingImage() {
+                        @Override
+                        public void FinishCallBackmethod(String success, String funType) {
+                            img5.setTag("up");
+                            pDialog.setMessage("Sending Images To Cloud...5");
+                            pDialog.dismiss();
+                            finish();
+                            Toast.makeText(RegisterActivity.this, "All Images Done", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+        }else {pDialog.dismiss();
+            finish();
         }
-        return gps_enabled;
     }
 }

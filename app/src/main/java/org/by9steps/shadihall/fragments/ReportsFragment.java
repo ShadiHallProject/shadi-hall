@@ -605,8 +605,7 @@ public class ReportsFragment extends Fragment implements View.OnClickListener,
         if (!docsFolder.exists()) {
             docsFolder.mkdir();
         }
-
-        String pdfname = "Report.pdf";
+        String pdfname = "Report1.pdf";
         pdfFile = new File(docsFolder.getAbsolutePath(), pdfname);
         OutputStream output = new FileOutputStream(pdfFile);
 
@@ -644,7 +643,6 @@ public class ReportsFragment extends Fragment implements View.OnClickListener,
         cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
         title.addCell(cell);
         title.addCell(footerCell("", PdfPCell.ALIGN_CENTER));
-
         title.addCell(footerCell("", PdfPCell.ALIGN_CENTER));
         title.addCell(footerCell("", PdfPCell.ALIGN_CENTER));
 
@@ -664,7 +662,7 @@ public class ReportsFragment extends Fragment implements View.OnClickListener,
         table.addCell("Ac Name");
         table.addCell("Debit Bal");
         table.addCell("Credit Bal");
-        table.setHeaderRows(1);
+       // table.setHeaderRows(1);
         PdfPCell[] cells = table.getRow(0).getCells();
         for (int j = 0; j < cells.length; j++) {
             cells[j].setBackgroundColor(BaseColor.PINK);
@@ -751,26 +749,33 @@ public class ReportsFragment extends Fragment implements View.OnClickListener,
     }
 
     public void customPDFView() {
-        MNotificationClass.ShowToastTem(getContext(),"Check File in "+pdfFile.getAbsolutePath());
-//        PackageManager packageManager = getContext().getPackageManager();
-//
-//        Intent testIntent = new Intent(Intent.ACTION_VIEW);
-//        testIntent.setType("application/pdf");
-//        List list = packageManager.queryIntentActivities(testIntent, PackageManager.MATCH_DEFAULT_ONLY);
-//        if (list.size() > 0) {
-//            Intent intent = new Intent();
-//            intent.setAction(Intent.ACTION_VIEW);
-//
-//            Uri uri = FileProvider.getUriForFile(getContext(), BuildConfig.APPLICATION_ID + ".provider",pdfFile.getAbsoluteFile());
-//
-//
-//           // Uri uri = Uri.fromFile(pdfFile);
-//            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-//            intent.setDataAndType(uri, "application/pdf");
-//            getContext().startActivity(intent);
-//        } else {
-//            Toast.makeText(getContext(), "Download a PDF Viewer to see the generated PDF", Toast.LENGTH_SHORT).show();
-//        }
+       try{
+           PackageManager packageManager = getContext().getPackageManager();
+
+           Intent testIntent = new Intent(Intent.ACTION_VIEW);
+           testIntent.setType("application/pdf");
+           List list = packageManager.queryIntentActivities(testIntent, PackageManager.MATCH_DEFAULT_ONLY);
+           if (list.size() > 0) {
+               Intent intent = new Intent();
+               intent.setAction(Intent.ACTION_VIEW);
+
+               Uri uri = FileProvider.getUriForFile(getContext(), BuildConfig.APPLICATION_ID + ".provider",pdfFile.getAbsoluteFile());
+
+
+               // Uri uri = Uri.fromFile(pdfFile);
+               intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+               intent.setDataAndType(uri, "application/pdf");
+               getContext().startActivity(intent);
+
+           } else {
+               Toast.makeText(getContext(), "Download a PDF Viewer to see the generated PDF", Toast.LENGTH_SHORT).show();
+           }
+       }catch (Exception e){
+           MNotificationClass.ShowToastTem(getContext(),"Error While Openin File Check File in "+pdfFile.getAbsolutePath());
+
+           e.printStackTrace();
+
+       }
     }
 
     @Override

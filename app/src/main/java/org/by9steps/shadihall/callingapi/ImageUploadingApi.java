@@ -17,6 +17,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 
 import org.by9steps.shadihall.AppController;
+import org.by9steps.shadihall.activities.RegisterActivity;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -44,21 +45,25 @@ public class ImageUploadingApi {
 //
 
         final String imgname = "image" + img;
-        Log.e("uritrack",uri.toString());
+       Log.e("uritrack",uri.getPath());
 //        imageView.setDrawingCacheEnabled(true);
 //        imageView.buildDrawingCache();
 //        Bitmap bitmap = Bitmap.createBitmap(imageView.getDrawingCache());
 //        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 //        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
 //        final String encodedImage = Base64.encodeToString(byteArrayOutputStream.toByteArray(), Base64.DEFAULT);
-        File f = new File(uri.toString());
-        //  Bitmap bitmap = Bitmap.createBitmap(imageView.getDrawingCache());
+//        File f = new File(uri.toString());
+//        //  Bitmap bitmap = Bitmap.createBitmap(imageView.getDrawingCache());
+//        Bitmap bitmap = new BitmapDrawable(context.getResources(), f.getAbsolutePath()).getBitmap();
+//        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+//        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
+//        final String encodedImage = Base64.encodeToString(byteArrayOutputStream.toByteArray(),
+//                Base64.DEFAULT);
+        File f = new File(uri.getPath());
         Bitmap bitmap = new BitmapDrawable(context.getResources(), f.getAbsolutePath()).getBitmap();
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
-        final String encodedImage = Base64.encodeToString(byteArrayOutputStream.toByteArray(),
-                Base64.DEFAULT);
-
+        final String encodedImage = Base64.encodeToString(byteArrayOutputStream.toByteArray(), Base64.DEFAULT);
         String tag_json_obj = "json_obj_req";
         String url = UrlForUploadClientRefrenceImagesImagesOnCloud;
 

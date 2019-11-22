@@ -25,7 +25,7 @@ public class salepurgridviewfrag extends Fragment {
     private DatabaseHelper databaseHelper;
     String EntryType=null;
     private RecyclerView mrecyclerview;
-    List<JoinQueryDaliyEntryPage1> page1List;
+    public static List<JoinQueryDaliyEntryPage1> page1List;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {

@@ -155,4 +155,6 @@ public class ApiRefStrings {
     public static String GetProjectMenu = ServerAddress + "PhpApi/GetProjectMenu.php";
     public static String LoginAttempApiRef = ServerAddress + "PhpApi/Login.php";
     public static String GetAccount4userRights = ServerAddress + "PhpApi/GetAccount4UserRights.php";
+    public static String RegisterAccountApiRef = ServerAddress + "PhpApi/Register.php";
+
 }

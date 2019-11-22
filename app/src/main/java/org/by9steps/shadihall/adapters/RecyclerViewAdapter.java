@@ -18,6 +18,7 @@ import com.squareup.picasso.Picasso;
 import org.by9steps.shadihall.R;
 import org.by9steps.shadihall.activities.GeneralLedgerActivity;
 import org.by9steps.shadihall.activities.MenuClickActivity;
+import org.by9steps.shadihall.helper.ApiRefStrings;
 import org.by9steps.shadihall.helper.MNotificationClass;
 import org.by9steps.shadihall.helper.Prefrence;
 import org.by9steps.shadihall.model.ProjectMenu;
@@ -54,7 +55,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter {
         ((MenuViewHolder)viewHolder).name.setText(menu.getMenuName());
 
         Picasso.get()
-                .load("http://shadihall.easysoft.com.pk/ProjectImages/MenuIcon/"+menu.getImageName()+".png")
+                .load(ApiRefStrings.ServerAddress+"PhpApi/ProjectImages/MenuIcon/"+menu.getImageName()+".png")
                 .placeholder(R.drawable.logo)
                 .into(((MenuViewHolder)viewHolder).imageView);
 
