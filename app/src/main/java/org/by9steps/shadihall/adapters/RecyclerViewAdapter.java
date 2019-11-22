@@ -55,7 +55,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter {
         ((MenuViewHolder)viewHolder).name.setText(menu.getMenuName());
 
         Picasso.get()
-                .load(ApiRefStrings.ServerAddress+"PhpApi/ProjectImages/MenuIcon/"+menu.getImageName()+".png")
+                .load(ApiRefStrings.ServerAddress+"ProjectImages/MenuIcon/"+menu.getImageName()+".png")
                 .placeholder(R.drawable.logo)
                 .into(((MenuViewHolder)viewHolder).imageView);
 
@@ -92,8 +92,6 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter {
         RelativeLayout layout;
         TextView name;
         ImageView imageView;
-
-
         public MenuViewHolder(View itemView) {
             super(itemView);
 
