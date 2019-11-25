@@ -263,38 +263,141 @@ public class GeneralLedgerActivity extends AppCompatActivity implements View.OnC
         debit = 0; credit = 0; balance = 0;
         Log.e("ACID",acID);
 
-            String query = "SELECT        ClientID, 0 AS EntryNo, MAX(CBDate) AS Date, 0 AS SelectedAc, 0 AS AgainstAc, '' AS AccountName, 'B/F' AS Particulars, SUM(Debit) AS Debit, SUM(Credit) AS Credit, '' AS EntryOf, SUM(Debit) - SUM(Credit) AS Balance\n" +
-                    "FROM            (SELECT        CashBook.ClientID, CashBook.CashBookID, CashBook.CBDate, CashBook.DebitAccount AS SelectedAc, CashBook.CreditAccount, Account3Name.AcName, CashBook.CBRemarks, CashBook.Amount AS Debit, \n" +
-                    "                                                    0 AS Credit, 'CB' AS EntryOf\n" +
-                    "                          FROM            CashBook INNER JOIN\n" +
-                    "                                                    Account3Name ON CashBook.CreditAccount = Account3Name.AcNameID\n" +
-                    "                          WHERE        (CashBook.ClientID = "+prefrence.getClientIDSession()+") AND (CashBook.CBDate < '"+date_picker1.getText().toString()+"') AND (CashBook.DebitAccount = "+acID+")\n" +
-                    "                          UNION ALL\n" +
-                    "                          SELECT        CashBook_1.ClientID, CashBook_1.CashBookID, CashBook_1.CBDate, CashBook_1.CreditAccount AS SelectedAc, CashBook_1.DebitAccount, Account3Name_1.AcName, CashBook_1.CBRemarks, 0 AS Debit, \n" +
-                    "                                                   CashBook_1.Amount AS Credit, 'CB' AS EntryOf\n" +
-                    "                          FROM            CashBook AS CashBook_1 INNER JOIN\n" +
-                    "                                                   Account3Name AS Account3Name_1 ON CashBook_1.DebitAccount = Account3Name_1.AcNameID\n" +
-                    "                          WHERE        (CashBook_1.ClientID = "+prefrence.getClientIDSession()+") AND (CashBook_1.CBDate < '"+date_picker1.getText().toString()+"') AND (CashBook_1.CreditAccount = "+acID+")) AS derivedtbl_1\n" +
-                    "GROUP BY ClientID\n" +
-                    "UNION ALL\n" +
-                    "SELECT        CashBook_2.ClientID, CashBook_2.CashBookID, CashBook_2.CBDate, CashBook_2.DebitAccount AS SelectedAc, CashBook_2.CreditAccount AS AgainsAc, Account3Name_2.AcName, CashBook_2.CBRemarks, \n" +
-                    "                         CashBook_2.Amount AS Debit, 0 AS Credit, 'CB' AS EntryOf, CashBook_2.Amount AS Balance\n" +
-                    "FROM            CashBook AS CashBook_2 INNER JOIN\n" +
-                    "                         Account3Name AS Account3Name_2 ON CashBook_2.CreditAccount = Account3Name_2.AcNameID\n" +
-                    "WHERE        (CashBook_2.ClientID = "+prefrence.getClientIDSession()+") AND (CashBook_2.CBDate >= '"+date_picker1.getText().toString()+"') AND (CashBook_2.CBDate <= '"+date_picker2.getText().toString()+"') AND (CashBook_2.DebitAccount = "+acID+")\n" +
-                    "UNION ALL\n" +
-                    "SELECT        CashBook_3.ClientID, CashBook_3.CashBookID, CashBook_3.CBDate, CashBook_3.CreditAccount AS SelectedAc, CashBook_3.DebitAccount AS AgainstAc, Account3Name_3.AcName, CashBook_3.CBRemarks, 0 AS Debit, \n" +
-                    "                         CashBook_3.Amount AS Credit, 'CB' AS EntryOf, - CashBook_3.Amount AS Balance\n" +
-                    "FROM            CashBook AS CashBook_3 INNER JOIN\n" +
-                    "                         Account3Name AS Account3Name_3 ON CashBook_3.DebitAccount = Account3Name_3.AcNameID\n" +
-                    "WHERE        (CashBook_3.ClientID = "+prefrence.getClientIDSession()+") AND (CashBook_3.CBDate >= '"+date_picker1.getText().toString()+"') AND (CashBook_3.CBDate <= '"+date_picker2.getText().toString()+"') AND (CashBook_3.CreditAccount = "+acID+")"+orderby;
+//            String query = "SELECT        ClientID, 0 AS EntryNo, MAX(CBDate) AS Date, 0 AS SelectedAc, 0 AS AgainstAc, '' AS AccountName, 'B/F' AS Particulars, SUM(Debit) AS Debit, SUM(Credit) AS Credit, '' AS EntryOf, SUM(Debit) - SUM(Credit) AS Balance\n" +
+//                    "FROM            (SELECT        CashBook.ClientID, CashBook.CashBookID, CashBook.CBDate, CashBook.DebitAccount AS SelectedAc, CashBook.CreditAccount, Account3Name.AcName, CashBook.CBRemarks, CashBook.Amount AS Debit, \n" +
+//                    "                                                    0 AS Credit, 'CB' AS EntryOf\n" +
+//                    "                          FROM            CashBook INNER JOIN\n" +
+//                    "                                                    Account3Name ON CashBook.CreditAccount = Account3Name.AcNameID\n" +
+//                    "                          WHERE        (CashBook.ClientID = "+prefrence.getClientIDSession()+") AND (CashBook.CBDate < '"+date_picker1.getText().toString()+"') AND (CashBook.DebitAccount = "+acID+")\n" +
+//                    "                          UNION ALL\n" +
+//                    "                          SELECT        CashBook_1.ClientID, CashBook_1.CashBookID, CashBook_1.CBDate, CashBook_1.CreditAccount AS SelectedAc, CashBook_1.DebitAccount, Account3Name_1.AcName, CashBook_1.CBRemarks, 0 AS Debit, \n" +
+//                    "                                                   CashBook_1.Amount AS Credit, 'CB' AS EntryOf\n" +
+//                    "                          FROM            CashBook AS CashBook_1 INNER JOIN\n" +
+//                    "                                                   Account3Name AS Account3Name_1 ON CashBook_1.DebitAccount = Account3Name_1.AcNameID\n" +
+//                    "                          WHERE        (CashBook_1.ClientID = "+prefrence.getClientIDSession()+") AND (CashBook_1.CBDate < '"+date_picker1.getText().toString()+"') AND (CashBook_1.CreditAccount = "+acID+")) AS derivedtbl_1\n" +
+//                    "GROUP BY ClientID\n" +
+//                    "UNION ALL\n" +
+//                    "SELECT        CashBook_2.ClientID, CashBook_2.CashBookID, CashBook_2.CBDate, CashBook_2.DebitAccount AS SelectedAc, CashBook_2.CreditAccount AS AgainsAc, Account3Name_2.AcName, CashBook_2.CBRemarks, \n" +
+//                    "                         CashBook_2.Amount AS Debit, 0 AS Credit, 'CB' AS EntryOf, CashBook_2.Amount AS Balance\n" +
+//                    "FROM            CashBook AS CashBook_2 INNER JOIN\n" +
+//                    "                         Account3Name AS Account3Name_2 ON CashBook_2.CreditAccount = Account3Name_2.AcNameID\n" +
+//                    "WHERE        (CashBook_2.ClientID = "+prefrence.getClientIDSession()+") AND (CashBook_2.CBDate >= '"+date_picker1.getText().toString()+"') AND (CashBook_2.CBDate <= '"+date_picker2.getText().toString()+"') AND (CashBook_2.DebitAccount = "+acID+")\n" +
+//                    "UNION ALL\n" +
+//                    "SELECT        CashBook_3.ClientID, CashBook_3.CashBookID, CashBook_3.CBDate, CashBook_3.CreditAccount AS SelectedAc, CashBook_3.DebitAccount AS AgainstAc, Account3Name_3.AcName, CashBook_3.CBRemarks, 0 AS Debit, \n" +
+//                    "                         CashBook_3.Amount AS Credit, 'CB' AS EntryOf, - CashBook_3.Amount AS Balance\n" +
+//                    "FROM            CashBook AS CashBook_3 INNER JOIN\n" +
+//                    "                         Account3Name AS Account3Name_3 ON CashBook_3.DebitAccount = Account3Name_3.AcNameID\n" +
+//                    "WHERE        (CashBook_3.ClientID = "+prefrence.getClientIDSession()+") AND (CashBook_3.CBDate >= '"+date_picker1.getText().toString()+"') AND (CashBook_3.CBDate <= '"+date_picker2.getText().toString()+"') AND (CashBook_3.CreditAccount = "+acID+")"+orderby;
+//
+           String query="SELECT        ClientID, 0 AS EntryNo, MAX(CBDate) AS Date, 0 AS SelectedAc, 0 AS AgainstAc, '' AS AccountName, 'B/F' AS Particulars, SUM(Debit) AS Debit, SUM(Credit) AS Credit, '' AS EntryOf, SUM(Debit) - SUM(Credit) AS Balance, '' As TableName, '' As TableID, '' As User  \n" +
+                   "                     FROM            (Select\n" +
+                   "    CashBook.ClientID,\n" +
+                   "    CashBook.CashBookID,\n" +
+                   "    CashBook.CBDate,\n" +
+                   "    CashBook.DebitAccount As SelectedAc,\n" +
+                   "    CashBook.CreditAccount,\n" +
+                   "    '' As AcName,\n" +
+                   "    CashBook.CBRemarks,\n" +
+                   "    CashBook.Amount As Debit,\n" +
+                   "    0 As Credit,\n" +
+                   "    'CB' As EntryOf,\n" +
+                   "    '' As TableName,\n" +
+                   "    '' As TableID,\n" +
+                   "    '' As User\n" +
+                   "From\n" +
+                   "    CashBook\n" +
+                   "Where\n" +
+                   "    CashBook.ClientID = "+prefrence.getClientIDSession()+" And\n" +
+                   "    CashBook.CBDate < '"+date_picker1.getText().toString()+"' And\n" +
+                   "    CashBook.DebitAccount = "+acID+"\n" +
+                   "                                               UNION ALL    \n" +
+                   "                                              Select\n" +
+                   "    CashBook_1.ClientID,\n" +
+                   "    CashBook_1.CashBookID,\n" +
+                   "    CashBook_1.CBDate,\n" +
+                   "    CashBook_1.CreditAccount As SelectedAc,\n" +
+                   "    CashBook_1.DebitAccount,\n" +
+                   "    '' As AcName,\n" +
+                   "    CashBook_1.CBRemarks,\n" +
+                   "    0 As Debit,\n" +
+                   "    CashBook_1.Amount As Credit,\n" +
+                   "    'CB' As EntryOf,\n" +
+                   "    '' As TableName,\n" +
+                   "    CashBook_1.TableID As TableID,\n" +
+                   "    '' As User\n" +
+                   "From\n" +
+                   "    CashBook As CashBook_1\n" +
+                   "Where\n" +
+                   "    CashBook_1.ClientID = "+prefrence.getClientIDSession()+" And\n" +
+                   "    CashBook_1.CBDate < '"+date_picker1.getText().toString()+"' And\n" +
+                   "    CashBook_1.CreditAccount = "+acID+") AS OpQuery\n" +
+                   "                     GROUP BY ClientID \n" +
+                   "\t\t\t\t\t \n" +
+                   "\t\t\t\t\t Union ALL\n" +
+                   "\t\t\t\t\t \n" +
+                   "Select\n" +
+                   "    CashBook_2.ClientID,\n" +
+                   "    CashBook_2.CashBookID,\n" +
+                   "    CashBook_2.CBDate,\n" +
+                   "    CashBook_2.DebitAccount As SelectedAc,\n" +
+                   "    CashBook_2.CreditAccount As AgainsAc,\n" +
+                   "    Account3Name_2.AcName,\n" +
+                   "    CashBook_2.CBRemarks,\n" +
+                   "    CashBook_2.Amount As Debit,\n" +
+                   "    0 As Credit,\n" +
+                   "    'CB' As EntryOf,\n" +
+                   "    CashBook_2.Amount As Balance,\n" +
+                   "    CashBook_2.TableName,\n" +
+                   "    CashBook_2.TableID,\n" +
+                   "    Account3Name.AcName As User\n" +
+                   "From\n" +
+                   "    CashBook As CashBook_2 Left Join\n" +
+                   "    Account3Name As Account3Name_2 On CashBook_2.CreditAccount = Account3Name_2.AcNameID\n" +
+                   "            And Account3Name_2.ClientID = CashBook_2.ClientID Left Join\n" +
+                   "    Account3Name On Account3Name.AcNameID = CashBook_2.ClientUserID\n" +
+                   "            And Account3Name.ClientID = CashBook_2.ClientID\n" +
+                   "Where\n" +
+                   "    CashBook_2.ClientID = "+prefrence.getClientIDSession()+" And\n" +
+                   "    CashBook_2.CBDate >= '"+date_picker1.getText().toString()+"' And\n" +
+                   "    CashBook_2.CBDate <= '"+date_picker2.getText().toString()+"' And\n" +
+                   "    CashBook_2.CreditAccount = "+acID+"\n" +
+                   "    \n" +
+                   "    UNION ALL    \n" +
+                   "                    Select\n" +
+                   "    CashBook_3.ClientID,\n" +
+                   "    CashBook_3.CashBookID,\n" +
+                   "    CashBook_3.CBDate,\n" +
+                   "    CashBook_3.CreditAccount As SelectedAc,\n" +
+                   "    CashBook_3.DebitAccount As AgainstAc,\n" +
+                   "    Account3Name_3.AcName,\n" +
+                   "    CashBook_3.CBRemarks,\n" +
+                   "    0 As Debit,\n" +
+                   "    CashBook_3.Amount As Credit,\n" +
+                   "    'CB' As EntryOf,\n" +
+                   "    -CashBook_3.Amount As Balance,\n" +
+                   "    CashBook_3.TableName,\n" +
+                   "    CashBook_3.TableID,\n" +
+                   "    Account3Name.AcName As User\n" +
+                   "From\n" +
+                   "    CashBook As CashBook_3 Left Join\n" +
+                   "    Account3Name As Account3Name_3 On CashBook_3.DebitAccount = Account3Name_3.AcNameID\n" +
+                   "            And Account3Name_3.ClientUserID = CashBook_3.ClientID Left Join\n" +
+                   "    Account3Name On Account3Name.AcName = CashBook_3.ClientUserID\n" +
+                   "            And Account3Name.ClientID = CashBook_3.ClientID\n" +
+                   "Where\n" +
+                   "    CashBook_3.ClientID = "+prefrence.getClientIDSession()+" And\n" +
+                   "    CashBook_3.CBDate >= '"+date_picker1.getText().toString()+"' And\n" +
+                   "    CashBook_3.CBDate <= '"+date_picker2.getText().toString()+"' And\n" +
+                   "    CashBook_3.CreditAccount = "+acID+" ";
+
+
             generalLedgerList = databaseHelper.getGeneralLedger(query);
 
         for (GeneralLedger g : generalLedgerList){
             balance = balance + Integer.valueOf(g.getBalance());
             debit = debit + Integer.valueOf(g.getDebit());
             credit = credit + Integer.valueOf(g.getCredit());
-            mList.add(GeneralLedger.createRow(g.getClientID(),g.getEntryNo(),g.getDate(),g.getSelectedAc(), g.getAgainstAc(),g.getAccountName(),g.getParticulars(),g.getDebit(),g.getCredit(),g.getEntryOf(),String.valueOf(balance)));
+            mList.add(GeneralLedger.createRow(g.getClientID(),g.getEntryNo(),g.getDate(),g.getSelectedAc(), g.getAgainstAc(),g.getAccountName(),g.getParticulars(),g.getDebit(),g.getCredit(),g.getEntryOf(),String.valueOf(balance),g.getTablename(),g.getTableid()));
         }
         mList.add(GeneralLedger.createTotal("","Total","","", "","","",String.valueOf(debit),String.valueOf(credit),"",String.valueOf(debit - credit)));
         if (generalLedgerList.size() > 0 && generalLedgerList.get(0).getEntryNo().equals("0")){

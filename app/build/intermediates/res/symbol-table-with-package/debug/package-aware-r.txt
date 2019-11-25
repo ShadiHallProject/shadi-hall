@@ -1771,6 +1771,7 @@ id liabilities
 id light
 id line1
 id line3
+id linearlayoutgrid
 id lineseparator
 id list
 id listMode
@@ -1917,6 +1918,7 @@ id reflayoutbase
 id refresh
 id refseclayout
 id register
+id relnear
 id remarks
 id report_search
 id report_spinner
@@ -2035,6 +2037,16 @@ id textaddnewitem
 id textinput_counter
 id textinput_error
 id textinput_helper_text
+id textview1
+id textview10
+id textview2
+id textview3
+id textview4
+id textview5
+id textview6
+id textview7
+id textview8
+id textview9
 id textviewShowdata
 id threedotpopup
 id threedotpopupsaleedit
@@ -2172,6 +2184,7 @@ layout activity_chaart_of_acc_add
 layout activity_detail_calendar
 layout activity_event_cash_book
 layout activity_general_ledger
+layout activity_item_ledger
 layout activity_login
 layout activity_main
 layout activity_main_lib
@@ -2275,6 +2288,8 @@ layout inital_image
 layout item_dir
 layout item_entry_dialog2
 layout item_file
+layout item_ledger_content_row
+layout item_ledger_list_item
 layout itementrydialog
 layout items_view
 layout main_image
@@ -2339,6 +2354,7 @@ menu contextmenu
 menu crop_image_menu
 menu dropdown
 menu generic_grid_header_menu
+menu item_ledger_menu
 menu menu_main
 menu setting_menu
 mipmap ic_launcher
@@ -2834,6 +2850,7 @@ style CardView_Dark
 style CardView_Light
 style DialogAnimations
 style DialogAnimations_SmileWindow
+style ItemLedgerContentRow
 style MonthPickerDialogStyle
 style Permissions_TransparentTheme
 style PixAppTheme

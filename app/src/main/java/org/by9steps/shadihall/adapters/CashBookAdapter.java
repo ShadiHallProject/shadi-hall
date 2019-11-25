@@ -170,6 +170,7 @@ public class CashBookAdapter extends RecyclerView.Adapter {
                     bb.putString("BookingID", "0");
                     bb.putString("Spinner", "View");
                     bb.putString("EntryType",CashBookEntryDialog.entrytypelist[0]);
+                    Log.e("temsss",""+CashBookEntryDialog.entrytypelist[0]);
                     ////////////////Type either Edit or New
                     bb.putString("Type", "Edit");
                     /////////////////////if view Type is edit then must send CashBookID to update

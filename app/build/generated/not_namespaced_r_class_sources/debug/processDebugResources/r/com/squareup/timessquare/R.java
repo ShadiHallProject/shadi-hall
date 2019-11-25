@@ -62,13 +62,13 @@ public final class R {
 
         public static final int calendar_grid = 0x7f090080;
         public static final int day_view_adapter_class = 0x7f0900ec;
-        public static final int title = 0x7f09029f;
+        public static final int title = 0x7f0902ab;
     }
     public static final class layout {
         private layout() {}
 
-        public static final int month = 0x7f0c008f;
-        public static final int week = 0x7f0c00c4;
+        public static final int month = 0x7f0c0092;
+        public static final int week = 0x7f0c00c7;
     }
     public static final class string {
         private string() {}

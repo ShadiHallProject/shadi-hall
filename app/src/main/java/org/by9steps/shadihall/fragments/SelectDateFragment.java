@@ -10,6 +10,7 @@ import android.widget.DatePicker;
 import org.by9steps.shadihall.AppController;
 import org.by9steps.shadihall.activities.CashCollectionActivity;
 import org.by9steps.shadihall.activities.GeneralLedgerActivity;
+import org.by9steps.shadihall.activities.ItemLedgerActivity;
 import org.by9steps.shadihall.activities.Salepur1AddNewActivity;
 
 import java.util.Calendar;
@@ -93,9 +94,9 @@ public class SelectDateFragment extends DialogFragment implements DatePickerDial
                 d = "0" + String.valueOf(day);
             }
             if (AppController.date.equals("GL1")) {
-                GeneralLedgerActivity.date_picker1.setText(year + "-" + m + "-" + d);
+                ItemLedgerActivity.date_picker1.setText(year + "-" + m + "-" + d);
             } else if (AppController.date.equals("GL2")) {
-                GeneralLedgerActivity.date_picker2.setText(year + "-" + m + "-" + d);
+                ItemLedgerActivity.date_picker2.setText(year + "-" + m + "-" + d);
             }
             AppController.date = "";
         } else if (AppController.date.equals("Booking")) {

@@ -26,19 +26,14 @@ import org.by9steps.shadihall.model.ProjectMenu;
 import java.util.List;
 
 public class RecyclerViewAdapter extends RecyclerView.Adapter {
-
-
     private Context mCtx;
     List<ProjectMenu> mList;
-
     Prefrence prefrence;
-
     public RecyclerViewAdapter(Context mCtx, List<ProjectMenu> mList) {
         this.mCtx = mCtx;
         this.mList = mList;
         prefrence = new Prefrence(mCtx);
     }
-
     @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
@@ -46,7 +41,6 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter {
         View view = inflater.inflate(R.layout.fragment_section_list, null);
         return new MenuViewHolder(view);
     }
-
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder viewHolder, final int position) {
 
@@ -81,12 +75,10 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter {
         });
 
     }
-
     @Override
     public int getItemCount() {
         return mList.size();
     }
-
     class MenuViewHolder extends RecyclerView.ViewHolder {
 
         RelativeLayout layout;

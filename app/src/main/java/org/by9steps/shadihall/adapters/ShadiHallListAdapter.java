@@ -4,8 +4,11 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
@@ -15,59 +18,32 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.volley.DefaultRetryPolicy;
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.RetryPolicy;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.squareup.picasso.Picasso;
+import com.squareup.picasso.RequestCreator;
+import com.squareup.picasso.Target;
 
 import org.by9steps.shadihall.AppController;
 import org.by9steps.shadihall.R;
 import org.by9steps.shadihall.callingapi.AuthencateUser;
-import org.by9steps.shadihall.callingapi.CashBookApis;
 import org.by9steps.shadihall.callingapi.GetAllDataFrom0Api;
 import org.by9steps.shadihall.callingapi.MasterRefreshApi;
-import org.by9steps.shadihall.helper.ApiRefStrings;
 import org.by9steps.shadihall.helper.DatabaseHelper;
-import org.by9steps.shadihall.helper.GenericConstants;
 import org.by9steps.shadihall.helper.MNotificationClass;
 import org.by9steps.shadihall.helper.Prefrence;
-import org.by9steps.shadihall.helper.refdb;
-import org.by9steps.shadihall.model.Account1Type;
-import org.by9steps.shadihall.model.Account2Group;
-import org.by9steps.shadihall.model.Account3Name;
 import org.by9steps.shadihall.model.ActiveClients;
-import org.by9steps.shadihall.model.Bookings;
 import org.by9steps.shadihall.model.Client;
-import org.by9steps.shadihall.model.Item1Type;
-import org.by9steps.shadihall.model.Item2Group;
-import org.by9steps.shadihall.model.ProjectMenu;
-import org.by9steps.shadihall.model.item3name.Item3Name;
-import org.by9steps.shadihall.model.item3name.Item3Name_;
-import org.by9steps.shadihall.model.salepur1data.SalePur1Data;
-import org.by9steps.shadihall.model.salepur1data.Salepur1;
-import org.by9steps.shadihall.model.salepur2data.SalePur2;
-import org.by9steps.shadihall.model.salepur2data.SalePur2Data;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
-import java.util.HashMap;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.List;
-import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
-
-import static org.by9steps.shadihall.helper.ApiRefStrings.ACCOUNT1TYPE_GET_ALL_DATA;
-import static org.by9steps.shadihall.helper.ApiRefStrings.Account3NameGetDataFromServer;
-import static org.by9steps.shadihall.helper.ApiRefStrings.BOOKING_GET_ALL_DATA_FROM_SERVER;
 
 
 public class ShadiHallListAdapter extends RecyclerView.Adapter {
@@ -113,28 +89,33 @@ public class ShadiHallListAdapter extends RecyclerView.Adapter {
     }
 
     @Override
-    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder viewHolder, int position) {
+    public void onBindViewHolder(@NonNull final RecyclerView.ViewHolder viewHolder, int position) {
         final ActiveClients shadiHallList = mList.get(position);
 
         ((ListViewHolder) viewHolder).name.setText(shadiHallList.getCompanyName());
         ((ListViewHolder) viewHolder).address.setText(shadiHallList.getCompanyAddress());
         ((ListViewHolder) viewHolder).rights.setText(shadiHallList.getUserRights());
 
-        Picasso.get()
+        RequestCreator creator= Picasso.get()
                 .load(AppController.imageUrl + shadiHallList.getClientID() + "/logo.png")
-                .placeholder(R.drawable.default_avatar)
-                .into(((ListViewHolder) viewHolder).image);
-//        ((ListViewHolder) viewHolder).itemView.setOnLongClickListener(new View.OnLongClickListener() {
-//            @Override
-//            public boolean onLongClick(View v) {
-////                mCtx.startActivity(new Intent(mCtx, ViewDBAllData.class));
-//                return true;
-//            }
-//        });
+                .placeholder(R.drawable.default_avatar);
+
+        creator.into(((ListViewHolder) viewHolder).image);
+        //////////////////////////temp image view for pdf image
+//        final ImageView imageView=new ImageView(((ListViewHolder) viewHolder).itemView.getContext());
+//        imageView.buildDrawingCache(true);
+//        Picasso.get()
+//                .load(AppController.imageUrl + shadiHallList.getClientID() + "/logo.png")
+//                .placeholder(R.drawable.default_avatar)
+//                .into(imageView);
+
         ((ListViewHolder) viewHolder).itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                ((ListViewHolder) viewHolder).image.setDrawingCacheEnabled(true);
+//                SaveImage(((ListViewHolder) viewHolder).image, shadiHallList.getClientID(),
+//                        null);
+                downnloadImageFromserver(shadiHallList.getClientID());
                 String query = "SELECT * FROM Client WHERE ClientID = " + shadiHallList.getClientID();
                 clients = databaseHelper.getClient(query);
 
@@ -1187,4 +1168,91 @@ public class ShadiHallListAdapter extends RecyclerView.Adapter {
         }
         return connected;
     }
+
+    public void SaveImage(ImageView imageview, String clientID,Bitmap bm) {
+        if(bm!=null){
+
+        }else{
+            imageview.buildDrawingCache();
+             bm = imageview.getDrawingCache();
+        }
+
+
+        OutputStream fOut = null;
+        Uri outputFileUri;
+        try {
+            File root = new File(mCtx.getFilesDir()
+                    + File.separator + "ShadiHallImages" + File.separator);
+            root.mkdirs();
+            File sdImageMainDirectory = new File(root, clientID + "myPicName.jpg");
+            outputFileUri = Uri.fromFile(sdImageMainDirectory);
+            Log.e("asdfasdf", outputFileUri.toString());
+            fOut = new FileOutputStream(sdImageMainDirectory);
+        } catch (Exception e) {
+            Toast.makeText(mCtx, "Error occured. Please try again later.",
+                    Toast.LENGTH_SHORT).show();
+        }
+        try {
+            bm.compress(Bitmap.CompressFormat.PNG, 100, fOut);
+            fOut.flush();
+            fOut.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    public void downnloadImageFromserver(final String clientID){
+
+        Target target=new Target() {
+            @Override
+            public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+                SaveImage(null,clientID,bitmap);
+            }
+
+            @Override
+            public void onBitmapFailed(Exception e, Drawable errorDrawable) {
+
+            }
+
+            @Override
+            public void onPrepareLoad(Drawable placeHolderDrawable) {
+
+            }
+        };
+        RequestCreator creator= Picasso.get()
+                .load(AppController.imageUrl + clientID + "/logo.png")
+                .placeholder(R.drawable.default_avatar);
+
+        creator.into(target);
+    }
+//    private void SaveIamge(Bitmap bitmapImage,String cliid) {
+//        ContextWrapper cw = new ContextWrapper(mCtx);
+//        // path to /data/data/yourapp/app_data/imageDir
+//        File directory = cw.getDir("imageDir", Context.MODE_PRIVATE);
+//        // Create imageDir
+//        File mypath=new File(directory,cliid+"profile.jpg");
+//        try {
+//            mypath.createNewFile();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//        FileOutputStream fos = null;
+//        try {
+//            fos = new FileOutputStream(mypath);
+//            // Use the compress method on the BitMap object to write image to the OutputStream
+//            bitmapImage.compress(Bitmap.CompressFormat.PNG, 100, fos);
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        } finally {
+//            try {
+//                fos.close();
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//        }
+//
+//
+//    }
+
 }

@@ -59,6 +59,8 @@ import org.by9steps.shadihall.activities.Salepur1AddNewActivity;
 import org.by9steps.shadihall.fragments.salepurviewtypes.salepurgridviewfrag;
 import org.by9steps.shadihall.helper.DatabaseHelper;
 import org.by9steps.shadihall.helper.MNotificationClass;
+import org.by9steps.shadihall.helper.Prefrence;
+import org.by9steps.shadihall.model.Client;
 import org.by9steps.shadihall.model.JoinQueryDaliyEntryPage1;
 
 import java.io.ByteArrayOutputStream;
@@ -240,6 +242,7 @@ public class SalePur1Fragment extends Fragment implements AdapterView.OnItemSele
         if (!docsFolder.exists()) {
             docsFolder.mkdir();
         }
+        List<Client> clientsinfo = getClientsInfo();
         String pdfname = "SalePur1.pdf";
         pdfFile = new File(docsFolder.getAbsolutePath(), pdfname);
         OutputStream output = new FileOutputStream(pdfFile);
@@ -258,11 +261,12 @@ public class SalePur1Fragment extends Fragment implements AdapterView.OnItemSele
 
         Font chapterFont = FontFactory.getFont(FontFactory.HELVETICA, 16, Font.BOLD);
         Font paragraphFont = FontFactory.getFont(FontFactory.HELVETICA, 10, Font.BOLD);
-        Chunk chunk = new Chunk("Client Name:Umer Bilal For Testing Pdf", chapterFont);
-        Paragraph name = new Paragraph("Address:This is Sample Adddress For Testing", paragraphFont);
-        name.setIndentationLeft(0);
-        Paragraph contact = new Paragraph("Contact:034151", paragraphFont);
-        contact.setIndentationLeft(0);
+
+//        Chunk chunk = new Chunk("Client Name:" + clientName, chapterFont);
+//        Paragraph name = new Paragraph("Address:" + clientAdrs, paragraphFont);
+//        name.setIndentationLeft(0);
+//        Paragraph contact = new Paragraph("Contact:" + clientNo, paragraphFont);
+//        contact.setIndentationLeft(0);
 
         PdfPTable title = new PdfPTable(new float[]{3, 3, 3});
         title.getDefaultCell().setHorizontalAlignment(Element.ALIGN_CENTER);
@@ -284,7 +288,7 @@ public class SalePur1Fragment extends Fragment implements AdapterView.OnItemSele
 
         Date date = new Date();
         String date1 = new SimpleDateFormat("yyyy-MM-dd").format(date);
-        PdfPCell pCell = pCell = new PdfPCell(new Phrase("Date" + ": " + date1));
+        PdfPCell pCell = new PdfPCell(new Phrase("Date" + ": " + date1));
         pCell.setBorder(PdfPCell.NO_BORDER);
         pCell.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
         pCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
@@ -369,9 +373,62 @@ public class SalePur1Fragment extends Fragment implements AdapterView.OnItemSele
         Font f = new Font(Font.FontFamily.TIMES_ROMAN, 30.0f, Font.UNDERLINE, BaseColor.BLACK);
         Paragraph paragraph = new Paragraph("Cash Book \n\n", f);
         paragraph.setAlignment(Element.ALIGN_CENTER);
-        document.add(chunk);
-        document.add(name);
-        document.add(contact);
+//        Drawable d = getContext().getResources().getDrawable(R.drawable.supplier);
+//        BitmapDrawable bitDw = ((BitmapDrawable) d);
+//        Bitmap bmp = bitDw.getBitmap();
+//        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+//        bmp.compress(Bitmap.CompressFormat.PNG, 100, stream);
+//         Image image = Image.getInstance(stream.toByteArray());
+        File root = new File(getContext().getFilesDir()
+                + File.separator + "ShadiHallImages" + File.separator);
+        root.mkdirs();
+        String idid = new Prefrence(getContext()).getClientIDSession();
+        File mypath = new File(root, idid + "myPicName.jpg");
+
+        Image image = Image.getInstance(mypath.toURI().toURL());
+        //image.scaleToFit(10, 10);
+        //image.scaleAbsolute(10,10);
+        image.scaleAbsolute(new Rectangle(20,20));
+        PdfPTable toptable = new PdfPTable(2);
+        toptable.getDefaultCell()
+                .setBorder(Rectangle.NO_BORDER);
+        toptable.setWidthPercentage(100);
+        toptable.setWidths(new int[]{1, 2});
+        toptable.getDefaultCell().setFixedHeight(10);
+
+        toptable.addCell(createImageCell(image));
+
+        Paragraph p = new Paragraph();
+        p.setAlignment(Element.ALIGN_BOTTOM);
+        p.setSpacingAfter(10);
+        p.setSpacingBefore(50);
+        //p.add(chunk);
+        p.add(Chunk.NEWLINE);
+        String clientName = "Null", clientAdrs = "Null", clientNo = "Null";
+        if (clientsinfo != null && clientsinfo.size() > 0) {
+            clientName = clientsinfo.get(0).getNameOfPerson();
+            clientAdrs = clientsinfo.get(0).getCompanyAddress();
+            clientNo = clientsinfo.get(0).getLoginMobileNo();
+        }
+        Chunk cliname = new Chunk("Client Name:" + clientName, chapterFont);
+        Chunk adrschnk = new Chunk("Address:  "+clientAdrs, paragraphFont);
+        Chunk cntckchnk = new Chunk("ContactNo:  "+clientNo, paragraphFont);
+        p.add(new Phrase(cliname));
+        p.add(Chunk.NEWLINE);
+        p.add(new Phrase(adrschnk));
+        p.add(Chunk.NEWLINE);
+        p.add(cntckchnk);
+        p.add(Chunk.NEWLINE);
+        // toptable.addCell(name);
+        PdfPCell temcell = new PdfPCell();
+        temcell.addElement(p);
+        temcell.setVerticalAlignment(PdfPCell.ALIGN_TOP);
+        temcell.setBorder(Rectangle.NO_BORDER);
+        toptable.addCell(temcell);
+        document.add(toptable);
+        // document.add(chunk);
+        //document.add(name);
+//        document.add(contact);
         document.add(title);
         document.add(table);
 //        try {
@@ -393,6 +450,13 @@ public class SalePur1Fragment extends Fragment implements AdapterView.OnItemSele
         document.close();
         customPDFView();
         Log.e("PDFDocument", "Created");
+    }
+
+    public static PdfPCell createImageCell(Image img) throws DocumentException, IOException {
+        PdfPCell cell = new PdfPCell(img, true);
+
+        cell.setBorder(Rectangle.NO_BORDER);
+        return cell;
     }
 
     public PdfPCell footerCell(String text, int alignment) {
@@ -461,10 +525,21 @@ public class SalePur1Fragment extends Fragment implements AdapterView.OnItemSele
                 Bitmap bmp = bitDw.getBitmap();
                 ByteArrayOutputStream stream = new ByteArrayOutputStream();
                 bmp.compress(Bitmap.CompressFormat.PNG, 100, stream);
-                Image image = Image.getInstance(stream.toByteArray());
+                // Image image = Image.getInstance(stream.toByteArray());
+//                ContextWrapper cw = new ContextWrapper(getContext());
+//                File directory = cw.getDir("imageDir", Context.MODE_PRIVATE);
+//                File mypath=new File(directory,"115profile.jpg");
+                File root = new File(getContext().getFilesDir()
+                        + File.separator + "ShadiHallImages" + File.separator);
+                root.mkdirs();
+                String idid = new Prefrence(getContext()).getClientIDSession();
+                File mypath = new File(root, idid + "myPicName.jpg");
+                Log.e("asdfasdfasdf", mypath.toString());
+                Log.e("asdfasdfasdf", "" + mypath.toURI().toURL());
+                Image image = Image.getInstance(mypath.toURI().toURL());
                 //image.setWidthPercentage(10f);
                 image.scaleToFit(80, 80);
-                PdfPCell cell=new PdfPCell();
+                PdfPCell cell = new PdfPCell();
                 cell.setFixedHeight(10);
                 cell.setImage(image);
                 cell.setBorder(Rectangle.NO_BORDER);
@@ -477,8 +552,7 @@ public class SalePur1Fragment extends Fragment implements AdapterView.OnItemSele
             }
             table.addCell(footerCell("www.easysoft.com.pk", PdfPCell.ALIGN_LEFT));
 
-                table.addCell(footerCell("LeftBlank", PdfPCell.ALIGN_LEFT));
-
+            table.addCell(footerCell("LeftBlank", PdfPCell.ALIGN_LEFT));
 
 
 /////////////////////////////////////////////
@@ -527,5 +601,12 @@ public class SalePur1Fragment extends Fragment implements AdapterView.OnItemSele
             e.printStackTrace();
 
         }
+    }
+
+    public List<Client> getClientsInfo() {
+        Prefrence p = new Prefrence(getContext());
+
+        String query = "SELECT * FROM Client WHERE ClientID = " + p.getClientIDSession();
+        return databaseHelper.getClient(query);
     }
 }

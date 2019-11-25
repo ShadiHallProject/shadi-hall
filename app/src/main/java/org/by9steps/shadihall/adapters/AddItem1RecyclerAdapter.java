@@ -1,9 +1,12 @@
 package org.by9steps.shadihall.adapters;
 
 import android.content.Context;
+import android.content.Intent;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -12,6 +15,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import org.by9steps.shadihall.R;
+import org.by9steps.shadihall.activities.ItemLedgerActivity;
 import org.by9steps.shadihall.activities.MenuClickActivity;
 import org.by9steps.shadihall.helper.DatabaseHelper;
 import org.by9steps.shadihall.model.item3name.Item3Name_;
@@ -45,7 +49,7 @@ public class AddItem1RecyclerAdapter extends RecyclerView.Adapter<AddItem1Recycl
     public void onBindViewHolder(@NonNull mRecyclerView mRecyclerView, int i) {
 
 
-
+        Log.e("dsfasfasdfasdf",list.get(i).getItem3NameID()+"");
         mRecyclerView.col1.setText(list.get(i).getItemCode());
         mRecyclerView.col2.setText(list.get(i).getItemName());
         mRecyclerView.col3.setText(list.get(i).getSalePrice());
@@ -68,7 +72,7 @@ public class AddItem1RecyclerAdapter extends RecyclerView.Adapter<AddItem1Recycl
         private ImageView imageView;
         private Item3Name_ clickData;
 
-        public mRecyclerView(@NonNull View itemView) {
+        public mRecyclerView(@NonNull final View itemView) {
             super(itemView);
             col1=itemView.findViewById(R.id.col1ItemGroup);
             col2=itemView.findViewById(R.id.col2ItemName);
@@ -76,6 +80,18 @@ public class AddItem1RecyclerAdapter extends RecyclerView.Adapter<AddItem1Recycl
             col4=itemView.findViewById(R.id.col4Stock);
             imageView=itemView.findViewById(R.id.Image3Dot);
             imageView.setOnClickListener(this);
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                    Intent ii=new Intent(v.getContext(), ItemLedgerActivity.class);
+
+                    Log.e("asdfasdf",clickData.getItem3NameID()+"");
+                    ii.putExtra("Item3nameid",clickData.getItem3NameID()+"");
+
+                    itemView.getContext().startActivity(ii);
+                }
+            });
 
 
         }

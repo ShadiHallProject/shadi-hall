@@ -12,6 +12,6 @@ public final class R {
     public static final class style {
         private style() {}
 
-        public static final int Permissions_TransparentTheme = 0x7f1000d0;
+        public static final int Permissions_TransparentTheme = 0x7f1000d1;
     }
 }

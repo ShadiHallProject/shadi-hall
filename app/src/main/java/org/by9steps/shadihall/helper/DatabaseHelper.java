@@ -23,6 +23,7 @@ import org.by9steps.shadihall.model.Client;
 import org.by9steps.shadihall.model.GeneralLedger;
 import org.by9steps.shadihall.model.Item1Type;
 import org.by9steps.shadihall.model.Item2Group;
+import org.by9steps.shadihall.model.ItemLedger;
 import org.by9steps.shadihall.model.JoinQueryAccount3Name;
 import org.by9steps.shadihall.model.JoinQueryAddVehicle;
 import org.by9steps.shadihall.model.JoinQueryDaliyEntryPage1;
@@ -1282,7 +1283,8 @@ public class DatabaseHelper extends SQLiteAssetHelper {
                 generalLedger.setCredit(c.getString(c.getColumnIndex("Credit")));
                 generalLedger.setEntryOf(c.getString(c.getColumnIndex("EntryOf")));
                 generalLedger.setBalance(c.getString(c.getColumnIndex("Balance")));
-
+                generalLedger.setTablename(c.getString(c.getColumnIndex("TableName")));
+                generalLedger.setTableid(c.getString(c.getColumnIndex("TableID")));
                 // adding to todo list
                 mGeneralLedger.add(generalLedger);
             } while (c.moveToNext());
@@ -1290,7 +1292,48 @@ public class DatabaseHelper extends SQLiteAssetHelper {
 
         return mGeneralLedger;
     }
+    public List<ItemLedger> getItemLedger(String query) {
+        List<ItemLedger> mItemLedger = new ArrayList<>();
 
+
+        Log.e(LOG, query);
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor c = db.rawQuery(query, null);
+        Log.e("SSSS", String.valueOf(c.moveToFirst()));
+        ItemLedger.columnNames=new String[c.getColumnCount()];
+        ItemLedger.columnNames=c.getColumnNames();
+        for (int i = 0; i <c.getColumnCount() ; i++) {
+            Log.e("ItemLedgerSequ","ColNo"+i+")"+c.getColumnName(i));
+        }
+
+        // looping through all rows and adding to list
+        if (c.moveToFirst()) {
+            do {
+                ItemLedger itemLedger=new ItemLedger(c.getColumnCount());
+                for (int i = 0; i <c.getColumnCount() ; i++) {
+                    itemLedger.columnsData[i]=c.getString(i);
+                }
+                ///////////////////////////////AddingManualEachColumn
+                itemLedger.ClientIDcol=c.getString(0);
+                itemLedger.Datecol=c.getString(1);
+                itemLedger.ItemIDcol=c.getString(2);
+                itemLedger.EntryTypecol=c.getString(3);
+                itemLedger.BillNocol=c.getString(4);
+                itemLedger.AccountNameCol=c.getString(5);
+                itemLedger.RemarksCol=c.getString(6);
+                itemLedger.AddCol=c.getString(7);
+                itemLedger.LessCol=c.getString(8);
+                itemLedger.PriceCol=c.getString(9);
+                itemLedger.BalCol=c.getString(10);
+                itemLedger.UserCol=c.getString(11);
+                itemLedger.LocCol=c.getString(12);
+                mItemLedger.add(itemLedger);
+            } while (c.moveToNext());
+        }
+
+        return mItemLedger;
+    }
     public List<Bookings> getBookings(String query) {
         List<Bookings> mGeneralLedger = new ArrayList<>();
 
@@ -1867,7 +1910,22 @@ public class DatabaseHelper extends SQLiteAssetHelper {
         }
         return spinners;
     }
+    public List<ItemLedgerRef> getItemLedgerSpinner(String query) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor c = db.rawQuery(query, null);
 
+        List<ItemLedgerRef> spinners = new ArrayList<>();
+
+        if (c.moveToFirst()) {
+            do {
+                ItemLedgerRef itemLedger=new ItemLedgerRef();
+                itemLedger.setItemname(c.getString(0));
+                itemLedger.setItem3ID(c.getString(1));
+spinners.add(itemLedger);
+            } while (c.moveToNext());
+        }
+        return spinners;
+    }
     //Get Voucher
     public List<Voucher> getPrintValues(String query) {
         List<Voucher> vouchers = new ArrayList<>();

@@ -228,7 +228,6 @@ public class MenuClickActivity extends AppCompatActivity implements CustomDialog
         reportsFragment.searchView.setQuery("", false);
         reportsFragment.searchView.clearFocus();
     }
-
     public void MenuItemClickListener(String  s1, String s2, String s3, int id){
         Bundle bundle=new Bundle();
         bundle.putInt("keyid",id);
@@ -252,7 +251,12 @@ public class MenuClickActivity extends AppCompatActivity implements CustomDialog
         dialog.setArguments(bundle);
         dialog.show(getSupportFragmentManager(),"TAG");
     }
-    public void showVehicleDialog(String vehicleID, String vehicleName, String colour, String model, String registrationNo, String contactNo, String brand,String VehicleIDGroup,String driverName) {
+    public void showVehicleDialog(String vehicleID, String vehicleName,
+                                  String colour, String model,
+                                  String registrationNo,
+                                  String contactNo, String brand,
+                                  String VehicleIDGroup,
+                                  String driverName) {
         Bundle bundle=new Bundle();
         bundle.putString("type","Edit");
         bundle.putString("VehicleID",vehicleID);
@@ -269,7 +273,6 @@ public class MenuClickActivity extends AppCompatActivity implements CustomDialog
         dialog.setArguments(bundle);
         dialog.show(getSupportFragmentManager(),"TAG");
     }
-
     public void showCustomeGroupDialog(String name,int id){
         Bundle bundle=new Bundle();
         bundle.putString("mode","Edit");

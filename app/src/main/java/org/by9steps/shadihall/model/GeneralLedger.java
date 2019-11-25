@@ -16,10 +16,11 @@ public class GeneralLedger implements Serializable {
     String EntryOf;
     String Balance;
     String month;
+    String tablename,tableid;
 
     private int isRow;
 
-    public static GeneralLedger createRow(String clientID, String entryNo, String date, String selectedAc, String againstAc, String accountName, String particulars, String debit, String credit, String entryOf, String balance) {
+    public static GeneralLedger createRow(String clientID, String entryNo, String date, String selectedAc, String againstAc, String accountName, String particulars, String debit, String credit, String entryOf, String balance,String tblname,String tblid) {
         GeneralLedger generalLedger = new GeneralLedger();
         generalLedger.isRow = 1;
         generalLedger.ClientID = clientID;
@@ -33,6 +34,8 @@ public class GeneralLedger implements Serializable {
         generalLedger.Credit = credit;
         generalLedger.EntryOf = entryOf;
         generalLedger.Balance = balance;
+        generalLedger.tablename = tblname;
+        generalLedger.tableid = tblid;
         return generalLedger;
     }
 
@@ -157,5 +160,21 @@ public class GeneralLedger implements Serializable {
 
     public String getMonth() {
         return month;
+    }
+
+    public String getTablename() {
+        return tablename;
+    }
+
+    public void setTablename(String tablename) {
+        this.tablename = tablename;
+    }
+
+    public String getTableid() {
+        return tableid;
+    }
+
+    public void setTableid(String tableid) {
+        this.tableid = tableid;
     }
 }
