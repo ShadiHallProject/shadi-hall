@@ -12,10 +12,10 @@
     <color name="updateddata">#000</color>
 
 <!--    For Generic Grid-->
-    <color name="g_gridrow1">#B9CAC0C1</color>
-    <color name="g_gridrow2">#6F88947D</color>
+    <color name="g_gridrow1">#B9FFFCFE</color>
+    <color name="g_gridrow2">#6FDDE0DA</color>
     <color name="contenttextcolor">#0E0D0D</color>
-    <color name="g_gridheadcolor">#01579B</color>
-    <color name="g_gridbottomcolor">#AD4CA9E7</color>
-    <color name="g_gridbottomsec_of_sec_color">#AD426B81</color>
+    <color name="g_gridheadcolor">#EAF7D6</color>
+    <color name="g_gridbottomcolor">#ADC6CFD6</color>
+    <color name="g_gridbottomsec_of_sec_color">#ADBCC5CC</color>
 </resources>

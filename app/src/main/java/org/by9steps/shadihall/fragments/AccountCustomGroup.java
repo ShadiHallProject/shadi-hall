@@ -172,8 +172,35 @@ public class AccountCustomGroup extends Fragment implements View.OnClickListener
     public void fillgridView(){
 
        // String query="select * from Account5customGroup2 where ClientID='"+prefrence.getClientIDSession()+"' AND CustomGroup1ID = '"+list.get(itemselectindex).getCustomGroup1ID()+"'";
+///////////////////////////////////////selecting from grid
+        //String query1="select * from Account3CustomGroup_SelectAc where ClientID = '"+prefrence.getClientIDSession()+"'";
 
-        String query1="select * from Account3CustomGroup_SelectAc where ClientID = '"+prefrence.getClientIDSession()+"'";
+//        String query1="Select\n" +
+//                "    Account5CustomGroup2.CustomGroup1ID = '' As \"Select\",\n" +
+//                "    Account3Name.AcNameID As ID,\n" +
+//                "    Account3Name.AcName As \"Account Name\",\n" +
+//                "    Account3Name.ClientID\n" +
+//                "From\n" +
+//                "    Account3Name Left Join\n" +
+//                "    Account5CustomGroup2 On Account5CustomGroup2.AcNameID = Account3Name.AcNameID\n" +
+//                "            And Account5CustomGroup2.ClientID = Account3Name.ClientID\n" +
+//                "Where\n" +
+//                "    Account3Name.ClientID = '"+prefrence.getClientIDSession()+"'";
+
+String query1="Select\n" +
+        "    Account5CustomGroup2.AcNameID,\n" +
+        "    Account3Name.AcName As AccountName,\n" +
+        "    Account3Name.AcDebitBal As Debit,\n" +
+        "    Account3Name.AcCreditBal As Credit,\n" +
+        "    Account5CustomGroup2.ClientID As ClientID_H,\n" +
+        "    Account5CustomGroup2.CustomGroup1ID\n" +
+        "From\n" +
+        "    Account5CustomGroup2 Left Join\n" +
+        "    Account3Name On Account3Name.AcNameID = Account5CustomGroup2.AcNameID\n" +
+        "            And Account3Name.ClientID = Account5CustomGroup2.ClientID\n" +
+        "Where\n" +
+        "    Account5CustomGroup2.ClientID = '"+prefrence.getClientIDSession()+"'";
+
         Cursor cc=databaseHelper.getReadableDatabase().rawQuery(query1,null);
         Log.e("aaaaaa",""+cc.getCount());
         final MediatorClass mediatorClass=new MediatorClass(cc,recyclerView);

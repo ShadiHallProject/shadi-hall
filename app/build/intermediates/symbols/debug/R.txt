@@ -4169,7 +4169,8 @@ int styleable monthPickerDialog_monthFontColorDisabled 7
 int styleable monthPickerDialog_monthFontColorNormal 8
 int styleable monthPickerDialog_monthFontColorSelected 9
 int xml external_files 0x7f120000
-int xml pref_data_sync 0x7f120001
-int xml pref_general 0x7f120002
-int xml pref_headers 0x7f120003
-int xml pref_notification 0x7f120004
+int xml network_security_config 0x7f120001
+int xml pref_data_sync 0x7f120002
+int xml pref_general 0x7f120003
+int xml pref_headers 0x7f120004
+int xml pref_notification 0x7f120005

@@ -22297,9 +22297,10 @@ public final class R {
   }
   public static final class xml {
     public static final int external_files=0x7f120000;
-    public static final int pref_data_sync=0x7f120001;
-    public static final int pref_general=0x7f120002;
-    public static final int pref_headers=0x7f120003;
-    public static final int pref_notification=0x7f120004;
+    public static final int network_security_config=0x7f120001;
+    public static final int pref_data_sync=0x7f120002;
+    public static final int pref_general=0x7f120003;
+    public static final int pref_headers=0x7f120004;
+    public static final int pref_notification=0x7f120005;
   }
 }

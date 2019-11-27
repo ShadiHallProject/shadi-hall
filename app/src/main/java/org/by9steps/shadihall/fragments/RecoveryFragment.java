@@ -273,8 +273,65 @@ public class RecoveryFragment extends Fragment implements View.OnClickListener {
         gChargesTotal = 0;
         gBalance = 0;
         gProfit = 0;
-
-        recoveries = databaseHelper.getRecoveries("select * from ShadiHallBookingProfit");
+        String query="Select\n" +
+                "    Booking.ID As ID_H,\n" +
+                "    Booking.BookingID As BookingID_C,\n" +
+                "    StrfTime('%Y %m', Booking.EventDate) As Month_G,\n" +
+                "    Booking.EventDate,\n" +
+                "    Booking.ChargesTotal As ChargesTotal_S,\n" +
+                "    '+' As R_L,\n" +
+                "    IfNull(ShadiHallBookingReceived.Received, 0) As Received_S,\n" +
+                "    IfNull(Booking.ChargesTotal, 0) - IfNull(ShadiHallBookingReceived.Received, 0) As Balance_S,\n" +
+                "    '+' As E_L,\n" +
+                "    IfNull(ShadiHallBookingExpense.Expense, 0) As Expense_S,\n" +
+                "    IfNull(ShadiHallBookingReceived.Received, 0) - IfNull(ShadiHallBookingExpense.Expense, 0) As Profit_S,\n" +
+                "    Booking.EventName,\n" +
+                "    Booking.ClientName,\n" +
+                "    Booking.ClientMobile,\n" +
+                "    Booking.Description,\n" +
+                "    Booking.ArrangePersons,\n" +
+                "    Booking.ClientAddress,\n" +
+                "    Booking.ClientNic,\n" +
+                "    Booking.Shift,\n" +
+                "    Booking.BookingDate,\n" +
+                "    Account3Name.AcName As User,\n" +
+                "    Booking.ClientID\n" +
+                "From\n" +
+                "    Booking Left Outer Join\n" +
+                "    (Select\n" +
+                "         CashBook.ClientID,\n" +
+                "         CashBook.TableID As BookingID,\n" +
+                "         Sum(CashBook.Amount) As Expense\n" +
+                "     From\n" +
+                "         CashBook\n" +
+                "     Group By\n" +
+                "         CashBook.ClientID,\n" +
+                "         CashBook.TableID,\n" +
+                "         CashBook.TableName\n" +
+                "     Having\n" +
+                "         CashBook.TableName = \"Booking_Expense\") As ShadiHallBookingExpense On\n" +
+                "            Booking.ClientID = ShadiHallBookingExpense.ClientID\n" +
+                "            And Booking.BookingID = ShadiHallBookingExpense.BookingID Left Outer Join\n" +
+                "    (Select\n" +
+                "         CashBook.ClientID,\n" +
+                "         CashBook.TableID As BookingID,\n" +
+                "         Sum(CashBook.Amount) As Received\n" +
+                "     From\n" +
+                "         CashBook\n" +
+                "     Group By\n" +
+                "         CashBook.ClientID,\n" +
+                "         CashBook.TableID,\n" +
+                "         CashBook.TableName\n" +
+                "     Having\n" +
+                "         CashBook.TableName = \"Booking_Received\") As ShadiHallBookingReceived On\n" +
+                "            Booking.ClientID = ShadiHallBookingReceived.ClientID\n" +
+                "            And Booking.BookingID = ShadiHallBookingReceived.BookingID Left Join\n" +
+                "    Account3Name On Account3Name.AcNameID = Booking.ClientUserID\n" +
+                "            And Account3Name.ClientID = Booking.ClientID\n" +
+                "Where\n" +
+                "    Booking.ClientID = '"+prefrence.getClientIDSession()+"'";
+//        recoveries = databaseHelper.getRecoveries("select * from ShadiHallBookingProfit");
+        recoveries = databaseHelper.getRecoveries(query);
 
         mList = new ArrayList<>();
 

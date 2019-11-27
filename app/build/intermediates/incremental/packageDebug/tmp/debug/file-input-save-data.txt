@@ -1,23 +1,23 @@
 #Internal package file, do not edit.
-#Mon Nov 25 20:29:00 PKT 2019
-2.base=D\:\\Android_Program\\ShadiHallProject\\FromGithub\\shadi-hall\\app\\build\\intermediates\\dex\\debug\\mergeDexDebug\\out
-0.path=classes.dex
+#Tue Nov 26 23:49:12 PKT 2019
+2.base=D\:\\Android_Program\\ShadiHallProject\\FromGithub\\shadi-hall\\app\\build\\intermediates\\dex\\debug\\mergeExtDexDebug\\out
+0.path=classes2.dex
 2.baseType=DIRECTORY
-3.base=D\:\\Android_Program\\ShadiHallProject\\FromGithub\\shadi-hall\\app\\build\\intermediates\\dex\\debug\\mergeDexDebug\\out
+3.base=D\:\\Android_Program\\ShadiHallProject\\FromGithub\\shadi-hall\\app\\build\\intermediates\\merged_assets\\debug\\out
 2.set=DEX
-1.path=databases/ShadiHallUser.db
-4.base=D\:\\Android_Program\\ShadiHallProject\\FromGithub\\shadi-hall\\app\\build\\intermediates\\merged_assets\\debug\\out
+1.path=databases/EasySoftDataFile.db
+4.base=D\:\\Android_Program\\ShadiHallProject\\FromGithub\\shadi-hall\\app\\build\\intermediates\\dex\\debug\\mergeProjectDexDebug\\out
 count=5
-2.path=classes3.dex
-4.set=ASSET
-3.path=classes2.dex
+2.path=classes.dex
+4.set=DEX
+3.path=crashlytics-build.properties
 3.baseType=DIRECTORY
 1.set=ASSET
-4.path=crashlytics-build.properties
+4.path=classes.dex
 1.baseType=DIRECTORY
-0.base=D\:\\Android_Program\\ShadiHallProject\\FromGithub\\shadi-hall\\app\\build\\intermediates\\dex\\debug\\mergeDexDebug\\out
+0.base=D\:\\Android_Program\\ShadiHallProject\\FromGithub\\shadi-hall\\app\\build\\intermediates\\dex\\debug\\mergeExtDexDebug\\out
 0.baseType=DIRECTORY
-3.set=DEX
+3.set=ASSET
 1.base=D\:\\Android_Program\\ShadiHallProject\\FromGithub\\shadi-hall\\app\\build\\intermediates\\merged_assets\\debug\\out
 4.baseType=DIRECTORY
 0.set=DEX

@@ -64,7 +64,7 @@ public class DatabaseHelper extends SQLiteAssetHelper {
     private static final int DATABASE_VERSION = 1;
 
     // Database Name
-    private static final String DATABASE_NAME = "ShadiHallUser.db";
+    private static final String DATABASE_NAME = "EasySoftDataFile.db";
 
     // Table Names
     private static final String TABLE_Account3Name = "Account3Name";
@@ -1395,7 +1395,7 @@ public class DatabaseHelper extends SQLiteAssetHelper {
         if (c.moveToFirst()) {
             do {
                 Recovery generalLedger = new Recovery();
-                Log.e("SSSSS", c.getString(c.getColumnIndex("BookingID")));
+                Log.e("SSSSS", ""+c.getInt(c.getColumnIndex("BookingID")));
 
                 generalLedger.setClientID(c.getString(c.getColumnIndex("ClientNic")));
                 generalLedger.setBookingID(c.getString(c.getColumnIndex("BookingID")));

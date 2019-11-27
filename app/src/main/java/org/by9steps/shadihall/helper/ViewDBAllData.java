@@ -177,49 +177,49 @@ public class ViewDBAllData extends AppCompatActivity implements View.OnClickList
 //            builder.append(cashBooksList.get(i).toString() + "\n");
 //            builder.append("-----END OBject "+(i+1)+"\n");
 //        }
-        Cursor cc=helper.getReadableDatabase().rawQuery("Select * from ShadiHallBookingProfit",null);
-        Log.e("aaaaaa",""+cc.getCount());
-       final MediatorClass mediatorClass=new MediatorClass(cc,recyclerView);
-        //mediatorClass.setSortingAllowed(true);
-        mediatorClass.ShowGrid();
-        mediatorClass.registerHeaderRowMenuClickListner(new DialogForSearchGrid.DialogClickListener() {
-            @Override
-            public void HandleClickLisnterOfDialog(String colName, String SearchText) {
-                Log.e("asdfasdfasdf",colName+"---"+SearchText);
-                String qq="Select * from ShadiHallBookingProfit where "+colName+" "
-                        +"LIKE '%"+SearchText+"%';";
-
-
-                Cursor cc = helper.getReadableDatabase().rawQuery(qq, null);
-                MNotificationClass.ShowToast(ViewDBAllData.this,cc.getCount()+" Row Found");
-                mediatorClass.FilterListByEnterText(cc);
-            }
-        });
+//        Cursor cc=helper.getReadableDatabase().rawQuery("Select * from ShadiHallBookingProfit",null);
+//        Log.e("aaaaaa",""+cc.getCount());
+//       final MediatorClass mediatorClass=new MediatorClass(cc,recyclerView);
+//        //mediatorClass.setSortingAllowed(true);
+//        mediatorClass.ShowGrid();
+//        mediatorClass.registerHeaderRowMenuClickListner(new DialogForSearchGrid.DialogClickListener() {
+//            @Override
+//            public void HandleClickLisnterOfDialog(String colName, String SearchText) {
+//                Log.e("asdfasdfasdf",colName+"---"+SearchText);
+//                String qq="Select * from ShadiHallBookingProfit where "+colName+" "
+//                        +"LIKE '%"+SearchText+"%';";
+//
+//
+//                Cursor cc = helper.getReadableDatabase().rawQuery(qq, null);
+//                MNotificationClass.ShowToast(ViewDBAllData.this,cc.getCount()+" Row Found");
+//                mediatorClass.FilterListByEnterText(cc);
+//            }
+//        });
 //        mediatorClass.registerHeaderRowMenuClickListner(new GenericGridAdapter.MenuItemHeaderRowClickListner() {
 //            @Override
 //            public void ListenForDotMenuItemClick(MenuItem menuItem) {
 //                MNotificationClass.ShowToastTem(ViewDBAllData.this,""+menuItem.getTitle());
 //            }
 //        });
-        mediatorClass.listenForSortClick(new GenericGridAdapter.ListenerForChange() {
-            @Override
-            public void listenForSortClick(String columnName, int index, char sorttype) {
-                Toast.makeText(ViewDBAllData.this, "ColName:(" + columnName + ")indx(" + index+") SrotType:("+sorttype+")", Toast.LENGTH_SHORT).show();
-                String orderby = "";
-                if (sorttype == 'A') {
-                    sorttype='D';
-                    orderby = " ORDER BY " + columnName + " DESC ";
-                }
-                else {
-                    sorttype='A';
-                    orderby = " ORDER BY " + columnName + " ASC ";
-                }
-                String qq="Select * from CashBook " + orderby;
-                Log.e("query",qq);
-                Cursor cc = helper.getReadableDatabase().rawQuery(qq, null);
-                mediatorClass.FilterList(cc, index,sorttype);
-            }
-        });
+//        mediatorClass.listenForSortClick(new GenericGridAdapter.ListenerForChange() {
+//            @Override
+//            public void listenForSortClick(String columnName, int index, char sorttype) {
+//                Toast.makeText(ViewDBAllData.this, "ColName:(" + columnName + ")indx(" + index+") SrotType:("+sorttype+")", Toast.LENGTH_SHORT).show();
+//                String orderby = "";
+//                if (sorttype == 'A') {
+//                    sorttype='D';
+//                    orderby = " ORDER BY " + columnName + " DESC ";
+//                }
+//                else {
+//                    sorttype='A';
+//                    orderby = " ORDER BY " + columnName + " ASC ";
+//                }
+//                String qq="Select * from CashBook " + orderby;
+//                Log.e("query",qq);
+//                Cursor cc = helper.getReadableDatabase().rawQuery(qq, null);
+//                mediatorClass.FilterList(cc, index,sorttype);
+//            }
+//        });
     }
     private void GetItem1Type() {
         item1TypeList = helper.getItem1TypeData("Select * from Item1Type");

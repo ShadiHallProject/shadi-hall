@@ -150,7 +150,6 @@ public class MenuClickActivity extends AppCompatActivity implements CustomDialog
                         .add(R.id.menu_container,accountCustomGroup)
                         .commit();
             }
-
             //Reports
             else if (message.equals("CashBook")) {
                 getSupportFragmentManager().beginTransaction()
