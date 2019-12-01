@@ -314,5 +314,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void test(){
         int a=1+1+1;
+
+       // MAMRI
     }
 }
