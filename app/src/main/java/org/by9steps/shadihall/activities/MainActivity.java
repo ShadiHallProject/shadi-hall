@@ -311,4 +311,8 @@ public class MainActivity extends AppCompatActivity {
             dl.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
         }
     }
+
+    public void test(){
+        int a=1+1+1;
+    }
 }
