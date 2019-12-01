@@ -191,6 +191,8 @@
     <string name="Item_price">Price</string>
     <string name="Item_stock">Stock</string>
     <string name="login_information">Login information</string>
+    <string name="Open" >Open</string>
+    <string name="Close">Close</string>
     <string-array name="pref_example_list_titles">
         <item>Always</item>
         <item>When possible</item>

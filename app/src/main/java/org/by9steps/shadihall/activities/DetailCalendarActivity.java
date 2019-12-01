@@ -22,6 +22,7 @@ import com.squareup.timessquare.CalendarPickerView;
 import com.squareup.timessquare.DefaultDayViewAdapter;
 
 import org.by9steps.shadihall.R;
+import org.by9steps.shadihall.helper.ThemeProvider;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -49,6 +50,7 @@ public class DetailCalendarActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        ThemeProvider.setThemeOfApp(this);
         setContentView(R.layout.activity_detail_calendar);
         String message = "";
         //   initializeCalendar();

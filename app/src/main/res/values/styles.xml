@@ -7,6 +7,13 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
     </style>
+    <!-- Base application theme. -->
+    <style name="AppThemeNoActionBar" parent="Theme.AppCompat.Light.NoActionBar">
+        <!-- Customize yor theme here. -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+    </style>
 
     <style name="AppTheme.NoActionBar">
         <item name="windowActionBar">false</item>
@@ -22,7 +29,27 @@
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+    <style name="AppTheme2" parent="Theme.AppCompat.Light.NoActionBar">
+        <!--._+*._+*._+*._+*._+*//Customize your theme here._+*._+*._+*._+*._+*._+*._+*._+*._+*._+*._+*._+*._+*-->
+        <item name="colorPrimary">@color/colorPrimary2</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark2</item>
+        <item name="colorAccent">@color/colorAccent2</item>
+        <item name="android:textColorPrimary">@color/textcolorprimasdf</item>
+        <item name="android:textColor">@color/textcolorprimasdf</item>
+        <item name="editTextBackground">@color/colorPrimary2</item>
+        <item name="buttonStyle">@style/ScoreButtons</item>
+        <item name="android:textViewStyle">@style/ScoreButtonstext</item>
+    </style>
+    <style name="ScoreButtons" parent="Widget.AppCompat.Button">
+        <item name="android:background">@color/textcolorprimasdfbtns</item>
 
+    </style>
+
+    <style name="ScoreButtonstext" >
+        <!--        <item name="android:background">@color/textcolorprimasdftext</item>-->
+        <item name="android:textColor">@color/textcolorprimasdftext</item>
+        <item name="android:textStyle">bold</item>
+    </style>
 
 <!--    <style name="GridRowStyle">-->
 <!--        <item name="android:layout_weight">2</item>-->

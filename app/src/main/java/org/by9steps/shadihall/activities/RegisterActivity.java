@@ -41,6 +41,9 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.fxn.pix.Pix;
 import com.orm.SugarContext;
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.MemoryPolicy;
+import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
@@ -58,7 +61,6 @@ import org.by9steps.shadihall.helper.GenericConstants;
 import org.by9steps.shadihall.helper.InputValidation;
 import org.by9steps.shadihall.helper.MNotificationClass;
 import org.by9steps.shadihall.helper.Prefrence;
-import org.by9steps.shadihall.model.AreaName;
 import org.by9steps.shadihall.model.Projects;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -229,8 +231,8 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
             if (type.equals("Register")) {
 //                latitude = intent.getStringExtra("Latitude");
 //                longitude = intent.getStringExtra("Longitude");
-                String url = ApiRefStrings.ServerAddress+ "ProjectImages/ProjectsLogo/" + prefrence.getProjectIDSession() + ".png";
-                Log.e("URL", url);
+                String url = ApiRefStrings.ServerAddress + "ProjectImages/ProjectsLogo/" + prefrence.getProjectIDSession() + ".png";
+                Log.e("URLOfProj", url);
                 Picasso.get()
                         .load(url)
                         .placeholder(R.drawable.default_avatar)
@@ -258,6 +260,21 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
 //                } catch (IOException e) {
 //                    e.printStackTrace();
 //                }
+            } else if (type.equals("Edit")) {
+                MNotificationClass.ShowToastTem(this, "Edit Mode");
+                String url = ApiRefStrings.ServerAddress + "ProjectImages/ProjectsLogo/" + prefrence.getProjectIDSession() + ".png";
+                Log.e("URLOfProj", url);
+                Picasso.get()
+                        .load(url)
+                        .placeholder(R.drawable.default_avatar)
+                        .into(projimage);
+                String query = "SELECT * FROM Project where ProjectID=" + prefrence.getProjectIDSession();
+                List<Projects> projectsList = new DatabaseHelper(this).getProjects(query);
+                String projname = "";
+                if (projectsList != null) {
+                    projname = projectsList.get(0).getProjectName();
+                    projectnamed.setText(projname);
+                }
             }
         }
 
@@ -323,30 +340,31 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
             public void onClick(View v) {
                 final ProjectMenuDialog dialog = new ProjectMenuDialog();
                 boolean isconnected = GenericConstants.isConnected(RegisterActivity.this);
-                if (isconnected) {
+                if (isconnected && !type.equals(AppController.profileType)) {
 
                     dialog.listenerproj = new ProjectsListAdapter.OnItemClickListener() {
                         @Override
                         public void onItemClick(String id, String name) {
-                            prefrence.setProjectIDSession(id);
-                            prefrence.setUserRighhtsSession("0");
-                            prefrence.setClientUserIDSession("0");
-                            prefrence.setMYClientUserIDSession("0");
-                            prefrence.setClientIDSession("0");
-                            dialog.dismiss();
-                            String url = "http://shadihall.easysoft.com.pk/ProjectImages/ProjectsLogo/" + prefrence.getProjectIDSession() + ".png";
-                            Log.e("URL", url);
-                            Picasso.get()
-                                    .load(url)
-                                    .placeholder(R.drawable.default_avatar)
-                                    .into(projimage);
-                            String query = "SELECT * FROM Project where ProjectID=" + prefrence.getProjectIDSession();
-                            List<Projects> projectsList = new DatabaseHelper(RegisterActivity.this).getProjects(query);
-                            String projname = "";
-                            if (projectsList != null) {
-                                projname = projectsList.get(0).getProjectName();
-                                projectnamed.setText(projname);
-                            }
+
+                              prefrence.setProjectIDSession(id);
+                              prefrence.setUserRighhtsSession("0");
+                              prefrence.setClientUserIDSession("0");
+                              prefrence.setMYClientUserIDSession("0");
+                              prefrence.setClientIDSession("0");
+                              dialog.dismiss();
+                              String url = ApiRefStrings.ServerAddress + "/ProjectImages/ProjectsLogo/" + prefrence.getProjectIDSession() + ".png";
+                              Log.e("URL", url);
+                              Picasso.get()
+                                      .load(url)
+                                      .placeholder(R.drawable.default_avatar)
+                                      .into(projimage);
+                              String query = "SELECT * FROM Project where ProjectID=" + prefrence.getProjectIDSession();
+                              List<Projects> projectsList = new DatabaseHelper(RegisterActivity.this).getProjects(query);
+                              String projname = "";
+                              if (projectsList != null) {
+                                  projname = projectsList.get(0).getProjectName();
+                                  projectnamed.setText(projname);
+                              }
 //                            if (isGpsEnabled()) {
 //                                Intent intent = new Intent(RegisterActivity.this, RegisterActivity.class);
 //                                intent.putExtra("TYPE", "Register");
@@ -356,8 +374,9 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
 ////                                i.putExtra("ClientID","98");
 ////                                startActivity(i);
 //                            }
-                            MNotificationClass.ShowToastTem(RegisterActivity.this,
-                                    name);
+                              MNotificationClass.ShowToastTem(RegisterActivity.this,
+                                      name);
+
                             // prefrence.setProjectIDSession(id);
                         }
                     };
@@ -418,9 +437,10 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
 //                final String contry = country.getText().toString();
 //                final String cty = city.getText().toString();
 //                final String subCty = sub_city.getText().toString();
+                Log.e("asdfasdf", "FirstPass");
                 if (city.equals("") || country.equals("") || subCity.equals("")) {
 
-                   // uploadImages("115");
+                    // uploadImages("115");
 //                    pDialog = new ProgressDialog(RegisterActivity.this);
 //                    pDialog.setTitle("New Image Upload");
 //                    pDialog.setMessage("Uploading image");
@@ -452,10 +472,12 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                     return;
                 }
 
-
-                if (!inputValidation.isInputEditTextFilled(password, password_layout, getString(R.string.error_message_password))) {
-                    return;
+                if (!type.equals(AppController.profileType)) {
+                    if (!inputValidation.isInputEditTextFilled(password, password_layout, getString(R.string.error_message_password))) {
+                        return;
+                    }
                 }
+
 //                if (!inputValidation.isInputEditTextFilled(c_number, c_number_layout, getString(R.string.error_message_c_number))) {
 //                    return;
 //                }
@@ -481,12 +503,14 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
 //                if (!inputValidation.isInputEditTextFilled(description, description_layout, getString(R.string.error_message_description))) {
 //                    return;
 //                }
-                if (encodedImage.isEmpty() || encodedImage.equals("")) {
+                if (encodedImage.isEmpty() || encodedImage.equals("") ) {
                     Toast.makeText(RegisterActivity.this, "Select Company Logo", Toast.LENGTH_LONG).show();
+                    if (type.equals(AppController.profileType))
+                        SendUpdatedDataToServer();
                 } else {
 
                     if (type.equals(AppController.profileType)) {
-
+                        SendUpdatedDataToServer();
                     } else {
                         String tag_json_obj = "json_obj_req";
                         String url = ApiRefStrings.RegisterAccountApiRef;
@@ -509,7 +533,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                                             String success = jsonObj.getString("success");
 
                                             if (success.equals("1")) {
-                                               // pDialog.dismiss();
+                                                // pDialog.dismiss();
                                                 Log.e("Response", response);
                                                 String id = jsonObj.getString("ClientID");
 //                                                Toast.makeText(RegisterActivity.this, "User Register", Toast.LENGTH_SHORT).show();
@@ -836,7 +860,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
     public void getUserProfile() {
         // Tag used to cancel the request
         final String tag_json_obj = "json_obj_req";
-        String url = "http://69.167.137.121/plesk-site-preview/sky.com.pk/shadiHall/GetUserProfile.php";
+        String url = ApiRefStrings.ServerAddress + "PhpApi/GetUserProfile.php";
 
         pDialog = new ProgressDialog(RegisterActivity.this);
         pDialog.setMessage("Searching...");
@@ -848,41 +872,50 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                     @Override
                     public void onResponse(String response) {
                         Log.e("Profile", response);
+                        //  pDialog.dismiss();
                         try {
                             JSONObject json = new JSONObject(response);
                             String success = json.getString("success");
-                            Log.e("Profile", success);
+                            Log.e("Profileasdf", success);
 
                             if (success.equals("1")) {
                                 JSONArray jsonArray = json.getJSONArray("UserProfile");
-                                Log.e("Profile", jsonArray.toString());
-                                AreaName.deleteAll(AreaName.class);
+                                Log.e("ProfileToSTring", "AraryLen " + jsonArray.length());
+
+                                Log.e("ProfileToSTring", jsonArray.toString());
+                                // AreaName.deleteAll(AreaName.class);
                                 for (int i = 0; i < jsonArray.length(); i++) {
                                     JSONObject jsonObject = jsonArray.getJSONObject(i);
-                                    String cId = jsonObject.getString("ClientID");
+                                    Log.e("ProfilObjtss", jsonObject.toString());
+
+                                    //  String cId = jsonObject.getString("ClientID");
                                     String cName = jsonObject.getString("CompanyName");
                                     String cAddress = jsonObject.getString("CompanyAddress");
                                     String cNumber = jsonObject.getString("CompanyNumber");
                                     String pName = jsonObject.getString("NameOfPerson");
                                     String cMail = jsonObject.getString("Email");
-                                    String cCountry = jsonObject.getString("Country");
-                                    String cCity = jsonObject.getString("City");
-                                    String cSubCity = jsonObject.getString("SubCity");
-                                    String cWebsite = jsonObject.getString("WebSite");
-                                    String cPersons = jsonObject.getString("CapacityOfPersons");
+                                    country = jsonObject.getString("Country");
+                                    city = jsonObject.getString("City");
+                                    subCity = jsonObject.getString("SubCity");
+                                    String cWebsite = jsonObject.getString("Website");
+                                    latitude = jsonObject.getString("Lat");
+                                    longitude = jsonObject.getString("Lng");
+                                    description.setText(jsonObject.getString("BusinessDescriptions"));
+                                    projectstatus.setText(country + " " + city + " " + subCity);
+                                    // String cPersons = jsonObject.getString("CapacityOfPersons");
 
-                                    Picasso.get()
-                                            .load(AppController.imageUrl + cId + "/logo.png")
-                                            .placeholder(R.drawable.default_avatar)
-                                            .into(image);
-
+//                                    Picasso.get()
+//                                            .load(AppController.imageUrl + cId + "/logo.png")
+//                                            .placeholder(R.drawable.default_avatar)
+//                                            .into(image);
+                                    setImagesToImageViewFromSErver();
                                     c_name.setText(cName);
                                     c_address.setText(cAddress);
                                     c_number.setText(cNumber);
                                     name_of_person.setText(pName);
                                     email.setText(cMail);
                                     website.setText(cWebsite);
-//                                    persons.setText(cPersons);
+                                    //persons.setText(cPersons);
 
                                     pDialog.dismiss();
                                 }
@@ -892,6 +925,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
 
                         } catch (JSONException e) {
                             e.printStackTrace();
+                            Log.e("except", e.getMessage());
                         }
                     }
                 }, new Response.ErrorListener() {
@@ -905,8 +939,8 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
             @Override
             protected Map<String, String> getParams() {
                 Map<String, String> params = new HashMap<String, String>();
-                Log.e("Phone", ph);
-                params.put("LoginMobileNo", ph);
+                Log.e("PhoneNoOfClient", ph + " ClientDI:" + prefrence.getClientIDSession());
+                params.put("ClientID", prefrence.getClientIDSession() + "");
                 return params;
             }
         };
@@ -914,6 +948,105 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         jsonObjectRequest.setRetryPolicy(policy);
         AppController.getInstance().addToRequestQueue(jsonObjectRequest, tag_json_obj);
+    }
+
+    public void setImagesToImageViewFromSErver() {
+        String uriForLogo=AppController.imageUrl + prefrence.getClientIDSession() + "/logo.png";
+        Log.e("asdfasddfasdf",uriForLogo);
+
+        Picasso.get().load(AppController.imageUrl + prefrence.getClientIDSession() + "/logo.png")
+                .placeholder(R.drawable.default_avatar).networkPolicy(NetworkPolicy.NO_CACHE)
+                .memoryPolicy(MemoryPolicy.NO_CACHE)
+                .into(image);
+       // encodedImage="Null";
+       // createEncodeIamgeStramTosendServer();
+
+        try {
+//            img1.setTag(TAGSET);
+//            img2.setTag(TAGSET);
+//            img3.setTag(TAGSET);
+//            img4.setTag(TAGSET);
+//            img5.setTag(TAGSET);
+            /////////////////////////Loading Slider Images
+            Picasso.get().load(AppController.imageUrl + prefrence.getClientIDSession() + "/SliderImages/image1.png")
+                    .placeholder(R.drawable.default_avatar)
+                    .into(img1, new Callback() {
+                        @Override
+                        public void onSuccess() {
+                            img1.setTag(TAGNULL);
+                        }
+
+                        @Override
+                        public void onError(Exception e) {
+                            img1.setTag(TAGNULL);
+                            // img5.setVisibility(IN);
+                        }
+                    });
+            /////////////////////////Loading Slider Images
+            Picasso.get().load(AppController.imageUrl + prefrence.getClientIDSession() + "/SliderImages/image2.png")
+                    .placeholder(R.drawable.default_avatar)
+                    .into(img2, new Callback() {
+                        @Override
+                        public void onSuccess() {
+                            img2.setTag(TAGNULL);
+                        }
+
+                        @Override
+                        public void onError(Exception e) {
+                            img2.setTag(TAGNULL);
+                            // img5.setVisibility(IN);
+                        }
+                    });
+            /////////////////////////Loading Slider Images
+            Picasso.get().load(AppController.imageUrl + prefrence.getClientIDSession() + "/SliderImages/image3.png")
+                    .placeholder(R.drawable.default_avatar)
+                    .into(img3, new Callback() {
+                        @Override
+                        public void onSuccess() {
+                            img3.setTag(TAGNULL);
+                        }
+
+                        @Override
+                        public void onError(Exception e) {
+                            img3.setTag(TAGNULL);
+                            // img5.setVisibility(IN);
+                        }
+                    });
+            /////////////////////////Loading Slider Images
+            Picasso.get().load(AppController.imageUrl + prefrence.getClientIDSession() + "/SliderImages/image4.png")
+                    .placeholder(R.drawable.default_avatar)
+                    .into(img4, new Callback() {
+                        @Override
+                        public void onSuccess() {
+                            img4.setTag(TAGNULL);
+                        }
+
+                        @Override
+                        public void onError(Exception e) {
+                            img4.setTag(TAGNULL);
+                            // img5.setVisibility(IN);
+                        }
+                    });
+
+            /////////////////////////Loading Slider Images
+            Picasso.get().load(AppController.imageUrl + prefrence.getClientIDSession() + "/SliderImages/image5.png")
+                    .placeholder(R.drawable.default_avatar)
+                    .into(img5, new Callback() {
+                        @Override
+                        public void onSuccess() {
+                            img5.setTag(TAGNULL);
+                        }
+
+                        @Override
+                        public void onError(Exception e) {
+                            img5.setTag(TAGNULL);
+                            // img5.setVisibility(IN);
+                        }
+                    });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
 
     ///////////////////////////////////////////////Click Listener For Each Image
@@ -942,7 +1075,6 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         });
         builder.show();
     }
-
 
 
     private Boolean isGpsEnabled() {
@@ -981,11 +1113,122 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         }
         return gps_enabled;
     }
-///////////////////////////////////////////////All Fun Related To Image Uploading
+
+    public void SendUpdatedDataToServer() {
+        Log.e("asdfasdf", "ClickedUpdateDAta");
+        String tag_json_obj = "json_obj_req";
+        String url = ApiRefStrings.UpdateClientDataINClientTAble;
+
+        pDialog = new ProgressDialog(RegisterActivity.this);
+        pDialog.setTitle("Updating Account");
+        pDialog.setMessage("Updating Account...");
+        pDialog.setCancelable(false);
+        pDialog.show();
+
+        StringRequest jsonObjectRequest = new StringRequest(Request.Method.POST, url,
+                new Response.Listener<String>() {
+                    JSONObject jsonObj = null;
+
+                    @Override
+                    public void onResponse(String response) {
+                        Log.e("Register", response);
+                        try {
+                            jsonObj = new JSONObject(response);
+                            String success = jsonObj.getString("success");
+
+                            if (success.equals("1")) {
+                                // pDialog.dismiss();
+                                Log.e("Response", response);
+                                String id = jsonObj.getString("ClientID");
+//                                                Toast.makeText(RegisterActivity.this, "User Register", Toast.LENGTH_SHORT).show();
+//                                                Intent intent = new Intent(RegisterActivity.this, SelectImagesActivity.class);
+//                                                intent.putExtra("ClientID",id);
+//                                                startActivity(intent);
+//                                                finish();
+                                pDialog.show();
+                                 uploadImages(id);
+//                                SharedPreferences.Editor editor = sharedPreferences.edit();
+//                                editor.putString(resume, "1");
+//                                editor.apply();
+                               // pDialog.dismiss();
+                            } else if (success.equals("0")) {
+                                pDialog.dismiss();
+                                String message = jsonObj.getString("message");
+                                Toast.makeText(RegisterActivity.this, message, Toast.LENGTH_SHORT).show();
+                            } else {
+                                pDialog.dismiss();
+                                Toast.makeText(RegisterActivity.this, response, Toast.LENGTH_SHORT).show();
+                            }
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                pDialog.dismiss();
+                Log.e("Error", error.toString());
+                Toast.makeText(RegisterActivity.this, error.toString(), Toast.LENGTH_SHORT).show();
+            }
+        }) {
+            @Override
+            protected Map<String, String> getParams() {
+
+                Map<String, String> params = new HashMap<String, String>();
+                Log.e("asdfasdfCie", prefrence.getClientIDSession() + "");
+                Log.e("asdfasdfCie", encodedImage+ "()()()");
+                params.put("CompanyName", checkNullField(c_name.getText().toString()));
+                params.put("CompanyAddress", checkNullField(c_address.getText().toString()));
+                params.put("CompanyNumber", checkNullField(c_number.getText().toString()));
+                params.put("NameOfPerson", checkNullField(name_of_person.getText().toString()));
+                // params.put("LoginMobileNo", checkNullField(login_number.getText().toString()));
+                params.put("Email", checkNullField(email.getText().toString()));
+                params.put("Country", checkNullField(country));
+                params.put("ClientID", prefrence.getClientIDSession());
+                //  params.put("Password", checkNullField(password.getText().toString()));
+                params.put("City", checkNullField(city));
+                params.put("SubCity", checkNullField(subCity));
+                params.put("Website", checkNullField(website.getText().toString()));
+                params.put("CapacityOfPersons", "0");
+                // params.put("CompaDisplayImagenyLogo", encodedImage);
+              //  params.put("", encodedImage);
+               // createEncodeIamgeStramTosendServer();
+                if (encodedImage.isEmpty() || encodedImage.equals("") ){
+                   // params.put("CompanyLogo", "Null");
+                } else {
+
+                    params.put("CompanyLogo", encodedImage);
+                }
+                params.put("Lat", latitude);
+                params.put("Lng", longitude);
+                params.put("ProjectID", prefrence.getProjectIDSession());
+                params.put("BusinessDescriptions", checkNullField(description.getText().toString()));
+                params.put("FinancialYear", financial_year.getText().toString());
+                return params;
+            }
+        };
+        int socketTimeout = 30000;//30 seconds
+        RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
+        jsonObjectRequest.setRetryPolicy(policy);
+        AppController.getInstance().addToRequestQueue(jsonObjectRequest, tag_json_obj);
+    }
+
+    private void createEncodeIamgeStramTosendServer() {
+        image.setDrawingCacheEnabled(true);
+        image.buildDrawingCache(true);
+        Bitmap bit = image.getDrawingCache();
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        bit.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
+        encodedImage = Base64.encodeToString(byteArrayOutputStream.toByteArray(), Base64.DEFAULT);
+    }
+
+    ///////////////////////////////////////////////All Fun Related To Image Uploading
     private void uploadImages(final String clientID) {
+
         pDialog.setMessage("Sending Images To Cloud...0");
-        Log.e("flageimage1","inimg1");
-       // IMAGE_Code++;
+        Log.e("flageimage1", "inimg1");
+        // IMAGE_Code++;
         if (img1.getTag().equals(TAGSET)) {
             ImageUploadingApi.uploadImageToCloud(this,
                     clientID, "1", img1, imageshashmap.get(1), new ImageUploadingApi.ImageUploadingImage() {
@@ -997,7 +1240,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                             SendImage2ToColud(clientID);
                         }
                     });
-        }else  SendImage2ToColud(clientID);
+        } else SendImage2ToColud(clientID);
 //        count = total = 0;
 //        int size = 0;
 //        if (imageList != null && imageList.size() > 0) {
@@ -1080,8 +1323,9 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
 //            AppController.getInstance().addToRequestQueue(jsonObjectRequest, tag_json_obj);
 //        }
     }
-    private void SendImage2ToColud(final String clientID){
-        Log.e("flageimage2","inimg2");
+
+    private void SendImage2ToColud(final String clientID) {
+        Log.e("flageimage2", "inimg2");
         if (img2.getTag().equals(TAGSET)) {
             ImageUploadingApi.uploadImageToCloud(this,
                     clientID, "2", img2, imageshashmap.get(2), new ImageUploadingApi.ImageUploadingImage() {
@@ -1094,10 +1338,11 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
 
                         }
                     });
-        }else SendImage3ToColud(clientID);
+        } else SendImage3ToColud(clientID);
     }
-    private void SendImage3ToColud(final String clientID){
-        Log.e("flageimage3","inimg3");
+
+    private void SendImage3ToColud(final String clientID) {
+        Log.e("flageimage3", "inimg3");
         if (img3.getTag().equals(TAGSET)) {
             ImageUploadingApi.uploadImageToCloud(this,
                     clientID, "3", img3, imageshashmap.get(3), new ImageUploadingApi.ImageUploadingImage() {
@@ -1109,10 +1354,11 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                             SendImage4ToColud(clientID);
                         }
                     });
-        }else SendImage4ToColud(clientID);
+        } else SendImage4ToColud(clientID);
     }
-    private void SendImage4ToColud(final String clientID){
-        Log.e("flageimage4","inimg4");
+
+    private void SendImage4ToColud(final String clientID) {
+        Log.e("flageimage4", "inimg4");
         if (img4.getTag().equals(TAGSET)) {
             ImageUploadingApi.uploadImageToCloud(this,
                     clientID, "4", img4, imageshashmap.get(4), new ImageUploadingApi.ImageUploadingImage() {
@@ -1124,10 +1370,11 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                             SendImage5ToColud(clientID);
                         }
                     });
-        }else SendImage5ToColud(clientID);
+        } else SendImage5ToColud(clientID);
     }
-    private void SendImage5ToColud(final String clientID){
-        Log.e("flageimage5","inimg5");
+
+    private void SendImage5ToColud(final String clientID) {
+        Log.e("flageimage5", "inimg5");
         if (img5.getTag().equals(TAGSET)) {
             ImageUploadingApi.uploadImageToCloud(this,
                     clientID, "5", img5, imageshashmap.get(5), new ImageUploadingApi.ImageUploadingImage() {
@@ -1140,7 +1387,8 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                             Toast.makeText(RegisterActivity.this, "All Images Done", Toast.LENGTH_SHORT).show();
                         }
                     });
-        }else {pDialog.dismiss();
+        } else {
+            pDialog.dismiss();
             finish();
         }
     }

@@ -32,6 +32,7 @@ import org.by9steps.shadihall.helper.DatabaseHelper;
 import org.by9steps.shadihall.helper.GenericConstants;
 import org.by9steps.shadihall.helper.InputValidation;
 import org.by9steps.shadihall.helper.Prefrence;
+import org.by9steps.shadihall.helper.ThemeProvider;
 import org.by9steps.shadihall.helper.refdb;
 import org.by9steps.shadihall.model.CBUpdate;
 import org.by9steps.shadihall.model.CashBook;
@@ -74,6 +75,7 @@ public class CashCollectionActivity extends AppCompatActivity implements View.On
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        ThemeProvider.setThemeOfApp(this);
         setContentView(R.layout.activity_cash_collection);
 
         if (getSupportActionBar() != null) {

@@ -10,6 +10,7 @@ import org.by9steps.shadihall.fragments.DateBalSheetFragment;
 import org.by9steps.shadihall.fragments.ListFragment;
 import org.by9steps.shadihall.fragments.MonthBalSheetFragment;
 import org.by9steps.shadihall.fragments.SummerizeTrailBalFragment;
+import org.by9steps.shadihall.helper.ThemeProvider;
 
 public class BalSheetActivity extends AppCompatActivity {
 
@@ -18,6 +19,7 @@ public class BalSheetActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        ThemeProvider.setThemeOfApp(this);
         setContentView(R.layout.activity_bal_sheet);
 
         if (getSupportActionBar()!=null) {

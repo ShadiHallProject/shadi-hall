@@ -10,6 +10,7 @@ import android.view.View;
 import org.by9steps.shadihall.R;
 import org.by9steps.shadihall.fragments.BookingDetailFragment;
 import org.by9steps.shadihall.fragments.BookingFormFragment;
+import org.by9steps.shadihall.helper.ThemeProvider;
 
 public class BookingActivity extends AppCompatActivity {
 
@@ -18,6 +19,7 @@ public class BookingActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        ThemeProvider.setThemeOfApp(this);
         setContentView(R.layout.activity_booking);
 
         if (getSupportActionBar() != null) {

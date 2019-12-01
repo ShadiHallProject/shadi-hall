@@ -71,6 +71,7 @@ import org.by9steps.shadihall.fragments.RecoveryFragment;
 import org.by9steps.shadihall.fragments.SelectDateFragment;
 import org.by9steps.shadihall.helper.DatabaseHelper;
 import org.by9steps.shadihall.helper.Prefrence;
+import org.by9steps.shadihall.helper.ThemeProvider;
 import org.by9steps.shadihall.helper.refdb;
 import org.by9steps.shadihall.model.Account3Name;
 import org.by9steps.shadihall.model.Bookings;
@@ -139,7 +140,7 @@ public class EventCashBookActivity extends AppCompatActivity implements View.OnC
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_event_cash_book);
-
+        ThemeProvider.setThemeOfApp(this);
         recyclerView = findViewById(R.id.recycler);
         header = findViewById(R.id.header);
         scrollView = findViewById(R.id.scrollView);

@@ -24,6 +24,7 @@ import org.by9steps.shadihall.helper.GenericConstants;
 import org.by9steps.shadihall.helper.InputValidation;
 import org.by9steps.shadihall.helper.MNotificationClass;
 import org.by9steps.shadihall.helper.Prefrence;
+import org.by9steps.shadihall.helper.ThemeProvider;
 import org.by9steps.shadihall.model.Account3Name;
 
 import java.util.HashMap;
@@ -65,6 +66,7 @@ public class ChaartOfAccAddActivity extends AppCompatActivity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        ThemeProvider.setThemeOfApp(this);
         setContentView(R.layout.activity_chaart_of_acc_add);
 
         if (getSupportActionBar() != null) {

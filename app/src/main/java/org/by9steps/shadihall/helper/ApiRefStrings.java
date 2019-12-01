@@ -157,4 +157,5 @@ public class ApiRefStrings {
     public static String GetAccount4userRights = ServerAddress + "PhpApi/GetAccount4UserRights.php";
     public static String RegisterAccountApiRef = ServerAddress + "PhpApi/Register.php";
 
+    public static String UpdateClientDataINClientTAble=ServerAddress + "PhpApi/UpdateClientData.php";
 }

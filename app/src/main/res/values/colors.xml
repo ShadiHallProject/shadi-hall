@@ -12,10 +12,31 @@
     <color name="updateddata">#000</color>
 
 <!--    For Generic Grid-->
-    <color name="g_gridrow1">#B9FFFCFE</color>
+    <color name="g_gridrow1">#B9F700A2</color>
     <color name="g_gridrow2">#6FDDE0DA</color>
-    <color name="contenttextcolor">#0E0D0D</color>
-    <color name="g_gridheadcolor">#EAF7D6</color>
-    <color name="g_gridbottomcolor">#ADC6CFD6</color>
-    <color name="g_gridbottomsec_of_sec_color">#ADBCC5CC</color>
+    <color name="contentHeadertextcolor">#0E0D0D</color>
+    <color name="contenttextcolor">#311B92</color>
+    <color name="g_gridheadcolor">#1B5E20</color>
+    <color name="g_gridbottomcolor">#B71C1C</color>
+    <color name="g_gridbottomsec_of_sec_color">#F57F17</color>
+    <!--    For Generic Grid Blue Color -->
+    <color name="g_gridrow1b">#B9FFFCFE</color>
+    <color name="g_gridrow2b">#6FDDE0DA</color>
+    <color name="contenttextcolorb">#0E0D0D</color>
+    <color name="contentHeadertextcolorb">#0E0D0D</color>
+    <color name="g_gridheadcolorb">#EAF7D6</color>
+    <color name="g_gridbottomcolorb">#ADC6CFD6</color>
+    <color name="g_gridbottomsec_of_sec_colorb">#ADBCC5CC</color>
+
+
+
+<!--    For Sample thme using this -->
+    <color name="colorPrimary2">#F57F17</color>
+    <color name="colorPrimaryDark2">#4A148C</color>
+    <color name="colorAccent2">#1B5E20</color>
+
+    <color name="textcolorprimasdf">#FF0008</color>
+    <color name="textcolorprimasdftext">#8B8B5A</color>
+
+    <color name="textcolorprimasdfbtns">#D1EE45</color>
 </resources>

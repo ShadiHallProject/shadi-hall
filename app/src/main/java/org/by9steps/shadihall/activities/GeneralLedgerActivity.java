@@ -53,6 +53,7 @@ import org.by9steps.shadihall.adapters.GeneralLedgerAdapter;
 import org.by9steps.shadihall.fragments.SelectDateFragment;
 import org.by9steps.shadihall.helper.DatabaseHelper;
 import org.by9steps.shadihall.helper.Prefrence;
+import org.by9steps.shadihall.helper.ThemeProvider;
 import org.by9steps.shadihall.model.Account3Name;
 import org.by9steps.shadihall.model.GeneralLedger;
 import org.by9steps.shadihall.model.Spinner;
@@ -112,6 +113,7 @@ public class GeneralLedgerActivity extends AppCompatActivity implements View.OnC
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        ThemeProvider.setThemeOfApp(this);
         setContentView(R.layout.activity_general_ledger);
         SugarContext.init(this);
 

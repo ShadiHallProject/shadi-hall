@@ -744,8 +744,11 @@ color cardview_light_background
 color cardview_shadow_end_color
 color cardview_shadow_start_color
 color colorAccent
+color colorAccent2
 color colorPrimary
+color colorPrimary2
 color colorPrimaryDark
+color colorPrimaryDark2
 color colorPrimaryLightPix
 color colorPrimaryPix
 color common_google_signin_btn_text_dark
@@ -759,7 +762,10 @@ color common_google_signin_btn_text_light_disabled
 color common_google_signin_btn_text_light_focused
 color common_google_signin_btn_text_light_pressed
 color common_google_signin_btn_tint
+color contentHeadertextcolor
+color contentHeadertextcolorb
 color contenttextcolor
+color contenttextcolorb
 color currentMonthDayColor
 color daysLabelColor
 color defaultColor
@@ -790,10 +796,15 @@ color fontWhiteEnable
 color foreground_material_dark
 color foreground_material_light
 color g_gridbottomcolor
+color g_gridbottomcolorb
 color g_gridbottomsec_of_sec_color
+color g_gridbottomsec_of_sec_colorb
 color g_gridheadcolor
+color g_gridheadcolorb
 color g_gridrow1
+color g_gridrow1b
 color g_gridrow2
+color g_gridrow2b
 color gridbottom
 color gridbottombg
 color highlighted_text_material_dark
@@ -871,6 +882,9 @@ color switch_thumb_material_light
 color switch_thumb_normal_material_dark
 color switch_thumb_normal_material_light
 color tableheadbg
+color textcolorprimasdf
+color textcolorprimasdfbtns
+color textcolorprimasdftext
 color tooltip_background_dark
 color tooltip_background_light
 color updateddata
@@ -1429,6 +1443,7 @@ id action_spinner
 id action_text
 id actions
 id activity_chooser_view_content
+id activity_main
 id add
 id addAccountCustomGroup
 id addEntry
@@ -1452,6 +1467,7 @@ id async
 id auto
 id balance
 id balance_sheet
+id baltrans
 id barrier
 id beginning
 id bl_date
@@ -1659,6 +1675,7 @@ id ed_net_code1
 id ed_sys_code1
 id ed_updated_date1
 id edit
+id edit_profile
 id edit_query
 id email
 id email_layout
@@ -1718,6 +1735,7 @@ id groups
 id gv
 id header
 id headerlayout
+id headertextview
 id headimage1
 id headimage2
 id headimage3
@@ -1833,6 +1851,7 @@ id name_layout1
 id name_layout2
 id name_of_person
 id name_of_person_layout
+id navheaderimageview
 id navigation_header_container
 id negative_button
 id never
@@ -1842,6 +1861,7 @@ id normal
 id notification_background
 id notification_main_column
 id notification_main_column_container
+id nv
 id off
 id ok
 id ok_action
@@ -1903,6 +1923,7 @@ id r_totalcharges
 id radio
 id range_picker
 id receiyptno
+id recharg
 id recieved
 id recovery_search
 id recovery_spinner
@@ -2056,6 +2077,7 @@ id title
 id titleDividerNoCustom
 id title_template
 id today_button
+id toolbar
 id top
 id topPanel
 id topbar
@@ -2300,6 +2322,7 @@ layout month_trial_balance_item
 layout month_view_header
 layout mtrl_layout_snackbar
 layout mtrl_layout_snackbar_include
+layout nav_header
 layout nearest_list_item
 layout notification_action
 layout notification_action_tombstone
@@ -2356,15 +2379,18 @@ menu dropdown
 menu generic_grid_header_menu
 menu item_ledger_menu
 menu menu_main
+menu navigation_menu
 menu setting_menu
 mipmap ic_launcher
 mipmap ic_launcher_foreground
 mipmap ic_launcher_round
 string Cancel
+string Close
 string Item_group
 string Item_name
 string Item_price
 string Item_stock
+string Open
 string Recieved
 string abc_action_bar_home_description
 string abc_action_bar_up_description
@@ -2653,6 +2679,8 @@ style AppTheme
 style AppTheme_AppBarOverlay
 style AppTheme_NoActionBar
 style AppTheme_PopupOverlay
+style AppTheme2
+style AppThemeNoActionBar
 style Base_AlertDialog_AppCompat
 style Base_AlertDialog_AppCompat_Light
 style Base_Animation_AppCompat_Dialog
@@ -2885,6 +2913,8 @@ style RtlOverlay_Widget_AppCompat_Search_DropDown_Text
 style RtlOverlay_Widget_AppCompat_SearchView_MagIcon
 style RtlUnderlay_Widget_AppCompat_ActionButton
 style RtlUnderlay_Widget_AppCompat_ActionButton_Overflow
+style ScoreButtons
+style ScoreButtonstext
 style TextAppearance_AppCompat
 style TextAppearance_AppCompat_Body1
 style TextAppearance_AppCompat_Body2

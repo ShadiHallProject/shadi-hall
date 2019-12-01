@@ -328,6 +328,10 @@
         "source": "C:\\Users\\Billa Tiger\\.gradle\\caches\\transforms-2\\files-2.1\\74c318f7e8221893c9bc48d5a85bfe55\\res\\drawable\\mtrl_snackbar_background.xml"
     },
     {
+        "merged": "D:\\Android_Program\\ShadiHallProject\\FromGithub\\shadi-hall\\app\\build\\intermediates\\res\\merged\\debug\\layout_nav_header.xml.flat",
+        "source": "D:\\Android_Program\\ShadiHallProject\\FromGithub\\shadi-hall\\app\\src\\main\\res\\layout\\nav_header.xml"
+    },
+    {
         "merged": "D:\\Android_Program\\ShadiHallProject\\FromGithub\\shadi-hall\\app\\build\\intermediates\\res\\merged\\debug\\layout_month_picker_dialog.xml.flat",
         "source": "C:\\Users\\Billa Tiger\\.gradle\\caches\\transforms-2\\files-2.1\\3a2b34712667e1ba42ec92bffa57707c\\res\\layout\\month_picker_dialog.xml"
     },
@@ -998,6 +1002,10 @@
     {
         "merged": "D:\\Android_Program\\ShadiHallProject\\FromGithub\\shadi-hall\\app\\build\\intermediates\\res\\merged\\debug\\color_common_google_signin_btn_text_dark.xml.flat",
         "source": "C:\\Users\\Billa Tiger\\.gradle\\caches\\transforms-2\\files-2.1\\cbe3544fe9fd26223b6a7dcbaa4906cc\\res\\color\\common_google_signin_btn_text_dark.xml"
+    },
+    {
+        "merged": "D:\\Android_Program\\ShadiHallProject\\FromGithub\\shadi-hall\\app\\build\\intermediates\\res\\merged\\debug\\menu_navigation_menu.xml.flat",
+        "source": "D:\\Android_Program\\ShadiHallProject\\FromGithub\\shadi-hall\\app\\src\\main\\res\\menu\\navigation_menu.xml"
     },
     {
         "merged": "D:\\Android_Program\\ShadiHallProject\\FromGithub\\shadi-hall\\app\\build\\intermediates\\res\\merged\\debug\\drawable-xxhdpi-v4_abc_btn_radio_to_on_mtrl_000.png.flat",

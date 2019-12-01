@@ -8,6 +8,7 @@ import android.widget.Toast;
 
 public class Prefrence {
 
+    private static final String DRAWER_VISIBILTIY = "DRAWERVISIBLITY";
     String PREFS_FILENAME = "org.by9steps.shadihall.helper.Prefrence";
     String CLIENT_ID_SESSION = "client_id_session";
     String USER_RIGHTS_SESSION = "user_rights_session";
@@ -59,5 +60,15 @@ public class Prefrence {
 //    //public String getMYClientUserIDSession(){
 //        return prefs.getString("MYID", "0");
 //    }
-
+////////////////////set Variable for navdrawer
+public void setDrawerVisibiltiy(boolean ss){
+    MNotificationClass.ShowToastTem(context, "Set Client User ID::"+ss);
+    Log.e("IDDD",context.getClass().getName()+"IDDD::Set"+ss);
+    prefs.edit().putBoolean(this.DRAWER_VISIBILTIY, ss).apply();
+}
+    public boolean getDrawerVisibiltiy(){
+        boolean idd= prefs.getBoolean(DRAWER_VISIBILTIY,false);
+        Log.e("IDDD",context.getClass().getName()+"IDDD::Get"+idd);
+        return idd;
+    }
 }

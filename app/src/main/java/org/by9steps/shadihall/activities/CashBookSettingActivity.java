@@ -9,6 +9,7 @@ import android.widget.Switch;
 import android.widget.Toast;
 
 import org.by9steps.shadihall.R;
+import org.by9steps.shadihall.helper.ThemeProvider;
 import org.by9steps.shadihall.model.CBSetting;
 import java.util.List;
 
@@ -19,6 +20,7 @@ public class CashBookSettingActivity extends AppCompatActivity implements Compou
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        ThemeProvider.setThemeOfApp(this);
         setContentView(R.layout.activity_cash_book_setting);
 
         if (getSupportActionBar() != null) {

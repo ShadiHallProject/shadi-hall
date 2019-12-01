@@ -60,6 +60,7 @@ public class ViewDBAllData extends AppCompatActivity implements View.OnClickList
         setContentView(R.layout.activity_view_dball_data);
         linearLayout=findViewById(R.id.containerforbtn);
         addBtnTolinearylayout();
+
         recyclerView=findViewById(R.id.recyclerviewmgrid);
         getSupportActionBar().setTitle("View Data");
         showAlldata = findViewById(R.id.textviewShowdata);

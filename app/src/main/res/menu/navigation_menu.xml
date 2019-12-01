@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item android:id="@+id/edit_profile"
+
+        android:title="Edit Profile"/>
+    <item android:id="@+id/recharg"
+
+        android:title="Recharge"/>
+    <item android:id="@+id/baltrans"
+
+        android:title="Balance Transfer"/>
+
+</menu>

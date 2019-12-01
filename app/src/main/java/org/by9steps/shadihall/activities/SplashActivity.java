@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Environment;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -25,6 +26,12 @@ import org.by9steps.shadihall.helper.ViewDBAllData;
 import org.by9steps.shadihall.helper.refdb;
 import org.by9steps.shadihall.model.ProjectMenu;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.text.ParseException;
 import java.util.ArrayList;
 
@@ -99,6 +106,29 @@ public class SplashActivity extends AppCompatActivity {
                             startActivity(new Intent(SplashActivity.this, LoginActivity.class));
                             finish();
                         }
+//                        try {
+//                            File file=getDatabasePath("EasySoftDataFile.db");
+//                            Log.e("ddaaptSource",file.toString()+" is exist:"+file.exists());
+//
+//                           //File targetloc= getDir(Environment.getExternalStorageDirectory().getAbsolutePath());
+//                          //  File targetloc= getFilesDir();
+//                            File docsFolder = new File(getExternalFilesDir(Environment.DIRECTORY_MOVIES) + "");
+//                            if (!docsFolder.exists()) {
+//                                docsFolder.mkdir();
+//                            }
+//                            File ff=new File(docsFolder,"EasySoftDataFile");
+//                            //if(!ff.exists()){
+//                               // ff.mkdir();
+//                                 boolean creted=ff.mkdir();
+//                            Log.e("ddaaptDesti","File Created Status:"+creted);
+//                         //   }
+//                            Log.e("ddaaptDesti",ff.toString());
+//                            movefile(file,ff);
+//
+//                        }catch (Exception e){
+//                            e.printStackTrace();
+//                        }
+
                       //  startActivity(new Intent(SplashActivity.this, ViewDBAllData.class));
 
                     }
@@ -111,6 +141,22 @@ public class SplashActivity extends AppCompatActivity {
             }
         });
 //        Crashlytics.getInstance().crash();
+    }
+
+    private void movefile(File file, File targetloc) throws Exception {
+        InputStream in = new FileInputStream(file);
+        OutputStream out = new FileOutputStream(targetloc);
+
+        // Copy the bits from instream to outstream
+        byte[] buf = new byte[1024];
+        int len;
+
+        while ((len = in.read(buf)) > 0) {
+            out.write(buf, 0, len);
+        }
+
+        in.close();
+        out.close();
     }
 
 }

@@ -28,6 +28,7 @@ import com.android.volley.toolbox.StringRequest;
 
 import org.by9steps.shadihall.AppController;
 import org.by9steps.shadihall.R;
+import org.by9steps.shadihall.activities.MainActivity;
 import org.by9steps.shadihall.adapters.ProjectsListAdapter;
 import org.by9steps.shadihall.helper.ApiRefStrings;
 import org.by9steps.shadihall.helper.DatabaseHelper;
@@ -60,6 +61,11 @@ public class HomeFragment extends Fragment implements ProjectsListAdapter.OnItem
         // Required empty public constructor
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+     //   ((MainActivity)getActivity()).nv.setVisibility(View.GONE);
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,

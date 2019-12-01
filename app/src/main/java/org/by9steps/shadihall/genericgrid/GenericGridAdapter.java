@@ -17,6 +17,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import org.by9steps.shadihall.R;
+import org.by9steps.shadihall.helper.GenericGridColorSchema;
 
 import java.util.List;
 
@@ -25,7 +26,8 @@ public class GenericGridAdapter extends RecyclerView.Adapter {
     ///////////////////////////Defining Width Of Each Column TextView
 
     /////////////////////////////////////
-
+//////////////////////////Theme For Generic Grid
+    GenericGridColorSchema Themeproviderref;
     //////////////////////Each Text View Padding
     public static int txtpadl = 0, txtpadt = 0, txtpadr = 40, txtpadb = 0;
     List<ViewModeRef> list;
@@ -121,6 +123,7 @@ public class GenericGridAdapter extends RecyclerView.Adapter {
                     textView.setText(list.get(position).columns[i]);
                 //textView.setText(list.get(position).columns[i]);
                 headrow.textviewtext[i] = list.get(position).columns[i];
+               // textView.setTextColor();
                 textView.setPadding(txtpadl, txtpadt, txtpadr, txtpadb);
                 int txtwidth = ViewModeRef.eachColWidth[i] * ViewModeRef.MaxPxlEachCharTake;
                 if (txtwidth > ViewModeRef.MaxLimitForEachColWidth)
@@ -459,6 +462,7 @@ public class GenericGridAdapter extends RecyclerView.Adapter {
             super(itemView);
             rootview = itemView;
             linearLayout = itemView.findViewById(R.id.refseclayout);
+           // linearLayout.setBackgroundColor(Themeproviderref.get);
 //            listenerheaderrow = new View.OnClickListener() {
 //                @Override
 //                public void onClick(View view) {
