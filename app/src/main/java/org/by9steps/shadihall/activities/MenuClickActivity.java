@@ -140,7 +140,7 @@ public class MenuClickActivity extends AppCompatActivity implements CustomDialog
 
             }
             else if(message.equals("AddItemCategory")) {
-                MNotificationClass.ShowToastTem(this,"AddItemCategory");
+               // MNotificationClass.ShowToastTem(this,"AddItemCategory");
                 fragmentAddItemCategory AddItemCategory=new fragmentAddItemCategory();
                 getSupportFragmentManager().beginTransaction()
                         .add(R.id.menu_container,AddItemCategory)

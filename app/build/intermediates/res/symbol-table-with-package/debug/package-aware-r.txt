@@ -1515,6 +1515,8 @@ id btnDelete
 id btnEdit
 id btnPartPaymentCollection
 id btnPendingsBills
+id btnResturentPortationAdd
+id btnResturentPortationCancel
 id btnRunningBills
 id btnVechicleAdd
 id btnVechiclecancel
@@ -1528,6 +1530,8 @@ id btn_nearest
 id btn_night_booking
 id btn_print
 id btn_tree
+id btnaddPortation
+id btnaddTable
 id btnhorizontal1
 id btnhorizontal2
 id btnhorizontal3
@@ -2146,6 +2150,7 @@ id textview_title_totalPrice
 id threedotpopup
 id threedotpopupsaleedit
 id thursdayLabel
+id tietPortaionName
 id time
 id title
 id titleDividerNoCustom
@@ -2379,6 +2384,7 @@ layout fragment_section_list
 layout fragment_selected_date_bookings
 layout fragment_shadi_hall_home
 layout fragment_summerize_trail_bal
+layout fragment_table_portation
 layout fragment_trail_balance
 layout fragment_tree
 layout fragment_year_profit_loss
@@ -2439,6 +2445,7 @@ layout quantity_entry_dialog
 layout recovery_group_total
 layout recovery_list_item
 layout register_spinner_item
+layout resturent_dialog_add_portaion
 layout saleentrydialog
 layout salepur1fragment_part1gridview
 layout salepurfragrow

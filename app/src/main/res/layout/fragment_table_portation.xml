@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:weightSum="10">
+
+
+        <Button
+            android:id="@+id/btnaddPortation"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Add Portation"
+            android:textAllCaps="false"
+            android:layout_weight="5"
+            android:layout_margin="5dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="50dp"
+            android:background="@color/colorPrimary"/>
+
+        <Button
+            android:id="@+id/btnaddTable"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Add Table"
+            android:layout_weight="5"
+            android:textAllCaps="false"
+            android:layout_margin="5dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="50dp"
+            android:background="@color/colorPrimary"/>
+
+    </LinearLayout>
+
+    <HorizontalScrollView
+        android:layout_width="match_parent"
+        android:layout_height="20dp"
+        android:layout_marginTop="20dp"
+        android:fillViewport="true"
+        android:measureAllChildren="false"
+        android:scrollbars="none">
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+            <Button
+                android:id="@+id/btnhorizontal1"
+                android:layout_marginEnd="10dp"
+                android:text="   Grid View   "
+                android:background="@drawable/round_corner_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+            <Button
+                android:id="@+id/btnhorizontal2"
+                android:layout_marginEnd="10dp"
+                android:text="  Tree View    "
+                android:background="@drawable/round_corner_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+
+        </LinearLayout>
+
+    </HorizontalScrollView>
+
+    <FrameLayout
+        android:id="@+id/GVcontainer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+    </FrameLayout>
+
+
+</LinearLayout>

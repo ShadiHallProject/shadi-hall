@@ -60,15 +60,15 @@ public final class R {
     public static final class id {
         private id() {}
 
-        public static final int calendar_grid = 0x7f090096;
-        public static final int day_view_adapter_class = 0x7f090103;
-        public static final int title = 0x7f0902f1;
+        public static final int calendar_grid = 0x7f09009a;
+        public static final int day_view_adapter_class = 0x7f090107;
+        public static final int title = 0x7f0902f6;
     }
     public static final class layout {
         private layout() {}
 
-        public static final int month = 0x7f0c009d;
-        public static final int week = 0x7f0c00d7;
+        public static final int month = 0x7f0c009e;
+        public static final int week = 0x7f0c00d9;
     }
     public static final class string {
         private string() {}
