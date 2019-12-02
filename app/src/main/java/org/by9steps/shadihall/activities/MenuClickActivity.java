@@ -1,6 +1,7 @@
 package org.by9steps.shadihall.activities;
 
 import android.content.Intent;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -19,15 +20,18 @@ import org.by9steps.shadihall.R;
 import org.by9steps.shadihall.chartofaccountdialog.CustomDialogOnDismisListener;
 import org.by9steps.shadihall.chartofaccountdialog.Dialog2ForAddNewItemEntry;
 import org.by9steps.shadihall.chartofaccountdialog.DialogForAddNewItemEntry;
+import org.by9steps.shadihall.chartofaccountdialog.DialogResturentTableLayoutSetting;
 import org.by9steps.shadihall.chartofaccountdialog.VehicleBookingDialog;
 import org.by9steps.shadihall.chartofaccountdialog.customGroupDialog1;
 import org.by9steps.shadihall.fragments.AccountCustomGroup;
 import org.by9steps.shadihall.fragments.BalSheetFragment;
 import org.by9steps.shadihall.fragments.BookCalendarFragment;
 import org.by9steps.shadihall.fragments.CashBookFragment;
+import org.by9steps.shadihall.fragments.CashCollectionFragment;
 import org.by9steps.shadihall.fragments.ChartOfAccFragment;
 import org.by9steps.shadihall.fragments.DateBalSheetFragment;
 import org.by9steps.shadihall.fragments.DateProfitLossFragment;
+import org.by9steps.shadihall.fragments.FragmentResturent;
 import org.by9steps.shadihall.fragments.ListFragment;
 import org.by9steps.shadihall.fragments.MonthBalSheetFragment;
 import org.by9steps.shadihall.fragments.MonthTrialBalance;
@@ -52,12 +56,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class MenuClickActivity extends AppCompatActivity implements CustomDialogOnDismisListener {
+public class MenuClickActivity extends AppCompatActivity implements CustomDialogOnDismisListener
+        , DialogResturentTableLayoutSetting.onClickInterface{
 
     String currentDate;
     DatabaseHelper databaseHelper;
+    Prefrence prefrence;
     //////////////////////listener for Change
     ReportsFragment reportsFragment;
+    FragmentResturent ResturentFragObj;
+    CashCollectionFragment cashCollectionFragment;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -65,6 +73,7 @@ public class MenuClickActivity extends AppCompatActivity implements CustomDialog
         setContentView(R.layout.activity_menu_click);
 
         databaseHelper = new DatabaseHelper(this);
+        prefrence=new Prefrence(this);
 
         Date date = new Date();
         SimpleDateFormat curFormater = new SimpleDateFormat("yyyy-MM-dd");
@@ -207,6 +216,36 @@ public class MenuClickActivity extends AppCompatActivity implements CustomDialog
                         .add(R.id.menu_container, new MonthBalSheetFragment())
                         .commit();
             }
+            else if(message.equals("TableService")){
+//                Intent intent=new Intent(this,Resturent.class);
+//                startActivity(intent);
+                ResturentFragObj=new FragmentResturent();
+                getSupportFragmentManager().beginTransaction()
+                        .add(R.id.menu_container,ResturentFragObj)
+                        .commit();
+
+            }else if(message.equals("Test")) {
+                cashCollectionFragment=new CashCollectionFragment();
+                getSupportFragmentManager().beginTransaction()
+                        .add(R.id.menu_container,cashCollectionFragment)
+                        .commit();
+            }else if(message.equals("Timings")){
+
+                Bundle bundle=new Bundle();
+                bundle.putString("TableName","counterSale");
+                bundle.putString("BillAmount","0");
+                bundle.putString("SalePur1ID","0");
+                bundle.putString("TableSatus","counterSale");
+                bundle.putString("PortaionName","0");
+                bundle.putString("ClientID",prefrence.getClientIDSession());
+                bundle.putString("TableID","0");
+                Intent intent=new Intent(this, ResturentAddItemActivity.class);
+                intent.putExtras(bundle);
+                startActivity(intent);
+                finish();
+
+            }
+
 
 
 
@@ -280,5 +319,44 @@ public class MenuClickActivity extends AppCompatActivity implements CustomDialog
         customGroupDialog1 dialog1=new customGroupDialog1();
         dialog1.setArguments(bundle);
         dialog1.show(getSupportFragmentManager(),"TAG");
+    }
+
+    public void tableLayoutSetting(){
+        DialogResturentTableLayoutSetting dialog=new DialogResturentTableLayoutSetting();
+        dialog.show(getSupportFragmentManager(),"TAG");
+    }
+    //seeekbar update Table column
+    @Override
+    public void updateRecyclerView() {
+        ResturentFragObj.updateTableColumn();
+
+    }
+
+    //updatingCashcollectionRecyclerView;
+    public void updateCashcollectionRecyclerView(){
+        cashCollectionFragment.updateREcyclerView();
+    }
+
+
+
+    //Dialog update Table column
+    public void updateTableRecyclerView(){
+        ResturentFragObj.updateTableColumn();
+    }
+
+    //update Table column
+    //updatating while retruning to ResturentAddItemActivity
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if(requestCode == 1){
+            String returnString = data.getStringExtra("keyName");
+            ResturentFragObj.updateTableColumn();
+        }
+
+
+
     }
 }

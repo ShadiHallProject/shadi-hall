@@ -11,7 +11,6 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 
@@ -19,7 +18,6 @@ import org.by9steps.shadihall.R;
 import org.by9steps.shadihall.activities.GeneralLedgerActivity;
 import org.by9steps.shadihall.activities.MenuClickActivity;
 import org.by9steps.shadihall.helper.ApiRefStrings;
-import org.by9steps.shadihall.helper.MNotificationClass;
 import org.by9steps.shadihall.helper.Prefrence;
 import org.by9steps.shadihall.model.ProjectMenu;
 
@@ -65,7 +63,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter {
                         intent.putExtra("AcID","1");
                         mCtx.startActivity(intent);
                 }else {
-                    Intent intent = new Intent(mCtx,MenuClickActivity.class);
+                    Intent intent = new Intent(mCtx, MenuClickActivity.class);
                     intent.putExtra("title",menu.getMenuName());
                     intent.putExtra("message",menu.getPageOpen());
                     intent.putExtra("position",menu.getValuePass());

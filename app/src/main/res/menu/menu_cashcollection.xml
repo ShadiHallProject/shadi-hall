@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/action_EditBill"
+        android:orderInCategory="100"
+        android:title="Edit Bill"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_ShowColumn"
+        android:orderInCategory="100"
+        android:title="Show Column"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_ChangeStatus"
+        android:orderInCategory="100"
+        android:title="Change Status"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_OtherCollection"
+        android:orderInCategory="100"
+        android:title="Other Collection"
+        app:showAsAction="never" />
+
+</menu>

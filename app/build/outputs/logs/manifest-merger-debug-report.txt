@@ -1,20 +1,20 @@
 -- Merging decision tree log ---
 provider#org.by9steps.shadihall.helper.GenericFileProvider
-INJECTED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:94:9-102:20
+INJECTED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:95:9-103:20
 	android:grantUriPermissions
-		ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:98:13-47
+		ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:99:13-47
 	android:authorities
 		INJECTED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml
-		ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:96:13-64
+		ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:97:13-64
 	android:exported
-		ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:97:13-37
+		ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:98:13-37
 	android:name
-		ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:95:13-55
+		ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:96:13-55
 manifest
-ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:2:1-116:12
-INJECTED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:2:1-116:12
-INJECTED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:2:1-116:12
-INJECTED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:2:1-116:12
+ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:2:1-117:12
+INJECTED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:2:1-117:12
+INJECTED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:2:1-117:12
+INJECTED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:2:1-117:12
 MERGED from [com.android.support:multidex:1.0.3] C:\Users\User\.gradle\caches\transforms-2\files-2.1\a6f23c1e1f9078d41f61a9862df5b34b\AndroidManifest.xml:17:1-22:12
 MERGED from [com.fxn769:pix:1.2.5] C:\Users\User\.gradle\caches\transforms-2\files-2.1\284a3b4236b9fcb3af23d7d2992c5b54\AndroidManifest.xml:2:1-26:12
 MERGED from [com.android.support:design:28.0.0] C:\Users\User\.gradle\caches\transforms-2\files-2.1\71b6e34f7319c138ea5018fe6d713355\AndroidManifest.xml:17:1-24:12
@@ -97,27 +97,27 @@ MERGED from [com.crashlytics.sdk.android:crashlytics-core:2.7.0] C:\Users\User\.
 MERGED from [com.crashlytics.sdk.android:beta:1.2.10] C:\Users\User\.gradle\caches\transforms-2\files-2.1\e69a64655de6ac2db04d1d94ae7c73d4\AndroidManifest.xml:2:1-13:12
 MERGED from [com.crashlytics.sdk.android:answers:1.4.7] C:\Users\User\.gradle\caches\transforms-2\files-2.1\9235bbf095c7935a02303efaeaec74b7\AndroidManifest.xml:2:1-13:12
 MERGED from [io.fabric.sdk.android:fabric:1.4.8] C:\Users\User\.gradle\caches\transforms-2\files-2.1\8ff6a8130d7dca1683f4eb5d0692b3a2\AndroidManifest.xml:22:1-33:12
-INJECTED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:2:1-116:12
-INJECTED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:2:1-116:12
-INJECTED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:2:1-116:12
+INJECTED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:2:1-117:12
+INJECTED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:2:1-117:12
+INJECTED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:2:1-117:12
 	package
 		ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:4:5-37
 		INJECTED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml
 		INJECTED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml
 	android:versionName
 		INJECTED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml
-		ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:2:1-116:12
+		ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:2:1-117:12
 		INJECTED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml
 	xmlns:tools
 		ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:3:5-51
 	android:versionCode
 		INJECTED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml
-		ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:2:1-116:12
+		ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:2:1-117:12
 		INJECTED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml
 	xmlns:android
 		ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:2:11-69
 application
-ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:6:5-105:19
+ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:6:5-106:19
 MERGED from [com.fxn769:pix:1.2.5] C:\Users\User\.gradle\caches\transforms-2\files-2.1\284a3b4236b9fcb3af23d7d2992c5b54\AndroidManifest.xml:16:5-24:19
 MERGED from [com.fxn769:pix:1.2.5] C:\Users\User\.gradle\caches\transforms-2\files-2.1\284a3b4236b9fcb3af23d7d2992c5b54\AndroidManifest.xml:16:5-24:19
 MERGED from [com.android.support:design:28.0.0] C:\Users\User\.gradle\caches\transforms-2\files-2.1\71b6e34f7319c138ea5018fe6d713355\AndroidManifest.xml:22:5-20
@@ -242,144 +242,148 @@ activity#org.by9steps.shadihall.activities.SelectImagesActivity
 ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:21:9-69
 	android:name
 		ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:21:19-66
+activity#org.by9steps.shadihall.activities.ResturentAddItemActivity
+ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:22:9-72
+	android:name
+		ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:22:19-70
 activity#org.by9steps.shadihall.activities.BookingActivity
-ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:22:9-64
+ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:23:9-64
 	android:name
-		ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:22:19-61
+		ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:23:19-61
 activity#org.by9steps.shadihall.activities.MapsActivity
-ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:23:9-25:59
+ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:24:9-26:59
 	android:label
-		ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:25:13-56
+		ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:26:13-56
 	android:name
-		ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:24:13-52
+		ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:25:13-52
 activity#org.by9steps.shadihall.activities.EventCashBookActivity
-ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:26:9-70
+ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:27:9-70
 	android:name
-		ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:26:19-67
+		ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:27:19-67
 activity#org.by9steps.shadihall.activities.CashBookSettingActivity
-ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:35:9-72
+ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:36:9-72
 	android:name
-		ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:35:19-69
+		ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:36:19-69
 activity#org.by9steps.shadihall.activities.GeneralLedgerActivity
-ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:36:9-70
+ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:37:9-70
 	android:name
-		ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:36:19-67
+		ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:37:19-67
 activity#org.by9steps.shadihall.activities.ProfitLossActivity
-ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:37:9-39:77
+ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:38:9-40:77
 	android:configChanges
-		ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:39:13-74
+		ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:40:13-74
 	android:name
-		ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:38:13-58
+		ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:39:13-58
 activity#org.by9steps.shadihall.activities.BalSheetActivity
-ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:40:9-42:77
+ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:41:9-43:77
 	android:configChanges
-		ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:42:13-74
+		ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:43:13-74
 	android:name
-		ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:41:13-56
+		ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:42:13-56
 activity#org.by9steps.shadihall.activities.TrailBalanceActivity
-ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:43:9-45:77
+ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:44:9-46:77
 	android:configChanges
-		ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:45:13-74
+		ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:46:13-74
 	android:name
-		ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:44:13-60
+		ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:45:13-60
 activity#org.by9steps.shadihall.activities.ChaartOfAccAddActivity
-ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:47:9-49:77
+ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:48:9-50:77
 	android:configChanges
-		ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:49:13-74
+		ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:50:13-74
 	android:name
-		ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:48:13-62
+		ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:49:13-62
 activity#org.by9steps.shadihall.activities.CashCollectionActivity
-ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:50:9-52:77
+ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:51:9-53:77
 	android:configChanges
-		ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:52:13-74
+		ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:53:13-74
 	android:name
-		ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:51:13-62
+		ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:52:13-62
 activity#org.by9steps.shadihall.activities.OtpActivity
-ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:53:9-55:77
+ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:54:9-56:77
 	android:configChanges
-		ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:55:13-74
+		ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:56:13-74
 	android:name
-		ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:54:13-51
+		ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:55:13-51
 activity#org.by9steps.shadihall.activities.LoginActivity
-ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:56:9-58:77
+ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:57:9-59:77
 	android:configChanges
-		ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:58:13-74
+		ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:59:13-74
 	android:name
-		ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:57:13-53
+		ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:58:13-53
 activity#org.by9steps.shadihall.activities.SplashActivity
-ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:59:9-68:20
+ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:60:9-69:20
 	android:configChanges
-		ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:61:13-74
+		ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:62:13-74
 	android:theme
-		ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:62:13-56
+		ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:63:13-56
 	android:name
-		ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:60:13-54
+		ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:61:13-54
 intent-filter#action:name:android.intent.action.MAIN+category:name:android.intent.category.LAUNCHER
-ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:63:13-67:29
+ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:64:13-68:29
 action#android.intent.action.MAIN
-ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:64:17-69
+ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:65:17-69
 	android:name
-		ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:64:25-66
+		ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:65:25-66
 category#android.intent.category.LAUNCHER
-ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:66:17-77
+ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:67:17-77
 	android:name
-		ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:66:27-74
+		ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:67:27-74
 activity#org.by9steps.shadihall.activities.RegisterActivity
-ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:69:9-71:77
+ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:70:9-72:77
 	android:configChanges
-		ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:71:13-74
+		ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:72:13-74
 	android:name
-		ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:70:13-56
+		ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:71:13-56
 activity#org.by9steps.shadihall.activities.MenuClickActivity
-ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:72:9-75:57
+ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:73:9-76:57
 	android:windowSoftInputMode
-		ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:75:13-54
+		ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:76:13-54
 	android:configChanges
-		ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:74:13-74
+		ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:75:13-74
 	android:name
-		ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:73:13-57
+		ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:74:13-57
 activity#org.by9steps.shadihall.activities.DetailCalendarActivity
-ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:76:9-79:70
+ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:77:9-80:70
 	android:label
-		ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:79:13-67
+		ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:80:13-67
 	android:configChanges
-		ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:78:13-74
+		ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:79:13-74
 	android:name
-		ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:77:13-62
+		ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:78:13-62
 activity#org.by9steps.shadihall.activities.MainActivity
-ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:80:9-86:20
+ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:81:9-87:20
 	android:configChanges
-		ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:83:13-74
+		ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:84:13-74
 	android:theme
-		ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:81:13-55
+		ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:82:13-55
 	android:name
-		ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:82:13-52
+		ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:83:13-52
 meta-data#io.fabric.ApiKey
-ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:87:9-89:72
+ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:88:9-90:72
 	android:value
-		ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:89:13-69
+		ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:90:13-69
 	android:name
-		ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:88:13-44
+		ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:89:13-44
 meta-data#com.google.android.geo.API_KEY
-ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:91:9-93:55
+ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:92:9-94:55
 	android:value
-		ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:93:13-52
+		ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:94:13-52
 	android:name
-		ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:92:13-58
+		ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:93:13-58
 activity#com.theartofdev.edmodo.cropper.CropImageActivity
-ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:103:9-84
+ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:104:9-84
 	android:name
-		ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:103:19-82
+		ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:104:19-82
 activity#org.by9steps.shadihall.activities.ItemLedgerActivity
-ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:104:9-67
+ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:105:9-67
 	android:name
-		ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:104:19-64
+		ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:105:19-64
 uses-permission#android.permission.ACCESS_FINE_LOCATION
-ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:106:5-79
+ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:107:5-79
 	android:name
-		ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:106:22-76
+		ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:107:22-76
 uses-permission#android.permission.INTERNET
-ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:107:5-67
+ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:108:5-67
 MERGED from [com.google.android.gms:play-services-maps:16.1.0] C:\Users\User\.gradle\caches\transforms-2\files-2.1\bf2e03d95e216939cad46a36ef3f6cc1\AndroidManifest.xml:24:5-67
 MERGED from [com.google.android.gms:play-services-maps:16.1.0] C:\Users\User\.gradle\caches\transforms-2\files-2.1\bf2e03d95e216939cad46a36ef3f6cc1\AndroidManifest.xml:24:5-67
 MERGED from [com.google.firebase:firebase-database-connection:16.0.1] C:\Users\User\.gradle\caches\transforms-2\files-2.1\7b931f36f674b7b1b81be962a659bd0a\AndroidManifest.xml:8:5-67
@@ -405,33 +409,33 @@ MERGED from [com.crashlytics.sdk.android:answers:1.4.7] C:\Users\User\.gradle\ca
 MERGED from [io.fabric.sdk.android:fabric:1.4.8] C:\Users\User\.gradle\caches\transforms-2\files-2.1\8ff6a8130d7dca1683f4eb5d0692b3a2\AndroidManifest.xml:29:5-67
 MERGED from [io.fabric.sdk.android:fabric:1.4.8] C:\Users\User\.gradle\caches\transforms-2\files-2.1\8ff6a8130d7dca1683f4eb5d0692b3a2\AndroidManifest.xml:29:5-67
 	android:name
-		ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:107:22-64
+		ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:108:22-64
 uses-permission#android.permission.READ_CONTACTS
-ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:108:5-72
+ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:109:5-72
 	android:name
-		ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:108:22-69
+		ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:109:22-69
 uses-permission#android.permission.READ_EXTERNAL_STORAGE
-ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:109:5-80
+ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:110:5-80
 MERGED from [com.fxn769:pix:1.2.5] C:\Users\User\.gradle\caches\transforms-2\files-2.1\284a3b4236b9fcb3af23d7d2992c5b54\AndroidManifest.xml:12:5-80
 MERGED from [com.fxn769:pix:1.2.5] C:\Users\User\.gradle\caches\transforms-2\files-2.1\284a3b4236b9fcb3af23d7d2992c5b54\AndroidManifest.xml:12:5-80
 	android:name
-		ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:109:22-77
+		ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:110:22-77
 uses-permission#android.permission.WRITE_EXTERNAL_STORAGE
-ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:110:5-81
+ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:111:5-81
 MERGED from [com.fxn769:pix:1.2.5] C:\Users\User\.gradle\caches\transforms-2\files-2.1\284a3b4236b9fcb3af23d7d2992c5b54\AndroidManifest.xml:14:5-81
 MERGED from [com.fxn769:pix:1.2.5] C:\Users\User\.gradle\caches\transforms-2\files-2.1\284a3b4236b9fcb3af23d7d2992c5b54\AndroidManifest.xml:14:5-81
 	android:name
-		ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:110:22-78
+		ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:111:22-78
 uses-permission#android.permission.CAMERA
-ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:111:5-65
+ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:112:5-65
 MERGED from [com.fxn769:pix:1.2.5] C:\Users\User\.gradle\caches\transforms-2\files-2.1\284a3b4236b9fcb3af23d7d2992c5b54\AndroidManifest.xml:11:5-65
 MERGED from [com.fxn769:pix:1.2.5] C:\Users\User\.gradle\caches\transforms-2\files-2.1\284a3b4236b9fcb3af23d7d2992c5b54\AndroidManifest.xml:11:5-65
 MERGED from [io.fotoapparat.fotoapparat:library:2.3.1] C:\Users\User\.gradle\caches\transforms-2\files-2.1\567a92909c85e177ea6e4ac08644d64a\AndroidManifest.xml:9:5-65
 MERGED from [io.fotoapparat.fotoapparat:library:2.3.1] C:\Users\User\.gradle\caches\transforms-2\files-2.1\567a92909c85e177ea6e4ac08644d64a\AndroidManifest.xml:9:5-65
 	android:name
-		ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:111:22-62
+		ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:112:22-62
 uses-permission#android.permission.ACCESS_NETWORK_STATE
-ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:112:5-79
+ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:113:5-79
 MERGED from [com.google.android.gms:play-services-maps:16.1.0] C:\Users\User\.gradle\caches\transforms-2\files-2.1\bf2e03d95e216939cad46a36ef3f6cc1\AndroidManifest.xml:23:5-79
 MERGED from [com.google.android.gms:play-services-maps:16.1.0] C:\Users\User\.gradle\caches\transforms-2\files-2.1\bf2e03d95e216939cad46a36ef3f6cc1\AndroidManifest.xml:23:5-79
 MERGED from [com.google.android.gms:play-services-measurement-api:16.4.0] C:\Users\User\.gradle\caches\transforms-2\files-2.1\3f344999270a7b349525538f6725c52b\AndroidManifest.xml:23:5-79
@@ -445,15 +449,15 @@ MERGED from [com.google.android.gms:play-services-measurement-impl:16.4.0] C:\Us
 MERGED from [com.google.android.gms:play-services-measurement-sdk-api:16.4.0] C:\Users\User\.gradle\caches\transforms-2\files-2.1\a80d0c7d6a075e29d2ee3927d8f2c08a\AndroidManifest.xml:24:5-79
 MERGED from [com.google.android.gms:play-services-measurement-sdk-api:16.4.0] C:\Users\User\.gradle\caches\transforms-2\files-2.1\a80d0c7d6a075e29d2ee3927d8f2c08a\AndroidManifest.xml:24:5-79
 	android:name
-		ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:112:22-76
+		ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:113:22-76
 uses-permission#android.permission.ACCESS_COARSE_LOCATION
-ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:113:5-81
+ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:114:5-81
 	android:name
-		ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:113:22-78
+		ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:114:22-78
 uses-permission#android.permission.CALL_PHONE
-ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:114:5-69
+ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:115:5-69
 	android:name
-		ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:114:22-66
+		ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:115:22-66
 uses-sdk
 INJECTED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml reason: use-sdk injection requested
 INJECTED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml
@@ -635,11 +639,11 @@ INJECTED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\Andr
 		ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml
 		INJECTED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml
 meta-data#android.support.FILE_PROVIDER_PATHS
-ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:99:13-101:58
+ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:100:13-102:58
 	android:resource
-		ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:101:17-55
+		ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:102:17-55
 	android:name
-		ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:100:17-67
+		ADDED from C:\Users\User\AndroidStudioProjects\newSHadiHall\app\src\main\AndroidManifest.xml:101:17-67
 uses-permission#android.permission.VIBRATE
 ADDED from [com.fxn769:pix:1.2.5] C:\Users\User\.gradle\caches\transforms-2\files-2.1\284a3b4236b9fcb3af23d7d2992c5b54\AndroidManifest.xml:13:5-66
 	android:name

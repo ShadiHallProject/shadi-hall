@@ -8,6 +8,26 @@ import org.by9steps.shadihall.model.item3name.UpdatedDate;
 
 public class Salepur1 {
 
+    private String data;
+
+    public String getData() {
+        return data;
+    }
+
+    public void setData(String data) {
+        this.data = data;
+    }
+
+    public String getBillSatus() {
+        return BillSatus;
+    }
+
+    public void setBillSatus(String billSatus) {
+        BillSatus = billSatus;
+    }
+
+    private String BillSatus;
+
     @SerializedName("ID")
     @Expose
     private int iD;

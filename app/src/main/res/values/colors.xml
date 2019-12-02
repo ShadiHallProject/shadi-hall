@@ -39,4 +39,11 @@
     <color name="textcolorprimasdftext">#8B8B5A</color>
 
     <color name="textcolorprimasdfbtns">#D1EE45</color>
+
+
+
+    <color name="redColor">#FF0000</color>
+    <color name="greenColor">#1A993C</color>
+    <color name="lightGreenColor">#A4D1A2</color>
+    <color name="white">#FFFFFF</color>
 </resources>

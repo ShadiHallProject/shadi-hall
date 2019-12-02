@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="25dp">
+    <Button
+        android:id="@+id/btnAddItem"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Add Item"
+        android:textAllCaps="false"
+        android:background="@color/greenColor"
+        android:layout_marginTop="20dp"/>
+
+    <Button
+        android:id="@+id/btnCashCollection"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Cash Collection"
+        android:textAllCaps="false"
+        android:background="@color/gridbottombg"
+        android:layout_marginTop="20dp"/>
+    <Button
+        android:id="@+id/btnPartPaymentCollection"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Part Payment Collection"
+        android:textAllCaps="false"
+        android:background="@color/colorAccent"
+        android:layout_marginTop="20dp"/>
+
+    <Button
+        android:id="@+id/btnBillPrint"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Bill Print"
+        android:textAllCaps="false"
+        android:background="@color/lightGreenColor"
+        android:layout_marginTop="20dp"/>
+
+</LinearLayout>

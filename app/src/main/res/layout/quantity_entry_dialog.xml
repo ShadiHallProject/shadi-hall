@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <TextView
+        android:id="@+id/label_itemName"
+        android:padding="8dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Item Name"
+        android:textSize="18sp"
+        android:gravity="center"/>
+
+    <LinearLayout
+        android:gravity="center"
+        android:weightSum="10"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <TextView
+            android:textSize="18sp"
+            android:layout_weight="2"
+            android:text="Qty : "
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"/>
+        <EditText
+
+            android:id="@+id/label_itemQuantity"
+            android:inputType="numberDecimal"
+            android:maxLines="1"
+            android:layout_weight="3"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:textSize="18sp"/>
+    </LinearLayout>
+    <LinearLayout
+        android:gravity="center"
+        android:weightSum="10"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <TextView
+            android:textSize="18sp"
+            android:layout_weight="2"
+            android:text="Price:"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"/>
+        <EditText
+
+            android:id="@+id/label_itemPrice"
+            android:maxLines="1"
+            android:inputType="numberDecimal"
+            android:layout_weight="3"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:textSize="18sp"/>
+    </LinearLayout>
+    <LinearLayout
+        android:gravity="center"
+        android:weightSum="10"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp">
+        <TextView
+            android:textSize="18sp"
+            android:layout_weight="2"
+            android:textStyle="bold"
+            android:text="Total:"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"/>
+        <TextView
+            android:id="@+id/label_totalPrice"
+            android:clickable="false"
+            android:text="0.00"
+            android:maxLines="1"
+            android:layout_weight="3"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:textSize="18sp"
+            android:gravity="center"
+            />
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:weightSum="10"
+        android:gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <Button
+            android:id="@+id/btnCancleOrder1"
+            android:background="@color/colorPrimary"
+            android:layout_margin="8dp"
+            android:text="Cancel"
+            android:layout_weight="3"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"/>
+        <Button
+            android:id="@+id/btnAddOrder"
+            android:background="@color/colorPrimary"
+            android:layout_margin="8dp"
+            android:text="Add Order"
+            android:layout_weight="3"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"/>
+    </LinearLayout>
+
+</LinearLayout>

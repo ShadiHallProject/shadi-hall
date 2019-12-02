@@ -34,6 +34,7 @@ import org.by9steps.shadihall.model.ProjectMenu;
 import org.by9steps.shadihall.model.Projects;
 import org.by9steps.shadihall.model.Recovery;
 import org.by9steps.shadihall.model.Reports;
+import org.by9steps.shadihall.model.Restaurant2Table;
 import org.by9steps.shadihall.model.Spinner;
 import org.by9steps.shadihall.model.Summerize;
 import org.by9steps.shadihall.model.Vehicle1Group;
@@ -42,6 +43,9 @@ import org.by9steps.shadihall.model.Vehicle3Booking;
 import org.by9steps.shadihall.model.Voucher;
 import org.by9steps.shadihall.model.item3name.Item3Name_;
 import org.by9steps.shadihall.model.item3name.UpdatedDate;
+import org.by9steps.shadihall.model.joinQueryCashCollection;
+import org.by9steps.shadihall.model.joinQueryForResturent;
+import org.by9steps.shadihall.model.joinQueryForResturentAddOrder;
 import org.by9steps.shadihall.model.salepur1data.SPDate;
 import org.by9steps.shadihall.model.salepur1data.Salepur1;
 import org.by9steps.shadihall.model.salepur2data.SalePur2;
@@ -64,7 +68,7 @@ public class DatabaseHelper extends SQLiteAssetHelper {
     private static final int DATABASE_VERSION = 1;
 
     // Database Name
-    private static final String DATABASE_NAME = "EasySoftDataFile.db";
+    private static final String DATABASE_NAME = "ShadiHallUser.db";
 
     // Table Names
     private static final String TABLE_Account3Name = "Account3Name";
@@ -1527,6 +1531,29 @@ public class DatabaseHelper extends SQLiteAssetHelper {
 
         return mSummerize;
     }
+    public List<joinQueryCashCollection> getDataFromJoinQueryCashCollection(String query){
+        Log.e("amir", "getDataFromJoinQueryCashCollection: " +query );
+        List<joinQueryCashCollection> list=new ArrayList<>();
+        SQLiteDatabase database=this.getReadableDatabase();
+        Cursor c=database.rawQuery(query,null);
+        if(c.moveToFirst()){
+            do{
+                joinQueryCashCollection mylist=new joinQueryCashCollection();
+                mylist.setClientID(c.getString(c.getColumnIndex("ClientID")));
+                mylist.setBillNo(c.getString(c.getColumnIndex("BillNo")));
+                mylist.setEntryType(c.getString(c.getColumnIndex("EntryType")));
+                mylist.setBillAmount(c.getString(c.getColumnIndex("BillAmount")));
+                mylist.setReceived(c.getString(c.getColumnIndex("Received")));
+                mylist.setBillBalance(c.getString(c.getColumnIndex("BillBalance")));
+                mylist.setBillStatus(c.getString(c.getColumnIndex("BillStatus")));
+                mylist.setRemarks(c.getString(c.getColumnIndex("Remarks")));
+                mylist.setSPDate(c.getString(c.getColumnIndex("SPDate")));
+                mylist.setUser(c.getString(c.getColumnIndex("User")));
+                list.add(mylist);
+            }while (c.moveToNext());
+        }
+        return list;
+    }
 
     //Get MonthTB
     public List<MonthTb> getMonthTB(String query) {
@@ -1729,6 +1756,155 @@ public class DatabaseHelper extends SQLiteAssetHelper {
 
         return mAccount1Type;
     }
+
+    public List<String> getPortationName(String query){
+        List<String> list=new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor c = db.rawQuery(query, null);
+        Log.e("Restaurant1Potion", String.valueOf(c.moveToFirst()));
+
+        if (c.moveToFirst()) {
+            do {
+                String temp= c.getString(c.getColumnIndex("PotionName"));
+                list.add(temp);
+            } while (c.moveToNext());
+        }
+        return list;
+    }
+
+    public List<joinQueryForResturent> GetDataFromjoinQueryForResturent(String query){
+        Log.e("amir", "joinQueryForResturent: " +query );
+        List<joinQueryForResturent> joinQueryForResturentList=new ArrayList<>();
+        SQLiteDatabase database=this.getReadableDatabase();
+        Cursor c=database.rawQuery(query,null);
+        if(c.moveToFirst()){
+            do{
+                joinQueryForResturent mylist=new joinQueryForResturent();
+                mylist.setTableName(c.getString(c.getColumnIndex("TableName")));
+                mylist.setPotionName(c.getString(c.getColumnIndex("PotionName")));
+                mylist.setBillAmount(c.getString(c.getColumnIndex("BillAmount")));
+                mylist.setTableStatus(c.getString(c.getColumnIndex("TableStatus"))) ;
+                mylist.setClientID(c.getString(c.getColumnIndex("ClientID")));
+                mylist.setSalPur1ID(c.getString(c.getColumnIndex("SalPur1ID")));
+                joinQueryForResturentList.add(mylist);
+            }while (c.moveToNext());
+        }
+        return joinQueryForResturentList;
+    }
+
+    public List<joinQueryForResturentAddOrder> GetDataFromjoinQueryForResturentAddOrder(String query){
+        Log.e("amir", "joinQueryForResturent: " +query );
+        List<joinQueryForResturentAddOrder> joinQueryForResturentAddOrderList=new ArrayList<>();
+        SQLiteDatabase database=this.getReadableDatabase();
+        Cursor c=database.rawQuery(query,null);
+        if(c.moveToFirst()){
+            do{
+                joinQueryForResturentAddOrder mylist=new joinQueryForResturentAddOrder();
+                mylist.setItem2GroupID(c.getString(0));
+                mylist.setItem2GroupName(c.getString(1));
+                mylist.setItem3NameID(c.getString(2));
+                mylist.setItemName(c.getString(3)); ;
+                mylist.setSalePrice(c.getString(4));
+                mylist.setStock(c.getString(5));
+                mylist.setItemStatus(c.getString(6));
+                mylist.setItemType(c.getString(7)); ;
+                mylist.setClientID(c.getString(8));
+                joinQueryForResturentAddOrderList.add(mylist);
+            }while (c.moveToNext());
+        }
+        return joinQueryForResturentAddOrderList;
+    }
+    public List<String> getItem2GroupName(String query){
+        List<String> list=new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor c = db.rawQuery(query, null);
+        Log.e("Item2Group", String.valueOf(c.moveToFirst()));
+
+        if (c.moveToFirst()) {
+            do {
+                String temp= c.getString(c.getColumnIndex("Item2GroupName"));
+                list.add(temp);
+            } while (c.moveToNext());
+        }
+        return list;
+    }
+
+    public void deleteRestaurant2Table() {
+        Log.e("delete", "deleteRestaurant2Table: delete fun " );
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.execSQL("DELETE FROM Restaurant2Table");
+        Log.e("delete", "deleteRestaurant2Table: delete fun execute " );
+    }
+    public long createRestaurant2Table(Restaurant2Table restaurant2Table) {
+        Log.d("aaaaaaaaaaaaa", "createRestaurant2Table: fun1");
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+
+        Log.d("aaaaaaaaaaaaa", "createRestaurant2Table: fun2");
+
+        values.put("TableID", restaurant2Table.getTableID());
+        values.put("PotionID", restaurant2Table.getPotionID());
+        values.put("TableDescription", restaurant2Table.getTableDescription());
+        values.put("TableStatus", restaurant2Table.getTableStatus());
+        values.put("ClientID", restaurant2Table.getClientID());
+        values.put("ClientID", restaurant2Table.getClientID());
+        values.put("ClientUserID", restaurant2Table.getClientUserID());
+        values.put("SysCode", restaurant2Table.getSysCode());
+        values.put("UpdatedDate", restaurant2Table.getUpdatedDate());
+
+        Log.d("aaaaaaaaaaaaa", "createRestaurant2Table: fun3");
+        // insert row
+        return db.insert("Restaurant2Table", null, values);
+    }
+
+    public int updateSalePur1BillAmount(int salepur1id,int billAmount){
+
+        SQLiteDatabase db=this.getWritableDatabase();
+        ContentValues values=new ContentValues();
+        values.put("BillAmount",billAmount);
+        int status=db.update(refdb.SlePur1.TABLE_SalePur1,values,"SalePur1ID = '"+salepur1id+"'",null);
+        return  status;
+
+
+    }
+    public int updateSalePur1BillSatus(String salepur1id,String  BillSatus,String ClientID){
+
+        SQLiteDatabase db=this.getWritableDatabase();
+        ContentValues values=new ContentValues();
+        values.put("BillStatus",BillSatus);
+        int status=db.update(refdb.SlePur1.TABLE_SalePur1,values,"SalePur1ID = '"+ salepur1id +"' AND ClientID = '"+ ClientID +"'",null);
+        return  status;
+
+
+    }
+    public int updateResturent2TableSalePur1ID(String tableName, int newSalepur1ID,String TableStatus,String TableID ){
+
+        Log.d("amir", "updateResturent2TableSalePur1ID: "+newSalepur1ID+ " "+TableID+ "  "+tableName);
+        SQLiteDatabase db=this.getWritableDatabase();
+        ContentValues values=new ContentValues();
+        values.put("SalPur1ID",newSalepur1ID);
+        values.put("TableStatus",TableStatus);
+
+        //int status=db.update("Restaurant2Table",values,"TableID = '"+TableID+"' AND TableName = '"+tableName+"'",null);
+        int status=db.update("Restaurant2Table",values,"TableName = '"+tableName+"'",null);
+        return  status;
+
+
+    }
+    public int updateResturent2TableTableStatus(String tableName, String Salepur1ID,String TableStatus,String ClientID,String TableID ){
+
+        SQLiteDatabase db=this.getWritableDatabase();
+        ContentValues values=new ContentValues();
+        values.put("TableStatus",TableStatus);
+
+        int status=db.update("Restaurant2Table",values,"TableID = '"+TableID+"' AND TableName = '"+tableName+"' AND ClientID = '"+ClientID+"'",null);
+        return  status;
+
+
+    }
+
+
+
 
     //Get Entry ProfitLoss
     public List<ProfitLoss> getProfitLoss(String query) {
@@ -2958,7 +3134,8 @@ spinners.add(itemLedger);
 
         values.put(refdb.SlePur1.KEY_1, salepur1.getSalePur1ID());
         values.put(refdb.SlePur1.KEY_2, salepur1.getEntryType());
-        values.put(refdb.SlePur1.KEY_3, salepur1.getSPDate().getDate());
+        //  values.put(refdb.SlePur1.KEY_3, salepur1.getSPDate().getDate());
+        values.put(refdb.SlePur1.KEY_3, salepur1.getData());
         values.put(refdb.SlePur1.KEY_4, salepur1.getAcNameID());
         values.put(refdb.SlePur1.KEY_5, salepur1.getRemarks());
         values.put(refdb.SlePur1.KEY_6, salepur1.getClientID());
@@ -2968,6 +3145,7 @@ spinners.add(itemLedger);
         values.put(refdb.SlePur1.KEY_10, salepur1.getUpdatedDate().getDate());
         values.put(refdb.SlePur1.KEY_11, salepur1.getNameOfPerson());
         values.put(refdb.SlePur1.KEY_12, salepur1.getPayAfterDay());
+        values.put("BillStatus", salepur1.getBillSatus());
 
         // insert row
         return db.insert(refdb.SlePur1.TABLE_SalePur1, null, values);
