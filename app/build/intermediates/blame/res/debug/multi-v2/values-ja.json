@@ -1,10 +1,10 @@
 {
     "logs": [
         {
-            "outputFile": "D:\\Android_Program\\ShadiHallProject\\AmirResturent_2_12_2019\\shadi-hall\\app\\build\\intermediates\\incremental\\mergeDebugResources\\merged.dir\\values-ja\\values-ja.xml",
+            "outputFile": "C:\\Users\\User\\AndroidStudioProjects\\newSHadiHall\\app\\build\\intermediates\\incremental\\mergeDebugResources\\merged.dir\\values-ja\\values-ja.xml",
             "map": [
                 {
-                    "source": "C:\\Users\\Billa Tiger\\.gradle\\caches\\transforms-2\\files-2.1\\9801a48a29697d9a6282e769cf940fbc\\res\\values-ja\\values.xml",
+                    "source": "C:\\Users\\User\\.gradle\\caches\\transforms-2\\files-2.1\\b0b707fa0c59dcfd88b54b387f47439d\\res\\values-ja\\values.xml",
                     "from": {
                         "startLines": "4,5",
                         "startColumns": "0,0",
@@ -21,7 +21,7 @@
                     }
                 },
                 {
-                    "source": "C:\\Users\\Billa Tiger\\.gradle\\caches\\transforms-2\\files-2.1\\dbcb50003ab1acebf3f36f6b1726ca5f\\res\\values-ja\\values-ja.xml",
+                    "source": "C:\\Users\\User\\.gradle\\caches\\transforms-2\\files-2.1\\741f0e8fb45b24f4950a800a5fb2d928\\res\\values-ja\\values-ja.xml",
                     "from": {
                         "startLines": "4",
                         "startColumns": "4",
@@ -38,7 +38,7 @@
                     }
                 },
                 {
-                    "source": "C:\\Users\\Billa Tiger\\.gradle\\caches\\transforms-2\\files-2.1\\c3e9abbed6f89c95458b0cb39e938398\\res\\values-ja\\values-ja.xml",
+                    "source": "C:\\Users\\User\\.gradle\\caches\\transforms-2\\files-2.1\\242ec924a769ea01f0a311247a10d62e\\res\\values-ja\\values-ja.xml",
                     "from": {
                         "startLines": "2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29",
                         "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4",
@@ -55,24 +55,7 @@
                     }
                 },
                 {
-                    "source": "C:\\Users\\Billa Tiger\\.gradle\\caches\\transforms-2\\files-2.1\\99be6b3b3fc947e2b4c8d75a21399c42\\res\\values-ja\\values-ja.xml",
-                    "from": {
-                        "startLines": "2",
-                        "startColumns": "4",
-                        "startOffsets": "55",
-                        "endColumns": "100",
-                        "endOffsets": "151"
-                    },
-                    "to": {
-                        "startLines": "51",
-                        "startColumns": "4",
-                        "startOffsets": "5470",
-                        "endColumns": "100",
-                        "endOffsets": "5566"
-                    }
-                },
-                {
-                    "source": "C:\\Users\\Billa Tiger\\.gradle\\caches\\transforms-2\\files-2.1\\cbe3544fe9fd26223b6a7dcbaa4906cc\\res\\values-ja\\values.xml",
+                    "source": "C:\\Users\\User\\.gradle\\caches\\transforms-2\\files-2.1\\c9ab98651e2c8358bb0f4526a49bcbdb\\res\\values-ja\\values.xml",
                     "from": {
                         "startLines": "4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20",
                         "startColumns": "0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0",
@@ -89,7 +72,24 @@
                     }
                 },
                 {
-                    "source": "C:\\Users\\Billa Tiger\\.gradle\\caches\\transforms-2\\files-2.1\\3b9652d433936ac7d52f4e0e782fef54\\res\\values-ja\\values.xml",
+                    "source": "C:\\Users\\User\\.gradle\\caches\\transforms-2\\files-2.1\\d9a724e2954b249641b252562f6f18cf\\res\\values-ja\\values-ja.xml",
+                    "from": {
+                        "startLines": "2",
+                        "startColumns": "4",
+                        "startOffsets": "55",
+                        "endColumns": "100",
+                        "endOffsets": "151"
+                    },
+                    "to": {
+                        "startLines": "51",
+                        "startColumns": "4",
+                        "startOffsets": "5470",
+                        "endColumns": "100",
+                        "endOffsets": "5566"
+                    }
+                },
+                {
+                    "source": "C:\\Users\\User\\.gradle\\caches\\transforms-2\\files-2.1\\b0423b719a213824bf54a88e4703cc9a\\res\\values-ja\\values.xml",
                     "from": {
                         "startLines": "4",
                         "startColumns": "0",

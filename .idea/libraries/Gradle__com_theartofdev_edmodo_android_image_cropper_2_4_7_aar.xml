@@ -1,12 +1,10 @@
 <component name="libraryTable">
   <library name="Gradle: com.theartofdev.edmodo:android-image-cropper:2.4.7@aar">
     <CLASSES>
-      <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/5a4e977458812fd2b336c13c5a0fa722/jars/classes.jar!/" />
-      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/5a4e977458812fd2b336c13c5a0fa722/res" />
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/70f65a807e6a9d108f08fa118411f2d3/jars/classes.jar!/" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/70f65a807e6a9d108f08fa118411f2d3/res" />
     </CLASSES>
-    <JAVADOC>
-      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.theartofdev.edmodo/android-image-cropper/2.4.7/6e86ca3599e2b5b26f82f52b5611ec4ade81a565/android-image-cropper-2.4.7-javadoc.jar!/" />
-    </JAVADOC>
+    <JAVADOC />
     <SOURCES>
       <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.theartofdev.edmodo/android-image-cropper/2.4.7/50a7eea01adac2df650ae8fa88ca8fbc50b0a187/android-image-cropper-2.4.7-sources.jar!/" />
     </SOURCES>
