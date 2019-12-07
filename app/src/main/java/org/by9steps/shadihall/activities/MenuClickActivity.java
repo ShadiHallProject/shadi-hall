@@ -43,6 +43,7 @@ import org.by9steps.shadihall.fragments.SummerizeTrailBalFragment;
 import org.by9steps.shadihall.fragments.TrailBalanceFragment;
 import org.by9steps.shadihall.fragments.VehicleBookingFragment;
 import org.by9steps.shadihall.fragments.YearProfitLossFragment;
+import org.by9steps.shadihall.fragments.fargmentTableAndPortation;
 import org.by9steps.shadihall.fragments.fragmentAddItem;
 import org.by9steps.shadihall.fragments.fragmentAddItemCategory;
 import org.by9steps.shadihall.helper.DatabaseHelper;
@@ -66,6 +67,8 @@ public class MenuClickActivity extends AppCompatActivity implements CustomDialog
     ReportsFragment reportsFragment;
     FragmentResturent ResturentFragObj;
     CashCollectionFragment cashCollectionFragment;
+    fargmentTableAndPortation objTableAndPortation;
+    fragmentAddItem fragmentAddItem;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -132,10 +135,10 @@ public class MenuClickActivity extends AppCompatActivity implements CustomDialog
                 bundle.putString("AddItemMessage",message);
                 bundle.putString("AddItemPossition",ValuePass);
 
-                fragmentAddItem fragment=new fragmentAddItem();
-                fragment.setArguments(bundle);
+                fragmentAddItem=new fragmentAddItem();
+                fragmentAddItem.setArguments(bundle);
                 getSupportFragmentManager().beginTransaction()
-                        .add(R.id.menu_container,fragment)
+                        .add(R.id.menu_container,fragmentAddItem)
                         .commit();
 
             }
@@ -217,19 +220,26 @@ public class MenuClickActivity extends AppCompatActivity implements CustomDialog
                         .commit();
             }
             else if(message.equals("TableService")){
-//                Intent intent=new Intent(this,Resturent.class);
-//                startActivity(intent);
                 ResturentFragObj=new FragmentResturent();
                 getSupportFragmentManager().beginTransaction()
                         .add(R.id.menu_container,ResturentFragObj)
                         .commit();
 
-            }else if(message.equals("Test")) {
+            }else if(message.equals("CashCollection")) {
                 cashCollectionFragment=new CashCollectionFragment();
                 getSupportFragmentManager().beginTransaction()
                         .add(R.id.menu_container,cashCollectionFragment)
                         .commit();
-            }else if(message.equals("Timings")){
+
+
+
+            }else  if(message.equals("AddTables")){
+                objTableAndPortation=new fargmentTableAndPortation();
+                getSupportFragmentManager().beginTransaction()
+                        .add(R.id.menu_container,objTableAndPortation)
+                        .commit();
+            }
+            else if(message.equals("CounterSales")){
 
                 Bundle bundle=new Bundle();
                 bundle.putString("TableName","counterSale");
@@ -244,6 +254,8 @@ public class MenuClickActivity extends AppCompatActivity implements CustomDialog
                 startActivity(intent);
                 finish();
 
+            }else if(message.equals("KitchenScreen")){
+                MNotificationClass.ShowToastTem(this,"KitchenScreen");
             }
 
 
@@ -356,7 +368,13 @@ public class MenuClickActivity extends AppCompatActivity implements CustomDialog
             ResturentFragObj.updateTableColumn();
         }
 
+    }
 
+    public void updateTableGrid(){
+        objTableAndPortation.updatefun();
+    }
 
+    public void updateItemDGrid(){
+        fragmentAddItem.updateGridView();
     }
 }

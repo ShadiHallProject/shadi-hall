@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_margin="20dp">
+
+    <Spinner
+        android:id="@+id/spPortation"
+        android:layout_marginTop="@dimen/sp_10"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+
+    <android.support.design.widget.TextInputLayout
+        android:layout_marginTop="@dimen/sp_10"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <android.support.design.widget.TextInputEditText
+            android:id="@+id/tietTableName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Table Name" />
+    </android.support.design.widget.TextInputLayout>
+
+
+    <LinearLayout
+        android:layout_marginTop="@dimen/sp_10"
+        android:orientation="horizontal"
+        android:weightSum="10"
+        android:gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <Button
+            android:id="@+id/btnResturentTableCancel"
+            android:background="@color/colorPrimary"
+            android:layout_margin="8dp"
+            android:text="Cancel"
+            android:layout_weight="3"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"/>
+        <Button
+            android:id="@+id/btnResturentTableAdd"
+            android:background="@color/colorPrimary"
+            android:layout_margin="8dp"
+            android:text="ADD"
+            android:layout_weight="3"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"/>
+    </LinearLayout>
+
+
+</LinearLayout>

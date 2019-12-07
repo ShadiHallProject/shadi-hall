@@ -34,6 +34,7 @@ import org.by9steps.shadihall.model.ProjectMenu;
 import org.by9steps.shadihall.model.Projects;
 import org.by9steps.shadihall.model.Recovery;
 import org.by9steps.shadihall.model.Reports;
+import org.by9steps.shadihall.model.Restaurant1Potion;
 import org.by9steps.shadihall.model.Restaurant2Table;
 import org.by9steps.shadihall.model.Spinner;
 import org.by9steps.shadihall.model.Summerize;
@@ -68,7 +69,7 @@ public class DatabaseHelper extends SQLiteAssetHelper {
     private static final int DATABASE_VERSION = 1;
 
     // Database Name
-    private static final String DATABASE_NAME = "ShadiHallUser.db";
+    private static final String DATABASE_NAME = "EasySoftDataFile.db";
 
     // Table Names
     private static final String TABLE_Account3Name = "Account3Name";
@@ -757,6 +758,15 @@ public class DatabaseHelper extends SQLiteAssetHelper {
     public void deleteVehicle1GroupEntry(){
 
     }
+    public String getAcNameAccount3Name(String q){
+        String name=null;
+//        SQLiteDatabase db=this.getReadableDatabase();
+//        Cursor cursor=db.rawQuery(q,null);
+//        if(cursor.moveToNext()){
+//           name=cursor.getString(cursor.getColumnIndex("AcName"));
+//        }
+        return name;
+    }
 
     public List<Vehicle1Group> getVehicle1Group(String query) {
         List<Vehicle1Group> vehicle1GroupsList=new ArrayList<>();
@@ -771,6 +781,28 @@ public class DatabaseHelper extends SQLiteAssetHelper {
             }while (cursor.moveToNext());
         }
         return vehicle1GroupsList;
+    }
+
+    public List<Restaurant1Potion> getRestaurant1Potion(String query) {
+        List<Restaurant1Potion> list=new ArrayList<>();
+        SQLiteDatabase db=this.getReadableDatabase();
+        Cursor cursor=db.rawQuery(query,null);
+        if(cursor.moveToNext()){
+            do{
+                Restaurant1Potion restaurant1Potion=new Restaurant1Potion();
+                restaurant1Potion.setID(cursor.getInt(cursor.getColumnIndex("ID")));
+                restaurant1Potion.setPotionID(cursor.getString(cursor.getColumnIndex("PotionID")));
+                restaurant1Potion.setPotionName(cursor.getString(cursor.getColumnIndex("PotionName")));
+                restaurant1Potion.setPotionDescriptions(cursor.getString(cursor.getColumnIndex("PotioDescriptions")));
+                restaurant1Potion.setClientID(cursor.getString(cursor.getColumnIndex("ClientID")));
+                restaurant1Potion.setClientUserID(cursor.getString(cursor.getColumnIndex("ClientUserID")));
+                restaurant1Potion.setNetCode(cursor.getString(cursor.getColumnIndex("NetCode")));
+                restaurant1Potion.setSysCode(cursor.getString(cursor.getColumnIndex("SysCode")));
+                restaurant1Potion.setUpdatedDate(cursor.getString(cursor.getColumnIndex("UpdatedDate")));
+                list.add(restaurant1Potion);
+            }while (cursor.moveToNext());
+        }
+        return list;
     }
 
     public String getVehicle1GroupSpinnerVehicleGroupName(String query) {
@@ -791,6 +823,22 @@ public class DatabaseHelper extends SQLiteAssetHelper {
         return Value;
     }
 
+
+    public long createRestaurant1Potion(Restaurant1Potion restaurant1Potion){
+        SQLiteDatabase database=this.getWritableDatabase();
+        ContentValues contentValues=new ContentValues();
+        contentValues.put("PotionID",restaurant1Potion.getPotionID());
+        contentValues.put("PotionName",restaurant1Potion.getPotionName());
+        contentValues.put("PotioDescriptions",restaurant1Potion.getPotionDescriptions());
+        contentValues.put("ClientID",restaurant1Potion.getClientID());
+        contentValues.put("ClientUserID",restaurant1Potion.getClientUserID());
+        contentValues.put("NetCode",restaurant1Potion.getNetCode());
+        contentValues.put("SysCode",restaurant1Potion.getSysCode());
+        contentValues.put("UpdatedDate",restaurant1Potion.getUpdatedDate());
+        long abc=database.insert("Restaurant1Potion",null,contentValues);
+        return abc;
+
+    }
 
     /**
      * create Vehicle2Name
@@ -1080,7 +1128,46 @@ public class DatabaseHelper extends SQLiteAssetHelper {
         Cursor ctem = dbtem.rawQuery(query, null);
         ctem.moveToFirst();
         Log.e("TEMP" + "TEMP", "Maxium ID " + ctem.getInt(0));
-        return ctem.getInt(0);
+        int valu=-1;
+        if(ctem.getInt(0)==0){
+            valu=-1;
+        }else {
+            valu=ctem.getInt(0);
+        }
+        return valu;
+    }
+
+    public int getMaxValueOfRestaurant2Table(String ClientID){
+        String query="select -(Max(Abs(Ifnull(TableID,0)))+1) from Restaurant2Table where ClientID = " + ClientID+"";
+        Log.e("TEMP","("+query);
+        SQLiteDatabase dbtem = this.getReadableDatabase();
+        Cursor ctem = dbtem.rawQuery(query, null);
+        ctem.moveToFirst();
+        Log.e("TEMP" + "TEMP", "Maxium ID " + ctem.getInt(0));
+        int valu=-1;
+        if(ctem.getInt(0)==0){
+            valu=-1;
+        }else {
+            valu=ctem.getInt(0);
+        }
+        return valu;
+    }
+
+
+    public int getMaxValueOfRestaurant1Potion(String ClientID){
+        String query="select -(Max(Abs(Ifnull(PotionID,0)))+1) from Restaurant1Potion where ClientID = " + ClientID+"";
+        Log.e("TEMP","("+query);
+        SQLiteDatabase dbtem = this.getReadableDatabase();
+        Cursor ctem = dbtem.rawQuery(query, null);
+        ctem.moveToFirst();
+        Log.e("TEMP" + "TEMP", "Maxium ID " + ctem.getInt(0));
+        int valu=-1;
+        if(ctem.getInt(0)==0){
+            valu=-1;
+        }else {
+            valu=ctem.getInt(0);
+        }
+        return valu;
     }
 
     public int getMaxValueOfAccount5customGroup1(String ClientID){
@@ -1090,7 +1177,14 @@ public class DatabaseHelper extends SQLiteAssetHelper {
         Cursor cursor = db.rawQuery(query, null);
         cursor.moveToFirst();
         Log.e("TEMP" + "TEMP", "Maxium ID " + cursor.getInt(0));
-        return cursor.getInt(0);
+
+        int valu=-1;
+        if(cursor.getInt(0)==0){
+            valu=-1;
+        }else {
+            valu=cursor.getInt(0);
+        }
+        return valu;
     }
 //    public  List<Account5customGroup1> getAccount5customGroup1(String query){
 //        List<Account5customGroup1> account5customGroup1List=new ArrayList<>();
@@ -1786,6 +1880,7 @@ public class DatabaseHelper extends SQLiteAssetHelper {
                 mylist.setTableStatus(c.getString(c.getColumnIndex("TableStatus"))) ;
                 mylist.setClientID(c.getString(c.getColumnIndex("ClientID")));
                 mylist.setSalPur1ID(c.getString(c.getColumnIndex("SalPur1ID")));
+                mylist.setTableID(c.getString(c.getColumnIndex("TableID")));
                 joinQueryForResturentList.add(mylist);
             }while (c.moveToNext());
         }
@@ -1844,13 +1939,15 @@ public class DatabaseHelper extends SQLiteAssetHelper {
 
         values.put("TableID", restaurant2Table.getTableID());
         values.put("PotionID", restaurant2Table.getPotionID());
+        values.put("TableName",restaurant2Table.getTabelName());
         values.put("TableDescription", restaurant2Table.getTableDescription());
         values.put("TableStatus", restaurant2Table.getTableStatus());
         values.put("ClientID", restaurant2Table.getClientID());
-        values.put("ClientID", restaurant2Table.getClientID());
         values.put("ClientUserID", restaurant2Table.getClientUserID());
+        values.put("NetCode",restaurant2Table.getNetCode());
         values.put("SysCode", restaurant2Table.getSysCode());
         values.put("UpdatedDate", restaurant2Table.getUpdatedDate());
+        values.put("SalPur1ID",restaurant2Table.getSalPur1ID());
 
         Log.d("aaaaaaaaaaaaa", "createRestaurant2Table: fun3");
         // insert row
@@ -1877,6 +1974,18 @@ public class DatabaseHelper extends SQLiteAssetHelper {
 
 
     }
+
+    public int updateResturent1Portation(int PrimaryKey,String  PortaionName){
+
+        SQLiteDatabase db=this.getWritableDatabase();
+        ContentValues values=new ContentValues();
+        values.put("PotionName",PortaionName);
+        int status=db.update("Restaurant1Potion",values,"ID = '"+ PrimaryKey +"'",null);
+        return  status;
+
+
+    }
+
     public int updateResturent2TableSalePur1ID(String tableName, int newSalepur1ID,String TableStatus,String TableID ){
 
         Log.d("amir", "updateResturent2TableSalePur1ID: "+newSalepur1ID+ " "+TableID+ "  "+tableName);
@@ -1885,8 +1994,8 @@ public class DatabaseHelper extends SQLiteAssetHelper {
         values.put("SalPur1ID",newSalepur1ID);
         values.put("TableStatus",TableStatus);
 
-        //int status=db.update("Restaurant2Table",values,"TableID = '"+TableID+"' AND TableName = '"+tableName+"'",null);
-        int status=db.update("Restaurant2Table",values,"TableName = '"+tableName+"'",null);
+        int status=db.update("Restaurant2Table",values,"TableID = '"+TableID+"' AND TableName = '"+tableName+"'",null);
+        //int status=db.update("Restaurant2Table",values,"TableName = '"+tableName+"'",null);
         return  status;
 
 
@@ -2440,7 +2549,14 @@ spinners.add(itemLedger);
         Cursor ctem = dbtem.rawQuery(qq, null);
         ctem.moveToFirst();
         Log.e("TEMP" + "TEMP", "Maxium ID " + ctem.getInt(0));
-        return ctem.getInt(0);
+        int returnval=-1;
+        if(ctem.getInt(0)==0){
+            returnval=-1;
+        }else{
+            returnval=ctem.getInt(0);
+        }
+        Log.e("aaaaa", "getMaxValueOfItem3Name: "+returnval );
+        return returnval;
     }
     //Getting Maximun Value of Item3Name
     public String getMaxUpDateOfItem3Name(String ClientID){
@@ -2462,7 +2578,16 @@ spinners.add(itemLedger);
         Cursor ctem = dbtem.rawQuery(qq, null);
         ctem.moveToFirst();
         Log.e("TEMP" + "TEMP", "Maxium ID " + ctem.getInt(0));
-        return ctem.getInt(0);
+
+        int returnval=-1;
+        if(ctem.getInt(0)==0){
+            returnval=-1;
+        }else{
+            returnval=ctem.getInt(0);
+        }
+        Log.e("aaaaa", "getMaxValueOfItem3Name: "+returnval );
+        return returnval;
+
     }
 
 
@@ -3066,65 +3191,76 @@ spinners.add(itemLedger);
 
     public int GetMaximunSalePur1ID(String ClientID,String entryType) {
 
-//        String qq="select -(Max(Abs(Ifnull(SalePur1ID,0)))+1) from "+ refdb.SlePur1.TABLE_SalePur1+
-//                " where ClientID=" + ClientID+" AND EntryType= '"+entryType+"'";
-//        Log.e("TEMP","("+qq);
-//        SQLiteDatabase dbtem = this.getReadableDatabase();
-//        Cursor ctem = dbtem.rawQuery(qq, null);
-//        ctem.moveToFirst();
-//        Log.e("TEMP" + "TEMP", "Maxium ID " + ctem.getInt(0));
+        String qq="select -(Max(Abs(Ifnull(SalePur1ID,0)))+1) from "+ refdb.SlePur1.TABLE_SalePur1+
+                " where ClientID=" + ClientID+" AND EntryType= '"+entryType+"'";
+        Log.e("TEMP","("+qq);
+        SQLiteDatabase dbtem = this.getReadableDatabase();
+        Cursor ctem = dbtem.rawQuery(qq, null);
+        ctem.moveToFirst();
+        Log.e("TEMP" + "TEMP", "Maxium ID " + ctem.getInt(0));
+
+        int returnval=-1;
+        if(ctem.getInt(0)==0){
+            returnval=-1;
+        }else {
+            returnval=ctem.getInt(0);
+        }
+        return returnval;
 
         ///////////////////////////////////////////////////Above code is temp
 
-        String querymax = "select max(abs(SalePur1ID)) as maxid from " + refdb.SlePur1.TABLE_SalePur1 + "" +
-                " where ClientID=" + ClientID+" AND EntryType= '"+entryType+"'";
-        String querymin = "select SalePur1ID as maxid from " + refdb.SlePur1.TABLE_SalePur1 + "" +
-                " where ClientID=" + ClientID+" AND EntryType= '"+entryType+"'";
-        Log.e(LOG + "ID", "MinID:" + querymin);
-        Log.e(LOG + "ID", "MaxID:" + querymax);
-        int maxid = -99, minid = -9999;
-        SQLiteDatabase db = this.getReadableDatabase();
-        Cursor c = db.rawQuery(querymax, null);
-        Cursor cmin = db.rawQuery(querymin, null);
-        for (int i = 0; i < c.getColumnCount(); i++) {
-            Log.e("col", c.getColumnName(i));
-        }
-
-        if (c != null && c.getCount() > 0) {
-            c.moveToFirst();
-            Log.e(LOG + "ID", "Maxium ID " + c.getInt(0));
-            maxid = c.getInt(0);
-        } else
-            Log.e(LOG + "ID", "Maxium ID -99");
-        if (cmin != null && cmin.getCount() > 0) {
-            cmin.moveToFirst();
-            int pre, next, min = 0;
-            pre = next = cmin.getInt(0);
-            do {
-
-                next = cmin.getInt(0);
-                if (pre > next)
-                    min = next;
-                pre = next;
-
-            } while (cmin.moveToNext());
-            minid = min;
-            Log.e(LOG + "ID", "Menium ID " + minid);
-
-        } else
-            Log.e(LOG + "ID", "Menium ID -99");
-        ///////////////Criterial for alogrith
-
-        if (minid >= 0) {
-            minid = -maxid - 1;
-        } else {
-            minid = minid - 1;
-        }
-//        if (minid < 0)
-//            minid = minid * -1;
-
-        Log.e(LOG + "ID", "MINIMID::" + minid);
-        return minid;
+//        String querymax = "select max(abs(SalePur1ID)) as maxid from " + refdb.SlePur1.TABLE_SalePur1 + "" +
+//                " where ClientID=" + ClientID+" AND EntryType= '"+entryType+"'";
+//
+//        String querymin = "select SalePur1ID as maxid from " + refdb.SlePur1.TABLE_SalePur1 + "" +
+//                " where ClientID=" + ClientID+" AND EntryType= '"+entryType+"'";
+//        Log.e(LOG + "ID", "MinID:" + querymin);
+//        Log.e(LOG + "ID", "MaxID:" + querymax);
+//     //for Editing and inserting (differance)
+//        int maxid = -99; // for Editing
+//                int minid = -9999; //for inserting
+//        SQLiteDatabase db = this.getReadableDatabase();
+//        Cursor c = db.rawQuery(querymax, null);
+//        Cursor cmin = db.rawQuery(querymin, null);
+//        for (int i = 0; i < c.getColumnCount(); i++) {
+//            Log.e("col", c.getColumnName(i));
+//        }
+//
+//        if (c != null && c.getCount() > 0) {
+//            c.moveToFirst();
+//            Log.e(LOG + "ID", "Maxium ID " + c.getInt(0));
+//            maxid = c.getInt(0);
+//        } else
+//            Log.e(LOG + "ID", "Maxium ID -99");
+//        if (cmin != null && cmin.getCount() > 0) {
+//            cmin.moveToFirst();
+//            int pre, next, min = 0;
+//            pre = next = cmin.getInt(0);
+//            do {
+//
+//                next = cmin.getInt(0);
+//                if (pre > next)
+//                    min = next;
+//                pre = next;
+//
+//            } while (cmin.moveToNext());
+//            minid = min;
+//            Log.e(LOG + "ID", "Menium ID " + minid);
+//
+//        } else
+//            Log.e(LOG + "ID", "Menium ID -99");
+//        ///////////////Criterial for alogrith
+//
+//        if (minid >= 0) {
+//            minid = -maxid - 1;
+//        } else {
+//            minid = minid - 1;
+//        }
+////        if (minid < 0)
+////            minid = minid * -1;
+//
+//        Log.e(LOG + "ID", "MINIMID::" + minid);
+//        return minid;
 
     }
 

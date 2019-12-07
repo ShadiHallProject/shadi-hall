@@ -1,5 +1,6 @@
 package org.by9steps.shadihall.activities;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -21,6 +22,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.WebView;
 import android.widget.Toast;
 
 import com.orm.SugarContext;
@@ -30,7 +32,9 @@ import org.by9steps.shadihall.R;
 import org.by9steps.shadihall.fragments.HomeFragment;
 import org.by9steps.shadihall.fragments.ListFragment;
 import org.by9steps.shadihall.fragments.MenuFragment;
+import org.by9steps.shadihall.helper.DatabaseHelper;
 import org.by9steps.shadihall.helper.GenericConstants;
+import org.by9steps.shadihall.helper.MNotificationClass;
 import org.by9steps.shadihall.helper.Prefrence;
 import org.by9steps.shadihall.helper.ThemeProvider;
 
@@ -52,14 +56,18 @@ public class MainActivity extends AppCompatActivity {
     public static final String login = "loginKey";
    public static int indexOfSelectdFrag = 0;
     Prefrence prefrence;
+    DatabaseHelper databaseHelper;
+
+    String clientID1,clientUserID1,userName1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         indexOfSelectdFrag=0;
         ThemeProvider.setThemeOfApp(this);
         setContentView(R.layout.activity_main);
-        settingnavdrawerComponents();
+
         SugarContext.init(this);
 
         if (getSupportActionBar() != null)
@@ -69,6 +77,19 @@ public class MainActivity extends AppCompatActivity {
         sharedPreferences = getSharedPreferences(mypreference,
                 Context.MODE_PRIVATE);
         prefrence = new Prefrence(this);
+        databaseHelper=new DatabaseHelper(this);
+
+        String q="select AcName from Account3Name where ClientID = '"+prefrence.getClientIDSession()+"' AND ClientUserID = '"+prefrence.getClientUserIDSession()+"'";
+       //userName1=databaseHelper.getAcNameAccount3Name(q);
+        clientID1=prefrence.getClientIDSession();
+        clientUserID1=prefrence.getClientUserIDSession();
+        settingnavdrawerComponents();
+
+//        Log.e("aaaa", "Client ID::" + new Prefrence(this).getClientIDSession());
+//        Log.e("aaaa", "ClientUserID::" + new Prefrence(this).getClientUserIDSession());
+//        Log.e("aaaa", "ProjectIDSerssion::" + new Prefrence(this).getProjectIDSession());
+//        Log.e("aaaa", "UserRightSession::" + new Prefrence(this).getUserRighhtsSession());
+
 
 
         viewPager = (ViewPager) findViewById(R.id.viewpager);
@@ -113,6 +134,8 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+
+
     private void settingnavdrawerComponents() {
         dl = (DrawerLayout) findViewById(R.id.activity_main);
         t = new ActionBarDrawerToggle(this, dl, R.string.Open, R.string.Close);
@@ -123,7 +146,10 @@ public class MainActivity extends AppCompatActivity {
         dl.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
         t.syncState();
 
+
         final ActionBar actionBar = getSupportActionBar();
+
+
 
         if (actionBar != null) {
             //  actionBar.setDisplayHomeAsUpEnabled(false);
@@ -136,7 +162,18 @@ public class MainActivity extends AppCompatActivity {
 
                 public void onDrawerOpened(View drawerView) {
                     supportInvalidateOptionsMenu();
+
+                    MNotificationClass.ShowToast(drawerView.getContext(),"open");
+
+
                     //drawerOpened = true;
+                }
+
+                @Override
+                public void onDrawerStateChanged(int newState) {
+                    super.onDrawerStateChanged(newState);
+
+
                 }
             };
 
@@ -149,6 +186,20 @@ public class MainActivity extends AppCompatActivity {
 
         nv = (NavigationView) findViewById(R.id.nv);
         nv.setVisibility(View.GONE);
+
+        // get menu from navigationView
+        Menu menu = nv.getMenu();
+
+        // find MenuItem you want to change
+        MenuItem nav_UserName = menu.findItem(R.id.action_username);
+        MenuItem nav_ClientID = menu.findItem(R.id.action_ClientID);
+        MenuItem nav_ClientUserID = menu.findItem(R.id.action_ClientUserID);
+
+
+        nav_UserName.setTitle("User Name    "+userName1);
+        nav_ClientID.setTitle("ClientID    "+clientID1);
+        nav_ClientUserID.setTitle("ClientUserID    "+clientUserID1);
+
 //
 //        nv.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
 //            @Override

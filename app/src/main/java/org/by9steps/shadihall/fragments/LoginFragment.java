@@ -267,7 +267,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
 
 
                                         prefrence.setClientIDSession(clientID);
-                                        prefrence.setClientUserIDSession(clientUserID);
+                                        prefrence.setMYClientUserIDSession(clientUserID);
                                         prefrence.setProjectIDSession(projectID);
                                         prefrence.setUserRighhtsSession(userRights);
                                         Log.e(GenericConstants.MYEdittion,"Editing");

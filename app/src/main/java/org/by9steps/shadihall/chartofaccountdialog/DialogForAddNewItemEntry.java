@@ -1,16 +1,20 @@
 package org.by9steps.shadihall.chartofaccountdialog;
 
 import android.app.Dialog;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AlertDialog;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -20,6 +24,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import org.by9steps.shadihall.R;
+import org.by9steps.shadihall.activities.MenuClickActivity;
 import org.by9steps.shadihall.helper.DatabaseHelper;
 import org.by9steps.shadihall.helper.GenericConstants;
 import org.by9steps.shadihall.helper.MNotificationClass;
@@ -39,6 +44,7 @@ public class DialogForAddNewItemEntry extends DialogFragment implements
     Spinner spinner;
     View customView;
     DatabaseHelper helper;
+    Prefrence prefrence;
     int salepur1id = -99;
     String EntryType, Title,Message;
     EditText ItemSalePrice, ItemName, ItemCode;
@@ -49,6 +55,7 @@ public class DialogForAddNewItemEntry extends DialogFragment implements
     String [] spinnerdata;
     int keyid;
     String name,dialogtype,price,code;
+    ImageView cancel;
 
 
 
@@ -71,9 +78,13 @@ public class DialogForAddNewItemEntry extends DialogFragment implements
                 bundle.putString("item1typeid","null");
                 bundle.putString("item2groupName","null");
 
+
+
                 Dialog2ForAddNewItemEntry AddItemEntry = new Dialog2ForAddNewItemEntry();
                 AddItemEntry.setArguments(bundle);
                 AddItemEntry.show(getFragmentManager(), "TAG");
+
+
             }
         });
 
@@ -93,7 +104,7 @@ public class DialogForAddNewItemEntry extends DialogFragment implements
 
 
 
-         Prefrence prefrence=new Prefrence(getContext());
+        prefrence=new Prefrence(getContext());
         int value =Integer.parseInt(prefrence.getClientIDSession());
 
         spinner.setOnItemSelectedListener(this);
@@ -101,13 +112,22 @@ public class DialogForAddNewItemEntry extends DialogFragment implements
 
         list= refdb.Table2Group.GetItem2GroupList(helper,"select * from Item2Group where  ClientID ='"+value+"'");
         spinnerdata=new String[list.size()];
-        for (int i = 0; i <list.size() ; i++) {
-            spinnerdata[i]=list.get(i).getItem2GroupName();
+
+        if(list.size()>0)
+        spinnerdata[0]= new NullSpinnerItem().toString();
+
+        for (int i = 1; i <list.size() ; i++) {
+            spinnerdata[i]=list.get(i-1).getItem2GroupName();
         }
         ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(getContext(),
                 android.R.layout.simple_spinner_item,
                 spinnerdata);
         spinner.setAdapter(dataAdapter);
+
+        TextView selectedView = (TextView) spinner.getSelectedView();
+        if (selectedView != null) {
+            selectedView.setTextColor(getResources().getColor(R.color.white));
+        }
 
 
         if(dialogtype!=null&& dialogtype.equals(DIALOG_EDIT_TEXT_TITLE)){
@@ -118,6 +138,7 @@ public class DialogForAddNewItemEntry extends DialogFragment implements
                 return OpenEditTypeDialog();
         }
         else {
+
             return new AlertDialog.Builder(getContext())
                     .setView(customView)
                     .setTitle("Item Entry")
@@ -131,6 +152,11 @@ public class DialogForAddNewItemEntry extends DialogFragment implements
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         helper=new DatabaseHelper(getContext());
+        Dialog dialog = super.onCreateDialog(savedInstanceState);
+
+        // request a window without the title
+        dialog.getWindow().requestFeature(Window.FEATURE_NO_TITLE);
+       // return dialog;
     }
     public Dialog OpenEditTypeDialog(){
         return  new AlertDialog.Builder(getContext())
@@ -189,7 +215,10 @@ public class DialogForAddNewItemEntry extends DialogFragment implements
         {
             SaveSalePurToID();
 
-        }else {
+        } else if(view.getId()==R.id.cancel_btn){
+            this.dismiss();
+        }
+        else if(view.getId()==R.id.cancelsale) {
             this.dismiss();
         }
 
@@ -204,6 +233,8 @@ public class DialogForAddNewItemEntry extends DialogFragment implements
     public void onNothingSelected(AdapterView<?> adapterView) {
 
     }
+
+
     public void AssignIDToView(View customView){
 
         spinner = customView.findViewById(R.id.itemnames);
@@ -222,6 +253,7 @@ public class DialogForAddNewItemEntry extends DialogFragment implements
         addsale=customView.findViewById(R.id.addsale);addsale.setOnClickListener(this);
         cancelsale=customView.findViewById(R.id.cancelsale);cancelsale.setOnClickListener(this);
         ImageBtnAdd=customView.findViewById(R.id.Imagebtn_add);
+        cancel=customView.findViewById(R.id.cancel_btn);cancel.setOnClickListener(this);
 
     }
     public void SaveSalePurToID() {
@@ -232,13 +264,17 @@ public class DialogForAddNewItemEntry extends DialogFragment implements
             MNotificationClass.ShowToast(getContext(), "Some Fields Empty");
             return;
         }
+        if(itemselectindex<=0){
+            MNotificationClass.ShowToast(getContext(),"Spinner is Empty");
+            return;
+        }else {
         Prefrence prefrence=new Prefrence(getContext());
         Item3Name_ item3Name=new Item3Name_();
 
 
 
         int value=helper.getMaxValueOfItem3Name(prefrence.getClientIDSession());
-        MNotificationClass.ShowToastTem(getContext(),""+value);
+        MNotificationClass.ShowToastTem(getContext(),"maxid  "+value);
 
         item3Name.setItem3NameID(value);//server and local data ---/++
         item3Name.setItem2GroupID(Integer.parseInt(list.get(itemselectindex).getItem2GroupID()));// spinner   Item2GroupID)save
@@ -259,13 +295,17 @@ public class DialogForAddNewItemEntry extends DialogFragment implements
 
 
         long status= refdb.Table3Name.AddItem3Name(helper,item3Name);
-        if(status!=-1)
-        {
+        if(status!=-1) {
             MNotificationClass.ShowToast(getContext(),"Item Added");
             serialcount--;
             setFieldsToEmpty();
+            MenuClickActivity activity=(MenuClickActivity)getContext();
+            activity.updateItemDGrid();
+
         }else{
             MNotificationClass.ShowToast(getContext(),"Item Not Added");
+        }
+
         }
 
     }
@@ -274,7 +314,11 @@ public class DialogForAddNewItemEntry extends DialogFragment implements
         if(ItemName.getText().toString().isEmpty() || ItemSalePrice.getText().toString().isEmpty()) {
             MNotificationClass.ShowToast(getContext(), "Some Fields Empty");
             return;
-        }else {
+        }else if(itemselectindex<=0){
+            MNotificationClass.ShowToast(getContext(),"Spinner is Empty");
+            return;
+        }
+        else {
             String query = "Update Item3Name SET UpdatedDate='Null', ItemName = '" + ItemName.getText().toString() + "', SalePrice = '" + ItemSalePrice.getText().toString() + "', ItemCode = '" + ItemCode.getText().toString() + "' WHERE ID =  "+keyid;
             helper.updateItem3Name(query);
             MNotificationClass.ShowToast(getContext(),"Updated Data");
@@ -288,7 +332,29 @@ public class DialogForAddNewItemEntry extends DialogFragment implements
         ItemSalePrice.setText("");
         ItemCode.setText("");
         itemselectindex=0;
+        spinner.setSelection(0);
     }
 
 
+    public  void popUpRecyclerView(){
+        list= refdb.Table2Group.GetItem2GroupList(helper,"select * from Item2Group where  ClientID ='"+prefrence.getClientIDSession()+"'");
+        spinnerdata=new String[list.size()];
+        for (int i = 0; i <list.size() ; i++) {
+            spinnerdata[i]=list.get(i).getItem2GroupName();
+        }
+        ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(getContext(),
+                android.R.layout.simple_spinner_item,
+                spinnerdata);
+        spinner.setAdapter(dataAdapter);
+
+    }
+
+    public class NullSpinnerItem {
+
+        @Override
+        public String toString() {
+            return "Select Value....";
+        }
+
+    }
 }

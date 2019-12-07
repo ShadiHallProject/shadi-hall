@@ -438,7 +438,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
 //                final String cty = city.getText().toString();
 //                final String subCty = sub_city.getText().toString();
                 Log.e("asdfasdf", "FirstPass");
-                if (city.equals("") || country.equals("") || subCity.equals("")) {
+              //  if (city.equals("") || country.equals("") || subCity.equals("")) {
 
                     // uploadImages("115");
 //                    pDialog = new ProgressDialog(RegisterActivity.this);
@@ -459,9 +459,9 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
 //                                            Toast.LENGTH_SHORT).show();
 //                                }
 //                            });
-                    MNotificationClass.ShowToast(this, "Select City First");
-                    return;
-                }
+                 //   MNotificationClass.ShowToast(this, "Select City First");
+                //    return;
+               // }
                 if (!inputValidation.isInputEditTextFilled(c_name, c_name_layout, getString(R.string.error_message_c_name))) {
                     return;
                 }
@@ -581,7 +581,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                                 params.put("Country", checkNullField(country));
                                 params.put("Password", checkNullField(password.getText().toString()));
                                 params.put("City", checkNullField(city));
-                                params.put("SubCity", checkNullField(subCity));
+                                params.put("SubCity", "abc");
                                 params.put("Website", checkNullField(website.getText().toString()));
                                 params.put("CapacityOfPersons", "0");
                                 params.put("CompanyLogo", encodedImage);

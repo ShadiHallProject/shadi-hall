@@ -100,7 +100,8 @@ public class AppController extends Application {
         String formattedDate = df.format(c);
         String untilformated = df.format(validtill);
         Log.e("formdate", formattedDate + " until:" + untilformated + " compare:" + c.after(validtill));
-        return c.after(validtill);
+       // return c.after(validtill);
+        return true;
     }
 
     public String getTodayDate() {

@@ -274,4 +274,13 @@ public class VehicleBookingDialog extends DialogFragment implements AdapterView.
 
     }
 
+    public class NullSpinnerItem {
+
+        @Override
+        public String toString() {
+            return "Select Value....";
+        }
+
+    }
+
 }

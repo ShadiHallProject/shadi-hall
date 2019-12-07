@@ -36,6 +36,7 @@ public class fragmentAddItem extends Fragment implements  AdapterView.OnItemSele
     private String ValuePass = null;
 
     Button viewgrid, viewtree, other;
+    FragmentAddItemCompleteStockGridView fragment;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -163,7 +164,7 @@ public class fragmentAddItem extends Fragment implements  AdapterView.OnItemSele
             bundle.putString("code", null);
 
             AddItemEntry.setArguments(bundle);
-            AddItemEntry.show(getFragmentManager(), "TAG");
+            AddItemEntry.show(getFragmentManager(), "DialogAddItem");
 
 
         }
@@ -218,7 +219,7 @@ public class fragmentAddItem extends Fragment implements  AdapterView.OnItemSele
     }
 
     public void fillGridView() {
-        FragmentAddItemCompleteStockGridView fragment = new FragmentAddItemCompleteStockGridView();
+        fragment = new FragmentAddItemCompleteStockGridView();
         getChildFragmentManager().beginTransaction()
                 .add(R.id.GridViewcontainer, fragment)
                 .addToBackStack(null)
@@ -261,5 +262,9 @@ public class fragmentAddItem extends Fragment implements  AdapterView.OnItemSele
 //                });
 //            }
 //        });
+    }
+
+    public void updateGridView(){
+        fragment.FillRecyclerViewAdapter();
     }
 }

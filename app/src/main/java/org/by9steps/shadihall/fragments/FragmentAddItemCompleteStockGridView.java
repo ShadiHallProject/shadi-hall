@@ -50,7 +50,7 @@ public class FragmentAddItemCompleteStockGridView extends Fragment {
         mRecyclerView = vv.findViewById(R.id.ItemEntry_CompleteStock_recyclerview);
     }
 
-    private void FillRecyclerViewAdapter() {
+    public void FillRecyclerViewAdapter() {
 
 
         Prefrence prefrence=new Prefrence(getContext());
@@ -63,4 +63,6 @@ public class FragmentAddItemCompleteStockGridView extends Fragment {
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         mRecyclerView.setAdapter(recyclerAdapter);
     }
+
+
 }

@@ -506,6 +506,7 @@ public class ResturentAddItemActivity extends AppCompatActivity implements
 
     private void updateResturent2TableSalePur1IDandTableStatus(){
 
+        MNotificationClass.ShowToast(this, "Tabel ID = "+TableID);
         String TableStatus="Running";
         int statusid=databaseHelper.updateResturent2TableSalePur1ID(tableName,maxid,TableStatus,TableID);
         if (statusid == -1)

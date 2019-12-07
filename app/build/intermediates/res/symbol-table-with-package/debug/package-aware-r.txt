@@ -1327,6 +1327,7 @@ drawable ic_arrow_drop_up
 drawable ic_arrow_drop_up_black_24dp
 drawable ic_arrow_left
 drawable ic_arrow_right
+drawable ic_cancel
 drawable ic_check_black_24dp
 drawable ic_check_box
 drawable ic_contact
@@ -1429,6 +1430,8 @@ id account_name
 id accountspinner
 id action0
 id action_ChangeStatus
+id action_ClientID
+id action_ClientUserID
 id action_EditBill
 id action_OtherCollection
 id action_ShowColumn
@@ -1461,6 +1464,7 @@ id action_signout
 id action_sms_settings
 id action_spinner
 id action_text
+id action_username
 id actions
 id activity_chooser_view_content
 id activity_main
@@ -1517,6 +1521,8 @@ id btnPartPaymentCollection
 id btnPendingsBills
 id btnResturentPortationAdd
 id btnResturentPortationCancel
+id btnResturentTableAdd
+id btnResturentTableCancel
 id btnRunningBills
 id btnVechicleAdd
 id btnVechiclecancel
@@ -1554,6 +1560,8 @@ id camera_view
 id cancel
 id cancelEntry
 id cancel_action
+id cancel_btn
+id cancel_btn1
 id cancelbtn
 id cancelsale
 id capital
@@ -1934,6 +1942,7 @@ id oval
 id packed
 id parallax
 id parent
+id parent1
 id parentPanel
 id parent_matrix
 id password
@@ -1988,6 +1997,7 @@ id recovery_spinner
 id rectangle
 id recycler
 id recyclerView
+id recyclerView1
 id recycler_layout
 id recycler_view
 id recyclerviewCustomeGroupDialog2
@@ -2054,7 +2064,9 @@ id search_src_text
 id search_voice_btn
 id searchitem
 id section_label
+id section_label_Edit
 id section_label_addOrder
+id section_label_itemName
 id section_name
 id section_show_all_button
 id sectioned_recycler_view
@@ -2081,6 +2093,7 @@ id snap
 id snapMargins
 id sorting
 id spGroupName
+id spPortation
 id sp_acgroup
 id spacer
 id spinerTitle
@@ -2151,6 +2164,7 @@ id threedotpopup
 id threedotpopupsaleedit
 id thursdayLabel
 id tietPortaionName
+id tietTableName
 id time
 id title
 id titleDividerNoCustom
@@ -2446,6 +2460,7 @@ layout recovery_group_total
 layout recovery_list_item
 layout register_spinner_item
 layout resturent_dialog_add_portaion
+layout resturent_dialog_add_table
 layout saleentrydialog
 layout salepur1fragment_part1gridview
 layout salepurfragrow
@@ -2462,6 +2477,7 @@ layout slider_item
 layout spinner_custom_layout
 layout spinner_dropdown_item
 layout spinner_item
+layout spinner_layout_resturent
 layout summerize_trail_bal_group_total
 layout summerize_trail_bal_item
 layout support_simple_spinner_dropdown_item

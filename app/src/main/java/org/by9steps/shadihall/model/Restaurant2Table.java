@@ -3,10 +3,26 @@ package org.by9steps.shadihall.model;
 public class Restaurant2Table {
     private int ID;
     private String ClientUserID,ClientID ,NetCode,SysCode ,UpdatedDate;
-    private String TableID,PotionID,TableDescription,TableStatus;
+    private String TableID,TabelName,PotionID,TableDescription,TableStatus,SalPur1ID;
 
     public int getID() {
         return ID;
+    }
+
+    public String getSalPur1ID() {
+        return SalPur1ID;
+    }
+
+    public void setSalPur1ID(String salPur1ID) {
+        SalPur1ID = salPur1ID;
+    }
+
+    public String getTabelName() {
+        return TabelName;
+    }
+
+    public void setTabelName(String tabelName) {
+        TabelName = tabelName;
     }
 
     public void setID(int ID) {

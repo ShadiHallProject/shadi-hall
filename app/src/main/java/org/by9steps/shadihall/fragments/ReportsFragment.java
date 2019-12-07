@@ -343,25 +343,86 @@ public class ReportsFragment extends Fragment implements View.OnClickListener,
         countForNewAdded=countForUpdated=0;
         String groupID = ((Account2Group) sp_acgroup.getSelectedItem()).getAcGroupID();
         String date = date_picker.getText().toString();
-        String query = "SELECT        Account3Name.AcNameID AS AccountID, AccountBalanct.Debit, AccountBalanct.Credit, AccountBalanct.Bal, AccountBalanct.DebitBal, AccountBalanct.CreditBal, \n" +
-                "                         Account3Name.AcName,Account3Name.ID,Account3Name.UpdatedDate,Account3Name.AcGroupID\n" +
-                "FROM            Account3Name LEFT OUTER JOIN\n" +
-                "                             (SELECT        AccountID, SUM(Debit) AS Debit, SUM(Credit) AS Credit, SUM(Debit) - SUM(Credit) AS Bal, CASE WHEN (SUM(Debit) - SUM(Credit)) > 0 THEN (SUM(Debit)\n" +
-                "                                                          - SUM(Credit)) ELSE 0 END AS DebitBal, CASE WHEN (SUM(Debit) - SUM(Credit)) < 0 THEN (SUM(Debit) - SUM(Credit)) ELSE 0 END AS CreditBal\n" +
-                "                               FROM            (SELECT        DebitAccount AS AccountID, Amount AS Debit, 0 AS Credit\n" +
-                "                                                         FROM            CashBook\n" +
-                "                                                         WHERE        (ClientID = " + prefrence.getClientIDSession() + ") AND (CBDate <= '" + date + "')\n" +
-                "                                                         UNION ALL\n" +
-                "                                                         SELECT        CreditAccount AS AccountID, 0 AS Debit, Amount AS Credit\n" +
-                "                                                         FROM            CashBook AS CashBook_1\n" +
-                "                                                         WHERE        (ClientID = " + prefrence.getClientIDSession() + ") AND (CBDate <= '" + date + "')) AS GroupTotal\n" +
-                "                               GROUP BY AccountID) AS AccountBalanct ON Account3Name.AcNameID = AccountBalanct.AccountID\n" +
-                "WHERE        (Account3Name.AcGroupID = " + groupID + ")";
+//        String query = "SELECT        Account3Name.AcNameID AS AccountID, AccountBalanct.Debit, AccountBalanct.Credit, AccountBalanct.Bal, AccountBalanct.DebitBal, AccountBalanct.CreditBal, \n" +
+//                "                         Account3Name.AcName,Account3Name.ID,Account3Name.UpdatedDate,Account3Name.AcGroupID\n" +
+//                "FROM            Account3Name LEFT OUTER JOIN\n" +
+//                "                             (SELECT        AccountID, SUM(Debit) AS Debit, SUM(Credit) AS Credit, SUM(Debit) - SUM(Credit) AS Bal, CASE WHEN (SUM(Debit) - SUM(Credit)) > 0 THEN (SUM(Debit)\n" +
+//                "                                                          - SUM(Credit)) ELSE 0 END AS DebitBal, CASE WHEN (SUM(Debit) - SUM(Credit)) < 0 THEN (SUM(Debit) - SUM(Credit)) ELSE 0 END AS CreditBal\n" +
+//                "                               FROM            (SELECT        DebitAccount AS AccountID, Amount AS Debit, 0 AS Credit\n" +
+//                "                                                         FROM            CashBook\n" +
+//                "                                                         WHERE        (ClientID = " + prefrence.getClientIDSession() + ") AND (CBDate <= '" + date + "')\n" +
+//                "                                                         UNION ALL\n" +
+//                "                                                         SELECT        CreditAccount AS AccountID, 0 AS Debit, Amount AS Credit\n" +
+//                "                                                         FROM            CashBook AS CashBook_1\n" +
+//                "                                                         WHERE        (ClientID = " + prefrence.getClientIDSession() + ") AND (CBDate <= '" + date + "')) AS GroupTotal\n" +
+//                "                               GROUP BY AccountID) AS AccountBalanct ON Account3Name.AcNameID = AccountBalanct.AccountID\n" +
+//                "WHERE        (Account3Name.AcGroupID = " + groupID + ")";
+//
 
-        reportsList = databaseHelper.getReports(query);
+        String query1="Select\n" +
+                "    Account3Name.AcNameID As AccountID,\n" +
+                "    AccountBalanct.Debit,\n" +
+                "    AccountBalanct.Credit,\n" +
+                "    AccountBalanct.Bal,\n" +
+                "    AccountBalanct.DebitBal,\n" +
+                "    AccountBalanct.CreditBal,\n" +
+                "    Account3Name.AcName,\n" +
+                "    Account3Name.ID,\n" +
+                "    Account3Name.UpdatedDate,\n" +
+                "    Account3Name.AcGroupID,\n" +
+                "    Account3Name.ClientID\n" +
+                "From\n" +
+                "    Account3Name Left Join\n" +
+                "    (Select\n" +
+                "         GroupTotal.AccountID,\n" +
+                "         Sum(GroupTotal.Debit) As Debit,\n" +
+                "         Sum(GroupTotal.Credit) As Credit,\n" +
+                "         Sum(GroupTotal.Debit) - Sum(GroupTotal.Credit) As Bal,\n" +
+                "         Case\n" +
+                "             When (Sum(GroupTotal.Debit) - Sum(GroupTotal.Credit)) > 0\n" +
+                "             Then (Sum(GroupTotal.Debit) - Sum(GroupTotal.Credit))\n" +
+                "             Else 0\n" +
+                "         End As DebitBal,\n" +
+                "         Case\n" +
+                "             When (Sum(GroupTotal.Debit) - Sum(GroupTotal.Credit)) < 0\n" +
+                "             Then (Sum(GroupTotal.Debit) - Sum(GroupTotal.Credit))\n" +
+                "             Else 0\n" +
+                "         End As CreditBal,\n" +
+                "         GroupTotal.ClientID\n" +
+                "     From\n" +
+                "         (Select\n" +
+                "              CashBook.DebitAccount As AccountID,\n" +
+                "              CashBook.Amount As Debit,\n" +
+                "              0 As Credit,\n" +
+                "              CashBook.ClientID\n" +
+                "          From\n" +
+                "              CashBook\n" +
+                "          Where\n" +
+                "              CashBook.ClientID = '"+prefrence.getClientIDSession()+"' And\n" +
+                "              CashBook.CBDate <= '"+date+"'\n" +
+                "          Union All\n" +
+                "          Select\n" +
+                "              CashBook_1.CreditAccount As AccountID,\n" +
+                "              0 As Debit,\n" +
+                "              CashBook_1.Amount As Credit,\n" +
+                "              CashBook_1.ClientID\n" +
+                "          From\n" +
+                "              CashBook As CashBook_1\n" +
+                "          Where\n" +
+                "              CashBook_1.ClientID = '"+prefrence.getClientIDSession()+"' And\n" +
+                "              CashBook_1.CBDate <= '"+date+"') As GroupTotal\n" +
+                "     Group By\n" +
+                "         GroupTotal.AccountID,\n" +
+                "         GroupTotal.ClientID) As AccountBalanct On Account3Name.AcNameID = AccountBalanct.AccountID\n" +
+                "            And AccountBalanct.ClientID = Account3Name.ClientID\n" +
+                "Where\n" +
+                "    Account3Name.AcGroupID = '"+groupID+"' And\n" +
+                "    Account3Name.ClientID = '"+prefrence.getClientIDSession()+"'";
+
+        reportsList = databaseHelper.getReports(query1);
 
 
-        Log.e("REPORT-QUERY", query);
+        Log.e("REPORT-QUERY", query1);
 
         int gCredit = 0, gDebit = 0;
         Log.e("key", "No of item in the list " + reportsList.size());

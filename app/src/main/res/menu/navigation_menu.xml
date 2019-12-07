@@ -11,4 +11,21 @@
 
         android:title="Balance Transfer"/>
 
+
+    <item android:title="User Information">
+        <menu>
+            <item
+                android:id="@+id/action_username"
+                android:title="User Name"/>
+
+            <item
+                android:id="@+id/action_ClientID"
+                android:title="ClientID"/>
+
+            <item
+                android:id="@+id/action_ClientUserID"
+                android:title="ClientUserID"/>
+        </menu>
+    </item>
+
 </menu>

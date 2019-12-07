@@ -5,6 +5,8 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,10 +14,13 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import org.by9steps.shadihall.R;
+import org.by9steps.shadihall.activities.MenuClickActivity;
 import org.by9steps.shadihall.helper.DatabaseHelper;
 import org.by9steps.shadihall.helper.GenericConstants;
 import org.by9steps.shadihall.helper.MNotificationClass;
@@ -41,6 +46,7 @@ public class Dialog2ForAddNewItemEntry extends DialogFragment implements
     String dialogtype=null;
     String itemtype,groupName,s3;
     int keyId;
+    private ImageView cancelbtn;
 
     @NonNull
     @Override
@@ -63,13 +69,24 @@ public class Dialog2ForAddNewItemEntry extends DialogFragment implements
 
         list = refdb.TableItem1.GetItem1TypeList(helper,"Select * from Item1Type");  //string
         country=new String[list.size()];
-        for (int i = 0; i <list.size() ; i++) {
-            country[i]=list.get(i).getItemType();
+
+        if(list.size()>0)
+        country[0]=new NullSpinnerItem().toString();
+
+        for (int i = 1; i <list.size() ; i++) {
+            country[i]=list.get(i-1).getItemType();
         }
         ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(getContext(),
                 android.R.layout.simple_spinner_item,
                 country);
         spinner.setAdapter(dataAdapter);
+
+      //  spinner.setSelection(0, false);
+
+        TextView selectedView = (TextView) spinner.getSelectedView();
+        if (selectedView != null) {
+            selectedView.setTextColor(getResources().getColor(R.color.white));
+        }
 
         if(dialogtype!=null && dialogtype.equals(DIALOG_EDIT_TEXT_TITLE)){
 
@@ -99,9 +116,14 @@ public class Dialog2ForAddNewItemEntry extends DialogFragment implements
 
         if(view.getId() == R.id.addEntry && dialogtype.equals(DIALOG_EDIT_TEXT_TITLE)){
             updateData();
+
+
         }
         else if (view.getId() == R.id.addEntry && dialogtype!=DIALOG_EDIT_TEXT_TITLE) {
             SaveData();
+           // DialogForAddNewItemEntry.popUpRecyclerView();
+        }else if(view.getId()==R.id.cancel_btn1){
+            this.dismiss();
         }
         else {
             this.dismiss();
@@ -123,6 +145,10 @@ public class Dialog2ForAddNewItemEntry extends DialogFragment implements
 
         spinner = customView.findViewById(R.id.SPitemType);
         spinner.setOnItemSelectedListener(this);
+
+        cancelbtn=customView.findViewById(R.id.cancel_btn1);
+        cancelbtn.setOnClickListener(this);
+
 
     }
 
@@ -150,6 +176,10 @@ public class Dialog2ForAddNewItemEntry extends DialogFragment implements
             MNotificationClass.ShowToast(getContext(),"Some Fields Empty");
             return;
         }
+        else if(itemselectindex<=0){
+            MNotificationClass.ShowToast(getContext(),"Spinner is Empty");
+            return;
+        }else{
 
 
 
@@ -179,12 +209,16 @@ public class Dialog2ForAddNewItemEntry extends DialogFragment implements
             MNotificationClass.ShowToast(getContext(),"Item Not Added");
         }
 
-
+        }
     }
     public void updateData(){
         if(EditTextGroupName.getText().toString().isEmpty() || itemselectindex < 0  )
         {
             Toast.makeText(getContext(), "Some field are Empty", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        else if(itemselectindex<=0){
+            MNotificationClass.ShowToast(getContext(),"Spinner is Empty");
             return;
         }
         else {
@@ -197,6 +231,16 @@ public class Dialog2ForAddNewItemEntry extends DialogFragment implements
     public void setFieldsToEmpty(){
         EditTextGroupName.setText("");
         itemselectindex=0;
+        spinner.setSelection(0);
+
+    }
+
+    public class NullSpinnerItem {
+
+        @Override
+        public String toString() {
+            return "Select Value....";
+        }
 
     }
 
